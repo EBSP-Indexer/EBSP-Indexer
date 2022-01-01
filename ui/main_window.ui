@@ -76,7 +76,7 @@
      <x>0</x>
      <y>0</y>
      <width>1467</width>
-     <height>26</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -89,14 +89,21 @@
    </widget>
    <widget class="QMenu" name="menuProcessing">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="title">
      <string>Processing</string>
     </property>
+    <widget class="QMenu" name="menuPattern_center_optimization">
+     <property name="title">
+      <string>Pattern center optimization</string>
+     </property>
+     <addaction name="actionCalibration_patterns"/>
+     <addaction name="actionPattern_selection"/>
+    </widget>
     <addaction name="actionProcessingMenu"/>
     <addaction name="actionROI"/>
-    <addaction name="actionPattern_Center"/>
+    <addaction name="menuPattern_center_optimization"/>
    </widget>
    <widget class="QMenu" name="menuPatternInspection">
     <property name="enabled">
@@ -277,9 +284,6 @@
    <property name="floating">
     <bool>false</bool>
    </property>
-   <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
-   </property>
    <property name="windowTitle">
     <string>Job Manager</string>
    </property>
@@ -327,6 +331,12 @@
    </property>
   </action>
   <action name="actionProcessingMenu">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -351,11 +361,6 @@
   <action name="actionDictionaryIndexing">
    <property name="text">
     <string>Dictionary indexing</string>
-   </property>
-  </action>
-  <action name="actionPattern_Center">
-   <property name="text">
-    <string>Refine pattern center</string>
    </property>
   </action>
   <action name="actionROI">
@@ -477,11 +482,25 @@
     <string>Refine Crystal Map Orientations</string>
    </property>
   </action>
+  <action name="actionPattern_center_refinement">
+   <property name="text">
+    <string>Pattern center refinement</string>
+   </property>
+  </action>
+  <action name="actionCalibration_patterns">
+   <property name="text">
+    <string>Calibration patterns</string>
+   </property>
+  </action>
+  <action name="actionPattern_selection">
+   <property name="text">
+    <string>Pattern selection</string>
+   </property>
+  </action>
   <zorder>dockWidgetTerminal</zorder>
   <zorder>dockWidgetSystemExplorer</zorder>
   <zorder>dockWidgetImageViewer</zorder>
   <zorder>dockWidgetJobManager</zorder>
-  <zorder>dockWidgetSignalNavigation</zorder>
  </widget>
  <customwidgets>
   <customwidget>

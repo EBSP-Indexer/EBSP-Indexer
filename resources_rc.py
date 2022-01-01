@@ -6,851 +6,839 @@
 from PySide6 import QtCore
 
 qt_resource_data = b"\
-\x00\x00\x03Q\
+\x00\x00\x03H\
 <\
 ?xml version=\x221.\
 0\x22 encoding=\x22utf\
--8\x22?>\x0d\x0a<!-- Gene\
-rator: Adobe Ill\
-ustrator 16.0.0,\
- SVG Export Plug\
--In . SVG Versio\
-n: 6.00 Build 0)\
-  -->\x0d\x0a<!DOCTYPE\
- svg PUBLIC \x22-//\
-W3C//DTD SVG 1.1\
-//EN\x22 \x22http://ww\
-w.w3.org/Graphic\
-s/SVG/1.1/DTD/sv\
-g11.dtd\x22>\x0d\x0a<svg \
-version=\x221.1\x22 id\
-=\x22Layer_1\x22 xmlns\
-=\x22http://www.w3.\
-org/2000/svg\x22 xm\
-lns:xlink=\x22http:\
-//www.w3.org/199\
-9/xlink\x22 x=\x220px\x22\
- y=\x220px\x22\x0d\x0a\x09 widt\
-h=\x2264px\x22 height=\
-\x2264px\x22 viewBox=\x22\
-0 0 64 64\x22 enabl\
-e-background=\x22ne\
-w 0 0 64 64\x22 xml\
-:space=\x22preserve\
-\x22>\x0d\x0a<path fill=\x22\
-none\x22 stroke=\x22#0\
-00000\x22 stroke-wi\
-dth=\x222\x22 stroke-m\
-iterlimit=\x2210\x22 d\
-=\x22M53.919,10.08c\
-12.108,12.106,12\
-.108,31.733,0,43\
-.84\x0d\x0a\x09c-12.105,1\
-2.107-31.732,12.\
-107-43.838,0c-12\
-.108-12.106-12.1\
-08-31.733,0-43.8\
-4C22.187-2.027,4\
-1.813-2.027,53.9\
-19,10.08z\x22/>\x0d\x0a<l\
-ine fill=\x22none\x22 \
-stroke=\x22#000000\x22\
- stroke-width=\x222\
-\x22 stroke-miterli\
-mit=\x2210\x22 x1=\x2210.\
-08\x22 y1=\x2210.08\x22 x\
-2=\x2253.92\x22 y2=\x2253\
-.92\x22/>\x0d\x0a</svg>\x0d\x0a\
-\
-\x00\x00\x02Z\
-<\
-?xml version=\x221.\
-0\x22 encoding=\x22utf\
--8\x22?>\x0d\x0a<!-- Gene\
-rator: Adobe Ill\
-ustrator 16.0.0,\
- SVG Export Plug\
--In . SVG Versio\
-n: 6.00 Build 0)\
-  -->\x0d\x0a<!DOCTYPE\
- svg PUBLIC \x22-//\
-W3C//DTD SVG 1.1\
-//EN\x22 \x22http://ww\
-w.w3.org/Graphic\
-s/SVG/1.1/DTD/sv\
-g11.dtd\x22>\x0d\x0a<svg \
-version=\x221.1\x22 id\
-=\x22Layer_1\x22 xmlns\
-=\x22http://www.w3.\
-org/2000/svg\x22 xm\
-lns:xlink=\x22http:\
-//www.w3.org/199\
-9/xlink\x22 x=\x220px\x22\
- y=\x220px\x22\x0d\x0a\x09 widt\
-h=\x2264px\x22 height=\
-\x2264px\x22 viewBox=\x22\
-0 0 64 64\x22 enabl\
-e-background=\x22ne\
-w 0 0 64 64\x22 xml\
-:space=\x22preserve\
-\x22>\x0d\x0a<polygon fil\
+-8\x22?>\x0a<!-- Gener\
+ator: Adobe Illu\
+strator 16.0.0, \
+SVG Export Plug-\
+In . SVG Version\
+: 6.00 Build 0) \
+ -->\x0a<!DOCTYPE s\
+vg PUBLIC \x22-//W3\
+C//DTD SVG 1.1//\
+EN\x22 \x22http://www.\
+w3.org/Graphics/\
+SVG/1.1/DTD/svg1\
+1.dtd\x22>\x0a<svg ver\
+sion=\x221.1\x22 id=\x22L\
+ayer_1\x22 xmlns=\x22h\
+ttp://www.w3.org\
+/2000/svg\x22 xmlns\
+:xlink=\x22http://w\
+ww.w3.org/1999/x\
+link\x22 x=\x220px\x22 y=\
+\x220px\x22\x0a\x09 width=\x226\
+4px\x22 height=\x2264p\
+x\x22 viewBox=\x220 0 \
+64 64\x22 enable-ba\
+ckground=\x22new 0 \
+0 64 64\x22 xml:spa\
+ce=\x22preserve\x22>\x0a<\
+path fill=\x22none\x22\
+ stroke=\x22#000000\
+\x22 stroke-width=\x22\
+2\x22 stroke-miterl\
+imit=\x2210\x22 d=\x22M53\
+.919,10.08c12.10\
+8,12.106,12.108,\
+31.733,0,43.84\x0a\x09\
+c-12.105,12.107-\
+31.732,12.107-43\
+.838,0c-12.108-1\
+2.106-12.108-31.\
+733,0-43.84C22.1\
+87-2.027,41.813-\
+2.027,53.919,10.\
+08z\x22/>\x0a<line fil\
 l=\x22none\x22 stroke=\
 \x22#000000\x22 stroke\
 -width=\x222\x22 strok\
 e-miterlimit=\x2210\
-\x22 points=\x2263,18 \
-63,54 1,54 1,10 \
-22,10 30,18 \x22/>\x0d\
-\x0a</svg>\x0d\x0a\
-\x00\x00\x04\x1b\
+\x22 x1=\x2210.08\x22 y1=\
+\x2210.08\x22 x2=\x2253.9\
+2\x22 y2=\x2253.92\x22/>\x0a\
+</svg>\x0a\
+\x00\x00\x02S\
 <\
 ?xml version=\x221.\
 0\x22 encoding=\x22utf\
--8\x22?>\x0d\x0a<!-- Gene\
-rator: Adobe Ill\
-ustrator 16.0.0,\
- SVG Export Plug\
--In . SVG Versio\
-n: 6.00 Build 0)\
-  -->\x0d\x0a<!DOCTYPE\
- svg PUBLIC \x22-//\
-W3C//DTD SVG 1.1\
-//EN\x22 \x22http://ww\
-w.w3.org/Graphic\
-s/SVG/1.1/DTD/sv\
-g11.dtd\x22>\x0d\x0a<svg \
-version=\x221.1\x22 id\
-=\x22Layer_1\x22 xmlns\
-=\x22http://www.w3.\
-org/2000/svg\x22 xm\
-lns:xlink=\x22http:\
-//www.w3.org/199\
-9/xlink\x22 x=\x220px\x22\
- y=\x220px\x22\x0d\x0a\x09 widt\
-h=\x2264px\x22 height=\
-\x2264px\x22 viewBox=\x22\
-0 0 64 64\x22 enabl\
-e-background=\x22ne\
-w 0 0 64 64\x22 xml\
-:space=\x22preserve\
-\x22>\x0d\x0a<g>\x0d\x0a\x09<polyl\
-ine fill=\x22none\x22 \
-stroke=\x22#000000\x22\
- stroke-width=\x222\
-\x22 stroke-miterli\
-mit=\x2210\x22 points=\
-\x2225,8 25,1 39,1 \
-39,8 \x09\x22/>\x0d\x0a\x09<pol\
-yline fill=\x22none\
-\x22 stroke=\x22#00000\
-0\x22 stroke-width=\
-\x222\x22 stroke-miter\
-limit=\x2210\x22 point\
-s=\x2214,10 14,63 5\
-0,63 50,10 \x09\x22/>\x0d\
-\x0a\x09<line fill=\x22no\
+-8\x22?>\x0a<!-- Gener\
+ator: Adobe Illu\
+strator 16.0.0, \
+SVG Export Plug-\
+In . SVG Version\
+: 6.00 Build 0) \
+ -->\x0a<!DOCTYPE s\
+vg PUBLIC \x22-//W3\
+C//DTD SVG 1.1//\
+EN\x22 \x22http://www.\
+w3.org/Graphics/\
+SVG/1.1/DTD/svg1\
+1.dtd\x22>\x0a<svg ver\
+sion=\x221.1\x22 id=\x22L\
+ayer_1\x22 xmlns=\x22h\
+ttp://www.w3.org\
+/2000/svg\x22 xmlns\
+:xlink=\x22http://w\
+ww.w3.org/1999/x\
+link\x22 x=\x220px\x22 y=\
+\x220px\x22\x0a\x09 width=\x226\
+4px\x22 height=\x2264p\
+x\x22 viewBox=\x220 0 \
+64 64\x22 enable-ba\
+ckground=\x22new 0 \
+0 64 64\x22 xml:spa\
+ce=\x22preserve\x22>\x0a<\
+polygon fill=\x22no\
 ne\x22 stroke=\x22#000\
 000\x22 stroke-widt\
 h=\x222\x22 stroke-mit\
-erlimit=\x2210\x22 x1=\
-\x2226\x22 y1=\x2220\x22 x2=\
-\x2226\x22 y2=\x2254\x22/>\x0d\x0a\
+erlimit=\x2210\x22 poi\
+nts=\x2263,18 63,54\
+ 1,54 1,10 22,10\
+ 30,18 \x22/>\x0a</svg\
+>\x0a\
+\x00\x00\x04\x0e\
+<\
+?xml version=\x221.\
+0\x22 encoding=\x22utf\
+-8\x22?>\x0a<!-- Gener\
+ator: Adobe Illu\
+strator 16.0.0, \
+SVG Export Plug-\
+In . SVG Version\
+: 6.00 Build 0) \
+ -->\x0a<!DOCTYPE s\
+vg PUBLIC \x22-//W3\
+C//DTD SVG 1.1//\
+EN\x22 \x22http://www.\
+w3.org/Graphics/\
+SVG/1.1/DTD/svg1\
+1.dtd\x22>\x0a<svg ver\
+sion=\x221.1\x22 id=\x22L\
+ayer_1\x22 xmlns=\x22h\
+ttp://www.w3.org\
+/2000/svg\x22 xmlns\
+:xlink=\x22http://w\
+ww.w3.org/1999/x\
+link\x22 x=\x220px\x22 y=\
+\x220px\x22\x0a\x09 width=\x226\
+4px\x22 height=\x2264p\
+x\x22 viewBox=\x220 0 \
+64 64\x22 enable-ba\
+ckground=\x22new 0 \
+0 64 64\x22 xml:spa\
+ce=\x22preserve\x22>\x0a<\
+g>\x0a\x09<polyline fi\
+ll=\x22none\x22 stroke\
+=\x22#000000\x22 strok\
+e-width=\x222\x22 stro\
+ke-miterlimit=\x221\
+0\x22 points=\x2225,8 \
+25,1 39,1 39,8 \x09\
+\x22/>\x0a\x09<polyline f\
+ill=\x22none\x22 strok\
+e=\x22#000000\x22 stro\
+ke-width=\x222\x22 str\
+oke-miterlimit=\x22\
+10\x22 points=\x2214,1\
+0 14,63 50,63 50\
+,10 \x09\x22/>\x0a\x09<line \
+fill=\x22none\x22 stro\
+ke=\x22#000000\x22 str\
+oke-width=\x222\x22 st\
+roke-miterlimit=\
+\x2210\x22 x1=\x2226\x22 y1=\
+\x2220\x22 x2=\x2226\x22 y2=\
+\x2254\x22/>\x0a\x09<line fi\
+ll=\x22none\x22 stroke\
+=\x22#000000\x22 strok\
+e-width=\x222\x22 stro\
+ke-miterlimit=\x221\
+0\x22 x1=\x2238\x22 y1=\x222\
+0\x22 x2=\x2238\x22 y2=\x225\
+4\x22/>\x0a\x09<line fill\
+=\x22none\x22 stroke=\x22\
+#000000\x22 stroke-\
+width=\x222\x22 stroke\
+-miterlimit=\x2210\x22\
+ x1=\x2210\x22 y1=\x229\x22 \
+x2=\x2254\x22 y2=\x229\x22/>\
+\x0a</g>\x0a</svg>\x0a\
+\x00\x00\x03k\
+<\
+?xml version=\x221.\
+0\x22 encoding=\x22utf\
+-8\x22?>\x0a<!-- Gener\
+ator: Adobe Illu\
+strator 16.0.0, \
+SVG Export Plug-\
+In . SVG Version\
+: 6.00 Build 0) \
+ -->\x0a<!DOCTYPE s\
+vg PUBLIC \x22-//W3\
+C//DTD SVG 1.1//\
+EN\x22 \x22http://www.\
+w3.org/Graphics/\
+SVG/1.1/DTD/svg1\
+1.dtd\x22>\x0a<svg ver\
+sion=\x221.1\x22 id=\x22L\
+ayer_1\x22 xmlns=\x22h\
+ttp://www.w3.org\
+/2000/svg\x22 xmlns\
+:xlink=\x22http://w\
+ww.w3.org/1999/x\
+link\x22 x=\x220px\x22 y=\
+\x220px\x22\x0a\x09 width=\x226\
+4px\x22 height=\x2264p\
+x\x22 viewBox=\x220 0 \
+64 64\x22 enable-ba\
+ckground=\x22new 0 \
+0 64 64\x22 xml:spa\
+ce=\x22preserve\x22>\x0a<\
+g>\x0a\x09<polygon fil\
+l=\x22none\x22 stroke=\
+\x22#000000\x22 stroke\
+-width=\x222\x22 strok\
+e-miterlimit=\x2210\
+\x22 points=\x2232,1 2\
+6,1 26,10 20,12 \
+14,6 6,14 12,20 \
+\x0a\x09\x0910,26 1,26 1,\
+38 10,38 12,44 6\
+,50 14,58 20,52 \
+26,54 26,63 32,6\
+3 38,63 38,54 44\
+,52 50,58 58,50 \
+52,44 54,38 63,3\
+8 63,26 54,26 \x0a\x09\
+\x0952,20 58,14 50,\
+6 44,12 38,10 38\
+,1 \x09\x22/>\x0a\x09<circle\
+ fill=\x22none\x22 str\
+oke=\x22#000000\x22 st\
+roke-width=\x222\x22 s\
+troke-miterlimit\
+=\x2210\x22 cx=\x2232\x22 cy\
+=\x2232\x22 r=\x226\x22/>\x0a</\
+g>\x0a</svg>\x0a\
+\x00\x00\x032\
+<\
+?xml version=\x221.\
+0\x22 encoding=\x22utf\
+-8\x22?>\x0a<!-- Gener\
+ator: Adobe Illu\
+strator 16.0.0, \
+SVG Export Plug-\
+In . SVG Version\
+: 6.00 Build 0) \
+ -->\x0a<!DOCTYPE s\
+vg PUBLIC \x22-//W3\
+C//DTD SVG 1.1//\
+EN\x22 \x22http://www.\
+w3.org/Graphics/\
+SVG/1.1/DTD/svg1\
+1.dtd\x22>\x0a<svg ver\
+sion=\x221.1\x22 id=\x22L\
+ayer_1\x22 xmlns=\x22h\
+ttp://www.w3.org\
+/2000/svg\x22 xmlns\
+:xlink=\x22http://w\
+ww.w3.org/1999/x\
+link\x22 x=\x220px\x22 y=\
+\x220px\x22\x0a\x09 width=\x226\
+4px\x22 height=\x2264p\
+x\x22 viewBox=\x220 0 \
+64 64\x22 enable-ba\
+ckground=\x22new 0 \
+0 64 64\x22 xml:spa\
+ce=\x22preserve\x22>\x0a<\
+g>\x0a\x09<rect x=\x221\x22 \
+y=\x2211\x22 fill=\x22non\
+e\x22 stroke=\x22#0000\
+00\x22 stroke-width\
+=\x222\x22 stroke-mite\
+rlimit=\x2210\x22 widt\
+h=\x2262\x22 height=\x224\
+2\x22/>\x0a\x09<polyline \
+fill=\x22none\x22 stro\
+ke=\x22#000000\x22 str\
+oke-width=\x222\x22 st\
+roke-miterlimit=\
+\x2210\x22 points=\x221,4\
+7 24,27 36,39 42\
+,31 63,49 \x09\x22/>\x0a\x09\
+<circle fill=\x22no\
+ne\x22 stroke=\x22#000\
+000\x22 stroke-widt\
+h=\x222\x22 stroke-mit\
+erlimit=\x2210\x22 cx=\
+\x2251\x22 cy=\x2222\x22 r=\x22\
+5\x22/>\x0a</g>\x0a</svg>\
+\x0a\
+\x00\x00\x05\x01\
+<\
+?xml version=\x221.\
+0\x22 encoding=\x22utf\
+-8\x22?>\x0a<!-- Gener\
+ator: Adobe Illu\
+strator 16.0.0, \
+SVG Export Plug-\
+In . SVG Version\
+: 6.00 Build 0) \
+ -->\x0a<!DOCTYPE s\
+vg PUBLIC \x22-//W3\
+C//DTD SVG 1.1//\
+EN\x22 \x22http://www.\
+w3.org/Graphics/\
+SVG/1.1/DTD/svg1\
+1.dtd\x22>\x0a<svg ver\
+sion=\x221.1\x22 id=\x22L\
+ayer_1\x22 xmlns=\x22h\
+ttp://www.w3.org\
+/2000/svg\x22 xmlns\
+:xlink=\x22http://w\
+ww.w3.org/1999/x\
+link\x22 x=\x220px\x22 y=\
+\x220px\x22\x0a\x09 width=\x226\
+4px\x22 height=\x2264p\
+x\x22 viewBox=\x220 0 \
+64 64\x22 enable-ba\
+ckground=\x22new 0 \
+0 64 64\x22 xml:spa\
+ce=\x22preserve\x22>\x0a<\
+g>\x0a\x09<path fill=\x22\
+none\x22 stroke=\x22#0\
+00000\x22 stroke-wi\
+dth=\x222\x22 stroke-m\
+iterlimit=\x2210\x22 d\
+=\x22M53.92,10.081\x0a\
+\x09\x09c12.107,12.105\
+,12.107,31.732,0\
+,43.838c-12.106,\
+12.108-31.734,12\
+.108-43.84,0c-12\
+.107-12.105-12.1\
+07-31.732,0-43.8\
+38\x0a\x09\x09C22.186-2.0\
+27,41.813-2.027,\
+53.92,10.081z\x22/>\
+\x0a\x09<polyline fill\
+=\x22none\x22 stroke=\x22\
+#000000\x22 stroke-\
+width=\x222\x22 stroke\
+-miterlimit=\x2210\x22\
+ points=\x2232,12 3\
+2,32 41,41 \x09\x22/>\x0a\
 \x09<line fill=\x22non\
 e\x22 stroke=\x22#0000\
 00\x22 stroke-width\
 =\x222\x22 stroke-mite\
 rlimit=\x2210\x22 x1=\x22\
-38\x22 y1=\x2220\x22 x2=\x22\
-38\x22 y2=\x2254\x22/>\x0d\x0a\x09\
-<line fill=\x22none\
-\x22 stroke=\x22#00000\
-0\x22 stroke-width=\
-\x222\x22 stroke-miter\
-limit=\x2210\x22 x1=\x221\
-0\x22 y1=\x229\x22 x2=\x2254\
-\x22 y2=\x229\x22/>\x0d\x0a</g>\
-\x0d\x0a</svg>\x0d\x0a\
-\x00\x00\x03w\
-<\
-?xml version=\x221.\
-0\x22 encoding=\x22utf\
--8\x22?>\x0d\x0a<!-- Gene\
-rator: Adobe Ill\
-ustrator 16.0.0,\
- SVG Export Plug\
--In . SVG Versio\
-n: 6.00 Build 0)\
-  -->\x0d\x0a<!DOCTYPE\
- svg PUBLIC \x22-//\
-W3C//DTD SVG 1.1\
-//EN\x22 \x22http://ww\
-w.w3.org/Graphic\
-s/SVG/1.1/DTD/sv\
-g11.dtd\x22>\x0d\x0a<svg \
-version=\x221.1\x22 id\
-=\x22Layer_1\x22 xmlns\
-=\x22http://www.w3.\
-org/2000/svg\x22 xm\
-lns:xlink=\x22http:\
-//www.w3.org/199\
-9/xlink\x22 x=\x220px\x22\
- y=\x220px\x22\x0d\x0a\x09 widt\
-h=\x2264px\x22 height=\
-\x2264px\x22 viewBox=\x22\
-0 0 64 64\x22 enabl\
-e-background=\x22ne\
-w 0 0 64 64\x22 xml\
-:space=\x22preserve\
-\x22>\x0d\x0a<g>\x0d\x0a\x09<polyg\
-on fill=\x22none\x22 s\
+4\x22 y1=\x2232\x22 x2=\x228\
+\x22 y2=\x2232\x22/>\x0a\x09<li\
+ne fill=\x22none\x22 s\
 troke=\x22#000000\x22 \
 stroke-width=\x222\x22\
  stroke-miterlim\
-it=\x2210\x22 points=\x22\
-32,1 26,1 26,10 \
-20,12 14,6 6,14 \
-12,20 \x0d\x0a\x09\x0910,26 \
-1,26 1,38 10,38 \
-12,44 6,50 14,58\
- 20,52 26,54 26,\
-63 32,63 38,63 3\
-8,54 44,52 50,58\
- 58,50 52,44 54,\
-38 63,38 63,26 5\
-4,26 \x0d\x0a\x09\x0952,20 5\
-8,14 50,6 44,12 \
-38,10 38,1 \x09\x22/>\x0d\
+it=\x2210\x22 x1=\x2256\x22 \
+y1=\x2232\x22 x2=\x2260\x22 \
+y2=\x2232\x22/>\x0a\x09<line\
+ fill=\x22none\x22 str\
+oke=\x22#000000\x22 st\
+roke-width=\x222\x22 s\
+troke-miterlimit\
+=\x2210\x22 x1=\x2232\x22 y1\
+=\x2260\x22 x2=\x2232\x22 y2\
+=\x2256\x22/>\x0a\x09<line f\
+ill=\x22none\x22 strok\
+e=\x22#000000\x22 stro\
+ke-width=\x222\x22 str\
+oke-miterlimit=\x22\
+10\x22 x1=\x2232\x22 y1=\x22\
+8\x22 x2=\x2232\x22 y2=\x224\
+\x22/>\x0a</g>\x0a</svg>\x0a\
+\
+\x00\x00\x02\xde\
+<\
+?xml version=\x221.\
+0\x22 encoding=\x22utf\
+-8\x22?>\x0a<!-- Gener\
+ator: Adobe Illu\
+strator 16.0.0, \
+SVG Export Plug-\
+In . SVG Version\
+: 6.00 Build 0) \
+ -->\x0a<!DOCTYPE s\
+vg PUBLIC \x22-//W3\
+C//DTD SVG 1.1//\
+EN\x22 \x22http://www.\
+w3.org/Graphics/\
+SVG/1.1/DTD/svg1\
+1.dtd\x22>\x0a<svg ver\
+sion=\x221.1\x22 id=\x22L\
+ayer_1\x22 xmlns=\x22h\
+ttp://www.w3.org\
+/2000/svg\x22 xmlns\
+:xlink=\x22http://w\
+ww.w3.org/1999/x\
+link\x22 x=\x220px\x22 y=\
+\x220px\x22\x0a\x09 width=\x226\
+4px\x22 height=\x2264p\
+x\x22 viewBox=\x220 0 \
+64 64\x22 enable-ba\
+ckground=\x22new 0 \
+0 64 64\x22 xml:spa\
+ce=\x22preserve\x22>\x0a<\
+g>\x0a\x09<polyline fi\
+ll=\x22none\x22 stroke\
+=\x22#000000\x22 strok\
+e-width=\x222\x22 stro\
+ke-linejoin=\x22bev\
+el\x22 stroke-miter\
+limit=\x2210\x22 point\
+s=\x2213,33 25,45 \x0a\
+\x09\x0949,21 \x09\x22/>\x0a</g\
+>\x0a<g>\x0a\x09<circle f\
+ill=\x22none\x22 strok\
+e=\x22#000000\x22 stro\
+ke-width=\x222\x22 str\
+oke-miterlimit=\x22\
+10\x22 cx=\x2232\x22 cy=\x22\
+32\x22 r=\x2230.999\x22/>\
+\x0a</g>\x0a</svg>\x0a\
+\x00\x00\x02j\
+<\
+?xml version=\x221.\
+0\x22 encoding=\x22utf\
+-8\x22?>\x0a<!-- Gener\
+ator: Adobe Illu\
+strator 16.0.0, \
+SVG Export Plug-\
+In . SVG Version\
+: 6.00 Build 0) \
+ -->\x0a<!DOCTYPE s\
+vg PUBLIC \x22-//W3\
+C//DTD SVG 1.1//\
+EN\x22 \x22http://www.\
+w3.org/Graphics/\
+SVG/1.1/DTD/svg1\
+1.dtd\x22>\x0a<svg ver\
+sion=\x221.1\x22 id=\x22L\
+ayer_1\x22 xmlns=\x22h\
+ttp://www.w3.org\
+/2000/svg\x22 xmlns\
+:xlink=\x22http://w\
+ww.w3.org/1999/x\
+link\x22 x=\x220px\x22 y=\
+\x220px\x22\x0a\x09 width=\x226\
+4px\x22 height=\x2264p\
+x\x22 viewBox=\x220 0 \
+64 64\x22 enable-ba\
+ckground=\x22new 0 \
+0 64 64\x22 xml:spa\
+ce=\x22preserve\x22>\x0a<\
+g>\x0a\x09<polyline fi\
+ll=\x22none\x22 stroke\
+=\x22#000000\x22 strok\
+e-width=\x222\x22 stro\
+ke-linejoin=\x22bev\
+el\x22 stroke-miter\
+limit=\x2210\x22 point\
+s=\x2227,15 44,32 \x0a\
+\x09\x0927,49 \x09\x22/>\x0a</g\
+>\x0a</svg>\x0a\
+\x00\x00\x02\xe5\
+<\
+?xml version=\x221.\
+0\x22 encoding=\x22utf\
+-8\x22?>\x0a<!-- Gener\
+ator: Adobe Illu\
+strator 16.0.0, \
+SVG Export Plug-\
+In . SVG Version\
+: 6.00 Build 0) \
+ -->\x0a<!DOCTYPE s\
+vg PUBLIC \x22-//W3\
+C//DTD SVG 1.1//\
+EN\x22 \x22http://www.\
+w3.org/Graphics/\
+SVG/1.1/DTD/svg1\
+1.dtd\x22>\x0a<svg ver\
+sion=\x221.1\x22 id=\x22L\
+ayer_1\x22 xmlns=\x22h\
+ttp://www.w3.org\
+/2000/svg\x22 xmlns\
+:xlink=\x22http://w\
+ww.w3.org/1999/x\
+link\x22 x=\x220px\x22 y=\
+\x220px\x22\x0a\x09 width=\x226\
+4px\x22 height=\x2264p\
+x\x22 viewBox=\x220 0 \
+64 64\x22 enable-ba\
+ckground=\x22new 0 \
+0 64 64\x22 xml:spa\
+ce=\x22preserve\x22>\x0a<\
+g>\x0a\x09<line fill=\x22\
+none\x22 stroke=\x22#0\
+00000\x22 stroke-wi\
+dth=\x222\x22 stroke-m\
+iterlimit=\x2210\x22 x\
+1=\x2218.947\x22 y1=\x221\
+7.153\x22 x2=\x2245.04\
+5\x22 y2=\x2243.056\x22/>\
+\x0a</g>\x0a<g>\x0a\x09<line\
+ fill=\x22none\x22 str\
+oke=\x22#000000\x22 st\
+roke-width=\x222\x22 s\
+troke-miterlimit\
+=\x2210\x22 x1=\x2219.045\
+\x22 y1=\x2243.153\x22 x2\
+=\x2244.947\x22 y2=\x2217\
+.056\x22/>\x0a</g>\x0a</s\
+vg>\x0a\
+\x00\x00\x02j\
+<\
+?xml version=\x221.\
+0\x22 encoding=\x22utf\
+-8\x22?>\x0a<!-- Gener\
+ator: Adobe Illu\
+strator 16.0.0, \
+SVG Export Plug-\
+In . SVG Version\
+: 6.00 Build 0) \
+ -->\x0a<!DOCTYPE s\
+vg PUBLIC \x22-//W3\
+C//DTD SVG 1.1//\
+EN\x22 \x22http://www.\
+w3.org/Graphics/\
+SVG/1.1/DTD/svg1\
+1.dtd\x22>\x0a<svg ver\
+sion=\x221.1\x22 id=\x22L\
+ayer_1\x22 xmlns=\x22h\
+ttp://www.w3.org\
+/2000/svg\x22 xmlns\
+:xlink=\x22http://w\
+ww.w3.org/1999/x\
+link\x22 x=\x220px\x22 y=\
+\x220px\x22\x0a\x09 width=\x226\
+4px\x22 height=\x2264p\
+x\x22 viewBox=\x220 0 \
+64 64\x22 enable-ba\
+ckground=\x22new 0 \
+0 64 64\x22 xml:spa\
+ce=\x22preserve\x22>\x0a<\
+g>\x0a\x09<polyline fi\
+ll=\x22none\x22 stroke\
+=\x22#000000\x22 strok\
+e-width=\x222\x22 stro\
+ke-linejoin=\x22bev\
+el\x22 stroke-miter\
+limit=\x2210\x22 point\
+s=\x2215,40 32,23 \x0a\
+\x09\x0949,40 \x09\x22/>\x0a</g\
+>\x0a</svg>\x0a\
+\x00\x00\x03Y\
+<\
+?xml version=\x221.\
+0\x22 encoding=\x22utf\
+-8\x22?>\x0a<!-- Gener\
+ator: Adobe Illu\
+strator 16.0.0, \
+SVG Export Plug-\
+In . SVG Version\
+: 6.00 Build 0) \
+ -->\x0a<!DOCTYPE s\
+vg PUBLIC \x22-//W3\
+C//DTD SVG 1.1//\
+EN\x22 \x22http://www.\
+w3.org/Graphics/\
+SVG/1.1/DTD/svg1\
+1.dtd\x22>\x0a<svg ver\
+sion=\x221.1\x22 id=\x22L\
+ayer_1\x22 xmlns=\x22h\
+ttp://www.w3.org\
+/2000/svg\x22 xmlns\
+:xlink=\x22http://w\
+ww.w3.org/1999/x\
+link\x22 x=\x220px\x22 y=\
+\x220px\x22\x0a\x09 width=\x226\
+4px\x22 height=\x2264p\
+x\x22 viewBox=\x220 0 \
+64 64\x22 enable-ba\
+ckground=\x22new 0 \
+0 64 64\x22 xml:spa\
+ce=\x22preserve\x22>\x0a<\
+g>\x0a\x09<line fill=\x22\
+none\x22 stroke=\x22#0\
+00000\x22 stroke-wi\
+dth=\x222\x22 stroke-m\
+iterlimit=\x2210\x22 x\
+1=\x2218.947\x22 y1=\x221\
+7.153\x22 x2=\x2245.04\
+5\x22 y2=\x2243.056\x22/>\
+\x0a</g>\x0a<g>\x0a\x09<line\
+ fill=\x22none\x22 str\
+oke=\x22#000000\x22 st\
+roke-width=\x222\x22 s\
+troke-miterlimit\
+=\x2210\x22 x1=\x2219.045\
+\x22 y1=\x2243.153\x22 x2\
+=\x2244.947\x22 y2=\x2217\
+.056\x22/>\x0a</g>\x0a<g>\
 \x0a\x09<circle fill=\x22\
 none\x22 stroke=\x22#0\
 00000\x22 stroke-wi\
 dth=\x222\x22 stroke-m\
 iterlimit=\x2210\x22 c\
 x=\x2232\x22 cy=\x2232\x22 r\
-=\x226\x22/>\x0d\x0a</g>\x0d\x0a</\
-svg>\x0d\x0a\
-\x00\x00\x03=\
+=\x2230.999\x22/>\x0a</g>\
+\x0a</svg>\x0a\
+\x00\x00\x03\x93\
 <\
 ?xml version=\x221.\
 0\x22 encoding=\x22utf\
--8\x22?>\x0d\x0a<!-- Gene\
-rator: Adobe Ill\
-ustrator 16.0.0,\
- SVG Export Plug\
--In . SVG Versio\
-n: 6.00 Build 0)\
-  -->\x0d\x0a<!DOCTYPE\
- svg PUBLIC \x22-//\
-W3C//DTD SVG 1.1\
-//EN\x22 \x22http://ww\
-w.w3.org/Graphic\
-s/SVG/1.1/DTD/sv\
-g11.dtd\x22>\x0d\x0a<svg \
-version=\x221.1\x22 id\
-=\x22Layer_1\x22 xmlns\
-=\x22http://www.w3.\
-org/2000/svg\x22 xm\
-lns:xlink=\x22http:\
-//www.w3.org/199\
-9/xlink\x22 x=\x220px\x22\
- y=\x220px\x22\x0d\x0a\x09 widt\
-h=\x2264px\x22 height=\
-\x2264px\x22 viewBox=\x22\
-0 0 64 64\x22 enabl\
-e-background=\x22ne\
-w 0 0 64 64\x22 xml\
-:space=\x22preserve\
-\x22>\x0d\x0a<g>\x0d\x0a\x09<rect \
-x=\x221\x22 y=\x2211\x22 fil\
-l=\x22none\x22 stroke=\
-\x22#000000\x22 stroke\
--width=\x222\x22 strok\
-e-miterlimit=\x2210\
-\x22 width=\x2262\x22 hei\
-ght=\x2242\x22/>\x0d\x0a\x09<po\
-lyline fill=\x22non\
-e\x22 stroke=\x22#0000\
-00\x22 stroke-width\
-=\x222\x22 stroke-mite\
-rlimit=\x2210\x22 poin\
-ts=\x221,47 24,27 3\
-6,39 42,31 63,49\
- \x09\x22/>\x0d\x0a\x09<circle \
-fill=\x22none\x22 stro\
-ke=\x22#000000\x22 str\
-oke-width=\x222\x22 st\
-roke-miterlimit=\
-\x2210\x22 cx=\x2251\x22 cy=\
-\x2222\x22 r=\x225\x22/>\x0d\x0a</\
-g>\x0d\x0a</svg>\x0d\x0a\
-\x00\x00\x05\x11\
-<\
-?xml version=\x221.\
-0\x22 encoding=\x22utf\
--8\x22?>\x0d\x0a<!-- Gene\
-rator: Adobe Ill\
-ustrator 16.0.0,\
- SVG Export Plug\
--In . SVG Versio\
-n: 6.00 Build 0)\
-  -->\x0d\x0a<!DOCTYPE\
- svg PUBLIC \x22-//\
-W3C//DTD SVG 1.1\
-//EN\x22 \x22http://ww\
-w.w3.org/Graphic\
-s/SVG/1.1/DTD/sv\
-g11.dtd\x22>\x0d\x0a<svg \
-version=\x221.1\x22 id\
-=\x22Layer_1\x22 xmlns\
-=\x22http://www.w3.\
-org/2000/svg\x22 xm\
-lns:xlink=\x22http:\
-//www.w3.org/199\
-9/xlink\x22 x=\x220px\x22\
- y=\x220px\x22\x0d\x0a\x09 widt\
-h=\x2264px\x22 height=\
-\x2264px\x22 viewBox=\x22\
-0 0 64 64\x22 enabl\
-e-background=\x22ne\
-w 0 0 64 64\x22 xml\
-:space=\x22preserve\
-\x22>\x0d\x0a<g>\x0d\x0a\x09<path \
-fill=\x22none\x22 stro\
-ke=\x22#000000\x22 str\
-oke-width=\x222\x22 st\
-roke-miterlimit=\
-\x2210\x22 d=\x22M53.92,1\
-0.081\x0d\x0a\x09\x09c12.107\
-,12.105,12.107,3\
-1.732,0,43.838c-\
-12.106,12.108-31\
-.734,12.108-43.8\
-4,0c-12.107-12.1\
-05-12.107-31.732\
-,0-43.838\x0d\x0a\x09\x09C22\
-.186-2.027,41.81\
-3-2.027,53.92,10\
-.081z\x22/>\x0d\x0a\x09<poly\
-line fill=\x22none\x22\
+-8\x22?>\x0a<!-- Gener\
+ator: Adobe Illu\
+strator 16.0.0, \
+SVG Export Plug-\
+In . SVG Version\
+: 6.00 Build 0) \
+ -->\x0a<!DOCTYPE s\
+vg PUBLIC \x22-//W3\
+C//DTD SVG 1.1//\
+EN\x22 \x22http://www.\
+w3.org/Graphics/\
+SVG/1.1/DTD/svg1\
+1.dtd\x22>\x0a<svg ver\
+sion=\x221.1\x22 id=\x22L\
+ayer_1\x22 xmlns=\x22h\
+ttp://www.w3.org\
+/2000/svg\x22 xmlns\
+:xlink=\x22http://w\
+ww.w3.org/1999/x\
+link\x22 x=\x220px\x22 y=\
+\x220px\x22\x0a\x09 width=\x226\
+4px\x22 height=\x2264p\
+x\x22 viewBox=\x220 0 \
+64 64\x22 enable-ba\
+ckground=\x22new 0 \
+0 64 64\x22 xml:spa\
+ce=\x22preserve\x22>\x0a<\
+path fill=\x22none\x22\
  stroke=\x22#000000\
 \x22 stroke-width=\x22\
 2\x22 stroke-miterl\
-imit=\x2210\x22 points\
-=\x2232,12 32,32 41\
-,41 \x09\x22/>\x0d\x0a\x09<line\
+imit=\x2210\x22 d=\x22M53\
+.92,10.081c12.10\
+7,12.105,12.107,\
+31.732,0,43.838\x0a\
+\x09c-12.106,12.108\
+-31.734,12.108-4\
+3.839,0c-12.107-\
+12.105-12.107-31\
+.732,0-43.838C22\
+.186-2.027,41.81\
+3-2.027,53.92,10\
+.081z\x22/>\x0a<line s\
+troke=\x22#000000\x22 \
+stroke-width=\x222\x22\
+ stroke-miterlim\
+it=\x2210\x22 x1=\x2232\x22 \
+y1=\x2217\x22 x2=\x2232\x22 \
+y2=\x2239\x22/>\x0a<line \
+stroke=\x22#000000\x22\
+ stroke-width=\x222\
+\x22 stroke-miterli\
+mit=\x2210\x22 x1=\x2232\x22\
+ y1=\x2243\x22 x2=\x2232\x22\
+ y2=\x2247\x22/>\x0a</svg\
+>\x0a\
+\x00\x00\x02j\
+<\
+?xml version=\x221.\
+0\x22 encoding=\x22utf\
+-8\x22?>\x0a<!-- Gener\
+ator: Adobe Illu\
+strator 16.0.0, \
+SVG Export Plug-\
+In . SVG Version\
+: 6.00 Build 0) \
+ -->\x0a<!DOCTYPE s\
+vg PUBLIC \x22-//W3\
+C//DTD SVG 1.1//\
+EN\x22 \x22http://www.\
+w3.org/Graphics/\
+SVG/1.1/DTD/svg1\
+1.dtd\x22>\x0a<svg ver\
+sion=\x221.1\x22 id=\x22L\
+ayer_1\x22 xmlns=\x22h\
+ttp://www.w3.org\
+/2000/svg\x22 xmlns\
+:xlink=\x22http://w\
+ww.w3.org/1999/x\
+link\x22 x=\x220px\x22 y=\
+\x220px\x22\x0a\x09 width=\x226\
+4px\x22 height=\x2264p\
+x\x22 viewBox=\x220 0 \
+64 64\x22 enable-ba\
+ckground=\x22new 0 \
+0 64 64\x22 xml:spa\
+ce=\x22preserve\x22>\x0a<\
+g>\x0a\x09<polyline fi\
+ll=\x22none\x22 stroke\
+=\x22#000000\x22 strok\
+e-width=\x222\x22 stro\
+ke-linejoin=\x22bev\
+el\x22 stroke-miter\
+limit=\x2210\x22 point\
+s=\x2215,24 32,41 \x0a\
+\x09\x0949,24 \x09\x22/>\x0a</g\
+>\x0a</svg>\x0a\
+\x00\x00\x03\xcf\
+<\
+?xml version=\x221.\
+0\x22 encoding=\x22utf\
+-8\x22?>\x0a<!-- Gener\
+ator: Adobe Illu\
+strator 16.0.0, \
+SVG Export Plug-\
+In . SVG Version\
+: 6.00 Build 0) \
+ -->\x0a<!DOCTYPE s\
+vg PUBLIC \x22-//W3\
+C//DTD SVG 1.0//\
+EN\x22 \x22http://www.\
+w3.org/TR/2001/R\
+EC-SVG-20010904/\
+DTD/svg10.dtd\x22>\x0a\
+<svg version=\x221.\
+0\x22 id=\x22Layer_1\x22 \
+xmlns=\x22http://ww\
+w.w3.org/2000/sv\
+g\x22 xmlns:xlink=\x22\
+http://www.w3.or\
+g/1999/xlink\x22 x=\
+\x220px\x22 y=\x220px\x22\x0a\x09 \
+width=\x2264px\x22 hei\
+ght=\x2264px\x22 viewB\
+ox=\x220 0 64 64\x22 e\
+nable-background\
+=\x22new 0 0 64 64\x22\
+ xml:space=\x22pres\
+erve\x22>\x0a<polyline\
  fill=\x22none\x22 str\
 oke=\x22#000000\x22 st\
 roke-width=\x222\x22 s\
 troke-miterlimit\
-=\x2210\x22 x1=\x224\x22 y1=\
-\x2232\x22 x2=\x228\x22 y2=\x22\
-32\x22/>\x0d\x0a\x09<line fi\
-ll=\x22none\x22 stroke\
-=\x22#000000\x22 strok\
-e-width=\x222\x22 stro\
-ke-miterlimit=\x221\
-0\x22 x1=\x2256\x22 y1=\x223\
-2\x22 x2=\x2260\x22 y2=\x223\
-2\x22/>\x0d\x0a\x09<line fil\
-l=\x22none\x22 stroke=\
-\x22#000000\x22 stroke\
--width=\x222\x22 strok\
-e-miterlimit=\x2210\
-\x22 x1=\x2232\x22 y1=\x2260\
-\x22 x2=\x2232\x22 y2=\x2256\
-\x22/>\x0d\x0a\x09<line fill\
-=\x22none\x22 stroke=\x22\
-#000000\x22 stroke-\
-width=\x222\x22 stroke\
--miterlimit=\x2210\x22\
- x1=\x2232\x22 y1=\x228\x22 \
-x2=\x2232\x22 y2=\x224\x22/>\
-\x0d\x0a</g>\x0d\x0a</svg>\x0d\x0a\
-\
-\x00\x00\x02\xeb\
-<\
-?xml version=\x221.\
-0\x22 encoding=\x22utf\
--8\x22?>\x0d\x0a<!-- Gene\
-rator: Adobe Ill\
-ustrator 16.0.0,\
- SVG Export Plug\
--In . SVG Versio\
-n: 6.00 Build 0)\
-  -->\x0d\x0a<!DOCTYPE\
- svg PUBLIC \x22-//\
-W3C//DTD SVG 1.1\
-//EN\x22 \x22http://ww\
-w.w3.org/Graphic\
-s/SVG/1.1/DTD/sv\
-g11.dtd\x22>\x0d\x0a<svg \
-version=\x221.1\x22 id\
-=\x22Layer_1\x22 xmlns\
-=\x22http://www.w3.\
-org/2000/svg\x22 xm\
-lns:xlink=\x22http:\
-//www.w3.org/199\
-9/xlink\x22 x=\x220px\x22\
- y=\x220px\x22\x0d\x0a\x09 widt\
-h=\x2264px\x22 height=\
-\x2264px\x22 viewBox=\x22\
-0 0 64 64\x22 enabl\
-e-background=\x22ne\
-w 0 0 64 64\x22 xml\
-:space=\x22preserve\
-\x22>\x0d\x0a<g>\x0d\x0a\x09<polyl\
-ine fill=\x22none\x22 \
-stroke=\x22#000000\x22\
- stroke-width=\x222\
-\x22 stroke-linejoi\
-n=\x22bevel\x22 stroke\
--miterlimit=\x2210\x22\
- points=\x2213,33 2\
-5,45 \x0d\x0a\x09\x0949,21 \x09\
-\x22/>\x0d\x0a</g>\x0d\x0a<g>\x0d\x0a\
-\x09<circle fill=\x22n\
-one\x22 stroke=\x22#00\
-0000\x22 stroke-wid\
-th=\x222\x22 stroke-mi\
-terlimit=\x2210\x22 cx\
-=\x2232\x22 cy=\x2232\x22 r=\
-\x2230.999\x22/>\x0d\x0a</g>\
-\x0d\x0a</svg>\x0d\x0a\
-\x00\x00\x02t\
-<\
-?xml version=\x221.\
-0\x22 encoding=\x22utf\
--8\x22?>\x0d\x0a<!-- Gene\
-rator: Adobe Ill\
-ustrator 16.0.0,\
- SVG Export Plug\
--In . SVG Versio\
-n: 6.00 Build 0)\
-  -->\x0d\x0a<!DOCTYPE\
- svg PUBLIC \x22-//\
-W3C//DTD SVG 1.1\
-//EN\x22 \x22http://ww\
-w.w3.org/Graphic\
-s/SVG/1.1/DTD/sv\
-g11.dtd\x22>\x0d\x0a<svg \
-version=\x221.1\x22 id\
-=\x22Layer_1\x22 xmlns\
-=\x22http://www.w3.\
-org/2000/svg\x22 xm\
-lns:xlink=\x22http:\
-//www.w3.org/199\
-9/xlink\x22 x=\x220px\x22\
- y=\x220px\x22\x0d\x0a\x09 widt\
-h=\x2264px\x22 height=\
-\x2264px\x22 viewBox=\x22\
-0 0 64 64\x22 enabl\
-e-background=\x22ne\
-w 0 0 64 64\x22 xml\
-:space=\x22preserve\
-\x22>\x0d\x0a<g>\x0d\x0a\x09<polyl\
-ine fill=\x22none\x22 \
-stroke=\x22#000000\x22\
- stroke-width=\x222\
-\x22 stroke-linejoi\
-n=\x22bevel\x22 stroke\
--miterlimit=\x2210\x22\
- points=\x2227,15 4\
-4,32 \x0d\x0a\x09\x0927,49 \x09\
-\x22/>\x0d\x0a</g>\x0d\x0a</svg\
->\x0d\x0a\
-\x00\x00\x02\xf1\
-<\
-?xml version=\x221.\
-0\x22 encoding=\x22utf\
--8\x22?>\x0d\x0a<!-- Gene\
-rator: Adobe Ill\
-ustrator 16.0.0,\
- SVG Export Plug\
--In . SVG Versio\
-n: 6.00 Build 0)\
-  -->\x0d\x0a<!DOCTYPE\
- svg PUBLIC \x22-//\
-W3C//DTD SVG 1.1\
-//EN\x22 \x22http://ww\
-w.w3.org/Graphic\
-s/SVG/1.1/DTD/sv\
-g11.dtd\x22>\x0d\x0a<svg \
-version=\x221.1\x22 id\
-=\x22Layer_1\x22 xmlns\
-=\x22http://www.w3.\
-org/2000/svg\x22 xm\
-lns:xlink=\x22http:\
-//www.w3.org/199\
-9/xlink\x22 x=\x220px\x22\
- y=\x220px\x22\x0d\x0a\x09 widt\
-h=\x2264px\x22 height=\
-\x2264px\x22 viewBox=\x22\
-0 0 64 64\x22 enabl\
-e-background=\x22ne\
-w 0 0 64 64\x22 xml\
-:space=\x22preserve\
-\x22>\x0d\x0a<g>\x0d\x0a\x09<line \
-fill=\x22none\x22 stro\
-ke=\x22#000000\x22 str\
-oke-width=\x222\x22 st\
-roke-miterlimit=\
-\x2210\x22 x1=\x2218.947\x22\
- y1=\x2217.153\x22 x2=\
-\x2245.045\x22 y2=\x2243.\
-056\x22/>\x0d\x0a</g>\x0d\x0a<g\
->\x0d\x0a\x09<line fill=\x22\
-none\x22 stroke=\x22#0\
-00000\x22 stroke-wi\
-dth=\x222\x22 stroke-m\
-iterlimit=\x2210\x22 x\
-1=\x2219.045\x22 y1=\x224\
-3.153\x22 x2=\x2244.94\
-7\x22 y2=\x2217.056\x22/>\
-\x0d\x0a</g>\x0d\x0a</svg>\x0d\x0a\
-\
-\x00\x00\x02t\
-<\
-?xml version=\x221.\
-0\x22 encoding=\x22utf\
--8\x22?>\x0d\x0a<!-- Gene\
-rator: Adobe Ill\
-ustrator 16.0.0,\
- SVG Export Plug\
--In . SVG Versio\
-n: 6.00 Build 0)\
-  -->\x0d\x0a<!DOCTYPE\
- svg PUBLIC \x22-//\
-W3C//DTD SVG 1.1\
-//EN\x22 \x22http://ww\
-w.w3.org/Graphic\
-s/SVG/1.1/DTD/sv\
-g11.dtd\x22>\x0d\x0a<svg \
-version=\x221.1\x22 id\
-=\x22Layer_1\x22 xmlns\
-=\x22http://www.w3.\
-org/2000/svg\x22 xm\
-lns:xlink=\x22http:\
-//www.w3.org/199\
-9/xlink\x22 x=\x220px\x22\
- y=\x220px\x22\x0d\x0a\x09 widt\
-h=\x2264px\x22 height=\
-\x2264px\x22 viewBox=\x22\
-0 0 64 64\x22 enabl\
-e-background=\x22ne\
-w 0 0 64 64\x22 xml\
-:space=\x22preserve\
-\x22>\x0d\x0a<g>\x0d\x0a\x09<polyl\
-ine fill=\x22none\x22 \
-stroke=\x22#000000\x22\
- stroke-width=\x222\
-\x22 stroke-linejoi\
-n=\x22bevel\x22 stroke\
--miterlimit=\x2210\x22\
- points=\x2215,40 3\
-2,23 \x0d\x0a\x09\x0949,40 \x09\
-\x22/>\x0d\x0a</g>\x0d\x0a</svg\
->\x0d\x0a\
-\x00\x00\x03h\
-<\
-?xml version=\x221.\
-0\x22 encoding=\x22utf\
--8\x22?>\x0d\x0a<!-- Gene\
-rator: Adobe Ill\
-ustrator 16.0.0,\
- SVG Export Plug\
--In . SVG Versio\
-n: 6.00 Build 0)\
-  -->\x0d\x0a<!DOCTYPE\
- svg PUBLIC \x22-//\
-W3C//DTD SVG 1.1\
-//EN\x22 \x22http://ww\
-w.w3.org/Graphic\
-s/SVG/1.1/DTD/sv\
-g11.dtd\x22>\x0d\x0a<svg \
-version=\x221.1\x22 id\
-=\x22Layer_1\x22 xmlns\
-=\x22http://www.w3.\
-org/2000/svg\x22 xm\
-lns:xlink=\x22http:\
-//www.w3.org/199\
-9/xlink\x22 x=\x220px\x22\
- y=\x220px\x22\x0d\x0a\x09 widt\
-h=\x2264px\x22 height=\
-\x2264px\x22 viewBox=\x22\
-0 0 64 64\x22 enabl\
-e-background=\x22ne\
-w 0 0 64 64\x22 xml\
-:space=\x22preserve\
-\x22>\x0d\x0a<g>\x0d\x0a\x09<line \
-fill=\x22none\x22 stro\
-ke=\x22#000000\x22 str\
-oke-width=\x222\x22 st\
-roke-miterlimit=\
-\x2210\x22 x1=\x2218.947\x22\
- y1=\x2217.153\x22 x2=\
-\x2245.045\x22 y2=\x2243.\
-056\x22/>\x0d\x0a</g>\x0d\x0a<g\
->\x0d\x0a\x09<line fill=\x22\
-none\x22 stroke=\x22#0\
-00000\x22 stroke-wi\
-dth=\x222\x22 stroke-m\
-iterlimit=\x2210\x22 x\
-1=\x2219.045\x22 y1=\x224\
-3.153\x22 x2=\x2244.94\
-7\x22 y2=\x2217.056\x22/>\
-\x0d\x0a</g>\x0d\x0a<g>\x0d\x0a\x09<c\
-ircle fill=\x22none\
-\x22 stroke=\x22#00000\
-0\x22 stroke-width=\
-\x222\x22 stroke-miter\
-limit=\x2210\x22 cx=\x223\
-2\x22 cy=\x2232\x22 r=\x2230\
-.999\x22/>\x0d\x0a</g>\x0d\x0a<\
-/svg>\x0d\x0a\
-\x00\x00\x03\x9d\
-<\
-?xml version=\x221.\
-0\x22 encoding=\x22utf\
--8\x22?>\x0d\x0a<!-- Gene\
-rator: Adobe Ill\
-ustrator 16.0.0,\
- SVG Export Plug\
--In . SVG Versio\
-n: 6.00 Build 0)\
-  -->\x0d\x0a<!DOCTYPE\
- svg PUBLIC \x22-//\
-W3C//DTD SVG 1.1\
-//EN\x22 \x22http://ww\
-w.w3.org/Graphic\
-s/SVG/1.1/DTD/sv\
-g11.dtd\x22>\x0d\x0a<svg \
-version=\x221.1\x22 id\
-=\x22Layer_1\x22 xmlns\
-=\x22http://www.w3.\
-org/2000/svg\x22 xm\
-lns:xlink=\x22http:\
-//www.w3.org/199\
-9/xlink\x22 x=\x220px\x22\
- y=\x220px\x22\x0d\x0a\x09 widt\
-h=\x2264px\x22 height=\
-\x2264px\x22 viewBox=\x22\
-0 0 64 64\x22 enabl\
-e-background=\x22ne\
-w 0 0 64 64\x22 xml\
-:space=\x22preserve\
-\x22>\x0d\x0a<path fill=\x22\
-none\x22 stroke=\x22#0\
-00000\x22 stroke-wi\
-dth=\x222\x22 stroke-m\
-iterlimit=\x2210\x22 d\
-=\x22M53.92,10.081c\
-12.107,12.105,12\
-.107,31.732,0,43\
-.838\x0d\x0a\x09c-12.106,\
-12.108-31.734,12\
-.108-43.839,0c-1\
-2.107-12.105-12.\
-107-31.732,0-43.\
-838C22.186-2.027\
-,41.813-2.027,53\
-.92,10.081z\x22/>\x0d\x0a\
-<line stroke=\x22#0\
-00000\x22 stroke-wi\
-dth=\x222\x22 stroke-m\
-iterlimit=\x2210\x22 x\
-1=\x2232\x22 y1=\x2217\x22 x\
-2=\x2232\x22 y2=\x2239\x22/>\
-\x0d\x0a<line stroke=\x22\
-#000000\x22 stroke-\
-width=\x222\x22 stroke\
--miterlimit=\x2210\x22\
- x1=\x2232\x22 y1=\x2243\x22\
- x2=\x2232\x22 y2=\x2247\x22\
-/>\x0d\x0a</svg>\x0d\x0a\
-\x00\x00\x02t\
-<\
-?xml version=\x221.\
-0\x22 encoding=\x22utf\
--8\x22?>\x0d\x0a<!-- Gene\
-rator: Adobe Ill\
-ustrator 16.0.0,\
- SVG Export Plug\
--In . SVG Versio\
-n: 6.00 Build 0)\
-  -->\x0d\x0a<!DOCTYPE\
- svg PUBLIC \x22-//\
-W3C//DTD SVG 1.1\
-//EN\x22 \x22http://ww\
-w.w3.org/Graphic\
-s/SVG/1.1/DTD/sv\
-g11.dtd\x22>\x0d\x0a<svg \
-version=\x221.1\x22 id\
-=\x22Layer_1\x22 xmlns\
-=\x22http://www.w3.\
-org/2000/svg\x22 xm\
-lns:xlink=\x22http:\
-//www.w3.org/199\
-9/xlink\x22 x=\x220px\x22\
- y=\x220px\x22\x0d\x0a\x09 widt\
-h=\x2264px\x22 height=\
-\x2264px\x22 viewBox=\x22\
-0 0 64 64\x22 enabl\
-e-background=\x22ne\
-w 0 0 64 64\x22 xml\
-:space=\x22preserve\
-\x22>\x0d\x0a<g>\x0d\x0a\x09<polyl\
-ine fill=\x22none\x22 \
-stroke=\x22#000000\x22\
- stroke-width=\x222\
-\x22 stroke-linejoi\
-n=\x22bevel\x22 stroke\
--miterlimit=\x2210\x22\
- points=\x2215,24 3\
-2,41 \x0d\x0a\x09\x0949,24 \x09\
-\x22/>\x0d\x0a</g>\x0d\x0a</svg\
->\x0d\x0a\
-\x00\x00\x03\xdb\
-<\
-?xml version=\x221.\
-0\x22 encoding=\x22utf\
--8\x22?>\x0d\x0a<!-- Gene\
-rator: Adobe Ill\
-ustrator 16.0.0,\
- SVG Export Plug\
--In . SVG Versio\
-n: 6.00 Build 0)\
-  -->\x0d\x0a<!DOCTYPE\
- svg PUBLIC \x22-//\
-W3C//DTD SVG 1.0\
-//EN\x22 \x22http://ww\
-w.w3.org/TR/2001\
-/REC-SVG-2001090\
-4/DTD/svg10.dtd\x22\
->\x0d\x0a<svg version=\
-\x221.0\x22 id=\x22Layer_\
-1\x22 xmlns=\x22http:/\
-/www.w3.org/2000\
-/svg\x22 xmlns:xlin\
-k=\x22http://www.w3\
-.org/1999/xlink\x22\
- x=\x220px\x22 y=\x220px\x22\
-\x0d\x0a\x09 width=\x2264px\x22\
- height=\x2264px\x22 v\
-iewBox=\x220 0 64 6\
-4\x22 enable-backgr\
-ound=\x22new 0 0 64\
- 64\x22 xml:space=\x22\
-preserve\x22>\x0d\x0a<pol\
-yline fill=\x22none\
-\x22 stroke=\x22#00000\
-0\x22 stroke-width=\
-\x222\x22 stroke-miter\
-limit=\x2210\x22 strok\
-e-dasharray=\x224,2\
-\x22 points=\x221,28 1\
-,1 63,1 \x0d\x0a\x0963,63\
- 36,63 \x22/>\x0d\x0a<rec\
-t x=\x221\x22 y=\x2233\x22 f\
-ill=\x22none\x22 strok\
-e=\x22#000000\x22 stro\
-ke-width=\x222\x22 str\
-oke-miterlimit=\x22\
-10\x22 width=\x2230\x22 h\
-eight=\x2230\x22/>\x0d\x0a<p\
-olyline fill=\x22no\
+=\x2210\x22 stroke-das\
+harray=\x224,2\x22 poi\
+nts=\x221,28 1,1 63\
+,1 \x0a\x0963,63 36,63\
+ \x22/>\x0a<rect x=\x221\x22\
+ y=\x2233\x22 fill=\x22no\
 ne\x22 stroke=\x22#000\
 000\x22 stroke-widt\
-h=\x222\x22 stroke-lin\
-ejoin=\x22bevel\x22 st\
-roke-miterlimit=\
-\x2210\x22 points=\x2257,\
-18 57,7 46,7 \x0d\x0a\x09\
-\x22/>\x0d\x0a<line fill=\
+h=\x222\x22 stroke-mit\
+erlimit=\x2210\x22 wid\
+th=\x2230\x22 height=\x22\
+30\x22/>\x0a<polyline \
+fill=\x22none\x22 stro\
+ke=\x22#000000\x22 str\
+oke-width=\x222\x22 st\
+roke-linejoin=\x22b\
+evel\x22 stroke-mit\
+erlimit=\x2210\x22 poi\
+nts=\x2257,18 57,7 \
+46,7 \x0a\x09\x22/>\x0a<line\
+ fill=\x22none\x22 str\
+oke=\x22#000000\x22 st\
+roke-width=\x222\x22 s\
+troke-miterlimit\
+=\x2210\x22 x1=\x2257\x22 y1\
+=\x227\x22 x2=\x2241\x22 y2=\
+\x2223\x22/>\x0a</svg>\x0a\
+\x00\x00\x07=\
+<\
+?xml version=\x221.\
+0\x22 encoding=\x22utf\
+-8\x22?>\x0a<!-- Gener\
+ator: Adobe Illu\
+strator 16.0.0, \
+SVG Export Plug-\
+In . SVG Version\
+: 6.00 Build 0) \
+ -->\x0a<!DOCTYPE s\
+vg PUBLIC \x22-//W3\
+C//DTD SVG 1.0//\
+EN\x22 \x22http://www.\
+w3.org/TR/2001/R\
+EC-SVG-20010904/\
+DTD/svg10.dtd\x22>\x0a\
+<svg version=\x221.\
+0\x22 id=\x22Layer_1\x22 \
+xmlns=\x22http://ww\
+w.w3.org/2000/sv\
+g\x22 xmlns:xlink=\x22\
+http://www.w3.or\
+g/1999/xlink\x22 x=\
+\x220px\x22 y=\x220px\x22\x0a\x09 \
+width=\x2264px\x22 hei\
+ght=\x2264px\x22 viewB\
+ox=\x220 0 64 64\x22 e\
+nable-background\
+=\x22new 0 0 64 64\x22\
+ xml:space=\x22pres\
+erve\x22>\x0a<polyline\
+ fill=\x22none\x22 str\
+oke=\x22#000000\x22 st\
+roke-width=\x222\x22 s\
+troke-miterlimit\
+=\x2210\x22 points=\x221,\
+30 1,1 63,1 63,6\
+3 34,63 \x22/>\x0a<g>\x0a\
+\x09<g>\x0a\x09\x09<polyline\
+ fill=\x22none\x22 str\
+oke=\x22#000000\x22 st\
+roke-width=\x222\x22 s\
+troke-miterlimit\
+=\x2210\x22 points=\x2231\
+,35 31,33 29,33 \
+\x09\x09\x22/>\x0a\x09\x09\x0a\x09\x09\x09<lin\
+e fill=\x22none\x22 st\
+roke=\x22#000000\x22 s\
+troke-width=\x222\x22 \
+stroke-miterlimi\
+t=\x2210\x22 stroke-da\
+sharray=\x224,2\x22 x1\
+=\x2227\x22 y1=\x2233\x22 x2\
+=\x224\x22 y2=\x2233\x22/>\x0a\x09\
+\x09<polyline fill=\
 \x22none\x22 stroke=\x22#\
 000000\x22 stroke-w\
 idth=\x222\x22 stroke-\
 miterlimit=\x2210\x22 \
-x1=\x2257\x22 y1=\x227\x22 x\
-2=\x2241\x22 y2=\x2223\x22/>\
-\x0d\x0a</svg>\x0d\x0a\
-\x00\x00\x07W\
-<\
-?xml version=\x221.\
-0\x22 encoding=\x22utf\
--8\x22?>\x0d\x0a<!-- Gene\
-rator: Adobe Ill\
-ustrator 16.0.0,\
- SVG Export Plug\
--In . SVG Versio\
-n: 6.00 Build 0)\
-  -->\x0d\x0a<!DOCTYPE\
- svg PUBLIC \x22-//\
-W3C//DTD SVG 1.0\
-//EN\x22 \x22http://ww\
-w.w3.org/TR/2001\
-/REC-SVG-2001090\
-4/DTD/svg10.dtd\x22\
->\x0d\x0a<svg version=\
-\x221.0\x22 id=\x22Layer_\
-1\x22 xmlns=\x22http:/\
-/www.w3.org/2000\
-/svg\x22 xmlns:xlin\
-k=\x22http://www.w3\
-.org/1999/xlink\x22\
- x=\x220px\x22 y=\x220px\x22\
-\x0d\x0a\x09 width=\x2264px\x22\
- height=\x2264px\x22 v\
-iewBox=\x220 0 64 6\
-4\x22 enable-backgr\
-ound=\x22new 0 0 64\
- 64\x22 xml:space=\x22\
-preserve\x22>\x0d\x0a<pol\
-yline fill=\x22none\
-\x22 stroke=\x22#00000\
-0\x22 stroke-width=\
-\x222\x22 stroke-miter\
-limit=\x2210\x22 point\
-s=\x221,30 1,1 63,1\
- 63,63 34,63 \x22/>\
-\x0d\x0a<g>\x0d\x0a\x09<g>\x0d\x0a\x09\x09<\
-polyline fill=\x22n\
+points=\x223,33 1,3\
+3 1,35 \x09\x09\x22/>\x0a\x09\x09\x0a\
+\x09\x09\x09<line fill=\x22n\
 one\x22 stroke=\x22#00\
 0000\x22 stroke-wid\
 th=\x222\x22 stroke-mi\
-terlimit=\x2210\x22 po\
-ints=\x2231,35 31,3\
-3 29,33 \x09\x09\x22/>\x0d\x0a\x09\
-\x09\x0d\x0a\x09\x09\x09<line fill\
-=\x22none\x22 stroke=\x22\
-#000000\x22 stroke-\
-width=\x222\x22 stroke\
--miterlimit=\x2210\x22\
- stroke-dasharra\
-y=\x224,2\x22 x1=\x2227\x22 \
-y1=\x2233\x22 x2=\x224\x22 y\
-2=\x2233\x22/>\x0d\x0a\x09\x09<pol\
-yline fill=\x22none\
-\x22 stroke=\x22#00000\
-0\x22 stroke-width=\
-\x222\x22 stroke-miter\
-limit=\x2210\x22 point\
-s=\x223,33 1,33 1,3\
-5 \x09\x09\x22/>\x0d\x0a\x09\x09\x0d\x0a\x09\x09\x09\
-<line fill=\x22none\
-\x22 stroke=\x22#00000\
-0\x22 stroke-width=\
-\x222\x22 stroke-miter\
-limit=\x2210\x22 strok\
-e-dasharray=\x224,2\
-\x22 x1=\x221\x22 y1=\x2237\x22\
- x2=\x221\x22 y2=\x2260\x22/\
->\x0d\x0a\x09\x09<polyline f\
-ill=\x22none\x22 strok\
-e=\x22#000000\x22 stro\
-ke-width=\x222\x22 str\
-oke-miterlimit=\x22\
-10\x22 points=\x221,61\
- 1,63 3,63 \x09\x09\x22/>\
-\x0d\x0a\x09\x09\x0d\x0a\x09\x09\x09<line f\
+terlimit=\x2210\x22 st\
+roke-dasharray=\x22\
+4,2\x22 x1=\x221\x22 y1=\x22\
+37\x22 x2=\x221\x22 y2=\x226\
+0\x22/>\x0a\x09\x09<polyline\
+ fill=\x22none\x22 str\
+oke=\x22#000000\x22 st\
+roke-width=\x222\x22 s\
+troke-miterlimit\
+=\x2210\x22 points=\x221,\
+61 1,63 3,63 \x09\x09\x22\
+/>\x0a\x09\x09\x0a\x09\x09\x09<line f\
 ill=\x22none\x22 strok\
 e=\x22#000000\x22 stro\
 ke-width=\x222\x22 str\
@@ -858,40 +846,39 @@ oke-miterlimit=\x22\
 10\x22 stroke-dasha\
 rray=\x224,2\x22 x1=\x225\
 \x22 y1=\x2263\x22 x2=\x2228\
-\x22 y2=\x2263\x22/>\x0d\x0a\x09\x09<\
-polyline fill=\x22n\
+\x22 y2=\x2263\x22/>\x0a\x09\x09<p\
+olyline fill=\x22no\
+ne\x22 stroke=\x22#000\
+000\x22 stroke-widt\
+h=\x222\x22 stroke-mit\
+erlimit=\x2210\x22 poi\
+nts=\x2229,63 31,63\
+ 31,61 \x09\x09\x22/>\x0a\x09\x09\x0a\
+\x09\x09\x09<line fill=\x22n\
 one\x22 stroke=\x22#00\
 0000\x22 stroke-wid\
 th=\x222\x22 stroke-mi\
-terlimit=\x2210\x22 po\
-ints=\x2229,63 31,6\
-3 31,61 \x09\x09\x22/>\x0d\x0a\x09\
-\x09\x0d\x0a\x09\x09\x09<line fill\
+terlimit=\x2210\x22 st\
+roke-dasharray=\x22\
+4,2\x22 x1=\x2231\x22 y1=\
+\x2259\x22 x2=\x2231\x22 y2=\
+\x2236\x22/>\x0a\x09</g>\x0a</g\
+>\x0a<polyline fill\
 =\x22none\x22 stroke=\x22\
 #000000\x22 stroke-\
 width=\x222\x22 stroke\
--miterlimit=\x2210\x22\
- stroke-dasharra\
-y=\x224,2\x22 x1=\x2231\x22 \
-y1=\x2259\x22 x2=\x2231\x22 \
-y2=\x2236\x22/>\x0d\x0a\x09</g>\
-\x0d\x0a</g>\x0d\x0a<polylin\
-e fill=\x22none\x22 st\
-roke=\x22#000000\x22 s\
-troke-width=\x222\x22 \
-stroke-linejoin=\
-\x22bevel\x22 stroke-m\
-iterlimit=\x2210\x22 p\
-oints=\x2241,12 41,\
-23 \x0d\x0a\x0952,23 \x22/>\x0d\
-\x0a<line fill=\x22non\
-e\x22 stroke=\x22#0000\
-00\x22 stroke-width\
-=\x222\x22 stroke-mite\
-rlimit=\x2210\x22 x1=\x22\
-41\x22 y1=\x2223\x22 x2=\x22\
-57\x22 y2=\x227\x22/>\x0d\x0a</\
-svg>\x0d\x0a\
+-linejoin=\x22bevel\
+\x22 stroke-miterli\
+mit=\x2210\x22 points=\
+\x2241,12 41,23 \x0a\x095\
+2,23 \x22/>\x0a<line f\
+ill=\x22none\x22 strok\
+e=\x22#000000\x22 stro\
+ke-width=\x222\x22 str\
+oke-miterlimit=\x22\
+10\x22 x1=\x2241\x22 y1=\x22\
+23\x22 x2=\x2257\x22 y2=\x22\
+7\x22/>\x0a</svg>\x0a\
 \x00\x02Z&\
 \x00\
 \x00\x01\x00\x06\x00\x00\x00\x00\x00\x01\x00 \x00\xb8\xd4\x00\
@@ -10656,46 +10643,46 @@ qt_resource_struct = b"\
 \x00\x00\x00\x00\x00\x00\x00\x00\
 \x00\x00\x01\x8a\x00\x02\x00\x00\x00\x07\x00\x00\x00\x07\
 \x00\x00\x00\x00\x00\x00\x00\x00\
-\x00\x00\x01\xe8\x00\x00\x00\x00\x00\x01\x00\x00\x18\x92\
-\x00\x00\x01\x87\x08\xf7\xc8+\
-\x00\x00\x02V\x00\x00\x00\x00\x00\x01\x00\x00 w\
-\x00\x00\x01\x87\x08\xf7\xc7\xef\
-\x00\x00\x02\x8c\x00\x00\x00\x00\x00\x01\x00\x00#\xe3\
-\x00\x00\x01\x87\x08\xf7\xc8\x06\
-\x00\x00\x02\xbe\x00\x00\x00\x00\x00\x01\x00\x00'\x84\
-\x00\x00\x01\x87\x08\xf7\xc7\xf9\
-\x00\x00\x01\xb4\x00\x00\x00\x00\x00\x01\x00\x00\x15\xa3\
-\x00\x00\x01\x87\x08\xf7\xc7\xea\
-\x00\x00\x026\x00\x00\x00\x00\x00\x01\x00\x00\x1d\xff\
-\x00\x00\x01\x87\x08\xf7\xc8a\
-\x00\x00\x02\x0e\x00\x00\x00\x00\x00\x01\x00\x00\x1b\x0a\
-\x00\x00\x01\x87\x08\xf7\xc8)\
+\x00\x00\x01\xe8\x00\x00\x00\x00\x00\x01\x00\x00\x18A\
+\x00\x00\x01\x86\x9d\xd0\xd9.\
+\x00\x00\x02V\x00\x00\x00\x00\x00\x01\x00\x00 \x06\
+\x00\x00\x01\x86\x9d\xd0\xd9!\
+\x00\x00\x02\x8c\x00\x00\x00\x00\x00\x01\x00\x00#c\
+\x00\x00\x01\x86\x9d\xd0\xd9&\
+\x00\x00\x02\xbe\x00\x00\x00\x00\x00\x01\x00\x00&\xfa\
+\x00\x00\x01\x86\x9d\xd0\xd9$\
+\x00\x00\x01\xb4\x00\x00\x00\x00\x00\x01\x00\x00\x15_\
+\x00\x00\x01\x86\x9d\xd0\xd9\x1f\
+\x00\x00\x026\x00\x00\x00\x00\x00\x01\x00\x00\x1d\x98\
+\x00\x00\x01\x86\x9d\xd0\xd9:\
+\x00\x00\x02\x0e\x00\x00\x00\x00\x00\x01\x00\x00\x1a\xaf\
+\x00\x00\x01\x86\x9d\xd0\xd9-\
 \x00\x00\x00l\x00\x02\x00\x00\x00\x01\x00\x00\x00\x0f\
 \x00\x00\x00\x00\x00\x00\x00\x00\
 \x00\x00\x00\x84\x00\x02\x00\x00\x00\x06\x00\x00\x00\x10\
 \x00\x00\x00\x00\x00\x00\x00\x00\
-\x00\x00\x00\xcc\x00\x00\x00\x00\x00\x01\x00\x00\x03U\
-\x00\x00\x01\x87\x08\xf7\xc8\x86\
-\x00\x00\x01f\x00\x00\x00\x00\x00\x01\x00\x00\x10\x8e\
-\x00\x00\x01\x87\x08\xf7\xc8y\
+\x00\x00\x00\xcc\x00\x00\x00\x00\x00\x01\x00\x00\x03L\
+\x00\x00\x01\x86\x9d\xd0\xd9E\
+\x00\x00\x01f\x00\x00\x00\x00\x00\x01\x00\x00\x10Z\
+\x00\x00\x01\x86\x9d\xd0\xd9A\
 \x00\x00\x00\xac\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\
-\x00\x00\x01\x87\x08\xf7\xc8k\
-\x00\x00\x01\x1c\x00\x00\x00\x00\x00\x01\x00\x00\x09\xd2\
-\x00\x00\x01\x87\x08\xf7\xc8\x87\
-\x00\x00\x00\xf2\x00\x00\x00\x00\x00\x01\x00\x00\x05\xb3\
-\x00\x00\x01\x87\x08\xf7\xc8\xce\
-\x00\x00\x01>\x00\x00\x00\x00\x00\x01\x00\x00\x0dM\
-\x00\x00\x01\x87\x08\xf7\xc8\xaf\
+\x00\x00\x01\x86\x9d\xd0\xd9=\
+\x00\x00\x01\x1c\x00\x00\x00\x00\x00\x01\x00\x00\x09\xb5\
+\x00\x00\x01\x86\x9d\xd0\xd9F\
+\x00\x00\x00\xf2\x00\x00\x00\x00\x00\x01\x00\x00\x05\xa3\
+\x00\x00\x01\x86\x9d\xd0\xd9`\
+\x00\x00\x01>\x00\x00\x00\x00\x00\x01\x00\x00\x0d$\
+\x00\x00\x01\x86\x9d\xd0\xd9X\
 \x00\x00\x00l\x00\x02\x00\x00\x00\x01\x00\x00\x00\x17\
 \x00\x00\x00\x00\x00\x00\x00\x00\
 \x00\x00\x02\xe2\x00\x02\x00\x00\x00\x02\x00\x00\x00\x18\
 \x00\x00\x00\x00\x00\x00\x00\x00\
-\x00\x00\x03\x10\x00\x00\x00\x00\x00\x01\x00\x00)\xfc\
-\x00\x00\x01\x87\x08\xf7\xc9#\
-\x00\x00\x03H\x00\x00\x00\x00\x00\x01\x00\x00-\xdb\
-\x00\x00\x01\x87\x08\xf7\xc9#\
-\x00\x00\x03\x80\x00\x00\x00\x00\x00\x01\x00\x0056\
-\x00\x00\x01\x87\x99T\xa6\x91\
+\x00\x00\x03\x10\x00\x00\x00\x00\x00\x01\x00\x00)h\
+\x00\x00\x01\x86\x9d\xd0\xd9y\
+\x00\x00\x03H\x00\x00\x00\x00\x00\x01\x00\x00-;\
+\x00\x00\x01\x86\x9d\xd0\xd9y\
+\x00\x00\x03\x80\x00\x00\x00\x00\x00\x01\x00\x004|\
+\x00\x00\x01\x87\x98\xaf\x80g\
 "
 
 def qInitResources():
