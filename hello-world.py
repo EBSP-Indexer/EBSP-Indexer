@@ -1,5 +1,5 @@
 print("Hello world")
-print("Hello Hallvard")
+print("Hello Olav")
 for i in range(3):
 
     print(i+1, "banan")
