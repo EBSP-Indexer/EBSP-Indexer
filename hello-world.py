@@ -13,7 +13,6 @@ for i in range(3):
 
 print("Bye bye")
 
-
 print("Hello Hallvard")
 for i in range(3):
     print(i)
