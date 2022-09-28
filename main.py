@@ -1,5 +1,5 @@
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt6 import QtWidgets
+from PyQt6.QtWidgets import QApplication, QMainWindow
 import sys
 
 def window():
@@ -13,7 +13,7 @@ def window():
     label.move(50,50)
 
     win.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 def main():
     window()
