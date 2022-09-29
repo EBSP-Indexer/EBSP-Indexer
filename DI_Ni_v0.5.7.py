@@ -1,16 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# # Dictionary indexing
-#
-# Håkon Wiik Ånes (hakon.w.anes@ntnu.no) and Jarle Hjelen, 2021-12-17
-#
-# See the kikuchipy manual (`kikuchipy/kikuchipy_manuals`) or the user guide notebooks (`kikuchipy/kikuchipy_user_guide_notebooks`)
-# for further details. These are also available at https://kikuchipy.org.
-#
-# ENDRE KUN DISSE PARAMETRENE:
-
-
 # Mappe med Pattern.dat. Må ligge i C:/EBSD data/Data set
 sample = "C:\EBSD data\DI data\Al 60x60"
 
