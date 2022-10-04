@@ -1,5 +1,5 @@
 # Mappe med Pattern.dat. Må ligge i C:/EBSD data/Data set
-sample = "C:\EBSD data\DI data\Al 60x60"
+sample = "Al 60x60"
 
 # Pattern Center og prøvetilt for prøve-detektor-modell
 pc = (0.489, 0.800, 0.497)
