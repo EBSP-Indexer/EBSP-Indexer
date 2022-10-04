@@ -14,6 +14,7 @@ pg_dict = {
     "ti_alpha": "6_mmm",  # 6/mmm
     "ti_beta": "m-3m",
 }
+
 # Fase og energi for master pattern
 phase = "al"  # al, austenite, ferrite, ni, si, ti_alpha, ti_beta
 pg = pg_dict[phase]
@@ -25,7 +26,7 @@ new_signal_shape = (60, 60)
 disori = 1.8  # Degrees
 
 # Sirkulær maske kan anvendes under indisering (ikke refinement enda)
-use_signal_mask = False  # True or False
+use_signal_mask = True  # True or False
 
 # Antall mønstre å matche under hver iterasjon av DI (tidligere n_slices).
 # Tryggest å ikke sette denne (None). Høyere antall bruker generelt mer minne,
@@ -37,7 +38,7 @@ n_per_iteration = None
 # 1 - Orientation
 # 2 - Projection center
 # 3 - Orientation and projection center
-refine = 0
+refine = 1
 
 
 import hyperspy.api as hs
@@ -57,7 +58,7 @@ dir_sim = os.path.join(dir_top, "ebsd_simulations")
 dir_ori_samp = os.path.join(dir_top, "orientation_sampling")
 
 # Paths to data (change)
-dir_data = "C:\EBSD data\DI dataset"
+dir_data = "C:\EBSD data\DI data"
 dir_sample = os.path.join(dir_data, sample)
 dir_nordif = dir_sample
 
@@ -72,10 +73,10 @@ for i in range(1, 100):
         print(
             f"Directory '{dir_out}' exists, will try to create directory '{dir_out[:-1] + str(i + 1)}'"
         )
+
 savefig_kwargs = dict(bbox_inches="tight", pad_inches=0, dpi=150)
 
 t0 = time()
-
 
 class SettingFile:
     def __init__(self, file_path):
@@ -100,8 +101,7 @@ file = os.path.join(dir_nordif, "Pattern.dat")
 s = kp.load(
     file, lazy=False
 )  # Set lazy=True if Pattern.dat is close to or greater than available memory
-s
-
+print(s)
 sem_md = s.metadata.Acquisition_instrument.SEM
 
 energy = sem_md.beam_energy
@@ -110,7 +110,7 @@ energy = sem_md.beam_energy
 sample_tilt = sem_md.Detector.EBSD.sample_tilt
 # sample_tilt = 70  # Degrees
 
-# s.plot()
+s.plot()
 
 
 # ## Set up setting file
@@ -173,33 +173,34 @@ vbse_gen
 red = (2, 1)
 green = (2, 2)
 blue = (2, 3)
-# p = vbse_gen.plot_grid(rgb_channels=[red, green, blue])
-# p._plot.signal_plot.figure.savefig(os.path.join(dir_out, "vbse_rgb_grid.png"), **savefig_kwargs)
+p = vbse_gen.plot_grid(rgb_channels=[red, green, blue])
+p._plot.signal_plot.figure.savefig(os.path.join(dir_out, "vbse_rgb_grid.png"), **savefig_kwargs)
 
 vbse_rgb_img = vbse_gen.get_rgb_image(r=red, g=green, b=blue)
 vbse_rgb_img.change_dtype("uint8")
 plt.imsave(os.path.join(dir_out, "vbse_rgb.png"), vbse_rgb_img.data)
-# s.plot(navigator=vbse_rgb_img)
+s.plot(navigator=vbse_rgb_img)
 
 
 # #### One image per VBSE grid tile
 
 vbse_gen.grid_shape = (3, 3)
-# p = vbse_gen.plot_grid()
-# p._plot.signal_plot.figure.savefig(os.path.join(dir_out, "vbse_grid2.png"), **savefig_kwargs)
+p = vbse_gen.plot_grid()
+p._plot.signal_plot.figure.savefig(os.path.join(dir_out, "vbse_grid2.png"), **savefig_kwargs)
 
 
 vbse_imgs = vbse_gen.get_images_from_grid()
 vbse_imgs.rescale_intensity(out_range=(0, 1), percentiles=(0.5, 99.5))
-# vbse_imgs.plot()
-# s.plot(navigator=vbse_imgs.inav[1, 2])
+vbse_imgs.plot()
+s.plot(navigator=vbse_imgs.inav[1, 2])
 
 fig, ax = plt.subplots(nrows=3, ncols=3)
 for idx in np.ndindex(vbse_imgs.axes_manager.navigation_shape[::-1]):
     img = vbse_imgs.data[idx]
+    print(idx)
     ax[idx].imshow(img, cmap="gray")
     ax[idx].axis("off")
-#    plt.imsave(os.path.join(dir_out, f"vbse_img_y{idx[0]}_x{idx[1]}.png"), arr=img, cmap="gray")
+    plt.imsave(os.path.join(dir_out, f"vbse_img_y{idx[0]}_x{idx[1]}.png"), arr=img, cmap="gray")
 fig.tight_layout(w_pad=0.5, h_pad=0.5)
 fig.savefig(os.path.join(dir_out, "vbse_img.png"), **savefig_kwargs)
 
@@ -217,7 +218,7 @@ f_settings.write("Static background corrected", True)
 s.remove_dynamic_background()
 f_settings.write("Dynamic background corrected", True)
 
-# s.plot(navigator=vbse_rgb_img)
+s.plot(navigator=vbse_rgb_img)
 
 window = kp.filters.Window("gaussian", std=1)
 # fig = window.plot(return_figure=True)
@@ -241,7 +242,7 @@ window = kp.filters.Window("gaussian", std=1)
 
 iq = s.get_image_quality()
 plt.imsave(os.path.join(dir_out, "iq.png"), iq, cmap="gray")
-# s.plot(navigator=hs.signals.Signal2D(iq))
+s.plot(navigator=hs.signals.Signal2D(iq))
 
 
 # The average dot product map computation was implemented by Ole Natlandsmyr.
@@ -249,7 +250,7 @@ plt.imsave(os.path.join(dir_out, "iq.png"), iq, cmap="gray")
 
 adp = s.get_average_neighbour_dot_product_map()
 plt.imsave(os.path.join(dir_out, "adp.png"), adp, cmap="gray")
-# s.plot(navigator=hs.signals.Signal2D(adp))
+s.plot(navigator=hs.signals.Signal2D(adp))
 
 
 # ## Dictionary indexing

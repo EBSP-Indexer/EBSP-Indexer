@@ -40,7 +40,6 @@ n_per_iteration = None
 # 3 - Orientation and projection center
 refine = 0
 
-
 import hyperspy.api as hs
 import kikuchipy as kp
 import matplotlib.pyplot as plt
