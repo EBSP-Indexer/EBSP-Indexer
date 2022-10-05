@@ -1,6 +1,6 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow
-from PyQt5.uic import loadUi
+from PyQt6.QtWidgets import QApplication, QMainWindow
+from PyQt6.uic import loadUi
 
 from filebrowser import FileBrowser
 
@@ -33,4 +33,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     win = Ui_MainWindow()
     win.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
