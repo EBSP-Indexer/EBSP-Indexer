@@ -1,4 +1,5 @@
 env
-.vscode
+.vscode/
+vscode
 __pycache__
 pyvenv.cfg
