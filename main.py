@@ -2,6 +2,7 @@ import sys
 from os.path import join
 from PyQt6.QtWidgets import QApplication, QMainWindow
 from PyQt6.uic import loadUi
+from ui.ui_main_window import Ui_MainWindow
 
 from scripts.filebrowser import FileBrowser
 from scripts.pattern_processing import background_processor
@@ -17,7 +18,6 @@ class Ui_MainWindow(QMainWindow):
         """
         super(Ui_MainWindow, self).__init__()
         loadUi("ui/main_window.ui", self)
-        self.showMaximized()
         self.initFileBrowserPanel()
         self.initProcessingPanel()
 
