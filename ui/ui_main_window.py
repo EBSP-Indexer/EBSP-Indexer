@@ -21,7 +21,7 @@ class Ui_MainWindow(object):
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 600)
+        MainWindow.resize(933, 600)
         MainWindow.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         MainWindow.setAutoFillBackground(False)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -44,8 +44,10 @@ class Ui_MainWindow(object):
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 24))
         self.menubar.setObjectName("menubar")
-        self.menuFiles = QtWidgets.QMenu(self.menubar)
-        self.menuFiles.setObjectName("menuFiles")
+        self.menuFile = QtWidgets.QMenu(self.menubar)
+        self.menuFile.setObjectName("menuFile")
+        self.menuProcessing = QtWidgets.QMenu(self.menubar)
+        self.menuProcessing.setObjectName("menuProcessing")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -53,8 +55,12 @@ class Ui_MainWindow(object):
         self.actionOpen_Workfolder = QtGui.QAction(MainWindow)
         self.actionOpen_Workfolder.setStatusTip("")
         self.actionOpen_Workfolder.setObjectName("actionOpen_Workfolder")
-        self.menuFiles.addAction(self.actionOpen_Workfolder)
-        self.menubar.addAction(self.menuFiles.menuAction())
+        self.actionProcessingMenu = QtGui.QAction(MainWindow)
+        self.actionProcessingMenu.setObjectName("actionProcessingMenu")
+        self.menuFile.addAction(self.actionOpen_Workfolder)
+        self.menuProcessing.addAction(self.actionProcessingMenu)
+        self.menubar.addAction(self.menuFile.menuAction())
+        self.menubar.addAction(self.menuProcessing.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -63,9 +69,11 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "EBSD-GUI"))
         self.pathLabel.setText(_translate("MainWindow", "Path selected: "))
+        self.menuProcessing.setTitle(_translate("MainWindow", "Processing"))
+        self.actionOpen_Workfolder.setText(_translate("MainWindow", "Open Workfolder..."))
+        self.actionProcessingMenu.setText(_translate("MainWindow", "N/S improvement"))
         self.Button_open_pattern_processing.setText(_translate("MainWindow", "Pattern processing"))
         self.menuFiles.setTitle(_translate("MainWindow", "Files"))
-        self.actionOpen_Workfolder.setText(_translate("MainWindow", "Open Workfolder..."))
 
 if __name__ == "__main__":
     import sys

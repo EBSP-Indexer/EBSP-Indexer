@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>933</width>
     <height>600</height>
    </rect>
   </property>
@@ -62,13 +62,20 @@
      <height>24</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFiles">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>Files</string>
+     <string>File</string>
     </property>
     <addaction name="actionOpen_Workfolder"/>
    </widget>
-   <addaction name="menuFiles"/>
+   <widget class="QMenu" name="menuProcessing">
+    <property name="title">
+     <string>Processing</string>
+    </property>
+    <addaction name="actionProcessingMenu"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuProcessing"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen_Workfolder">
@@ -77,6 +84,11 @@
    </property>
    <property name="statusTip">
     <string/>
+   </property>
+  </action>
+  <action name="actionProcessingMenu">
+   <property name="text">
+    <string>N/S improvement</string>
    </property>
   </action>
  </widget>
