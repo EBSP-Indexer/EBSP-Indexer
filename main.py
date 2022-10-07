@@ -18,11 +18,11 @@ class Ui_MainWindow(QMainWindow):
         super(Ui_MainWindow, self).__init__()
         loadUi("ui/main_window.ui", self)
         self.showMaximized()
+        self.file_browser = FileBrowser(FileBrowser.OpenDirectory)
         self.initFileBrowserPanel()
         self.initProcessingPanel()
 
     def initFileBrowserPanel(self):
-        self.file_browser = FileBrowser(FileBrowser.OpenDirectory)
         self.actionOpen_Workfolder.triggered.connect(
             lambda: self.selectWorkingDirectory()
         )
