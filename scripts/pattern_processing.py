@@ -1,8 +1,12 @@
-class background_processor():
+import os
+import kikuchipy as kp
 
-    def __init__(self):
-        self.file = os.path.join(self.working.dir, "Pattern.dat")
-        self.s = kp.load(self.file, lazy=True)
+
+class background_processor:
+    def __init__(self, working_dir, save_path = "Patter_avg.h5"):
+        self.working_dir = working_dir
+        self.save_path = save_path
+        self.s = kp.load(os.path.join(working_dir, "Pattern.dat"), lazy=True)
 
     def remove_static(self):
         self.s.remove_static_background()
@@ -14,5 +18,5 @@ class background_processor():
         window = kp.filters.Window("gaussian", std=1)
         self.s.average_neighbour_patterns(window)
 
-    def save_to_file(self):
-        self.s.save(os.path.joing(self.working_dir, "Pattern_ave.h5"))
+    def save_to_file(self, save_path):
+        self.s.save(save_path)
