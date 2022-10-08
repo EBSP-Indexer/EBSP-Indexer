@@ -1,22 +1,76 @@
-import os
-import kikuchipy as kp
+from msilib.schema import Error
+from os import path
+from kikuchipy import load, filters
+from PyQt6.QtWidgets import QDialog
+
+from scripts.filebrowser import FileBrowser
+from ui.ui_pattern_processing_dialog import Ui_PatternProcessingWindow
 
 
-class background_processor:
-    def __init__(self, working_dir, save_path = "Patter_avg.h5"):
+class PatternProcessingDialog(QDialog):
+    def __init__(self, working_dir, save_name="Pattern_avg.h5"):
+        super().__init__()
         self.working_dir = working_dir
-        self.save_path = save_path
-        self.s = kp.load(os.path.join(working_dir, "Pattern.dat"), lazy=True)
+        self.save_path = f"{self.working_dir}/{save_name}"
+        self.ui = Ui_PatternProcessingWindow()
+        self.ui.setupUi(self)
+        self.setupConnections()
+        self.options = self.getOptions()
 
-    def remove_static(self):
-        self.s.remove_static_background()
+        try:
+            self.s = load(path.join(working_dir, "Pattern.dat"), lazy=True)
+        except Exception as e:
+            raise e
+        self.gaussian_window = filters.Window("gaussian", std=1)
 
-    def remove_dynamic(self):
-        self.s.remove_dynamic_background()
+        self.fileBrowser = FileBrowser(
+            mode=FileBrowser.SaveFile,
+            dirpath=self.working_dir,
+            filter_name="Hierarchical Data Format (*.h5);;NordifUF Pattern Files (*.dat)",
+        )
 
-    def averaging(self):
-        window = kp.filters.Window("gaussian", std=1)
-        self.s.average_neighbour_patterns(window)
+    def setupConnections(self):
+        self.ui.browseButton.clicked.connect(lambda: self.setSavePath())
+        self.ui.buttonBox.accepted.connect(lambda: self.apply_processing())
+        self.ui.buttonBox.rejected.connect(lambda: self.reject())
+        self.ui.pathLineEdit.setText(self.save_path)
 
-    def save_to_file(self, save_path):
-        self.s.save(save_path)
+    def setSavePath(self):
+        if self.fileBrowser.getFile():
+            self.save_path = self.fileBrowser.getPaths()[0]
+            self.ui.pathLineEdit.setText(self.save_path)
+
+    def getOptions(self) -> dict:
+        return {
+            "static": {
+                self.ui.staticBackgroundBox.isChecked(),
+                lambda: self.s.remove_static_background(),
+            },
+            "dynamic": {
+                self.ui.dynamicBackgroundBox.isChecked(),
+                lambda: self.s.remove_dynamic_background(),
+            },
+            "average": {
+                self.ui.averageBox.isChecked(),
+                lambda: self.s.average_neighbour_patterns(self.gaussian_window),
+            },
+        }
+
+    def apply_processing(self):
+        self.options = self.getOptions()
+        for optionName, optionInfo in self.options.items():
+            optionEnabled, optionExecute = optionInfo
+            print(f"{optionName}: {optionEnabled}")
+            if optionEnabled:
+                optionExecute
+        try:
+            filepath = self.ui.pathLineEdit.text()
+            self.s.save(
+                filename=filepath,
+                overwrite=True,
+                extension=path.splitext(filepath)[1][1:],
+            )
+            self.accept()
+        except Exception as e:
+            print(f"Could not save processed pattern: {e}")
+            self.reject()
