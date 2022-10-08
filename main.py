@@ -34,12 +34,12 @@ class AppWindow(QMainWindow):
             self.setWindowTitle(f"EBSD-GUI - {self.working_dir}")
 
     def selectProcessing(self):
-        #try:
-        self.processingDialog = PatternProcessingDialog(self.working_dir)
-        self.processingDialog.show()
-        #except Exception as e:
-        #    print(e)
-        #    print("Could not initialize processing dialog")
+        try:
+            self.processingDialog = PatternProcessingDialog(self.working_dir)
+            self.processingDialog.show()
+        except Exception as e:
+            print(e)
+            print("Could not initialize processing dialog")
 
 
 if __name__ == "__main__":

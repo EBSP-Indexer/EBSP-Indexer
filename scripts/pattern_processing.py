@@ -19,9 +19,8 @@ class PatternProcessingDialog(QDialog):
 
         try:
             self.s = load(path.join(working_dir, "Pattern.dat"), lazy=True)
-        except:
-            print("No Pattern.dat file was found")
-            raise ValueError
+        except Exception as e:
+            raise e
         self.gaussian_window = filters.Window("gaussian", std=1)
 
         self.fileBrowser = FileBrowser(
@@ -66,8 +65,6 @@ class PatternProcessingDialog(QDialog):
                 optionExecute
         try:
             filepath = self.ui.pathLineEdit.text()
-            print(filepath)
-            print(path.splitext(filepath)[1])
             self.s.save(
                 filename=filepath,
                 overwrite=True,
