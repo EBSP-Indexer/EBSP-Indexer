@@ -32,7 +32,8 @@ This class will be the Ui class of our python logic class.
 After initializing the Ui class in our Python class to the variable self.ui, call self.ui.setupUi(self) to set up the designed GUI.
 Then another help method can be defined (e.g. setupConnections()) to connect self.ui and its elements to python functions/ logic. 
 
-Example 
+Example template
+```
 from ui.ui_python_widget import Ui_PythonWidget()
 
 class PythonWidget(QWidget):
@@ -46,3 +47,4 @@ class PythonWidget(QWidget):
     def setupConnections(self):
         *Connect GUI elements that exists in Ui_QtForm() to python functions here
         ...
+```
