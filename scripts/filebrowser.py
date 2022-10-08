@@ -4,9 +4,8 @@ from PyQt6.QtWidgets import QWidget, QFileDialog
 import sys
 
 # sourcecode: https://www.fundza.com/pyqt_pyside2/pyqt5_file_browser/index.html
-# A simple widget consisting of a QLabel, a QLineEdit and a
-# QPushButton. The class could be implemented in a separate
-# script called, say, file_browser.py
+
+
 class FileBrowser(QWidget):
 
     OpenFile = 0
@@ -14,14 +13,16 @@ class FileBrowser(QWidget):
     OpenDirectory = 2
     SaveFile = 3
 
-    def __init__(self, mode=OpenFile):
+    def __init__(
+        self, mode=OpenFile, dirpath=QDir.currentPath(), filter_name="All files (*.*)"
+    ):
         QWidget.__init__(self)
         self.browser_mode = mode
-        self.filter_name = "All files (*.*)"
-        self.dirpath = QDir.currentPath()
+        self.dirpath = dirpath
+        self.filter_name = filter_name
 
-    def setMode(self, mode):
-        self.mode = mode
+    def setMode(self, browser_mode):
+        self.browser_mode = browser_mode
 
     def setFileFilter(self, text):
         self.filter_name = text
@@ -29,9 +30,11 @@ class FileBrowser(QWidget):
     def setDefaultDir(self, path):
         self.dirpath = path
 
-    def getFile(self):
+    def getFile(self) -> int:
+        """
+        Method returns 1 if one or more paths are set. Abort/ cancel returns 0
+        """
         self.filepaths = []
-
         if self.browser_mode == FileBrowser.OpenFile:
             self.filepaths.append(
                 QFileDialog.getOpenFileName(
@@ -57,7 +60,7 @@ class FileBrowser(QWidget):
                 )
             )
         elif self.browser_mode == FileBrowser.SaveFile:
-            options = QFileDialog.Options()
+            options = QFileDialog.options(QFileDialog())
             if sys.platform == "darwin":
                 options |= QFileDialog.DontUseNativeDialog
             self.filepaths.append(
@@ -69,8 +72,9 @@ class FileBrowser(QWidget):
                     options=options,
                 )[0]
             )
-        if len(self.filepaths) == 0:
-            return
+        if self.filepaths[0] == "":
+            return 0
+        return 1
 
     def getPaths(self):
         return self.filepaths
