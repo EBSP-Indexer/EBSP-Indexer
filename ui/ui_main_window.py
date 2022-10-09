@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'c:\EBSD-GUI-erlenmos\ui\main_window.ui'
+# Form implementation generated from reading ui file 'c:\EBSD-GUI\ui\main_window.ui'
 #
 # Created by: PyQt6 UI code generator 6.4.0
 #

@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'c:\EBSD-GUI-erlenmos\ui\pattern_processing_dialog.ui'
+# Form implementation generated from reading ui file 'c:\EBSD-GUI\ui\pattern_processing_dialog.ui'
 #
 # Created by: PyQt6 UI code generator 6.4.0
 #
