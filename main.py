@@ -1,39 +1,49 @@
 import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow
-from PyQt6.uic import loadUi
+from ui.ui_main_window import Ui_MainWindow
 
 from scripts.filebrowser import FileBrowser
+from scripts.pattern_processing import PatternProcessingDialog
 
 
-class Ui_MainWindow(QMainWindow):
+class AppWindow(QMainWindow):
+    """
+    The main app window that is present at all times
+    """
 
     working_dir = ""
 
     def __init__(self) -> None:
-        """
-        Initializes the main window by loading the .ui file and initialize functionality
-        """
-        super(Ui_MainWindow, self).__init__()
-        loadUi("ui/main_window.ui", self)
+        super(AppWindow, self).__init__()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
         self.showMaximized()
-        self.initFileBrowserPanel()
+        self.fileBrowser = FileBrowser(FileBrowser.OpenDirectory)
+        self.setupConnections()
 
-    def initFileBrowserPanel(self):
-        self.dirFB = FileBrowser(FileBrowser.OpenDirectory)
-        self.actionOpen_Workfolder.triggered.connect(
+    def setupConnections(self):
+        self.ui.actionOpen_Workfolder.triggered.connect(
             lambda: self.selectWorkingDirectory()
         )
+        self.ui.actionProcessingMenu.triggered.connect(lambda: self.selectProcessing())
 
     def selectWorkingDirectory(self):
-        self.dirFB.getFile()
-        if self.dirFB.getPaths()[0] != "":
-            self.working_dir = self.dirFB.getPaths()[0]
-            labeltext = f"Path selected: {self.working_dir}"
-            self.pathLabel.setText(labeltext)
+        if self.fileBrowser.getFile():
+            self.working_dir = self.fileBrowser.getPaths()[0]
+            self.fileBrowser.setDefaultDir(self.working_dir)
+            self.setWindowTitle(f"EBSD-GUI - {self.working_dir}")
+
+    def selectProcessing(self):
+        try:
+            self.processingDialog = PatternProcessingDialog(self.working_dir)
+            self.processingDialog.show()
+        except Exception as e:
+            print(e)
+            print("Could not initialize processing dialog")
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    win = Ui_MainWindow()
+    win = AppWindow()
     win.show()
     sys.exit(app.exec())
