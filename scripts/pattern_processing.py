@@ -12,16 +12,19 @@ class PatternProcessingDialog(QDialog):
     ):
         super().__init__()
         if pattern_path == "":
-            pattern_path = path.join(working_dir, "Pattern.dat")
+            self.pattern_path = path.join(working_dir, "Pattern.dat")
+        else:
+            self.pattern_path = pattern_path
         self.working_dir = working_dir
         self.save_path = f"{self.working_dir}/{save_name}"
         self.ui = Ui_PatternProcessingWindow()
         self.ui.setupUi(self)
+        self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
         self.setupConnections()
         self.options = self.getOptions()
 
         try:
-            self.s = load(pattern_path, lazy=True)
+            self.s = load(self.pattern_path, lazy=True)
         except Exception as e:
             raise e
         self.gaussian_window = filters.Window("gaussian", std=1)
@@ -37,6 +40,7 @@ class PatternProcessingDialog(QDialog):
         self.ui.buttonBox.accepted.connect(lambda: self.apply_processing())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
         self.ui.pathLineEdit.setText(self.save_path)
+        
 
     def setSavePath(self):
         if self.fileBrowser.getFile():
