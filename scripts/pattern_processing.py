@@ -1,15 +1,18 @@
-from msilib.schema import Error
 from os import path
 from kikuchipy import load, filters
-from PyQt6.QtWidgets import QDialog
+from PySide6.QtWidgets import QDialog
 
 from scripts.filebrowser import FileBrowser
 from ui.ui_pattern_processing_dialog import Ui_PatternProcessingWindow
 
 
 class PatternProcessingDialog(QDialog):
-    def __init__(self, working_dir, save_name="Pattern_avg.h5"):
+    def __init__(
+        self, working_dir, pattern_path="Pattern.dat", save_name="Pattern_processed.h5"
+    ):
         super().__init__()
+        if pattern_path == "":
+            pattern_path = path.join(working_dir, "Pattern.dat")
         self.working_dir = working_dir
         self.save_path = f"{self.working_dir}/{save_name}"
         self.ui = Ui_PatternProcessingWindow()
@@ -18,7 +21,7 @@ class PatternProcessingDialog(QDialog):
         self.options = self.getOptions()
 
         try:
-            self.s = load(path.join(working_dir, "Pattern.dat"), lazy=True)
+            self.s = load(pattern_path, lazy=True)
         except Exception as e:
             raise e
         self.gaussian_window = filters.Window("gaussian", std=1)
