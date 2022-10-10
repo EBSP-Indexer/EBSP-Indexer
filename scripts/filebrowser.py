@@ -13,11 +13,13 @@ class FileBrowser(QWidget):
     OpenDirectory = 2
     SaveFile = 3
 
-    def __init__(self, mode=OpenFile):
+    def __init__(
+        self, mode=OpenFile, dirpath=QDir.currentPath(), filter_name="All files (*.*)"
+    ):
         QWidget.__init__(self)
         self.browser_mode = mode
-        self.filter_name = "All files (*.*)"
-        self.dirpath = QDir.currentPath()
+        self.dirpath = dirpath
+        self.filter_name = filter_name
 
     def setMode(self, browser_mode):
         self.browser_mode = browser_mode
@@ -70,9 +72,9 @@ class FileBrowser(QWidget):
                     options=options,
                 )[0]
             )
-        if self.filepaths[0] == '':
+        if self.filepaths[0] == "":
             return 0
-        return 1 
+        return 1
 
     def getPaths(self):
         return self.filepaths

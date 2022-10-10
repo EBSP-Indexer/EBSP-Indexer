@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file '/Users/olavletholsen/EBSD-data/EBSD-GUI-olavlet/ui/main_window.ui'
+# Form implementation generated from reading ui file 'c:\EBSD-GUI\ui\main_window.ui'
 #
 # Created by: PyQt6 UI code generator 6.4.0
 #
@@ -8,41 +8,20 @@
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-from ui_ui_remove_background import Ui_Pattern_Processing
-
 
 class Ui_MainWindow(object):
-    def openPatternProcessingWindow(self):
-        self.window = QtWidgets.QMainWindow()
-        self.ui = Ui_Pattern_Processing()
-        self.ui.setupUi(self.window)
-        self.window.show()
-
-
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(933, 600)
+        MainWindow.resize(933, 537)
         MainWindow.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         MainWindow.setAutoFillBackground(False)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.pathLabel = QtWidgets.QLabel(self.centralwidget)
-        self.pathLabel.setGeometry(QtCore.QRect(250, 20, 321, 41))
-        self.pathLabel.setObjectName("pathLabel")
-        self.Button_open_pattern_processing = QtWidgets.QPushButton(self.centralwidget)
-        self.Button_open_pattern_processing.setGeometry(QtCore.QRect(160, 180, 151, 32))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.Button_open_pattern_processing.sizePolicy().hasHeightForWidth())
-        self.Button_open_pattern_processing.setSizePolicy(sizePolicy)
-        self.Button_open_pattern_processing.setObjectName("Button_open_pattern_processing")
-        
-        self.Button_open_pattern_processing.clicked.connect(self.openPatternProcessingWindow)
-
+        self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout.setObjectName("gridLayout")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 24))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 933, 26))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -68,18 +47,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "EBSD-GUI"))
-        self.pathLabel.setText(_translate("MainWindow", "Path selected: "))
+        self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuProcessing.setTitle(_translate("MainWindow", "Processing"))
         self.actionOpen_Workfolder.setText(_translate("MainWindow", "Open Workfolder..."))
         self.actionProcessingMenu.setText(_translate("MainWindow", "N/S improvement"))
-        self.Button_open_pattern_processing.setText(_translate("MainWindow", "Pattern processing"))
-        self.menuFiles.setTitle(_translate("MainWindow", "Files"))
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec())
