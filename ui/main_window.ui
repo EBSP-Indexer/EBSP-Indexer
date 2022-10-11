@@ -76,8 +76,15 @@
     </property>
     <addaction name="actionProcessingMenu"/>
    </widget>
+   <widget class="QMenu" name="menuPlot">
+    <property name="title">
+     <string>Plotting</string>
+    </property>
+    <addaction name="actionSignalNavigation"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuProcessing"/>
+   <addaction name="menuPlot"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen_Workfolder">
@@ -94,6 +101,11 @@
    </property>
    <property name="statusTip">
     <string>Perform processing on a pattern</string>
+   </property>
+  </action>
+  <action name="actionSignalNavigation">
+   <property name="text">
+    <string>Signal navigation</string>
    </property>
   </action>
  </widget>

@@ -5,7 +5,7 @@ from ui.ui_main_window import Ui_MainWindow
 
 from scripts.filebrowser import FileBrowser
 from scripts.pattern_processing import PatternProcessingDialog
-
+from scripts.signal_navigation import SignalNavigation
 
 class AppWindow(QMainWindow):
     """
@@ -33,6 +33,7 @@ class AppWindow(QMainWindow):
         self.ui.systemViewer.clicked.connect(
             lambda index: self.onSystemViewClicked(index)
         )
+        self.ui.actionSignalNavigation.triggered.connect(lambda: self.selectSignalNavigation())
 
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
@@ -61,6 +62,13 @@ class AppWindow(QMainWindow):
     def onSystemViewClicked(self, index):
         self.file_selected = self.systemModel.filePath(index)
 
+    def selectSignalNavigation(self):
+        try:
+            SignalNavigation(self.working_dir)
+        except Exception as e:
+            print(e)
+            print("Could not initialize signal navigation")
+            
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -21,7 +21,6 @@ class PatternProcessingDialog(QDialog):
         self.ui.setupUi(self)
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
         self.setupConnections()
-        self.options = self.getOptions()
 
         try:
             self.s = load(self.pattern_path, lazy=True)
@@ -29,6 +28,7 @@ class PatternProcessingDialog(QDialog):
             raise e
         self.gaussian_window = filters.Window("gaussian", std=1)
 
+        self.options = self.getOptions()
         self.fileBrowser = FileBrowser(
             mode=FileBrowser.SaveFile,
             dirpath=self.working_dir,
@@ -51,15 +51,15 @@ class PatternProcessingDialog(QDialog):
         return {
             "static": {
                 self.ui.staticBackgroundBox.isChecked(),
-                lambda: self.s.remove_static_background(),
+                self.s.remove_static_background(),
             },
             "dynamic": {
                 self.ui.dynamicBackgroundBox.isChecked(),
-                lambda: self.s.remove_dynamic_background(),
+                self.s.remove_dynamic_background(),
             },
             "average": {
                 self.ui.averageBox.isChecked(),
-                lambda: self.s.average_neighbour_patterns(self.gaussian_window),
+                self.s.average_neighbour_patterns(self.gaussian_window),
             },
         }
 
