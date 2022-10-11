@@ -6,6 +6,7 @@ from ui.ui_main_window import Ui_MainWindow
 from scripts.filebrowser import FileBrowser
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.signal_navigation import SignalNavigation
+from scripts.pattern_center import PatterCenterDialog
 
 class AppWindow(QMainWindow):
     """
@@ -34,6 +35,7 @@ class AppWindow(QMainWindow):
             lambda index: self.onSystemViewClicked(index)
         )
         self.ui.actionSignalNavigation.triggered.connect(lambda: self.selectSignalNavigation())
+        self.ui.actionPattern_Center.triggered.connect(lambda: self.selectPatternCenter())
 
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
@@ -69,6 +71,12 @@ class AppWindow(QMainWindow):
             print(e)
             print("Could not initialize signal navigation")
             
+    def selectPatternCenter(self):
+        try:
+            self.patternCenter = PatterCenterDialog()
+            self.patternCenter.show()
+        except Exception as e:
+            print(e)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -20,12 +20,12 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QComboB
     QHBoxLayout, QLabel, QProgressBar, QSizePolicy,
     QSpacerItem, QVBoxLayout, QWidget)
 
-class Ui_Dialog(object):
-    def setupUi(self, Dialog):
-        if not Dialog.objectName():
-            Dialog.setObjectName(u"Dialog")
-        Dialog.resize(1055, 399)
-        self.gridLayout = QGridLayout(Dialog)
+class Ui_PatternCenterDialog(object):
+    def setupUi(self, PatternCenterDialog):
+        if not PatternCenterDialog.objectName():
+            PatternCenterDialog.setObjectName(u"PatternCenterDialog")
+        PatternCenterDialog.resize(1055, 399)
+        self.gridLayout = QGridLayout(PatternCenterDialog)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout_2 = QGridLayout()
         self.gridLayout_2.setObjectName(u"gridLayout_2")
@@ -35,7 +35,7 @@ class Ui_Dialog(object):
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer)
 
-        self.comboBox = QComboBox(Dialog)
+        self.comboBox = QComboBox(PatternCenterDialog)
         self.comboBox.addItem("")
         self.comboBox.addItem("")
         self.comboBox.addItem("")
@@ -51,7 +51,7 @@ class Ui_Dialog(object):
 
         self.horizontalLayout_2.addWidget(self.comboBox)
 
-        self.comboBox_3 = QComboBox(Dialog)
+        self.comboBox_3 = QComboBox(PatternCenterDialog)
         self.comboBox_3.addItem("")
         self.comboBox_3.addItem("")
         self.comboBox_3.addItem("")
@@ -64,7 +64,7 @@ class Ui_Dialog(object):
 
         self.horizontalLayout_2.addWidget(self.comboBox_3)
 
-        self.comboBox_2 = QComboBox(Dialog)
+        self.comboBox_2 = QComboBox(PatternCenterDialog)
         self.comboBox_2.addItem("")
         self.comboBox_2.addItem("")
         self.comboBox_2.addItem("")
@@ -85,7 +85,7 @@ class Ui_Dialog(object):
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.widget_2 = QWidget(Dialog)
+        self.widget_2 = QWidget(PatternCenterDialog)
         self.widget_2.setObjectName(u"widget_2")
         sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy1.setHorizontalStretch(0)
@@ -98,22 +98,22 @@ class Ui_Dialog(object):
 
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.checkBox = QCheckBox(Dialog)
+        self.checkBox = QCheckBox(PatternCenterDialog)
         self.checkBox.setObjectName(u"checkBox")
 
         self.verticalLayout.addWidget(self.checkBox)
 
-        self.checkBox_2 = QCheckBox(Dialog)
+        self.checkBox_2 = QCheckBox(PatternCenterDialog)
         self.checkBox_2.setObjectName(u"checkBox_2")
 
         self.verticalLayout.addWidget(self.checkBox_2)
 
-        self.checkBox_3 = QCheckBox(Dialog)
+        self.checkBox_3 = QCheckBox(PatternCenterDialog)
         self.checkBox_3.setObjectName(u"checkBox_3")
 
         self.verticalLayout.addWidget(self.checkBox_3)
 
-        self.checkBox_4 = QCheckBox(Dialog)
+        self.checkBox_4 = QCheckBox(PatternCenterDialog)
         self.checkBox_4.setObjectName(u"checkBox_4")
 
         self.verticalLayout.addWidget(self.checkBox_4)
@@ -122,12 +122,12 @@ class Ui_Dialog(object):
 
         self.verticalLayout.addItem(self.verticalSpacer)
 
-        self.label_4 = QLabel(Dialog)
+        self.label_4 = QLabel(PatternCenterDialog)
         self.label_4.setObjectName(u"label_4")
 
         self.verticalLayout.addWidget(self.label_4)
 
-        self.progressBar = QProgressBar(Dialog)
+        self.progressBar = QProgressBar(PatternCenterDialog)
         self.progressBar.setObjectName(u"progressBar")
         sizePolicy.setHeightForWidth(self.progressBar.sizePolicy().hasHeightForWidth())
         self.progressBar.setSizePolicy(sizePolicy)
@@ -147,32 +147,32 @@ class Ui_Dialog(object):
 
         self.horizontalLayout.addItem(self.horizontalSpacer_2)
 
-        self.label = QLabel(Dialog)
+        self.label = QLabel(PatternCenterDialog)
         self.label.setObjectName(u"label")
 
         self.horizontalLayout.addWidget(self.label)
 
-        self.doubleSpinBox_3 = QDoubleSpinBox(Dialog)
+        self.doubleSpinBox_3 = QDoubleSpinBox(PatternCenterDialog)
         self.doubleSpinBox_3.setObjectName(u"doubleSpinBox_3")
 
         self.horizontalLayout.addWidget(self.doubleSpinBox_3)
 
-        self.label_2 = QLabel(Dialog)
+        self.label_2 = QLabel(PatternCenterDialog)
         self.label_2.setObjectName(u"label_2")
 
         self.horizontalLayout.addWidget(self.label_2)
 
-        self.doubleSpinBox_2 = QDoubleSpinBox(Dialog)
+        self.doubleSpinBox_2 = QDoubleSpinBox(PatternCenterDialog)
         self.doubleSpinBox_2.setObjectName(u"doubleSpinBox_2")
 
         self.horizontalLayout.addWidget(self.doubleSpinBox_2)
 
-        self.label_3 = QLabel(Dialog)
+        self.label_3 = QLabel(PatternCenterDialog)
         self.label_3.setObjectName(u"label_3")
 
         self.horizontalLayout.addWidget(self.label_3)
 
-        self.doubleSpinBox = QDoubleSpinBox(Dialog)
+        self.doubleSpinBox = QDoubleSpinBox(PatternCenterDialog)
         self.doubleSpinBox.setObjectName(u"doubleSpinBox")
 
         self.horizontalLayout.addWidget(self.doubleSpinBox)
@@ -184,7 +184,7 @@ class Ui_Dialog(object):
 
         self.gridLayout_2.addLayout(self.horizontalLayout, 2, 1, 1, 1)
 
-        self.widget = QWidget(Dialog)
+        self.widget = QWidget(PatternCenterDialog)
         self.widget.setObjectName(u"widget")
         sizePolicy1.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
         self.widget.setSizePolicy(sizePolicy1)
@@ -192,7 +192,7 @@ class Ui_Dialog(object):
 
         self.gridLayout_2.addWidget(self.widget, 0, 0, 4, 1)
 
-        self.buttonBox = QDialogButtonBox(Dialog)
+        self.buttonBox = QDialogButtonBox(PatternCenterDialog)
         self.buttonBox.setObjectName(u"buttonBox")
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
 
@@ -202,39 +202,39 @@ class Ui_Dialog(object):
         self.gridLayout.addLayout(self.gridLayout_2, 3, 1, 1, 1)
 
 
-        self.retranslateUi(Dialog)
+        self.retranslateUi(PatternCenterDialog)
 
-        QMetaObject.connectSlotsByName(Dialog)
+        QMetaObject.connectSlotsByName(PatternCenterDialog)
     # setupUi
 
-    def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
-        self.comboBox.setItemText(0, QCoreApplication.translate("Dialog", u"Phase 1", None))
-        self.comboBox.setItemText(1, QCoreApplication.translate("Dialog", u"Nickel", None))
-        self.comboBox.setItemText(2, QCoreApplication.translate("Dialog", u"Aluminium", None))
-        self.comboBox.setItemText(3, QCoreApplication.translate("Dialog", u"Austenite", None))
-        self.comboBox.setItemText(4, QCoreApplication.translate("Dialog", u"Ferrite", None))
+    def retranslateUi(self, PatternCenterDialog):
+        PatternCenterDialog.setWindowTitle(QCoreApplication.translate("PatternCenterDialog", u"Dialog", None))
+        self.comboBox.setItemText(0, QCoreApplication.translate("PatternCenterDialog", u"Phase 1", None))
+        self.comboBox.setItemText(1, QCoreApplication.translate("PatternCenterDialog", u"Nickel", None))
+        self.comboBox.setItemText(2, QCoreApplication.translate("PatternCenterDialog", u"Aluminium", None))
+        self.comboBox.setItemText(3, QCoreApplication.translate("PatternCenterDialog", u"Austenite", None))
+        self.comboBox.setItemText(4, QCoreApplication.translate("PatternCenterDialog", u"Ferrite", None))
         self.comboBox.setItemText(5, "")
 
-        self.comboBox_3.setItemText(0, QCoreApplication.translate("Dialog", u"Phase 2", None))
-        self.comboBox_3.setItemText(1, QCoreApplication.translate("Dialog", u"Nickel", None))
-        self.comboBox_3.setItemText(2, QCoreApplication.translate("Dialog", u"Aluminium", None))
-        self.comboBox_3.setItemText(3, QCoreApplication.translate("Dialog", u"Austenite", None))
-        self.comboBox_3.setItemText(4, QCoreApplication.translate("Dialog", u"Ferrite", None))
+        self.comboBox_3.setItemText(0, QCoreApplication.translate("PatternCenterDialog", u"Phase 2", None))
+        self.comboBox_3.setItemText(1, QCoreApplication.translate("PatternCenterDialog", u"Nickel", None))
+        self.comboBox_3.setItemText(2, QCoreApplication.translate("PatternCenterDialog", u"Aluminium", None))
+        self.comboBox_3.setItemText(3, QCoreApplication.translate("PatternCenterDialog", u"Austenite", None))
+        self.comboBox_3.setItemText(4, QCoreApplication.translate("PatternCenterDialog", u"Ferrite", None))
 
-        self.comboBox_2.setItemText(0, QCoreApplication.translate("Dialog", u"Phase 3", None))
-        self.comboBox_2.setItemText(1, QCoreApplication.translate("Dialog", u"Nickel", None))
-        self.comboBox_2.setItemText(2, QCoreApplication.translate("Dialog", u"Aluminium", None))
-        self.comboBox_2.setItemText(3, QCoreApplication.translate("Dialog", u"Austenite", None))
-        self.comboBox_2.setItemText(4, QCoreApplication.translate("Dialog", u"Ferrite", None))
+        self.comboBox_2.setItemText(0, QCoreApplication.translate("PatternCenterDialog", u"Phase 3", None))
+        self.comboBox_2.setItemText(1, QCoreApplication.translate("PatternCenterDialog", u"Nickel", None))
+        self.comboBox_2.setItemText(2, QCoreApplication.translate("PatternCenterDialog", u"Aluminium", None))
+        self.comboBox_2.setItemText(3, QCoreApplication.translate("PatternCenterDialog", u"Austenite", None))
+        self.comboBox_2.setItemText(4, QCoreApplication.translate("PatternCenterDialog", u"Ferrite", None))
 
-        self.checkBox.setText(QCoreApplication.translate("Dialog", u"CheckBox", None))
-        self.checkBox_2.setText(QCoreApplication.translate("Dialog", u"CheckBox", None))
-        self.checkBox_3.setText(QCoreApplication.translate("Dialog", u"CheckBox", None))
-        self.checkBox_4.setText(QCoreApplication.translate("Dialog", u"CheckBox", None))
-        self.label_4.setText(QCoreApplication.translate("Dialog", u"Matching: 0.91", None))
-        self.label.setText(QCoreApplication.translate("Dialog", u"x:", None))
-        self.label_2.setText(QCoreApplication.translate("Dialog", u"y:", None))
-        self.label_3.setText(QCoreApplication.translate("Dialog", u"z:", None))
+        self.checkBox.setText(QCoreApplication.translate("PatternCenterDialog", u"CheckBox", None))
+        self.checkBox_2.setText(QCoreApplication.translate("PatternCenterDialog", u"CheckBox", None))
+        self.checkBox_3.setText(QCoreApplication.translate("PatternCenterDialog", u"CheckBox", None))
+        self.checkBox_4.setText(QCoreApplication.translate("PatternCenterDialog", u"CheckBox", None))
+        self.label_4.setText(QCoreApplication.translate("PatternCenterDialog", u"Matching: 0.91", None))
+        self.label.setText(QCoreApplication.translate("PatternCenterDialog", u"x:", None))
+        self.label_2.setText(QCoreApplication.translate("PatternCenterDialog", u"y:", None))
+        self.label_3.setText(QCoreApplication.translate("PatternCenterDialog", u"z:", None))
     # retranslateUi
 
