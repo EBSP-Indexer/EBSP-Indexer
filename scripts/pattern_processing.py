@@ -1,28 +1,34 @@
-from msilib.schema import Error
 from os import path
 from kikuchipy import load, filters
-from PyQt6.QtWidgets import QDialog
+from PySide6.QtWidgets import QDialog
 
 from scripts.filebrowser import FileBrowser
 from ui.ui_pattern_processing_dialog import Ui_PatternProcessingWindow
 
 
 class PatternProcessingDialog(QDialog):
-    def __init__(self, working_dir, save_name="Pattern_avg.h5"):
+    def __init__(
+        self, working_dir, pattern_path="Pattern.dat", save_name="Pattern_processed.h5"
+    ):
         super().__init__()
+        if pattern_path == "":
+            self.pattern_path = path.join(working_dir, "Pattern.dat")
+        else:
+            self.pattern_path = pattern_path
         self.working_dir = working_dir
         self.save_path = f"{self.working_dir}/{save_name}"
         self.ui = Ui_PatternProcessingWindow()
         self.ui.setupUi(self)
+        self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
         self.setupConnections()
-        self.options = self.getOptions()
 
         try:
-            self.s = load(path.join(working_dir, "Pattern.dat"), lazy=True)
+            self.s = load(self.pattern_path, lazy=True)
         except Exception as e:
             raise e
         self.gaussian_window = filters.Window("gaussian", std=1)
 
+        self.options = self.getOptions()
         self.fileBrowser = FileBrowser(
             mode=FileBrowser.SaveFile,
             dirpath=self.working_dir,
@@ -34,6 +40,7 @@ class PatternProcessingDialog(QDialog):
         self.ui.buttonBox.accepted.connect(lambda: self.apply_processing())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
         self.ui.pathLineEdit.setText(self.save_path)
+        
 
     def setSavePath(self):
         if self.fileBrowser.getFile():
@@ -44,15 +51,15 @@ class PatternProcessingDialog(QDialog):
         return {
             "static": {
                 self.ui.staticBackgroundBox.isChecked(),
-                lambda: self.s.remove_static_background(),
+                self.s.remove_static_background(),
             },
             "dynamic": {
                 self.ui.dynamicBackgroundBox.isChecked(),
-                lambda: self.s.remove_dynamic_background(),
+                self.s.remove_dynamic_background(),
             },
             "average": {
                 self.ui.averageBox.isChecked(),
-                lambda: self.s.average_neighbour_patterns(self.gaussian_window),
+                self.s.average_neighbour_patterns(self.gaussian_window),
             },
         }
 

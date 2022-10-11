@@ -21,7 +21,10 @@ There are 3 classes of importance:
 - QDialog: A popup window that originates from another window, usually the main window.
 - QWidget: Basic GUI element that can be part of a window or create custom elements
 
-After the ui file is created, the file can be compiled to python code using: pyuic4 input.ui -o output.py
+After the ui file is created, the file can be compiled to python code using: 
+```
+pyuic4 input.ui -o output.py
+```
 There are VScode extensions that automatically compiles the .ui file to a .py file every time the ui is saved to. 
 
 ### Python logic
