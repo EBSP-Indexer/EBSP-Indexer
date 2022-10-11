@@ -16,14 +16,15 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QApplication, QGridLayout, QMainWindow, QMenu,
-    QMenuBar, QSizePolicy, QStatusBar, QWidget)
+from PySide6.QtWidgets import (QApplication, QGridLayout, QHeaderView, QMainWindow,
+    QMenu, QMenuBar, QSizePolicy, QSpacerItem,
+    QStatusBar, QTreeView, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(933, 537)
+        MainWindow.resize(834, 806)
         MainWindow.setLayoutDirection(Qt.LeftToRight)
         MainWindow.setAutoFillBackground(False)
         self.actionOpen_Workfolder = QAction(MainWindow)
@@ -36,10 +37,24 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout = QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName(u"gridLayout")
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.gridLayout.addItem(self.horizontalSpacer, 0, 1, 1, 1)
+
+        self.systemViewer = QTreeView(self.centralwidget)
+        self.systemViewer.setObjectName(u"systemViewer")
+        self.systemViewer.setMinimumSize(QSize(500, 0))
+        self.systemViewer.setStyleSheet(u"")
+        self.systemViewer.setAnimated(True)
+        self.systemViewer.header().setStretchLastSection(True)
+
+        self.gridLayout.addWidget(self.systemViewer, 0, 0, 1, 1)
+
+        self.gridLayout.setColumnStretch(1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 933, 22))
+        self.menubar.setGeometry(QRect(0, 0, 834, 26))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuProcessing = QMenu(self.menubar)
@@ -67,9 +82,12 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"EBSD-GUI", None))
         self.actionOpen_Workfolder.setText(QCoreApplication.translate("MainWindow", u"Open Workfolder...", None))
 #if QT_CONFIG(statustip)
-        self.actionOpen_Workfolder.setStatusTip("")
+        self.actionOpen_Workfolder.setStatusTip(QCoreApplication.translate("MainWindow", u"Select a folder containing patterns", u"LOL"))
 #endif // QT_CONFIG(statustip)
         self.actionProcessingMenu.setText(QCoreApplication.translate("MainWindow", u"N/S improvement", None))
+#if QT_CONFIG(statustip)
+        self.actionProcessingMenu.setStatusTip(QCoreApplication.translate("MainWindow", u"Perform processing on a pattern", None))
+#endif // QT_CONFIG(statustip)
         self.actionSignalNavigation.setText(QCoreApplication.translate("MainWindow", u"Signal navigation", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuProcessing.setTitle(QCoreApplication.translate("MainWindow", u"Processing", None))

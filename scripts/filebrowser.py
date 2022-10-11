@@ -3,9 +3,6 @@ from PySide6.QtWidgets import QWidget, QFileDialog
 
 import sys
 
-# sourcecode: https://www.fundza.com/pyqt_pyside2/pyqt5_file_browser/index.html
-
-
 class FileBrowser(QWidget):
 
     OpenFile = 0
