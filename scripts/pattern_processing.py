@@ -1,4 +1,3 @@
-from msilib.schema import Error
 from os import path
 from kikuchipy import load, filters
 from PyQt6.QtWidgets import QDialog
