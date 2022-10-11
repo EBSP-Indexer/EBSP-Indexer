@@ -64,7 +64,7 @@ class AppWindow(QMainWindow):
 
     def selectSignalNavigation(self):
         try:
-            SignalNavigation(self.working_dir)
+            self.signalNavigation = SignalNavigation(self, file_path=self.file_selected)
         except Exception as e:
             print(e)
             print("Could not initialize signal navigation")

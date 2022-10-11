@@ -1,18 +1,15 @@
-from msilib.schema import Error
-from os import path
-import kikuchipy as kp
+from kikuchipy import load
 import matplotlib.pyplot as plt
 
 class SignalNavigation():
 
-    def __init__(self, working_dir):
+    def __init__(self, file_path):
         super().__init__()
-        self.working_dir = working_dir
+        self.file_path = file_path
         try:
-            self.s = kp.load(path.join(working_dir, "Pattern_avg.h5"), lazy=True)
+            self.s = load(file_path, lazy=True)
         except Exception as e:
             raise e
-
         self.s.plot()
         plt.show()
         
