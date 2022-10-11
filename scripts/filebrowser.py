@@ -1,5 +1,5 @@
-from PyQt6.QtCore import QDir
-from PyQt6.QtWidgets import QWidget, QFileDialog
+from PySide6.QtCore import QDir
+from PySide6.QtWidgets import QWidget, QFileDialog
 
 import sys
 
@@ -40,7 +40,7 @@ class FileBrowser(QWidget):
                 QFileDialog.getOpenFileName(
                     self,
                     caption="Choose File",
-                    directory=self.dirpath,
+                    dir=self.dirpath,
                     filter=self.filter_name,
                 )[0]
             )
@@ -49,14 +49,14 @@ class FileBrowser(QWidget):
                 QFileDialog.getOpenFileNames(
                     self,
                     caption="Choose Files",
-                    directory=self.dirpath,
+                    dir=self.dirpath,
                     filter=self.filter_name,
                 )[0]
             )
         elif self.browser_mode == FileBrowser.OpenDirectory:
             self.filepaths.append(
                 QFileDialog.getExistingDirectory(
-                    self, caption="Choose Directory", directory=self.dirpath
+                    self, caption="Choose Directory", dir=self.dirpath
                 )
             )
         elif self.browser_mode == FileBrowser.SaveFile:
@@ -67,7 +67,7 @@ class FileBrowser(QWidget):
                 QFileDialog.getSaveFileName(
                     self,
                     caption="Save/Save As",
-                    directory=self.dirpath,
+                    dir=self.dirpath,
                     filter=self.filter_name,
                     options=options,
                 )[0]

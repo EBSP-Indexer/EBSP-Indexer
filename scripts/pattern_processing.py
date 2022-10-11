@@ -1,7 +1,7 @@
 from msilib.schema import Error
 from os import path
 from kikuchipy import load, filters
-from PyQt6.QtWidgets import QDialog
+from PySide6.QtWidgets import QDialog
 
 from scripts.filebrowser import FileBrowser
 from ui.ui_pattern_processing_dialog import Ui_PatternProcessingWindow
@@ -15,7 +15,6 @@ class PatternProcessingDialog(QDialog):
         self.ui = Ui_PatternProcessingWindow()
         self.ui.setupUi(self)
         self.setupConnections()
-        self.options = self.getOptions()
 
         try:
             self.s = load(path.join(working_dir, "Pattern.dat"), lazy=True)
@@ -23,6 +22,7 @@ class PatternProcessingDialog(QDialog):
             raise e
         self.gaussian_window = filters.Window("gaussian", std=1)
 
+        self.options = self.getOptions()
         self.fileBrowser = FileBrowser(
             mode=FileBrowser.SaveFile,
             dirpath=self.working_dir,
@@ -44,15 +44,15 @@ class PatternProcessingDialog(QDialog):
         return {
             "static": {
                 self.ui.staticBackgroundBox.isChecked(),
-                lambda: self.s.remove_static_background(),
+                self.s.remove_static_background(),
             },
             "dynamic": {
                 self.ui.dynamicBackgroundBox.isChecked(),
-                lambda: self.s.remove_dynamic_background(),
+                self.s.remove_dynamic_background(),
             },
             "average": {
                 self.ui.averageBox.isChecked(),
-                lambda: self.s.average_neighbour_patterns(self.gaussian_window),
+                self.s.average_neighbour_patterns(self.gaussian_window),
             },
         }
 
