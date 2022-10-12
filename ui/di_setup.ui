@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DiSetupWindow</class>
- <widget class="QDialog" name="DiSetupWindow">
+ <class>DiSetupDialog</class>
+ <widget class="QDialog" name="DiSetupDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -35,7 +35,7 @@
       <property name="spacing">
        <number>10</number>
       </property>
-      <item row="5" column="0">
+      <item row="6" column="0">
        <widget class="QLabel" name="pathLabel">
         <property name="layoutDirection">
          <enum>Qt::LeftToRight</enum>
@@ -47,30 +47,20 @@
          <bool>false</bool>
         </property>
         <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
         </property>
        </widget>
-      </item>
-      <item row="6" column="2">
-       <widget class="QDialogButtonBox" name="buttonBox">
-        <property name="standardButtons">
-         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="lineEdit"/>
       </item>
       <item row="3" column="1">
-       <widget class="QLineEdit" name="lineEdit_2"/>
-      </item>
-      <item row="4" column="1">
-       <widget class="QLineEdit" name="lineEdit_3"/>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLineEdit" name="patternCenterY">
+        <property name="inputMask">
+         <string>.000</string>
+        </property>
         <property name="text">
-         <string>PC - y</string>
+         <string>.000</string>
+        </property>
+        <property name="placeholderText">
+         <string>.000</string>
         </property>
        </widget>
       </item>
@@ -81,6 +71,49 @@
         </property>
        </widget>
       </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="patternCenterX">
+        <property name="inputMask">
+         <string>.000</string>
+        </property>
+        <property name="text">
+         <string>.000</string>
+        </property>
+        <property name="cursorPosition">
+         <number>2</number>
+        </property>
+        <property name="placeholderText">
+         <string>.000</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="patternCenterZ">
+        <property name="inputMask">
+         <string>.000</string>
+        </property>
+        <property name="text">
+         <string>.000</string>
+        </property>
+        <property name="placeholderText">
+         <string>.000</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="2">
+       <widget class="QDialogButtonBox" name="buttonBox">
+        <property name="standardButtons">
+         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>PC - y</string>
+        </property>
+       </widget>
+      </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
@@ -88,8 +121,57 @@
         </property>
        </widget>
       </item>
+      <item row="6" column="1">
+       <widget class="QListWidget" name="listWidgetPhase">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::MultiSelection</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>al</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>si</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ni</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ferrite</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>austenite</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Refine</string>
+        </property>
+       </widget>
+      </item>
       <item row="5" column="1">
-       <widget class="QComboBox" name="comboBox"/>
+       <widget class="QCheckBox" name="checkBoxRefine">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
