@@ -35,22 +35,6 @@
       <property name="spacing">
        <number>10</number>
       </property>
-      <item row="6" column="0">
-       <widget class="QLabel" name="pathLabel">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string>Phase</string>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="1">
        <widget class="QLineEdit" name="patternCenterY">
         <property name="inputMask">
@@ -64,10 +48,19 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_4">
+      <item row="6" column="0">
+       <widget class="QLabel" name="pathLabel">
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
         <property name="text">
-         <string>PC - z</string>
+         <string>Phase</string>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
         </property>
        </widget>
       </item>
@@ -100,7 +93,14 @@
         </property>
        </widget>
       </item>
-      <item row="7" column="2">
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>PC - z</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="2">
        <widget class="QDialogButtonBox" name="buttonBox">
         <property name="standardButtons">
          <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
@@ -114,10 +114,10 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_2">
+      <item row="5" column="0">
+       <widget class="QLabel" name="label">
         <property name="text">
-         <string>PC - x</string>
+         <string>Refine</string>
         </property>
        </widget>
       </item>
@@ -159,10 +159,10 @@
         </item>
        </widget>
       </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Refine</string>
+         <string>PC - x</string>
         </property>
        </widget>
       </item>
@@ -170,6 +170,23 @@
        <widget class="QCheckBox" name="checkBoxRefine">
         <property name="text">
          <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="2">
+       <widget class="QPushButton" name="pushButtonBrowse">
+        <property name="text">
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QLineEdit" name="lineEditPath"/>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Master patterns</string>
         </property>
        </widget>
       </item>
