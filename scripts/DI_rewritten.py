@@ -32,7 +32,7 @@ pg_dict = {
 }
 # Faser og energi for master pattern, legg til de forventede fasene i lista
 
-phases = ["austenite", "ferrite", "ni"]
+phases = ["austenite", "ferrite"]
 
 # Binning
 new_signal_shape = (60, 60)
@@ -102,7 +102,7 @@ kp.__version__
 
 file = os.path.join(dir_nordif, "Pattern.dat")
 s = kp.load(
-    file, lazy=False
+    file, lazy=True
 )  # Set lazy=True if Pattern.dat is close to or greater than available memory
 s
 
@@ -149,7 +149,7 @@ f_settings.write(
 
 
 ### Pre-pattern processing maps
-
+"""
 # Maps of the data before doing any processing of pattern intensities.
 
 ### Mean intensity in each pattern
@@ -207,7 +207,7 @@ fig.tight_layout(w_pad=0.5, h_pad=0.5)
 fig.savefig(os.path.join(dir_out, "vbse_img.png"), **savefig_kwargs)
 
 plt.close("all")
-
+"""
 
 ### Processing of pattern intensities
 #       Improve the signal-to-noise ratio. This means enhancing the Kikuchi pattern (signal)
@@ -219,11 +219,11 @@ f_settings.write("Static background corrected", True)
 s.remove_dynamic_background()
 f_settings.write("Dynamic background corrected", True)
 
-s.plot(navigator=vbse_rgb_img)
+#s.plot(navigator=vbse_rgb_img)
 
 window = kp.filters.Window("gaussian", std=1)
-fig = window.plot(return_figure=True)
-fig.savefig(os.path.join(dir_out, "averaging_window.png"), **savefig_kwargs)
+#fig = window.plot(return_figure=True)
+#fig.savefig(os.path.join(dir_out, "averaging_window.png"), **savefig_kwargs)
 
 s.average_neighbour_patterns(window)
 f_settings.write("Averaging with neighbour patterns", True)
@@ -236,7 +236,7 @@ f_settings.write("Averaging with neighbour patterns", True)
 
 
 ### Pre-indexing maps
-
+"""
 # Maps after enhancing the signal-to-noise ratio, but before dictionary indexing.
 
 iq = s.get_image_quality()
@@ -262,7 +262,7 @@ s2.rescale_intensity(dtype_out=np.uint8)
 
 plt.close("all")
 
-
+"""
 ### Set up and perform dictionary indexing of patterns.
 
 ### Define the detector-sample geometry
@@ -451,7 +451,7 @@ if len(phases) > 1:
         crystal_maps=cm,
          mean_n_best=1,
          scores_prop="scores",
-        # simulation_indices_prop="simulation_indices",
+         simulation_indices_prop="simulation_indices",
     )
 
     xmap_merged

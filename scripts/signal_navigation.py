@@ -7,7 +7,7 @@ class SignalNavigation():
         super().__init__()
         self.file_path = file_path
         try:
-            self.s = load(file_path, lazy=True)
+            self.s = load(self.file_path, lazy=True)
         except Exception as e:
             raise e
         self.s.plot()
