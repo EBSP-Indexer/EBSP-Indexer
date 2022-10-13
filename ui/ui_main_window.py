@@ -33,6 +33,8 @@ class Ui_MainWindow(object):
         self.actionProcessingMenu.setObjectName(u"actionProcessingMenu")
         self.actionSignalNavigation = QAction(MainWindow)
         self.actionSignalNavigation.setObjectName(u"actionSignalNavigation")
+        self.actionDictinary_indexing_setup = QAction(MainWindow)
+        self.actionDictinary_indexing_setup.setObjectName(u"actionDictinary_indexing_setup")
         self.actionPattern_Center = QAction(MainWindow)
         self.actionPattern_Center.setObjectName(u"actionPattern_Center")
         self.centralwidget = QWidget(MainWindow)
@@ -63,6 +65,8 @@ class Ui_MainWindow(object):
         self.menuProcessing.setObjectName(u"menuProcessing")
         self.menuPlot = QMenu(self.menubar)
         self.menuPlot.setObjectName(u"menuPlot")
+        self.menuDictionary_indexing = QMenu(self.menubar)
+        self.menuDictionary_indexing.setObjectName(u"menuDictionary_indexing")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -71,10 +75,12 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuProcessing.menuAction())
         self.menubar.addAction(self.menuPlot.menuAction())
+        self.menubar.addAction(self.menuDictionary_indexing.menuAction())
         self.menuFile.addAction(self.actionOpen_Workfolder)
         self.menuProcessing.addAction(self.actionProcessingMenu)
         self.menuProcessing.addAction(self.actionPattern_Center)
         self.menuPlot.addAction(self.actionSignalNavigation)
+        self.menuDictionary_indexing.addAction(self.actionDictinary_indexing_setup)
 
         self.retranslateUi(MainWindow)
 
@@ -92,9 +98,11 @@ class Ui_MainWindow(object):
         self.actionProcessingMenu.setStatusTip(QCoreApplication.translate("MainWindow", u"Perform processing on a pattern", None))
 #endif // QT_CONFIG(statustip)
         self.actionSignalNavigation.setText(QCoreApplication.translate("MainWindow", u"Signal navigation", None))
+        self.actionDictinary_indexing_setup.setText(QCoreApplication.translate("MainWindow", u"Dictinary indexing setup", None))
         self.actionPattern_Center.setText(QCoreApplication.translate("MainWindow", u"Pattern center", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuProcessing.setTitle(QCoreApplication.translate("MainWindow", u"Processing", None))
         self.menuPlot.setTitle(QCoreApplication.translate("MainWindow", u"Plotting", None))
+        self.menuDictionary_indexing.setTitle(QCoreApplication.translate("MainWindow", u"Dictionary indexing", None))
     # retranslateUi
 

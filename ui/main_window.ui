@@ -83,9 +83,16 @@
     </property>
     <addaction name="actionSignalNavigation"/>
    </widget>
+   <widget class="QMenu" name="menuDictionary_indexing">
+    <property name="title">
+     <string>Dictionary indexing</string>
+    </property>
+    <addaction name="actionDictinary_indexing_setup"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuProcessing"/>
    <addaction name="menuPlot"/>
+   <addaction name="menuDictionary_indexing"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen_Workfolder">
@@ -109,6 +116,9 @@
     <string>Signal navigation</string>
    </property>
   </action>
+  <action name="actionDictinary_indexing_setup">
+   <property name="text">
+    <string>Dictinary indexing setup</string>
   <action name="actionPattern_Center">
    <property name="text">
     <string>Pattern center</string>

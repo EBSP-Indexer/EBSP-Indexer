@@ -6,6 +6,7 @@ from ui.ui_main_window import Ui_MainWindow
 from scripts.filebrowser import FileBrowser
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.signal_navigation import SignalNavigation
+from scripts.dictionary_indexing import DiSetupDialog
 from scripts.pattern_center import PatterCenterDialog
 
 class AppWindow(QMainWindow):
@@ -35,6 +36,7 @@ class AppWindow(QMainWindow):
             lambda index: self.onSystemViewClicked(index)
         )
         self.ui.actionSignalNavigation.triggered.connect(lambda: self.selectSignalNavigation())
+        self.ui.actionDictinary_indexing_setup.triggered.connect(lambda: self.selectDictionaryIndexingSetup())
         self.ui.actionPattern_Center.triggered.connect(lambda: self.selectPatternCenter())
 
     def selectWorkingDirectory(self):
@@ -66,10 +68,18 @@ class AppWindow(QMainWindow):
 
     def selectSignalNavigation(self):
         try:
-            self.signalNavigation = SignalNavigation(self, file_path=self.file_selected)
+            self.signalNavigation = SignalNavigation(file_path=self.file_selected)
         except Exception as e:
             print(e)
             print("Could not initialize signal navigation")
+
+    def selectDictionaryIndexingSetup(self):
+        try:
+            self.diSetup = DiSetupDialog(self.working_dir, pattern_path=self.file_selected)
+            self.diSetup.show()
+        except Exception as e:
+            print(e)
+            print("Could not initialize dictionary indexing")
             
     def selectPatternCenter(self):
         try:
