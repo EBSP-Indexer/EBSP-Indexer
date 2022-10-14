@@ -41,12 +41,6 @@ class DiSetupDialog(QDialog):
         # TODO: read master pattern path from a settings file
         #self.sim_dir = "C:\EBSD data\kikuchipy\ebsd_simulations"
 
-        # load selected EBSD pattern
-        try:
-            self.s = kp.load(self.pattern_path, lazy=False)
-        except Exception as e:
-            raise e
-
         # Defining phase dictionary
         # TODO: move point group dictionary to an external file that can be edited from GUI
         # TODO: check if we actually need this
@@ -80,6 +74,7 @@ class DiSetupDialog(QDialog):
             "PC_z": float(self.ui.patternCenterZ.text()),
             "Phase": self.ui.listWidgetPhase.selectedItems(),
             "Refine": self.ui.checkBoxRefine.isChecked(),
+            "Lazy": self.ui.checkBoxLazy.isChecked(),
         }
 
     def setSaveDir(self):
@@ -88,8 +83,17 @@ class DiSetupDialog(QDialog):
             self.ui.lineEditPath.setText(self.sim_dir)
 
     def runDictionaryIndexing(self):
+
         # get options from input
         self.options = self.getOptions()
+
+        #load selected EBSD pattern
+        try:
+            self.s = kp.load(self.pattern_path, lazy=self.options["Lazy"])
+        except Exception as e:
+            raise e
+
+        
 
         # set pattern center values
         self.pc = (
@@ -107,7 +111,7 @@ class DiSetupDialog(QDialog):
         
         # TODO: Settings that can be set as user input later
         self.savefig_kwargs = dict(bbox_inches="tight", pad_inches=0, dpi=150)
-        self.new_signal_shape = (60, 60)
+        self.new_signal_shape = (48, 48)
         self.disori = 2
         self.use_signal_mask = False
         self.n_per_iteration = None
