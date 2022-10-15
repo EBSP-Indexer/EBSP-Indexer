@@ -11,7 +11,7 @@ class PatternProcessingDialog(QDialog):
         self, working_dir, pattern_path="Pattern.dat", save_name="Pattern_processed.h5"
     ):
         super().__init__()
-        if pattern_path == "":
+        if pattern_path == None:
             self.pattern_path = path.join(working_dir, "Pattern.dat")
         else:
             self.pattern_path = pattern_path
