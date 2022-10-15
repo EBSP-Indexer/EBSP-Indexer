@@ -111,6 +111,7 @@
      <string>Processing</string>
     </property>
     <addaction name="actionProcessingMenu"/>
+    <addaction name="actionPattern_Center"/>
    </widget>
    <widget class="QMenu" name="menuPlot">
     <property name="title">
@@ -154,6 +155,9 @@
   <action name="actionDictinary_indexing_setup">
    <property name="text">
     <string>Dictinary indexing setup</string>
+  <action name="actionPattern_Center">
+   <property name="text">
+    <string>Pattern center</string>
    </property>
   </action>
  </widget>

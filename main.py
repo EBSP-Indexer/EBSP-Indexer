@@ -9,6 +9,7 @@ from scripts.pattern_processing import PatternProcessingDialog
 from scripts.signal_navigation import SignalNavigation
 from scripts.dictionary_indexing import DiSetupDialog
 from scripts.interpreter import ConsoleWidget
+from scripts.pattern_center import PatterCenterDialog
 
 class AppWindow(QMainWindow):
     """
@@ -41,6 +42,7 @@ class AppWindow(QMainWindow):
         )
         self.ui.actionSignalNavigation.triggered.connect(lambda: self.selectSignalNavigation())
         self.ui.actionDictinary_indexing_setup.triggered.connect(lambda: self.selectDictionaryIndexingSetup())
+        self.ui.actionPattern_Center.triggered.connect(lambda: self.selectPatternCenter())
 
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
@@ -82,6 +84,15 @@ class AppWindow(QMainWindow):
             self.diSetup.show()
         except Exception as e:
             self.console.send_console_log(f"Could not initialize dictionary indexing:\n{str(e)}\n")
+            print(e)
+            print("Could not initialize dictionary indexing")
+            
+    def selectPatternCenter(self):
+        try:
+            self.patternCenter = PatterCenterDialog()
+            self.patternCenter.show()
+        except Exception as e:
+            print(e)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
