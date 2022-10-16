@@ -75,6 +75,7 @@
      <string>Processing</string>
     </property>
     <addaction name="actionProcessingMenu"/>
+    <addaction name="actionROI"/>
    </widget>
    <widget class="QMenu" name="menuPlot">
     <property name="title">
@@ -118,6 +119,11 @@
   <action name="actionDictinary_indexing_setup">
    <property name="text">
     <string>Dictinary indexing setup</string>
+   </property>
+  </action>
+  <action name="actionROI">
+   <property name="text">
+    <string>ROI</string>
    </property>
   </action>
  </widget>

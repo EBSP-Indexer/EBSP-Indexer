@@ -2,6 +2,7 @@ from cmath import phase
 import os
 from tkinter import E
 from PySide6.QtWidgets import QDialog
+from PySide6.QtCore import QRunnable, Slot, QThreadPool
 
 from scripts.filebrowser import FileBrowser
 from ui.ui_di_setup import Ui_DiSetupDialog
@@ -17,7 +18,33 @@ from time import time
 import warnings
 import gc
 
-# from setting_file import SettingFile
+class Worker(QRunnable):
+    '''
+    Worker thread
+
+    Inherits from QRunnable to handler worker thread setup, signals and wrap-up.
+
+    :param callback: The function callback to run on this worker thread. Supplied args and
+                     kwargs will be passed through to the runner.
+    :type callback: function
+    :param args: Arguments to pass to the callback function
+    :param kwargs: Keywords to pass to the callback function
+
+    '''
+
+    def __init__(self, fn, *args, **kwargs):
+        super(Worker, self).__init__()
+        # Store constructor arguments (re-used for processing)
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+
+    @Slot()  # QtCore.Slot
+    def run(self):
+        '''
+        Initialise the runner function with passed args, kwargs.
+        '''
+        self.fn(*self.args, **self.kwargs)
 
 
 class DiSetupDialog(QDialog):
@@ -27,6 +54,8 @@ class DiSetupDialog(QDialog):
 
     def __init__(self, working_dir, pattern_path="Pattern.dat"):
         super().__init__()
+        #initate threadpool
+        self.threadpool = QThreadPool()
 
         # path for pattern to be indexed
         if pattern_path == "":
@@ -60,11 +89,12 @@ class DiSetupDialog(QDialog):
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         self.setupConnections()
+        self.sim_dir = self.ui.lineEditPath.text()
 
     def setupConnections(self):
-        self.ui.buttonBox.accepted.connect(lambda: self.runDictionaryIndexing())
+        self.ui.buttonBox.accepted.connect(lambda: self.run_dictionary_indexing())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
-        self.ui.pushButtonBrowse.clicked.connect(lambda: self.setSaveDir())
+        self.ui.pushButtonBrowse.clicked.connect(lambda: self.setSimDir())
 
     # read options from interactive elements in dialog box
     def getOptions(self) -> dict:
@@ -77,12 +107,19 @@ class DiSetupDialog(QDialog):
             "Lazy": self.ui.checkBoxLazy.isChecked(),
         }
 
-    def setSaveDir(self):
+    def setSimDir(self):
         if self.fileBrowserOD.getFile():
             self.sim_dir = self.fileBrowserOD.getPaths()[0]
             self.ui.lineEditPath.setText(self.sim_dir)
 
-    def runDictionaryIndexing(self):
+    def run_dictionary_indexing(self):
+        # Pass the function to execute
+        worker = Worker(self.dictionary_indexing)
+        # Execute
+        self.threadpool.start(worker)
+        self.accept()
+    
+    def dictionary_indexing(self):
 
         # get options from input
         self.options = self.getOptions()
