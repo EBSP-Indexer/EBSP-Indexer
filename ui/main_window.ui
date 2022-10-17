@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>834</width>
-    <height>806</height>
+    <width>1087</width>
+    <height>769</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,38 +20,74 @@
    <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout" columnstretch="0,1">
-    <item row="0" column="1">
-     <spacer name="horizontalSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="2" column="0">
+     <layout class="QVBoxLayout" name="bottomLayout" stretch="2,0">
+      <item>
+       <widget class="QPlainTextEdit" name="consoleLog"/>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="inputLayout">
+        <item>
+         <widget class="QLabel" name="consolePrompt">
+          <property name="text">
+           <string>&gt;&gt;&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="consoleInput"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </item>
-    <item row="0" column="0">
-     <widget class="QTreeView" name="systemViewer">
-      <property name="minimumSize">
-       <size>
-        <width>500</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="animated">
-       <bool>true</bool>
-      </property>
-      <attribute name="headerStretchLastSection">
-       <bool>true</bool>
-      </attribute>
-     </widget>
+    <item row="1" column="0">
+     <layout class="QHBoxLayout" name="topLayout" stretch="0,1">
+      <item>
+       <layout class="QVBoxLayout" name="systemViewerLayout">
+        <item>
+         <widget class="QLabel" name="folderLabel">
+          <property name="text">
+           <string>NO FOLDER OPENED</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTreeView" name="systemViewer">
+          <property name="minimumSize">
+           <size>
+            <width>500</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="animated">
+           <bool>true</bool>
+          </property>
+          <attribute name="headerStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -60,8 +96,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>834</width>
-     <height>22</height>
+     <width>1087</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -76,6 +112,7 @@
     </property>
     <addaction name="actionProcessingMenu"/>
     <addaction name="actionROI"/>
+    <addaction name="actionPattern_Center"/>
    </widget>
    <widget class="QMenu" name="menuPlot">
     <property name="title">
@@ -119,6 +156,11 @@
   <action name="actionDictinary_indexing_setup">
    <property name="text">
     <string>Dictinary indexing setup</string>
+   </property>
+  </action>
+  <action name="actionPattern_Center">
+   <property name="text">
+    <string>Pattern center</string>
    </property>
   </action>
   <action name="actionROI">
