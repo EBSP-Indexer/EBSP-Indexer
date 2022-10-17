@@ -38,7 +38,7 @@ class DiSetupDialog(QDialog):
 
         # master pattern index, as of now fixed and must be adjusted for every computer
         # TODO: read master pattern path from a settings file
-        self.sim_dir = "C:\EBSD data\kikuchipy\ebsd_simulations"
+        #self.sim_dir = "C:\EBSD data\kikuchipy\ebsd_simulations"
 
         # load selected EBSD pattern
         try:
@@ -63,11 +63,13 @@ class DiSetupDialog(QDialog):
         self.ui = Ui_DiSetupDialog()
         self.ui.setupUi(self)
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
+        self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         self.setupConnections()
 
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.runDictionaryIndexing())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
+        self.ui.pushButtonBrowse.clicked.connect(lambda: self.setSaveDir())
 
     # read options from interactive elements in dialog box
     def getOptions(self) -> dict:
@@ -78,6 +80,11 @@ class DiSetupDialog(QDialog):
             "Phase": self.ui.listWidgetPhase.selectedItems(),
             "Refine": self.ui.checkBoxRefine.isChecked(),
         }
+
+    def setSaveDir(self):
+        if self.fileBrowserOD.getFile():
+            self.sim_dir = self.fileBrowserOD.getPaths()[0]
+            self.ui.lineEditPath.setText(self.sim_dir)
 
     def runDictionaryIndexing(self):
         # get options from input
