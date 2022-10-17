@@ -1,6 +1,5 @@
 from cmath import phase
 import os
-from tkinter import E
 from PySide6.QtWidgets import QDialog
 
 from scripts.filebrowser import FileBrowser

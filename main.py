@@ -2,12 +2,14 @@ import sys
 from PySide6.QtCore import QDir
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel
 from ui.ui_main_window import Ui_MainWindow
+import warnings
 
 from scripts.filebrowser import FileBrowser
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.signal_navigation import SignalNavigation
 from scripts.dictionary_indexing import DiSetupDialog
 from scripts.pattern_center import PatterCenterDialog
+from scripts.setting_file import SettingFile
 
 class AppWindow(QMainWindow):
     """
@@ -83,10 +85,11 @@ class AppWindow(QMainWindow):
             
     def selectPatternCenter(self):
         try:
-            self.patternCenter = PatterCenterDialog()
+            self.patternCenter = PatterCenterDialog(self.working_dir)
             self.patternCenter.show()
         except Exception as e:
             print(e)
+            print("Could not initialize pattern center refinement")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>598</width>
-    <height>447</height>
+    <width>687</width>
+    <height>444</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,26 +15,37 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="MplWidget" name="MplWidget" native="true"/>
+    <widget class="MplWidget" name="MplWidget" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>400</width>
+       <height>400</height>
+      </size>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QPushButton" name="buttonAddPhase">
-       <property name="text">
-        <string>Add Phase</string>
-       </property>
-      </widget>
+      <widget class="QListWidget" name="listPhases"/>
      </item>
      <item>
-      <widget class="QListView" name="listPhases">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QPushButton" name="buttonAddPhase">
+         <property name="text">
+          <string>Add Phase</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="buttonRemovePhase">
+         <property name="text">
+          <string>Remove Phase</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <spacer name="verticalSpacer">
@@ -96,7 +107,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="labelZStatr">
+      <widget class="QLabel" name="labelZStar">
        <property name="text">
         <string>Z-Star</string>
        </property>
