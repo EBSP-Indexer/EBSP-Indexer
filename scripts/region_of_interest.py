@@ -65,7 +65,6 @@ class RegionOfInteresDialog(QDialog):
         self.s2 = self.s.inav[x_start:x_end,y_start:y_end]
         try:
             filepath = path.join(self.working_dir+f"/Pattern_ROI_{x_start}_{x_end}_{y_start}_{y_end}.h5")
-            #filepath = "C:\EBSD data\DI data\SDSS 070321_SR\Pattern_small2.h5"
             print(filepath)
             self.s2.save(
                 filepath,
