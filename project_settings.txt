@@ -1,0 +1,12 @@
+Working folder:	/Users/olavletholsen/EBSD-data/DI-dataset/Al 60x60
+Target folder:	/Users/olavletholsen/EBSD-data/DI-dataset/Al 60x60_results
+Tilt angle:	70
+Working distance:	19
+Acceleration voltage:	20
+Remove static background:	True
+Remove dynamic Background:	True
+Average neighbour patterns:	True
+X star:	0.445
+Y star:	0.511
+Z star:	0.542
+Master pattern 1:	C:/EBSD data/kikuchipy/ebsd_simulations/ni
