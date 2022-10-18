@@ -97,7 +97,7 @@
      <x>0</x>
      <y>0</y>
      <width>1087</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -111,6 +111,7 @@
      <string>Processing</string>
     </property>
     <addaction name="actionProcessingMenu"/>
+    <addaction name="actionROI"/>
     <addaction name="actionPattern_Center"/>
    </widget>
    <widget class="QMenu" name="menuPlot">
@@ -160,6 +161,11 @@
   <action name="actionPattern_Center">
    <property name="text">
     <string>Pattern center</string>
+   </property>
+  </action>
+  <action name="actionROI">
+   <property name="text">
+    <string>ROI</string>
    </property>
   </action>
  </widget>
