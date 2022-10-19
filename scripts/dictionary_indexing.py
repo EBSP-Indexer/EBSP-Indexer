@@ -1,9 +1,9 @@
-from cmath import phase
 import os
 from PySide6.QtWidgets import QDialog
-from PySide6.QtCore import QRunnable, Slot, QThreadPool
+from PySide6.QtCore import QThreadPool
 
-from scripts.filebrowser import FileBrowser
+from utils.filebrowser import FileBrowser
+from utils.worker import Worker
 from ui.ui_di_setup import Ui_DiSetupDialog
 
 import kikuchipy as kp
@@ -12,30 +12,8 @@ import numpy as np
 from orix.quaternion import Rotation
 from orix import io, sampling, plot
 
-import hyperspy.api as hs
-from time import time
-import warnings
+#TODO: from time import time
 import gc
-
-
-class Worker(QRunnable):
-    """
-    Worker thread
-    """
-
-    def __init__(self, fn, *args, **kwargs):
-        super(Worker, self).__init__()
-        # Store constructor arguments (re-used for processing)
-        self.fn = fn
-        self.args = args
-        self.kwargs = kwargs
-
-    @Slot()  # QtCore.Slot
-    def run(self):
-        """
-        Initialise the runner function with passed args, kwargs.
-        """
-        self.fn(*self.args, **self.kwargs)
 
 
 class DiSetupDialog(QDialog):

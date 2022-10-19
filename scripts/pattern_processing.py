@@ -1,39 +1,11 @@
 from os import path
 from kikuchipy import load, filters
 from PySide6.QtWidgets import QDialog
-from PySide6.QtCore import QRunnable, Slot, QThreadPool
+from PySide6.QtCore import QThreadPool
 
-from scripts.filebrowser import FileBrowser
+from utils.filebrowser import FileBrowser
+from utils.worker import Worker
 from ui.ui_pattern_processing_dialog import Ui_PatternProcessingWindow
-
-
-class Worker(QRunnable):
-    '''
-    Worker thread
-
-    Inherits from QRunnable to handler worker thread setup, signals and wrap-up.
-
-    :param callback: The function callback to run on this worker thread. Supplied args and
-                     kwargs will be passed through to the runner.
-    :type callback: function
-    :param args: Arguments to pass to the callback function
-    :param kwargs: Keywords to pass to the callback function
-
-    '''
-
-    def __init__(self, fn, *args, **kwargs):
-        super(Worker, self).__init__()
-        # Store constructor arguments (re-used for processing)
-        self.fn = fn
-        self.args = args
-        self.kwargs = kwargs
-
-    @Slot()  # QtCore.Slot
-    def run(self):
-        '''
-        Initialise the runner function with passed args, kwargs.
-        '''
-        self.fn(*self.args, **self.kwargs)
 
 
 class PatternProcessingDialog(QDialog):
@@ -43,7 +15,9 @@ class PatternProcessingDialog(QDialog):
         super().__init__()
 
         self.threadpool = QThreadPool()
-        print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
+        print(
+            "Multithreading with maximum %d threads" % self.threadpool.maxThreadCount()
+        )
 
         if pattern_path == "":
             self.pattern_path = path.join(working_dir, "Pattern.dat")
@@ -74,7 +48,6 @@ class PatternProcessingDialog(QDialog):
         self.ui.buttonBox.accepted.connect(lambda: self.run_processing())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
         self.ui.pathLineEdit.setText(self.save_path)
-        
 
     def setSavePath(self):
         if self.fileBrowser.getFile():
