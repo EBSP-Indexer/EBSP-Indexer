@@ -1,4 +1,5 @@
-import os
+from os import path, mkdir
+
 from PySide6.QtWidgets import QDialog
 from PySide6.QtCore import QThreadPool
 
@@ -12,7 +13,7 @@ import numpy as np
 from orix.quaternion import Rotation
 from orix import io, sampling, plot
 
-#TODO: from time import time
+# TODO: from time import time
 import gc
 
 
@@ -21,34 +22,21 @@ class DiSetupDialog(QDialog):
     Setup dialog box for Dictionary indexing
     """
 
-    def __init__(self, working_dir, pattern_path=""):
+    def __init__(self, pattern_path=None):
         super().__init__()
         # initate threadpool
         self.threadpool = QThreadPool()
 
-        # path for pattern to be indexed
+        # working directory
+        self.working_dir = path.dirname(pattern_path)
+
         if pattern_path == None:
-            # opens Pattern.dat if nothing else is specified
-            self.pattern_path = os.path.join(working_dir, "Pattern.dat")
+            self.pattern_path = path.join(self.working_dir, "Pattern.dat")
         else:
-            # opens selected pattern file from fileviewer
             self.pattern_path = pattern_path
 
-        # working index
-        self.working_dir = working_dir
-
         # Defining phase dictionary
-        # TODO: move point group dictionary to an external file that can be edited from GUI
-        # TODO: check if we actually need this
-        self.pg_dict = {
-            "al": "m-3m",
-            "austenite": "m-3m",
-            "ferrite": "m-3m",
-            "ni": "m-3m",
-            "si": "m-3m",
-            "ti_alpha": "6_mmm",  # 6/mmm
-            "ti_beta": "m-3m",
-        }
+        # TODO: move point group dictionary to an external file that can be edited from GU
 
         # Dialog box ui setup
         self.ui = Ui_DiSetupDialog()
@@ -70,9 +58,9 @@ class DiSetupDialog(QDialog):
     # read options from interactive elements in dialog box
     def getOptions(self) -> dict:
         return {
-            "PC_x": float(self.ui.patternCenterX.text()),
-            "PC_y": float(self.ui.patternCenterY.text()),
-            "PC_z": float(self.ui.patternCenterZ.text()),
+            "PC_x": float(self.ui.patternCenterX.value()),
+            "PC_y": float(self.ui.patternCenterY.value()),
+            "PC_z": float(self.ui.patternCenterZ.value()),
             "Phase": self.ui.listWidgetPhase.selectedItems(),
             "Refine": self.ui.checkBoxRefine.isChecked(),
             "Lazy": self.ui.checkBoxLazy.isChecked(),
@@ -115,7 +103,7 @@ class DiSetupDialog(QDialog):
 
         # TODO: Settings that can be set as user input later
         self.savefig_kwargs = dict(bbox_inches="tight", pad_inches=0, dpi=150)
-        self.new_signal_shape = (48, 48)
+        self.new_signal_shape = (30, 30)
         self.disori = 2
         self.use_signal_mask = False
         self.n_per_iteration = None
@@ -124,12 +112,12 @@ class DiSetupDialog(QDialog):
         i = 1
         while True:
             try:
-                self.save_dir = os.path.join(self.working_dir, "di_results" + str(i))
-                os.mkdir(self.save_dir)
+                self.results_dir = path.join(self.working_dir, "di_results" + str(i))
+                mkdir(self.results_dir)
                 break
             except FileExistsError:
                 print(
-                    f"Directory '{self.save_dir}' exists, will try to create directory '{self.save_dir[:-1] + str(i + 1)}'"
+                    f"Directory '{self.results_dir}' exists, will try to create directory '{self.results_dir[:-1] + str(i + 1)}'"
                 )
             i += 1
 
@@ -168,7 +156,7 @@ class DiSetupDialog(QDialog):
             ax[1].imshow(p * ~self.signal_mask, cmap="gray")
             ax[1].set_title("Used in matching")
             fig.savefig(
-                os.path.join(self.save_dir, "circular_mask_for_di.png"),
+                path.join(self.results_dir, "circular_mask_for_di.png"),
                 **self.savefig_kwargs,
             )
 
@@ -186,7 +174,7 @@ class DiSetupDialog(QDialog):
         # Master pattern dictionary
         self.mp = {}
         for ph in self.phases:
-            self.file_mp = os.path.join(self.sim_dir, ph, f"{ph}_mc_mp_20kv.h5")
+            self.file_mp = path.join(self.sim_dir, ph, f"{ph}_mc_mp_20kv.h5")
             self.mp[f"mp_{ph}"] = kp.load(
                 self.file_mp,
                 energy=self.energy,  # single energies like 10, 11, 12 etc. or a range like (10, 20)
@@ -227,8 +215,10 @@ class DiSetupDialog(QDialog):
             )
 
             fig.savefig(
-                os.path.join(self.save_dir, f"pc_{ph}.png"), **self.savefig_kwargs
+                path.join(self.results_dir, f"pc_{ph}.png"), **self.savefig_kwargs
             )
+
+            plt.close("all")
 
             ### Generate dictionary
 
@@ -247,11 +237,11 @@ class DiSetupDialog(QDialog):
             ### Save results from DI for phase
 
             io.save(
-                os.path.join(self.save_dir, f"di_results_{ph}.h5"),
+                path.join(self.results_dir, f"di_results_{ph}.h5"),
                 self.xmaps[f"xmap_{ph}"],
             )  # orix' HDF5
             io.save(
-                os.path.join(self.save_dir, f"di_results_{ph}.ang"),
+                path.join(self.results_dir, f"di_results_{ph}.ang"),
                 self.xmaps[f"xmap_{ph}"],
             )  # .ang
 
@@ -266,7 +256,7 @@ class DiSetupDialog(QDialog):
             )
 
             fig.savefig(
-                os.path.join(self.save_dir, f"ncc_{ph}.png"), **self.savefig_kwargs
+                path.join(self.results_dir, f"ncc_{ph}.png"), **self.savefig_kwargs
             )
 
             ### Calculate and save orientation similairty map
@@ -282,7 +272,7 @@ class DiSetupDialog(QDialog):
             )
 
             fig.savefig(
-                os.path.join(self.save_dir, f"osm_{ph}.png"), **self.savefig_kwargs
+                path.join(self.results_dir, f"osm_{ph}.png"), **self.savefig_kwargs
             )
 
             self.ckey = plot.IPFColorKeyTSL(self.mp[f"mp_{ph}"].phase.point_group)
@@ -302,7 +292,7 @@ class DiSetupDialog(QDialog):
                 self.xmaps_ref[f"xmap_ref_{ph}"] = self.xmap_ref
 
                 io.save(
-                    os.path.join(self.save_dir, f"di_ref_results_{ph}.ang"),
+                    path.join(self.results_dir, f"di_ref_results_{ph}.ang"),
                     self.xmaps_ref[f"xmap_ref_{ph}"],
                 )  # .ang
 
@@ -315,7 +305,7 @@ class DiSetupDialog(QDialog):
                 )
 
                 self.fig.savefig(
-                    os.path.join(self.save_dir, f"ipf_ref{ph}.png"),
+                    path.join(self.results_dir, f"ipf_ref{ph}.png"),
                     **self.savefig_kwargs,
                 )
 
@@ -326,10 +316,10 @@ class DiSetupDialog(QDialog):
             )
 
             self.fig.savefig(
-                os.path.join(self.save_dir, f"ipf_{ph}.png"), **self.savefig_kwargs
+                path.join(self.results_dir, f"ipf_{ph}.png"), **self.savefig_kwargs
             )
 
-            plt.close()
+            plt.close("all")
             del self.sim_dict
             gc.collect()
 
@@ -352,10 +342,10 @@ class DiSetupDialog(QDialog):
                 self.xmap_merged.phases[i].color = self.colors[i]
 
             io.save(
-                os.path.join(self.save_dir, "di_results_merged.h5"), self.xmap_merged
+                path.join(self.results_dir, "di_results_merged.h5"), self.xmap_merged
             )  # orix' HDF5
             io.save(
-                os.path.join(self.save_dir, "di_results_merged.ang"), self.xmap_merged
+                path.join(self.results_dir, "di_results_merged.ang"), self.xmap_merged
             )  # .ang
 
             ### Plot and save the normalized cross correlation score
@@ -369,14 +359,14 @@ class DiSetupDialog(QDialog):
             )
 
             fig.savefig(
-                os.path.join(self.save_dir, "ncc_merged.png"), **self.savefig_kwargs
+                path.join(self.results_dir, "ncc_merged.png"), **self.savefig_kwargs
             )
 
             ### Phase map
 
             fig = self.xmap_merged.plot(remove_padding=True, return_figure=True)
             fig.savefig(
-                os.path.join(self.save_dir, "phase_map.png"), **self.savefig_kwargs
+                path.join(self.results_dir, "phase_map.png"), **self.savefig_kwargs
             )
 
             # TODO: NCC histogram
@@ -396,11 +386,11 @@ class DiSetupDialog(QDialog):
                     self.xmap_merged_ref.phases[i].color = self.colors[i]
 
                 io.save(
-                    os.path.join(self.save_dir, "di_results_ref_merged.h5"),
+                    path.join(self.results_dir, "di_results_ref_merged.h5"),
                     self.xmap_merged_ref,
                 )  # orix' HDF5
                 io.save(
-                    os.path.join(self.save_dir, "di_results_ref_merged.ang"),
+                    path.join(self.results_dir, "di_results_ref_merged.ang"),
                     self.xmap_merged_ref,
                 )  # .ang
 
@@ -415,7 +405,7 @@ class DiSetupDialog(QDialog):
                 )
 
                 fig.savefig(
-                    os.path.join(self.save_dir, "ncc_merged_ref.png"),
+                    path.join(self.results_dir, "ncc_merged_ref.png"),
                     **self.savefig_kwargs,
                 )
 
@@ -423,7 +413,7 @@ class DiSetupDialog(QDialog):
 
                 fig = self.xmap_merged_ref.plot(remove_padding=True, return_figure=True)
                 fig.savefig(
-                    os.path.join(self.save_dir, "phase_map_ref.png"),
+                    path.join(self.results_dir, "phase_map_ref.png"),
                     **self.savefig_kwargs,
                 )
 
