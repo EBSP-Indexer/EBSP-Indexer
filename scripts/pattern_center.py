@@ -13,7 +13,7 @@ from orix.crystal_map.phase_list import Structure
 from orix.quaternion import Rotation
 from orix.crystal_map import Phase
 
-from scripts.filebrowser import FileBrowser
+from utils.filebrowser import FileBrowser
 from scripts.setting_file import SettingFile
 from ui.ui_pattern_center import Ui_PatternCenterDialog
 

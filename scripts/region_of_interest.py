@@ -1,11 +1,8 @@
 from os import path
-from tkinter import E
-from tracemalloc import start
-from kikuchipy import load, filters
+from kikuchipy import load
 from PySide6.QtWidgets import QDialog
-from PySide6.QtCore import QRunnable, Slot, QThreadPool
 
-from scripts.filebrowser import FileBrowser
+from utils.filebrowser import FileBrowser
 from ui.ui_roi_dialog import Ui_ROIDialog
 
 class RegionOfInteresDialog(QDialog):

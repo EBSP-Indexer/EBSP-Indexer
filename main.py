@@ -3,9 +3,8 @@ from os.path import basename
 from PySide6.QtCore import QDir
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
 from ui.ui_main_window import Ui_MainWindow
-import warnings
 
-from scripts.filebrowser import FileBrowser
+from utils.filebrowser import FileBrowser
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.signal_navigation import SignalNavigation
 from scripts.dictionary_indexing import DiSetupDialog
@@ -13,6 +12,7 @@ from scripts.interpreter import ConsoleWidget
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
 from scripts.setting_file import SettingFile
+
 
 class AppWindow(QMainWindow):
     """
@@ -32,7 +32,9 @@ class AppWindow(QMainWindow):
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         self.systemModel = QFileSystemModel()
 
-        variables = globals()   #TEMPERORY!!!: accessing variables in different thread may lead to crash
+        variables = (
+            globals()
+        )  # TEMPERORY!!!: accessing variables in different thread may lead to crash
         self.console = ConsoleWidget(self.ui, variables)
 
     def setupConnections(self):
@@ -44,11 +46,15 @@ class AppWindow(QMainWindow):
         self.ui.systemViewer.clicked.connect(
             lambda index: self.onSystemViewClicked(index)
         )
-        self.ui.actionSignalNavigation.triggered.connect(lambda: self.selectSignalNavigation())
-        self.ui.actionDictinary_indexing_setup.triggered.connect(lambda: self.selectDictionaryIndexingSetup())
-        self.ui.actionPattern_Center.triggered.connect(lambda: self.selectPatternCenter())
-
-
+        self.ui.actionSignalNavigation.triggered.connect(
+            lambda: self.selectSignalNavigation()
+        )
+        self.ui.actionDictinary_indexing_setup.triggered.connect(
+            lambda: self.selectDictionaryIndexingSetup()
+        )
+        self.ui.actionPattern_Center.triggered.connect(
+            lambda: self.selectPatternCenter()
+        )
 
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
@@ -58,7 +64,7 @@ class AppWindow(QMainWindow):
 
             # Setting the system viewer
             self.systemModel.setRootPath(self.working_dir)
-            self.systemModel.setNameFilters(["*.h5","*.dat"])
+            self.systemModel.setNameFilters(["*.h5", "*.dat"])
             self.systemModel.setNameFilterDisables(0)
             self.ui.systemViewer.setModel(self.systemModel)
             self.ui.systemViewer.setRootIndex(self.systemModel.index(self.working_dir))
@@ -70,14 +76,20 @@ class AppWindow(QMainWindow):
 
     def selectProcessing(self):
         try:
-            self.processingDialog = PatternProcessingDialog(self.working_dir, pattern_path=self.file_selected)
+            self.processingDialog = PatternProcessingDialog(
+                self.working_dir, pattern_path=self.file_selected
+            )
             self.processingDialog.exec()
         except Exception as e:
-            self.console.send_console_log(f"Could not initialize processing dialog:\n{str(e)}\n")
+            self.console.send_console_log(
+                f"Could not initialize processing dialog:\n{str(e)}\n"
+            )
 
     def selectROI(self):
         try:
-            self.ROIDialog = RegionOfInteresDialog(self.working_dir, pattern_path=self.file_selected)
+            self.ROIDialog = RegionOfInteresDialog(
+                self.working_dir, pattern_path=self.file_selected
+            )
             self.ROIDialog.exec()
         except Exception as e:
             print(e)
@@ -100,17 +112,23 @@ class AppWindow(QMainWindow):
             else:
                 print(e)
                 print("Could not initialize signal navigation")
-            self.console.send_console_log(f"Could not initialize signal navigation:\n{str(e)}\n")
+            self.console.send_console_log(
+                f"Could not initialize signal navigation:\n{str(e)}\n"
+            )
 
     def selectDictionaryIndexingSetup(self):
         try:
-            self.diSetup = DiSetupDialog(self.working_dir, pattern_path=self.file_selected)
+            self.diSetup = DiSetupDialog(
+                self.working_dir, pattern_path=self.file_selected
+            )
             self.diSetup.show()
         except Exception as e:
-            self.console.send_console_log(f"Could not initialize dictionary indexing:\n{str(e)}\n")
+            self.console.send_console_log(
+                f"Could not initialize dictionary indexing:\n{str(e)}\n"
+            )
             print(e)
             print("Could not initialize dictionary indexing")
-            
+
     def selectPatternCenter(self):
         try:
             self.patternCenter = PatterCenterDialog(self.working_dir)
@@ -118,6 +136,7 @@ class AppWindow(QMainWindow):
         except Exception as e:
             print(e)
             print("Could not initialize pattern center refinement")
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
