@@ -34,6 +34,11 @@ class Ui_DiSetupDialog(object):
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setSizeConstraint(QLayout.SetDefaultConstraint)
         self.gridLayout.setContentsMargins(20, 20, 20, 20)
+        self.label_4 = QLabel(self.centralwidget)
+        self.label_4.setObjectName(u"label_4")
+
+        self.gridLayout.addWidget(self.label_4, 4, 0, 1, 1)
+
         self.patternCenterY = QLineEdit(self.centralwidget)
         self.patternCenterY.setObjectName(u"patternCenterY")
 
@@ -45,7 +50,7 @@ class Ui_DiSetupDialog(object):
         self.pathLabel.setScaledContents(False)
         self.pathLabel.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignTop)
 
-        self.gridLayout.addWidget(self.pathLabel, 6, 0, 1, 1)
+        self.gridLayout.addWidget(self.pathLabel, 7, 0, 1, 1)
 
         self.patternCenterX = QLineEdit(self.centralwidget)
         self.patternCenterX.setObjectName(u"patternCenterX")
@@ -58,16 +63,23 @@ class Ui_DiSetupDialog(object):
 
         self.gridLayout.addWidget(self.patternCenterZ, 4, 1, 1, 1)
 
-        self.label_4 = QLabel(self.centralwidget)
-        self.label_4.setObjectName(u"label_4")
+        self.listWidgetPhase = QListWidget(self.centralwidget)
+        QListWidgetItem(self.listWidgetPhase)
+        QListWidgetItem(self.listWidgetPhase)
+        QListWidgetItem(self.listWidgetPhase)
+        QListWidgetItem(self.listWidgetPhase)
+        QListWidgetItem(self.listWidgetPhase)
+        self.listWidgetPhase.setObjectName(u"listWidgetPhase")
+        self.listWidgetPhase.setMinimumSize(QSize(0, 50))
+        self.listWidgetPhase.setSelectionMode(QAbstractItemView.MultiSelection)
 
-        self.gridLayout.addWidget(self.label_4, 4, 0, 1, 1)
+        self.gridLayout.addWidget(self.listWidgetPhase, 7, 1, 1, 1)
 
         self.buttonBox = QDialogButtonBox(self.centralwidget)
         self.buttonBox.setObjectName(u"buttonBox")
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
 
-        self.gridLayout.addWidget(self.buttonBox, 8, 2, 1, 1)
+        self.gridLayout.addWidget(self.buttonBox, 9, 2, 1, 1)
 
         self.label_3 = QLabel(self.centralwidget)
         self.label_3.setObjectName(u"label_3")
@@ -79,42 +91,42 @@ class Ui_DiSetupDialog(object):
 
         self.gridLayout.addWidget(self.label, 5, 0, 1, 1)
 
-        self.listWidgetPhase = QListWidget(self.centralwidget)
-        QListWidgetItem(self.listWidgetPhase)
-        QListWidgetItem(self.listWidgetPhase)
-        QListWidgetItem(self.listWidgetPhase)
-        QListWidgetItem(self.listWidgetPhase)
-        QListWidgetItem(self.listWidgetPhase)
-        self.listWidgetPhase.setObjectName(u"listWidgetPhase")
-        self.listWidgetPhase.setMinimumSize(QSize(0, 50))
-        self.listWidgetPhase.setSelectionMode(QAbstractItemView.MultiSelection)
+        self.pushButtonBrowse = QPushButton(self.centralwidget)
+        self.pushButtonBrowse.setObjectName(u"pushButtonBrowse")
 
-        self.gridLayout.addWidget(self.listWidgetPhase, 6, 1, 1, 1)
+        self.gridLayout.addWidget(self.pushButtonBrowse, 8, 2, 1, 1)
+
+        self.checkBoxRefine = QCheckBox(self.centralwidget)
+        self.checkBoxRefine.setObjectName(u"checkBoxRefine")
+        self.checkBoxRefine.setChecked(True)
+
+        self.gridLayout.addWidget(self.checkBoxRefine, 5, 1, 1, 1)
+
+        self.label_5 = QLabel(self.centralwidget)
+        self.label_5.setObjectName(u"label_5")
+
+        self.gridLayout.addWidget(self.label_5, 8, 0, 1, 1)
 
         self.label_2 = QLabel(self.centralwidget)
         self.label_2.setObjectName(u"label_2")
 
         self.gridLayout.addWidget(self.label_2, 2, 0, 1, 1)
 
-        self.checkBoxRefine = QCheckBox(self.centralwidget)
-        self.checkBoxRefine.setObjectName(u"checkBoxRefine")
-
-        self.gridLayout.addWidget(self.checkBoxRefine, 5, 1, 1, 1)
-
-        self.pushButtonBrowse = QPushButton(self.centralwidget)
-        self.pushButtonBrowse.setObjectName(u"pushButtonBrowse")
-
-        self.gridLayout.addWidget(self.pushButtonBrowse, 7, 2, 1, 1)
-
         self.lineEditPath = QLineEdit(self.centralwidget)
         self.lineEditPath.setObjectName(u"lineEditPath")
 
-        self.gridLayout.addWidget(self.lineEditPath, 7, 1, 1, 1)
+        self.gridLayout.addWidget(self.lineEditPath, 8, 1, 1, 1)
 
-        self.label_5 = QLabel(self.centralwidget)
-        self.label_5.setObjectName(u"label_5")
+        self.checkBoxLazy = QCheckBox(self.centralwidget)
+        self.checkBoxLazy.setObjectName(u"checkBoxLazy")
+        self.checkBoxLazy.setChecked(True)
 
-        self.gridLayout.addWidget(self.label_5, 7, 0, 1, 1)
+        self.gridLayout.addWidget(self.checkBoxLazy, 6, 1, 1, 1)
+
+        self.label_6 = QLabel(self.centralwidget)
+        self.label_6.setObjectName(u"label_6")
+
+        self.gridLayout.addWidget(self.label_6, 6, 0, 1, 1)
 
 
         self.gridLayout_2.addWidget(self.centralwidget, 0, 0, 1, 1)
@@ -127,6 +139,7 @@ class Ui_DiSetupDialog(object):
 
     def retranslateUi(self, DiSetupDialog):
         DiSetupDialog.setWindowTitle(QCoreApplication.translate("DiSetupDialog", u"Pattern Processing", None))
+        self.label_4.setText(QCoreApplication.translate("DiSetupDialog", u"PC - z", None))
         self.patternCenterY.setInputMask(QCoreApplication.translate("DiSetupDialog", u".000", None))
         self.patternCenterY.setText(QCoreApplication.translate("DiSetupDialog", u".000", None))
         self.patternCenterY.setPlaceholderText(QCoreApplication.translate("DiSetupDialog", u".000", None))
@@ -137,9 +150,6 @@ class Ui_DiSetupDialog(object):
         self.patternCenterZ.setInputMask(QCoreApplication.translate("DiSetupDialog", u".000", None))
         self.patternCenterZ.setText(QCoreApplication.translate("DiSetupDialog", u".000", None))
         self.patternCenterZ.setPlaceholderText(QCoreApplication.translate("DiSetupDialog", u".000", None))
-        self.label_4.setText(QCoreApplication.translate("DiSetupDialog", u"PC - z", None))
-        self.label_3.setText(QCoreApplication.translate("DiSetupDialog", u"PC - y", None))
-        self.label.setText(QCoreApplication.translate("DiSetupDialog", u"Refine", None))
 
         __sortingEnabled = self.listWidgetPhase.isSortingEnabled()
         self.listWidgetPhase.setSortingEnabled(False)
@@ -155,9 +165,14 @@ class Ui_DiSetupDialog(object):
         ___qlistwidgetitem4.setText(QCoreApplication.translate("DiSetupDialog", u"austenite", None));
         self.listWidgetPhase.setSortingEnabled(__sortingEnabled)
 
-        self.label_2.setText(QCoreApplication.translate("DiSetupDialog", u"PC - x", None))
-        self.checkBoxRefine.setText("")
+        self.label_3.setText(QCoreApplication.translate("DiSetupDialog", u"PC - y", None))
+        self.label.setText(QCoreApplication.translate("DiSetupDialog", u"Refine", None))
         self.pushButtonBrowse.setText(QCoreApplication.translate("DiSetupDialog", u"Browse", None))
+        self.checkBoxRefine.setText("")
         self.label_5.setText(QCoreApplication.translate("DiSetupDialog", u"Master patterns", None))
+        self.label_2.setText(QCoreApplication.translate("DiSetupDialog", u"PC - x", None))
+        self.lineEditPath.setText(QCoreApplication.translate("DiSetupDialog", u"C:\\EBSD data\\kikuchipy\\ebsd_simulations", None))
+        self.checkBoxLazy.setText("")
+        self.label_6.setText(QCoreApplication.translate("DiSetupDialog", u"Lazy", None))
     # retranslateUi
 
