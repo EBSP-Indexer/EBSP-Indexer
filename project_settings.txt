@@ -6,7 +6,7 @@ Acceleration voltage:	20
 Remove static background:	True
 Remove dynamic Background:	True
 Average neighbour patterns:	True
-X star:	0.445
-Y star:	0.511
-Z star:	0.542
+X star:	0.435
+Y star:	0.728
+Z star:	0.571
 Master pattern 1:	/Users/olavletholsen/EBSD-data/kikuchipy/ebsd_simulations/ni

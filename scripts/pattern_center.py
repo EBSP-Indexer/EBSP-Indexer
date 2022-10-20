@@ -1,4 +1,5 @@
 from os import path
+from re import T
 import kikuchipy as kp
 from PySide6.QtCore import QDir
 from PySide6.QtWidgets import QDialog, QApplication
@@ -20,7 +21,7 @@ from ui.ui_pattern_center import Ui_PatternCenterDialog
 from mplwidget import MplWidget
 
 def find_hkl(phase):
-    FCC = ["ni", "al", "austenite", "cu"]
+    FCC = ["ni", "al", "austenite", "cu", "si"]
     BCC = ["ferrite"]
     if phase.lower() in FCC:
         return [[1, 1, 1], [2, 0, 0], [2, 2, 0], [3, 1, 1]]
@@ -34,14 +35,16 @@ def fig2img(fig):
     fig.savefig(buf)
     buf.seek(0)
     img = Image.open(buf)
+    img = img.crop((img.width/6, img.height/6, img.width*5/6, img.height*5/6))
     return img
 
 class PatterCenterDialog(QDialog):
 
-    def __init__(self, working_dir="/Users/olavletholsen/EBSD-data/DI-dataset/Test1/1"):
+    def __init__(self, working_dir):
         super().__init__()
         self.setting_path = path.join(working_dir, "Setting.txt")
         self.working_dir = working_dir
+        self.pattern_index = 0
         self.ui = Ui_PatternCenterDialog()
         self.ui.setupUi(self)
         self.setupConnections()
@@ -70,11 +73,26 @@ class PatterCenterDialog(QDialog):
                 pass
 
     def setupConnections(self):
-        self.ui.buttonBox.accepted.connect(lambda: self.saveAndExit())
-        self.ui.buttonBox.rejected.connect(lambda: self.reject())
-        self.ui.buttonTune.clicked.connect(lambda: self.refinePatternCenter())
         self.ui.buttonAddPhase.clicked.connect(lambda: self.addPhase())
         self.ui.buttonRemovePhase.clicked.connect(lambda: self.removePhase())
+        self.ui.toolButtonLeft.clicked.connect(lambda: self.previousPattern())
+        self.ui.toolButtonRight.clicked.connect(lambda: self.nextPattern())
+        self.ui.buttonTune.clicked.connect(lambda: self.refinePatternCenter())
+        self.ui.buttonPlot.clicked.connect(lambda: self.plotData())
+        self.ui.buttonBox.accepted.connect(lambda: self.saveAndExit())
+        self.ui.buttonBox.rejected.connect(lambda: self.reject())
+
+    def previousPattern(self):
+        if self.pattern_index > 0:
+            self.pattern_index -= 1
+        else:
+            pass
+
+    def nextPattern(self):
+        if self.pattern_index < self.nav_size-1:
+            self.pattern_index += 1
+        else:
+            pass
 
     def addPhase(self):
         if self.fileBrowserOD.getFile():
@@ -95,12 +113,60 @@ class PatterCenterDialog(QDialog):
         self.ui.spinBoxY.setValue(self.pc[1])
         self.ui.spinBoxZ.setValue(self.pc[2])
 
+    def updatePCArrayFromSpinBox(self):
+        self.pc[0] = self.ui.spinBoxX.value()
+        self.pc[1] = self.ui.spinBoxY.value()
+        self.pc[2] = self.ui.spinBoxZ.value()
+
     def setupCalibrationPatterns(self):
         self.s_cal = kp.load(self.setting_path)
+        sig_shape = self.s_cal.axes_manager.signal_shape[::-1]
+        self.nav_size = self.s_cal.axes_manager.navigation_size
+        try:
+            self.s_cal.detector["shape"] = self.s_cal.axes_manager.signal_shape[::-1]
+            self.s_cal.detector = kp.detectors.EBSDDetector(**self.s_cal.detector)
+        except:
+            pass
+
         self.s_cal.remove_static_background()
         self.s_cal.remove_dynamic_background()
+        
+        self.indexer = ebsd_index.EBSDIndexer(
+            phaselist=["FCC", "BCC"],
+            vendor="bruker",
+            sampleTilt=self.s_cal.detector.sample_tilt,
+            camElev=self.s_cal.detector.tilt,
+            patDim=sig_shape
+        )
+
+    def refinePatternCenter(self):
+        self.updatePCArrayFromSpinBox()
+        sig_shape = self.s_cal.axes_manager.signal_shape[::-1]
+        pattern = self.s_cal.data[self.pattern_index]
+        indexer = ebsd_index.EBSDIndexer(
+            phaselist=["FCC", "BCC"],
+            vendor="bruker",
+            sampleTilt=self.s_cal.detector.sample_tilt,
+            camElev=0,
+            patDim=sig_shape
+        )
+        self.pc = pcopt.optimize(pattern, indexer, self.pc)
+        self.updatePCSpinBox()
+
+        data = indexer.index_pats(pattern, PC=self.pc)
+        try:
+            self.ui.labelMisfit.setText("Misfit(°): "+str(data["fit"][-1][self.pattern_index]))
+        except:
+            self.ui.labelMisfit.setText("Misfit(°): Coming in kikuchipy version 0.7")
+        self.plotData()
 
     def plotData(self):
+        self.updatePCArrayFromSpinBox()
+        try:
+            phase_chosen = self.ui.listPhases.currentItem().text()
+        except:
+            phase_chosen = self.mpPaths.keys[0]
+
         self.mp_dict = {}
         for name, h5path in self.mpPaths.items():
             mp_i = kp.load(
@@ -116,39 +182,41 @@ class PatterCenterDialog(QDialog):
             ref_i = ReciprocalLatticeVector(phase=self.mp_dict[name].phase, hkl=find_hkl(name))
             ref_i = ref_i.symmetrise().unique()
             ref_dict[name] = ref_i
-        
+
         simulator_dict = {}
         for name in self.mpPaths.keys():
             simulator_dict[name] = kp.simulations.KikuchiPatternSimulator(ref_dict[name])
 
-        ref = ref_dict["ni"]
+        detector = kp.detectors.EBSDDetector(
+            shape=self.s_cal.detector.shape,
+            sample_tilt=self.s_cal.detector.sample_tilt,
+            tilt=self.s_cal.detector.tilt,
+            pc=self.pc,
+            convention=self.indexer.vendor
+        )
 
-        sig_shape = self.s_cal.axes_manager.signal_shape[::-1]
-        indexer = ebsd_index.EBSDIndexer(vendor="KIKUCHIPY", sampleTilt=70, camElev=0, patDim=sig_shape)
+        data = self.indexer.index_pats(self.s_cal.data[self.pattern_index], PC=self.pc)[0]
+        rot = Rotation(data["quat"][-1]) * Rotation.from_axes_angles([0, 0, -1], np.pi / 2)
 
-        data, *_ = indexer.index_pats(self.s_cal.data.reshape((-1,) + sig_shape), PC=self.pc)
-        rot = Rotation(data[-1]["quat"])
-        detector = kp.detectors.EBSDDetector(sig_shape, sample_tilt=70, pc=self.pc)
-        simulator = kp.simulations.KikuchiPatternSimulator(ref)
-        sim = simulator.on_detector(detector, rot)
+        geosim_dict = {}
+        for name in self.mpPaths.keys():
+            geosim_dict[name] = simulator_dict[name].on_detector(detector, rot)
 
-        pat = sim.plot(pattern=self.s_cal.data[0], return_figure=True, zone_axes_labels=False)
-        self.ui.MplWidget.canvas.ax.imshow(fig2img(pat))
+        self.ui.MplWidget.canvas.ax.clear()
+        self.ui.MplWidget.canvas.ax.imshow(self.s_cal.data[self.pattern_index], cmap="gray")
+        lines, zone_axes, zone_axes_labels = geosim_dict[phase_chosen].as_collections(
+            zone_axes=True,
+            zone_axes_labels=True,
+            zone_axes_labels_kwargs=dict(fontsize=12),
+        )
+
+        self.ui.MplWidget.canvas.ax.add_collection(lines)
         self.ui.MplWidget.canvas.draw()
 
-
-    def refinePatternCenter(self):
-        sig_shape = self.s_cal.axes_manager.signal_shape[::-1]
-        indexer = ebsd_index.EBSDIndexer(vendor="KIKUCHIPY", sampleTilt=70, camElev=0, patDim=sig_shape)
-        self.pc = pcopt.optimize(self.s_cal.data.reshape((-1,) + sig_shape), indexer, self.pc)
-        self.updatePCSpinBox()
-        self.ui.labelMisfit.setText("Misfit(°): "+str(0.124))
-        self.plotData()
-
     def saveAndExit(self):
-        self.sf.write("X star:", str(self.ui.spinBoxX.value()))
-        self.sf.write("Y star:", str(self.ui.spinBoxY.value()))
-        self.sf.write("Z star:", str(self.ui.spinBoxZ.value()))
+        self.sf.write("X star:", str(self.pc[0]))
+        self.sf.write("Y star:", str(self.pc[1]))
+        self.sf.write("Z star:", str(self.pc[2]))
 
         for i in range(1, 5):
             try:

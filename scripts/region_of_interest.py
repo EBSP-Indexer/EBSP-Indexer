@@ -1,5 +1,4 @@
 from os import path
-from tkinter import E
 from tracemalloc import start
 from kikuchipy import load, filters
 from PySide6.QtWidgets import QDialog
