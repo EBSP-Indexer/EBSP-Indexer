@@ -16,12 +16,16 @@ class RegionOfInteresDialog(QDialog):
         self.working_dir = path.dirname(pattern_path)
 
         if pattern_path == None:
+            self.filenamebase = "Pattern"
             self.pattern_path = path.join(self.working_dir, "Pattern.dat")
+
         else:
             self.pattern_path = pattern_path
+            
+        self.filenamebase = path.basename(self.pattern_path).split(".")[0]
 
         # Standard filename of processed pattern
-        self.save_path = path.join(self.working_dir, "Pattern_ROI_x0_x1_y0_y1.h5")
+        self.save_path = path.join(self.working_dir, f"{self.filenamebase}_ROI_x0_x1_y0_y1.h5")
 
         self.ui = Ui_ROIDialog()
         self.ui.setupUi(self)
@@ -50,8 +54,8 @@ class RegionOfInteresDialog(QDialog):
         x_end = self.options["x-end"]
         y_start = self.options["y-start"]
         y_end = self.options["y-end"]
-        print("kjører")
-        self.save_path = path.join(self.working_dir, f"Pattern_ROI_{x_start}_{x_end}_{y_start}_{y_end}.h5")
+
+        self.save_path = path.join(self.working_dir, f"{self.filenamebase}_{x_start}_{x_end}_{y_start}_{y_end}.h5")
         self.ui.pathLineEdit.setText(self.save_path)
 
     def setupConnections(self):
@@ -82,10 +86,7 @@ class RegionOfInteresDialog(QDialog):
         self.s2 = self.s.inav[x_start:x_end, y_start:y_end]
         try:
             filepath = self.ui.pathLineEdit.text()
-            #filepath = path.join(
-            #    self.working_dir
-            #    ,f"/Pattern_ROI_{x_start}_{x_end}_{y_start}_{y_end}.h5"
-            #)
+
             print(filepath)
             self.s2.save(
                 filepath,
