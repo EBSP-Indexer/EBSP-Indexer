@@ -1,56 +1,31 @@
 from os import path
 from kikuchipy import load, filters
 from PySide6.QtWidgets import QDialog
-from PySide6.QtCore import QRunnable, Slot, QThreadPool
+from PySide6.QtCore import QThreadPool
 
-from scripts.filebrowser import FileBrowser
+from utils.filebrowser import FileBrowser
+from utils.worker import Worker
 from ui.ui_pattern_processing_dialog import Ui_PatternProcessingWindow
 
 
-class Worker(QRunnable):
-    '''
-    Worker thread
-
-    Inherits from QRunnable to handler worker thread setup, signals and wrap-up.
-
-    :param callback: The function callback to run on this worker thread. Supplied args and
-                     kwargs will be passed through to the runner.
-    :type callback: function
-    :param args: Arguments to pass to the callback function
-    :param kwargs: Keywords to pass to the callback function
-
-    '''
-
-    def __init__(self, fn, *args, **kwargs):
-        super(Worker, self).__init__()
-        # Store constructor arguments (re-used for processing)
-        self.fn = fn
-        self.args = args
-        self.kwargs = kwargs
-
-    @Slot()  # QtCore.Slot
-    def run(self):
-        '''
-        Initialise the runner function with passed args, kwargs.
-        '''
-        self.fn(*self.args, **self.kwargs)
-
-
 class PatternProcessingDialog(QDialog):
-    def __init__(
-        self, working_dir, pattern_path="Pattern.dat", save_name="Pattern_processed.h5"
-    ):
+    def __init__(self, pattern_path=None):
         super().__init__()
 
         self.threadpool = QThreadPool()
-        print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
+        print(
+            "Multithreading with maximum %d threads" % self.threadpool.maxThreadCount()
+        )
+        self.working_dir = path.dirname(pattern_path)
 
-        if pattern_path == "":
-            self.pattern_path = path.join(working_dir, "Pattern.dat")
+        if pattern_path == None:
+            self.pattern_path = path.join(self.working_dir, "Pattern.dat")
         else:
             self.pattern_path = pattern_path
-        self.working_dir = working_dir
-        self.save_path = f"{self.working_dir}/{save_name}"
+
+        # Standard filename of processed pattern
+        self.save_path = path.join(self.working_dir, "Pattern_processed.h5")
+
         self.ui = Ui_PatternProcessingWindow()
         self.ui.setupUi(self)
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
@@ -60,9 +35,11 @@ class PatternProcessingDialog(QDialog):
             self.s = load(self.pattern_path, lazy=True)
         except Exception as e:
             raise e
+        
         self.gaussian_window = filters.Window("gaussian", std=1)
 
         self.options = self.getOptions()
+
         self.fileBrowser = FileBrowser(
             mode=FileBrowser.SaveFile,
             dirpath=self.working_dir,
@@ -74,8 +51,7 @@ class PatternProcessingDialog(QDialog):
         self.ui.buttonBox.accepted.connect(lambda: self.run_processing())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
         self.ui.pathLineEdit.setText(self.save_path)
-        
-
+    
     def setSavePath(self):
         if self.fileBrowser.getFile():
             self.save_path = self.fileBrowser.getPaths()[0]
@@ -116,7 +92,6 @@ class PatternProcessingDialog(QDialog):
             self.s.save(
                 filename=filepath,
                 overwrite=True,
-                extension=path.splitext(filepath)[1][1:],
             )
             print("Processing complete")
         except Exception as e:
