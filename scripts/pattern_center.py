@@ -1,4 +1,5 @@
 from os import path
+from pickle import TRUE
 from re import T
 import kikuchipy as kp
 from PySide6.QtCore import QDir
@@ -6,7 +7,6 @@ from PySide6.QtWidgets import QDialog, QApplication
 import matplotlib.pyplot as plt
 import numpy as np
 
-from PIL import Image
 from diffsims.crystallography import ReciprocalLatticeVector
 from diffpy.structure import Atom, Lattice, Structure
 from pyebsdindex import ebsd_index, pcopt
@@ -27,16 +27,6 @@ def find_hkl(phase):
         return [[1, 1, 1], [2, 0, 0], [2, 2, 0], [3, 1, 1]]
     elif phase.lower() in BCC:
         return [[0, 1, 1], [0, 0, 2], [1, 1, 2], [0, 2, 2]]
-
-def fig2img(fig):
-    """Convert a Matplotlib figure to a PIL Image and return it"""
-    import io
-    buf = io.BytesIO()
-    fig.savefig(buf)
-    buf.seek(0)
-    img = Image.open(buf)
-    img = img.crop((img.width/6, img.height/6, img.width*5/6, img.height*5/6))
-    return img
 
 class PatterCenterDialog(QDialog):
 
