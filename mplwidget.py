@@ -11,10 +11,16 @@ matplotlib.use('QT5Agg')
 class MplCanvas(Canvas):
     def __init__(self):
         self.fig = Figure()
-        self.ax = self.fig.add_subplot(111)
+        self.fig.tight_layout()
+        self.ax = self.fig.add_subplot()
+        self.ax.set_axis_off()
         Canvas.__init__(self, self.fig)
         Canvas.setSizePolicy(self, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         Canvas.updateGeometry(self)
+    
+    def set_figure(self, figure):
+        self.inputFigure = figure
+    
 
 # Matplotlib widget
 class MplWidget(QtWidgets.QWidget):

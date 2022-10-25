@@ -82,7 +82,7 @@ class AppWindow(QMainWindow):
     def selectProcessing(self):
         try:
             self.processingDialog = PatternProcessingDialog(
-                self.working_dir, pattern_path=self.file_selected
+                pattern_path=self.file_selected
             )
             self.processingDialog.exec()
         except Exception as e:
@@ -93,7 +93,7 @@ class AppWindow(QMainWindow):
     def selectROI(self):
         try:
             self.ROIDialog = RegionOfInteresDialog(
-                self.working_dir, pattern_path=self.file_selected
+                pattern_path=self.file_selected
             )
             self.ROIDialog.exec()
         except Exception as e:
@@ -124,7 +124,7 @@ class AppWindow(QMainWindow):
     def selectDictionaryIndexingSetup(self):
         try:
             self.diSetup = DiSetupDialog(
-                self.working_dir, pattern_path=self.file_selected
+                pattern_path=self.file_selected
             )
             self.diSetup.show()
         except Exception as e:
