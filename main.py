@@ -1,6 +1,6 @@
 import sys
 from os.path import basename
-from PySide6.QtCore import QDir
+from PySide6.QtCore import QDir, QThreadPool
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
 from scripts.hough_indexing import HiSetupDialog
 from ui.ui_main_window import Ui_MainWindow
@@ -30,7 +30,11 @@ class AppWindow(QMainWindow):
         self.ui.setupUi(self)
         self.showMaximized()
         self.setupConnections()
-
+        
+        self.threadPool = QThreadPool()
+        print(
+            "Multithreading with maximum %d threads" % self.threadPool.maxThreadCount()
+        )
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         self.systemModel = QFileSystemModel()
 
@@ -82,6 +86,7 @@ class AppWindow(QMainWindow):
     def selectProcessing(self):
         try:
             self.processingDialog = PatternProcessingDialog(
+                parent = self,
                 pattern_path=self.file_selected
             )
             self.processingDialog.exec()
@@ -124,6 +129,7 @@ class AppWindow(QMainWindow):
     def selectDictionaryIndexingSetup(self):
         try:
             self.diSetup = DiSetupDialog(
+                parent = self,
                 pattern_path=self.file_selected
             )
             self.diSetup.show()

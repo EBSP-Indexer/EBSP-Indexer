@@ -1,6 +1,5 @@
 import os
 from PySide6.QtWidgets import QDialog, QDialogButtonBox
-from PySide6.QtCore import QThreadPool
 
 from utils.filebrowser import FileBrowser
 from utils.worker import Worker
@@ -9,7 +8,6 @@ from ui.ui_hi_setup import Ui_HISetupDialog
 import kikuchipy as kp
 import matplotlib.pyplot as plt
 import numpy as np
-from datetime import date
 from h5py import File
 from orix import io, plot
 from orix.crystal_map import CrystalMap, create_coordinate_arrays, PhaseList
@@ -31,7 +29,7 @@ class HiSetupDialog(QDialog):
 
     def __init__(self, parent, pattern_path):
         super().__init__(parent)
-        self.threadpool = QThreadPool()
+        self.threadPool = parent.threadPool
         self.pattern_path = pattern_path
         self.pattern_name = os.path.splitext(os.path.basename(pattern_path))[0]
         self.working_dir = os.path.dirname(pattern_path)
@@ -110,7 +108,6 @@ class HiSetupDialog(QDialog):
             raise e
         optionEnabled, optionExecute = options["pre"]
         if optionEnabled:
-            print("doing it")
             optionExecute()
         self.sig_shape = self.s.axes_manager.signal_shape[::-1]
         self.s.save(
@@ -176,12 +173,13 @@ class HiSetupDialog(QDialog):
             optionEnabled, optionExecute = options[key]
             if optionEnabled:
                 optionExecute()
+                plt.show()
 
     def run_hough_indexing(self):
         # Pass the function to execute
         hi_worker = Worker(lambda: self.hough_indexing())
         # Execute
-        self.threadpool.start(hi_worker)
+        self.threadPool.start(hi_worker)
 
     def set_phases_properties(self):
         for phase in self.phases:
@@ -192,7 +190,6 @@ class HiSetupDialog(QDialog):
 
     def generate_pre_maps(self):
         mean_intensity = self.s.mean(axis=(2, 3))
-        print("HELLO")
         plt.imsave(
             os.path.join(self.dir_out, "mean_intensity.png"),
             mean_intensity.data,
