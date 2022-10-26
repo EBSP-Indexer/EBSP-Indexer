@@ -1,7 +1,6 @@
 from os import path, mkdir
 
 from PySide6.QtWidgets import QDialog
-from PySide6.QtCore import QThreadPool
 
 from utils.filebrowser import FileBrowser
 from utils.worker import Worker
@@ -22,10 +21,10 @@ class DiSetupDialog(QDialog):
     Setup dialog box for Dictionary indexing
     """
 
-    def __init__(self, pattern_path=None):
-        super().__init__()
+    def __init__(self, parent=None, pattern_path=None):
+        super().__init__(parent)
         # initate threadpool
-        self.threadpool = QThreadPool()
+        self.threadPool = parent.threadPool
 
         # working directory
         self.working_dir = path.dirname(pattern_path)
@@ -75,7 +74,7 @@ class DiSetupDialog(QDialog):
         # Pass the function to execute
         worker = Worker(self.dictionary_indexing)
         # Execute
-        self.threadpool.start(worker)
+        self.threadPool.start(worker)
         self.accept()
 
     def dictionary_indexing(self):

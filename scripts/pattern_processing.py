@@ -1,7 +1,6 @@
 from os import path
 from kikuchipy import load, filters
 from PySide6.QtWidgets import QDialog
-from PySide6.QtCore import QThreadPool
 
 from utils.filebrowser import FileBrowser
 from utils.worker import Worker
@@ -9,13 +8,10 @@ from ui.ui_pattern_processing_dialog import Ui_PatternProcessingWindow
 
 
 class PatternProcessingDialog(QDialog):
-    def __init__(self, pattern_path=None):
-        super().__init__()
+    def __init__(self, parent=None, pattern_path=None):
+        super().__init__(parent)
 
-        self.threadpool = QThreadPool()
-        print(
-            "Multithreading with maximum %d threads" % self.threadpool.maxThreadCount()
-        )
+        self.threadPool = parent.threadPool
         self.working_dir = path.dirname(pattern_path)
 
         if pattern_path == None:
@@ -77,7 +73,7 @@ class PatternProcessingDialog(QDialog):
         # Pass the function to execute
         worker = Worker(self.apply_processing)
         # Execute
-        self.threadpool.start(worker)
+        self.threadPool.start(worker)
         self.accept()
 
     def apply_processing(self):
