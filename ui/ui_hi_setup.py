@@ -25,7 +25,7 @@ class Ui_HISetupDialog(object):
     def setupUi(self, HISetupDialog):
         if not HISetupDialog.objectName():
             HISetupDialog.setObjectName(u"HISetupDialog")
-        HISetupDialog.resize(424, 346)
+        HISetupDialog.resize(435, 331)
         self.gridLayout = QGridLayout(HISetupDialog)
         self.gridLayout.setObjectName(u"gridLayout")
         self.frame = QFrame(HISetupDialog)
@@ -50,6 +50,26 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout_3.addWidget(self.checkBoxLazy)
 
+        self.checkBoxPre = QCheckBox(self.frame)
+        self.checkBoxPre.setObjectName(u"checkBoxPre")
+
+        self.verticalLayout_3.addWidget(self.checkBoxPre)
+
+        self.checkBoxQuality = QCheckBox(self.frame)
+        self.checkBoxQuality.setObjectName(u"checkBoxQuality")
+
+        self.verticalLayout_3.addWidget(self.checkBoxQuality)
+
+        self.checkBoxPhase = QCheckBox(self.frame)
+        self.checkBoxPhase.setObjectName(u"checkBoxPhase")
+
+        self.verticalLayout_3.addWidget(self.checkBoxPhase)
+
+        self.checkBoxOrientation = QCheckBox(self.frame)
+        self.checkBoxOrientation.setObjectName(u"checkBoxOrientation")
+
+        self.verticalLayout_3.addWidget(self.checkBoxOrientation)
+
         self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_3.addItem(self.verticalSpacer_3)
@@ -63,39 +83,43 @@ class Ui_HISetupDialog(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.label_3 = QLabel(self.frame)
         self.label_3.setObjectName(u"label_3")
+        self.label_3.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
         self.horizontalLayout_2.addWidget(self.label_3)
 
-        self.patternCenterY = QDoubleSpinBox(self.frame)
-        self.patternCenterY.setObjectName(u"patternCenterY")
-        self.patternCenterY.setDecimals(4)
-        self.patternCenterY.setMaximum(0.999900000000000)
-        self.patternCenterY.setSingleStep(0.000100000000000)
-
-        self.horizontalLayout_2.addWidget(self.patternCenterY)
-
-        self.label_4 = QLabel(self.frame)
-        self.label_4.setObjectName(u"label_4")
-
-        self.horizontalLayout_2.addWidget(self.label_4)
-
         self.patternCenterX = QDoubleSpinBox(self.frame)
         self.patternCenterX.setObjectName(u"patternCenterX")
-        self.patternCenterX.setDecimals(4)
-        self.patternCenterX.setMaximum(0.999900000000000)
+        self.patternCenterX.setDecimals(3)
+        self.patternCenterX.setMaximum(1.000000000000000)
         self.patternCenterX.setSingleStep(0.000100000000000)
 
         self.horizontalLayout_2.addWidget(self.patternCenterX)
 
+        self.label_4 = QLabel(self.frame)
+        self.label_4.setObjectName(u"label_4")
+        self.label_4.setLayoutDirection(Qt.LeftToRight)
+        self.label_4.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.horizontalLayout_2.addWidget(self.label_4)
+
+        self.patternCenterY = QDoubleSpinBox(self.frame)
+        self.patternCenterY.setObjectName(u"patternCenterY")
+        self.patternCenterY.setDecimals(3)
+        self.patternCenterY.setMaximum(1.000000000000000)
+        self.patternCenterY.setSingleStep(0.000100000000000)
+
+        self.horizontalLayout_2.addWidget(self.patternCenterY)
+
         self.label_5 = QLabel(self.frame)
         self.label_5.setObjectName(u"label_5")
+        self.label_5.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
         self.horizontalLayout_2.addWidget(self.label_5)
 
         self.patternCenterZ = QDoubleSpinBox(self.frame)
         self.patternCenterZ.setObjectName(u"patternCenterZ")
-        self.patternCenterZ.setDecimals(4)
-        self.patternCenterZ.setMaximum(0.999900000000000)
+        self.patternCenterZ.setDecimals(3)
+        self.patternCenterZ.setMaximum(1.000000000000000)
         self.patternCenterZ.setSingleStep(0.000100000000000)
 
         self.horizontalLayout_2.addWidget(self.patternCenterZ)
@@ -155,9 +179,9 @@ class Ui_HISetupDialog(object):
 
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
 
-        QWidget.setTabOrder(self.checkBoxLazy, self.patternCenterY)
-        QWidget.setTabOrder(self.patternCenterY, self.patternCenterX)
-        QWidget.setTabOrder(self.patternCenterX, self.patternCenterZ)
+        QWidget.setTabOrder(self.checkBoxLazy, self.patternCenterX)
+        QWidget.setTabOrder(self.patternCenterX, self.patternCenterY)
+        QWidget.setTabOrder(self.patternCenterY, self.patternCenterZ)
 
         self.retranslateUi(HISetupDialog)
         self.buttonBox.rejected.connect(HISetupDialog.reject)
@@ -168,7 +192,11 @@ class Ui_HISetupDialog(object):
 
     def retranslateUi(self, HISetupDialog):
         HISetupDialog.setWindowTitle(QCoreApplication.translate("HISetupDialog", u"Hough Indexing setup", None))
-        self.checkBoxLazy.setText(QCoreApplication.translate("HISetupDialog", u"Lazy loading", None))
+        self.checkBoxLazy.setText(QCoreApplication.translate("HISetupDialog", u"Lazy loading of patterns", None))
+        self.checkBoxPre.setText(QCoreApplication.translate("HISetupDialog", u"Generate pre-indexing maps", None))
+        self.checkBoxQuality.setText(QCoreApplication.translate("HISetupDialog", u"Generate quality metrics for combined maps", None))
+        self.checkBoxPhase.setText(QCoreApplication.translate("HISetupDialog", u"Generate phase maps", None))
+        self.checkBoxOrientation.setText(QCoreApplication.translate("HISetupDialog", u"Generate orientation maps", None))
         self.label_2.setText(QCoreApplication.translate("HISetupDialog", u"Pattern center:", None))
         self.label_3.setText(QCoreApplication.translate("HISetupDialog", u"X:", None))
         self.label_4.setText(QCoreApplication.translate("HISetupDialog", u"Y:", None))

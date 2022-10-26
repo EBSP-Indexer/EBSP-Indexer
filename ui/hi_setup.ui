@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>424</width>
-    <height>346</height>
+    <width>435</width>
+    <height>331</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,13 +46,41 @@
              <enum>Qt::LeftToRight</enum>
             </property>
             <property name="text">
-             <string>Lazy loading</string>
+             <string>Lazy loading of patterns</string>
             </property>
             <property name="checked">
              <bool>true</bool>
             </property>
             <property name="tristate">
              <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBoxPre">
+            <property name="text">
+             <string>Generate pre-indexing maps</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBoxQuality">
+            <property name="text">
+             <string>Generate quality metrics for combined maps</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBoxPhase">
+            <property name="text">
+             <string>Generate phase maps</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBoxOrientation">
+            <property name="text">
+             <string>Generate orientation maps</string>
             </property>
            </widget>
           </item>
@@ -83,15 +111,18 @@
               <property name="text">
                <string>X:</string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="patternCenterY">
+             <widget class="QDoubleSpinBox" name="patternCenterX">
               <property name="decimals">
-               <number>4</number>
+               <number>3</number>
               </property>
               <property name="maximum">
-               <double>0.999900000000000</double>
+               <double>1.000000000000000</double>
               </property>
               <property name="singleStep">
                <double>0.000100000000000</double>
@@ -100,18 +131,24 @@
             </item>
             <item>
              <widget class="QLabel" name="label_4">
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
               <property name="text">
                <string>Y:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="patternCenterX">
+             <widget class="QDoubleSpinBox" name="patternCenterY">
               <property name="decimals">
-               <number>4</number>
+               <number>3</number>
               </property>
               <property name="maximum">
-               <double>0.999900000000000</double>
+               <double>1.000000000000000</double>
               </property>
               <property name="singleStep">
                <double>0.000100000000000</double>
@@ -123,6 +160,9 @@
               <property name="text">
                <string>Z:</string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
              </widget>
             </item>
             <item>
@@ -131,10 +171,10 @@
                <string/>
               </property>
               <property name="decimals">
-               <number>4</number>
+               <number>3</number>
               </property>
               <property name="maximum">
-               <double>0.999900000000000</double>
+               <double>1.000000000000000</double>
               </property>
               <property name="singleStep">
                <double>0.000100000000000</double>
@@ -244,8 +284,8 @@
  </widget>
  <tabstops>
   <tabstop>checkBoxLazy</tabstop>
-  <tabstop>patternCenterY</tabstop>
   <tabstop>patternCenterX</tabstop>
+  <tabstop>patternCenterY</tabstop>
   <tabstop>patternCenterZ</tabstop>
  </tabstops>
  <resources/>

@@ -1,5 +1,5 @@
 import os
-from PySide6.QtWidgets import QDialog
+from PySide6.QtWidgets import QDialog, QDialogButtonBox
 from PySide6.QtCore import QThreadPool
 
 from utils.filebrowser import FileBrowser
@@ -10,14 +10,12 @@ import kikuchipy as kp
 import matplotlib.pyplot as plt
 import numpy as np
 from datetime import date
-import importlib_metadata
-from diffpy.structure import Lattice, Structure
 from h5py import File
 from orix import io, plot
 from orix.crystal_map import CrystalMap, create_coordinate_arrays, PhaseList
 from orix.quaternion import Rotation
 from orix.vector import Vector3d
-from pyebsdindex import ebsd_index, pcopt
+from pyebsdindex import ebsd_index
 
 
 class HiSetupDialog(QDialog):
@@ -43,6 +41,7 @@ class HiSetupDialog(QDialog):
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         self.setupConnections()
+        self.checkPhaseSelected()
 
         self.pc = (
             0.000,
@@ -55,7 +54,7 @@ class HiSetupDialog(QDialog):
         self.phase_proxys = []
         self.xmap = None
         self.data = None
-        
+
         # Matplotlib configuration
         plt.rcParams.update({"font.size": 20})
         self.savefig_kwds = dict(pad_inches=0, bbox_inches="tight", dpi=150)
@@ -63,15 +62,32 @@ class HiSetupDialog(QDialog):
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_hough_indexing())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
+        self.ui.listWidgetPhase.clicked.connect(lambda: self.checkPhaseSelected())
 
     def getOptions(self) -> dict:
         return {
             "pc_x": float(self.ui.patternCenterX.text()),
             "pc_y": float(self.ui.patternCenterY.text()),
             "pc_z": float(self.ui.patternCenterZ.text()),
-            "phase": self.ui.listWidgetPhase.selectedItems(),
+            "phase_list": self.ui.listWidgetPhase.selectedItems(),
             "lazy": self.ui.checkBoxLazy.isChecked(),
+            "pre": [self.ui.checkBoxPre.isChecked(), self.generate_pre_maps],
+            "quality": [
+                self.ui.checkBoxQuality.isChecked(),
+                self.generate_combined_map,
+            ],
+            "phase": [self.ui.checkBoxPhase.isChecked(), self.generate_phase_map],
+            "orientation": [
+                self.ui.checkBoxOrientation.isChecked(),
+                self.generate_orientation_colour,
+            ],
         }
+
+    def checkPhaseSelected(self):
+        flag = False
+        if self.ui.listWidgetPhase.selectedItems():
+            flag = True
+        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(flag)
 
     def hough_indexing(self):
         for i in range(1, 100):
@@ -86,15 +102,17 @@ class HiSetupDialog(QDialog):
 
         options = self.getOptions()
         self.pc = (options["pc_x"], options["pc_y"], options["pc_z"])
-        self.phases = [phase.text() for phase in options["phase"]]
+        self.phases = [phase.text() for phase in options["phase_list"]]
         self.set_phases_properties()
-        print(self.phases)
-        print(self.pc)
-        
         try:
             self.s = kp.load(filename=self.pattern_path, lazy=options["lazy"])
         except Exception as e:
             raise e
+        optionEnabled, optionExecute = options["pre"]
+        if optionEnabled:
+            print("doing it")
+            optionExecute()
+        self.sig_shape = self.s.axes_manager.signal_shape[::-1]
         self.s.save(
             os.path.join(self.dir_out, "pattern.h5")
         )  # Not sure if the file must be converted to H5
@@ -112,9 +130,11 @@ class HiSetupDialog(QDialog):
             PC=self.pc,
             sampleTilt=sample_tilt,
             camElev=camera_tilt,
-            patDim=dset_h5.shape[1:],
+            patDim=self.sig_shape,
         )
-        self.data = indexer.index_pats(patsin=dset_h5, verbose=1)   
+
+        print("Starting indexing")
+        self.data = indexer.index_pats(patsin=dset_h5, verbose=1)
         # Verbose = 2 will crash because a Matplotlib GUI outside of the main thread will likely fail.
 
         # Generate CrystalMap from best match
@@ -152,13 +172,16 @@ class HiSetupDialog(QDialog):
             pattern_fit_prop="fit",
             extra_prop=["nmatch", "matchattempts0", "matchattempts1", "totvotes"],
         )
+        for key in ["quality", "phase", "orientation"]:
+            optionEnabled, optionExecute = options[key]
+            if optionEnabled:
+                optionExecute()
 
     def run_hough_indexing(self):
         # Pass the function to execute
-        worker = Worker(lambda: self.hough_indexing())
+        hi_worker = Worker(lambda: self.hough_indexing())
         # Execute
-        self.threadpool.start(worker)
-        self.accept()
+        self.threadpool.start(hi_worker)
 
     def set_phases_properties(self):
         for phase in self.phases:
@@ -167,11 +190,11 @@ class HiSetupDialog(QDialog):
             self.space_groups.append(space_group)
             self.phase_proxys.append(phase_proxy)
 
-    # Currently not in use
-    def generate_maps(self):
+    def generate_pre_maps(self):
         mean_intensity = self.s.mean(axis=(2, 3))
+        print("HELLO")
         plt.imsave(
-            os.path.join(self.working_dir, "mean_intensity.png"),
+            os.path.join(self.dir_out, "mean_intensity.png"),
             mean_intensity.data,
             cmap="gray",
         )
@@ -182,12 +205,12 @@ class HiSetupDialog(QDialog):
         blue = (2, 3)
         vbse_rgb_img = vbse_gen.get_rgb_image(r=red, g=green, b=blue)
         vbse_rgb_img.change_dtype("uint8")
-        plt.imsave(os.path.join(self.working_dir, "vbse_rgb.png"), vbse_rgb_img.data)
+        plt.imsave(os.path.join(self.dir_out, "vbse_rgb.png"), vbse_rgb_img.data)
 
         iq = self.s.get_image_quality()
         adp = self.s.get_average_neighbour_dot_product_map()
-        plt.imsave(os.path.join(self.working_dir, "maps_iq.png"), iq, cmap="gray")
-        plt.imsave(os.path.join(self.working_dir, "maps_adp.png"), adp, cmap="gray")
+        plt.imsave(os.path.join(self.dir_out, "maps_iq.png"), iq, cmap="gray")
+        plt.imsave(os.path.join(self.dir_out, "maps_adp.png"), adp, cmap="gray")
 
     def generate_combined_map(self):
         """
