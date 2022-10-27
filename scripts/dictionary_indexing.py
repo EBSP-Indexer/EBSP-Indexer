@@ -35,7 +35,10 @@ class DiSetupDialog(QDialog):
             self.pattern_path = pattern_path
 
         # Defining phase dictionary
-        # TODO: move point group dictionary to an external file that can be edited from GU
+        # TODO: move point group dictionary to an external file that can be edited from GUI
+
+        # Standard settings for dictionary indexing
+        self.savefig_kwargs = dict(bbox_inches="tight", pad_inches=0, dpi=150)
 
         # Dialog box ui setup
         self.ui = Ui_DiSetupDialog()
@@ -46,6 +49,33 @@ class DiSetupDialog(QDialog):
 
         # standard directory of simulated masterpattern is C:\EBSD data\kikuchipy\ebsd_simulations
         self.sim_dir = self.ui.lineEditPath.text()
+
+        # Load pattern-file to get acquisition resolution
+        try:
+            self.s = kp.load(self.pattern_path, lazy=True)
+        except Exception as e:
+            raise e
+
+        self.signal_shape = self.s.axes_manager.signal_shape[::-1]
+        bin_shapes_1D = np.array([10, 20, 30, 40, 50, 60, 12, 24, 32, 48])
+        bin_shapes_2D = np.array(
+            [
+                "(10, 10)",
+                "(20, 20)",
+                "(30, 30)",
+                "(40, 40)",
+                "(50, 50)",
+                "(60, 60)",
+                "(12, 12)",
+                "(24, 24)",
+                "(32, 32)",
+                "(48, 48)",
+            ]
+        )
+        self.bin_shapes_to_comboBox = bin_shapes_2D[
+            np.where(np.array(self.signal_shape[0] % bin_shapes_1D) == 0)[0]
+        ]
+        self.ui.comboBoxBinning.addItems(self.bin_shapes_to_comboBox)
 
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_dictionary_indexing())
@@ -63,6 +93,10 @@ class DiSetupDialog(QDialog):
             "Phase": self.ui.listWidgetPhase.selectedItems(),
             "Refine": self.ui.checkBoxRefine.isChecked(),
             "Lazy": self.ui.checkBoxLazy.isChecked(),
+            "Mask": self.ui.checkBoxMask.isChecked(),
+            "N_iter": int(self.ui.spinBoxNumIter.value()),
+            "Disori": float(self.ui.doubleSpinBoxStepSize.value()),
+            "Binning": self.ui.comboBoxBinning.currentText(),
         }
 
     def setSimDir(self):
@@ -76,6 +110,24 @@ class DiSetupDialog(QDialog):
         # Execute
         self.threadPool.start(worker)
         self.accept()
+
+    def signal_mask(self):
+        self.signal_mask = ~kp.filters.Window("circular", self.sig_shape).astype(bool)
+
+        # Save figure of signal mask
+        p = self.s2.inav[0, 0].data
+        fig, ax = plt.subplots(ncols=2, figsize=(10, 5))
+        ax[0].imshow(p * self.signal_mask, cmap="gray")
+        ax[0].set_title("Not used in matching")
+        ax[1].imshow(p * ~self.signal_mask, cmap="gray")
+        ax[1].set_title("Used in matching")
+        fig.savefig(
+            path.join(self.results_dir, "circular_mask_for_di.png"),
+            **self.savefig_kwargs,
+        )
+
+        # Use signal mask for dictionary indexing
+        self.di_kwargs["signal_mask"] = self.signal_mask
 
     def dictionary_indexing(self):
         # get options from input
@@ -101,11 +153,14 @@ class DiSetupDialog(QDialog):
         self.refine = self.options["Refine"]
 
         # TODO: Settings that can be set as user input later
-        self.savefig_kwargs = dict(bbox_inches="tight", pad_inches=0, dpi=150)
-        self.new_signal_shape = (30, 30)
-        self.disori = 2
-        self.use_signal_mask = False
+        self.new_signal_shape = eval(self.options["Binning"])
+        self.disori = self.options["Disori"]
+        self.use_signal_mask = self.options["Mask"]
+
         self.n_per_iteration = None
+
+        if self.options["N_iter"] != 0:
+            self.n_per_iteration = self.options["N_iter"]
 
         # Create folder for storing DI results in working directory
         i = 1
@@ -170,6 +225,7 @@ class DiSetupDialog(QDialog):
             self.di_kwargs["signal_mask"] = self.signal_mask
 
         ### Dictionaries for use with several phases
+
         # Master pattern dictionary
         self.mp = {}
         for ph in self.phases:
@@ -183,6 +239,7 @@ class DiSetupDialog(QDialog):
 
         # Xmaps dictionary for storing crystalmaps
         self.xmaps = {}
+
         # Refined xmaps dictionary for storing refined crystalmaps
         self.xmaps_ref = {}
 
