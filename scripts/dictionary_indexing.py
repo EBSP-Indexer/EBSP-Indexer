@@ -39,9 +39,8 @@ class DiSetupDialog(QDialog):
         # Defining phase dictionary
         # TODO: move point group dictionary to an external file that can be edited from GUI
 
-        # Matplotlib parameters
+        # Standard settings for dictionary indexing
         self.savefig_kwargs = dict(bbox_inches="tight", pad_inches=0, dpi=150)
-        
 
         # Dialog box ui setup
         self.ui = Ui_DiSetupDialog()
@@ -52,36 +51,6 @@ class DiSetupDialog(QDialog):
 
         # standard directory of simulated masterpattern is C:\EBSD data\kikuchipy\ebsd_simulations
         self.sim_dir = self.ui.lineEditPath.text()
-
-        # Load pattern-file to get acquisition resolution
-        try:
-            self.s = kp.load(self.pattern_path, lazy=True)
-        except Exception as e:
-            raise e
-
-        self.sig_shape = self.s.axes_manager.signal_shape[::-1]
-        bin_shapes_1D = np.array([10, 20, 30, 40, 50, 60, 12, 24, 32, 48])
-        bin_shapes_2D = np.array(
-            [
-                "(10, 10)",
-                "(20, 20)",
-                "(30, 30)",
-                "(40, 40)",
-                "(50, 50)",
-                "(60, 60)",
-                "(12, 12)",
-                "(24, 24)",
-                "(32, 32)",
-                "(48, 48)",
-            ]
-        )
-        self.bin_shapes_to_comboBox = bin_shapes_2D[
-            np.where(np.array(self.sig_shape[0] % bin_shapes_1D) == 0)[0]
-        ]
-        self.ui.comboBoxBinning.addItems(self.bin_shapes_to_comboBox)
-        
-        del self.s
-        gc.collect()
 
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_dictionary_indexing())
@@ -255,7 +224,6 @@ class DiSetupDialog(QDialog):
                 optionExecute()
 
         ### Dictionaries for use with several phases
-
         # Master pattern dictionary
         self.mp = {}
         for ph in self.phases:
@@ -269,7 +237,6 @@ class DiSetupDialog(QDialog):
 
         # Xmaps dictionary for storing crystalmaps
         self.xmaps = {}
-
         # Refined xmaps dictionary for storing refined crystalmaps
         self.xmaps_ref = {}
 
