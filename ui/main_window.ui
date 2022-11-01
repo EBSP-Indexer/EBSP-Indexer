@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>880</width>
-    <height>741</height>
+    <width>695</width>
+    <height>662</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,11 +22,11 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="2,1">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="2">
       <item>
-       <layout class="QHBoxLayout" name="topLayout" stretch="0,1">
+       <layout class="QHBoxLayout" name="topLayout" stretch="1,0,2">
         <item>
-         <layout class="QVBoxLayout" name="systemViewerLayout">
+         <layout class="QVBoxLayout" name="systemViewerLayout" stretch="0,1,0,0">
           <item>
            <widget class="QLabel" name="folderLabel">
             <property name="sizePolicy">
@@ -50,8 +50,8 @@
             </property>
             <property name="minimumSize">
              <size>
-              <width>240</width>
-              <height>0</height>
+              <width>320</width>
+              <height>320</height>
              </size>
             </property>
             <property name="styleSheet">
@@ -65,7 +65,38 @@
             </attribute>
            </widget>
           </item>
+          <item>
+           <widget class="QPlainTextEdit" name="consoleLog">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="inputLayout">
+            <item>
+             <widget class="QLabel" name="consolePrompt">
+              <property name="text">
+               <string>&gt;&gt;&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="consoleInput"/>
+            </item>
+           </layout>
+          </item>
          </layout>
+        </item>
+        <item>
+         <widget class="Line" name="line">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="MplWidget" name="MplWidget" native="true">
@@ -77,39 +108,11 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>200</width>
-            <height>200</height>
+            <width>320</width>
+            <height>320</height>
            </size>
           </property>
          </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="bottomLayout" stretch="2,0">
-        <item>
-         <widget class="QPlainTextEdit" name="consoleLog">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="inputLayout">
-          <item>
-           <widget class="QLabel" name="consolePrompt">
-            <property name="text">
-             <string>&gt;&gt;&gt;</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="consoleInput"/>
-          </item>
-         </layout>
         </item>
        </layout>
       </item>
@@ -122,8 +125,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>880</width>
-     <height>26</height>
+     <width>695</width>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
