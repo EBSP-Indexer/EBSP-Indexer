@@ -1,7 +1,8 @@
 import sys
 from os.path import basename
-from PySide6.QtCore import QDir
+from PySide6.QtCore import QDir, QThreadPool
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
+from scripts.hough_indexing import HiSetupDialog
 from ui.ui_main_window import Ui_MainWindow
 import matplotlib.image as mpimg
 import warnings
@@ -15,6 +16,7 @@ from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
 from scripts.setting_file import SettingFile
 
+SYSTEM_VIEWER_FILTER = ["*.h5", "*.dat", "*.ang", "*.jpg", "*.png", "*.gif", "*.txt"]
 
 class AppWindow(QMainWindow):
     """
@@ -30,7 +32,11 @@ class AppWindow(QMainWindow):
         self.ui.setupUi(self)
         self.showMaximized()
         self.setupConnections()
-
+        
+        self.threadPool = QThreadPool()
+        print(
+            "Multithreading with maximum %d threads" % self.threadPool.maxThreadCount()
+        )
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         self.systemModel = QFileSystemModel()
 
@@ -51,8 +57,11 @@ class AppWindow(QMainWindow):
         self.ui.actionSignalNavigation.triggered.connect(
             lambda: self.selectSignalNavigation()
         )
-        self.ui.actionDictinary_indexing_setup.triggered.connect(
+        self.ui.actionDictionary_indexing.triggered.connect(
             lambda: self.selectDictionaryIndexingSetup()
+        )
+        self.ui.actionHough_indexing.triggered.connect(
+            lambda: self.selectHoughIndexingSetup()
         )
         self.ui.actionPattern_Center.triggered.connect(
             lambda: self.selectPatternCenter()
@@ -66,7 +75,7 @@ class AppWindow(QMainWindow):
 
             # Setting the system viewer
             self.systemModel.setRootPath(self.working_dir)
-            self.systemModel.setNameFilters(["*.h5", "*.dat"])
+            self.systemModel.setNameFilters(SYSTEM_VIEWER_FILTER)
             self.systemModel.setNameFilterDisables(0)
             self.ui.systemViewer.setModel(self.systemModel)
             self.ui.systemViewer.setRootIndex(self.systemModel.index(self.working_dir))
@@ -79,6 +88,7 @@ class AppWindow(QMainWindow):
     def selectProcessing(self):
         try:
             self.processingDialog = PatternProcessingDialog(
+                parent = self,
                 pattern_path=self.file_selected
             )
             self.processingDialog.exec()
@@ -125,6 +135,7 @@ class AppWindow(QMainWindow):
     def selectDictionaryIndexingSetup(self):
         try:
             self.diSetup = DiSetupDialog(
+                parent = self,
                 pattern_path=self.file_selected
             )
             self.diSetup.show()
@@ -134,6 +145,15 @@ class AppWindow(QMainWindow):
             )
             print(e)
             print("Could not initialize dictionary indexing")
+
+    def selectHoughIndexingSetup(self):
+        try:
+            self.hiSetup = HiSetupDialog(parent=self, pattern_path=self.file_selected)
+            self.hiSetup.show()
+        except Exception as e:
+            self.console.send_console_log(
+                f"Could not initialize hough indexing:\n{str(e)}\n"
+            )
 
     def selectPatternCenter(self):
         try:

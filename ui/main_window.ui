@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>865</width>
-    <height>685</height>
+    <width>880</width>
+    <height>741</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -122,8 +122,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>865</width>
-     <height>24</height>
+     <width>880</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -148,9 +148,10 @@
    </widget>
    <widget class="QMenu" name="menuDictionary_indexing">
     <property name="title">
-     <string>Dictionary indexing</string>
+     <string>Indexing</string>
     </property>
-    <addaction name="actionDictinary_indexing_setup"/>
+    <addaction name="actionDictionary_indexing"/>
+    <addaction name="actionHough_indexing"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuProcessing"/>
@@ -179,9 +180,9 @@
     <string>Signal navigation</string>
    </property>
   </action>
-  <action name="actionDictinary_indexing_setup">
+  <action name="actionDictionary_indexing">
    <property name="text">
-    <string>Dictinary indexing setup</string>
+    <string>Dictionary indexing</string>
    </property>
   </action>
   <action name="actionPattern_Center">
@@ -192,6 +193,11 @@
   <action name="actionROI">
    <property name="text">
     <string>ROI</string>
+   </property>
+  </action>
+  <action name="actionHough_indexing">
+   <property name="text">
+    <string>Hough indexing</string>
    </property>
   </action>
  </widget>
