@@ -4,6 +4,8 @@ from PySide6.QtCore import QDir, QThreadPool
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
 from scripts.hough_indexing import HiSetupDialog
 from ui.ui_main_window import Ui_MainWindow
+import matplotlib.image as mpimg
+import warnings
 
 from utils.filebrowser import FileBrowser
 from scripts.pattern_processing import PatternProcessingDialog
@@ -14,7 +16,7 @@ from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
 from scripts.setting_file import SettingFile
 
-SYSTEM_VIEWER_FILTER = ["*.h5", "*.dat", "*.ang", "*.jpg", "*.png", "*.gif", "*.txt"]
+SYSTEM_VIEWER_FILTER = ["*.h5", "*.dat", "*.ang", "*.jpg", "*.png", "*.gif", "*.txt", ".bmp"]
 
 class AppWindow(QMainWindow):
     """
@@ -30,6 +32,7 @@ class AppWindow(QMainWindow):
         self.ui.setupUi(self)
         self.showMaximized()
         self.setupConnections()
+        self.showImage()
         
         self.threadPool = QThreadPool()
         print(
@@ -107,6 +110,7 @@ class AppWindow(QMainWindow):
 
     def onSystemViewClicked(self, index):
         self.file_selected = self.systemModel.filePath(index)
+        self.showImage(self.file_selected)
 
     def selectSignalNavigation(self):
         try:
@@ -157,6 +161,14 @@ class AppWindow(QMainWindow):
             print(e)
             print("Could not initialize pattern center refinement")
 
+    def showImage(self, imagePath="resources/kikuchipy_banner.png"):
+        image = mpimg.imread(imagePath)
+
+        self.ui.MplWidget.canvas.ax.clear()
+        self.ui.MplWidget.canvas.ax.axis(False)
+        self.ui.MplWidget.canvas.ax.imshow(image)
+        self.ui.MplWidget.canvas.draw()
+        
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

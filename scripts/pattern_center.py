@@ -58,7 +58,7 @@ class PatterCenterDialog(QDialog):
         except:
             self.pc = np.array([0.000, 0.000, 0.000])
         self.updatePCSpinBox()
-
+        
         self.mpPaths = {}
         for i in range(1, 5):
             try:
@@ -123,7 +123,7 @@ class PatterCenterDialog(QDialog):
             self.s_cal.detector["shape"] = self.s_cal.axes_manager.signal_shape[::-1]
             self.s_cal.detector = kp.detectors.EBSDDetector(**self.s_cal.detector)
         except:
-            pass
+            print("setupCalibrationPatterns has an error!")
 
         self.s_cal.remove_static_background()
         self.s_cal.remove_dynamic_background()
@@ -140,6 +140,7 @@ class PatterCenterDialog(QDialog):
         self.updatePCArrayFromSpinBox()
         sig_shape = self.s_cal.axes_manager.signal_shape[::-1]
         pattern = self.s_cal.data[self.pattern_index]
+        """
         indexer = ebsd_index.EBSDIndexer(
             phaselist=["FCC", "BCC"],
             vendor="bruker",
@@ -147,17 +148,13 @@ class PatterCenterDialog(QDialog):
             camElev=0,
             patDim=sig_shape,
         )
-        self.pc = pcopt.optimize(pattern, indexer, self.pc)
+        """
+        self.pc = pcopt.optimize(pattern, self.indexer, self.pc)
         self.updatePCSpinBox()
 
-        data = indexer.index_pats(pattern, PC=self.pc)
-        try:
-            self.ui.labelMisfit.setText(
-                "Misfit(°): " + str(data["fit"][-1][self.pattern_index])
-            )
-        except:
-            self.ui.labelMisfit.setText("Misfit(°): Coming in kikuchipy version 0.7")
+        data = self.indexer.index_pats(pattern, PC=self.pc)[0]
         self.plotData()
+        self.ui.labelMisfit.setText("Misfit(°): "+str(data["fit"][-1]))
 
     def plotData(self):
         self.updatePCArrayFromSpinBox()
@@ -210,6 +207,7 @@ class PatterCenterDialog(QDialog):
             geosim_dict[name] = simulator_dict[name].on_detector(detector, rot)
 
         self.ui.MplWidget.canvas.ax.clear()
+        self.ui.MplWidget.canvas.ax.axis("off")
         self.ui.MplWidget.canvas.ax.imshow(
             self.s_cal.data[self.pattern_index], cmap="gray"
         )
