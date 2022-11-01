@@ -20,6 +20,7 @@ from ui.ui_pattern_center import Ui_PatternCenterDialog
 
 from mplwidget import MplWidget
 
+
 def find_hkl(phase):
     FCC = ["ni", "al", "austenite", "cu", "si"]
     BCC = ["ferrite"]
@@ -28,8 +29,8 @@ def find_hkl(phase):
     elif phase.lower() in BCC:
         return [[0, 1, 1], [0, 0, 2], [1, 1, 2], [0, 2, 2]]
 
-class PatterCenterDialog(QDialog):
 
+class PatterCenterDialog(QDialog):
     def __init__(self, working_dir):
         super().__init__()
         self.setting_path = path.join(working_dir, "Setting.txt")
@@ -44,19 +45,25 @@ class PatterCenterDialog(QDialog):
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
 
     def setupInitialSettings(self):
-        self.sf = SettingFile("project_settings.txt")
-        self.pc = np.array([
-            float(self.sf.read("X star:")), 
-            float(self.sf.read("Y star:")), 
-            float(self.sf.read("Z star:"))
-        ])
+        self.sf = SettingFile(path.join(self.working_dir,"project_settings.txt"))
+        try:
+            self.pc = np.array(
+                [
+                    float(self.sf.read("X star:")),
+                    float(self.sf.read("Y star:")),
+                    float(self.sf.read("Z star:")),
+                ]
+            )
+
+        except:
+            self.pc = np.array([0.000, 0.000, 0.000])
         self.updatePCSpinBox()
-        
+
         self.mpPaths = {}
         for i in range(1, 5):
             try:
-                mpPath = self.sf.read("Master pattern "+str(i)+':')
-                phase = mpPath.split('/').pop()
+                mpPath = self.sf.read("Master pattern " + str(i) + ":")
+                phase = mpPath.split("/").pop()
                 self.mpPaths[phase] = mpPath
                 self.ui.listPhases.addItem(phase)
             except:
@@ -79,7 +86,7 @@ class PatterCenterDialog(QDialog):
             pass
 
     def nextPattern(self):
-        if self.pattern_index < self.nav_size-1:
+        if self.pattern_index < self.nav_size - 1:
             self.pattern_index += 1
         else:
             pass
@@ -88,12 +95,12 @@ class PatterCenterDialog(QDialog):
         if self.fileBrowserOD.getFile():
             mpPath = self.fileBrowserOD.getPaths()[0]
             phase = mpPath.split("/").pop()
-            self.fileBrowserOD.setDefaultDir(mpPath[0: -len(phase)-1])
-            
+            self.fileBrowserOD.setDefaultDir(mpPath[0 : -len(phase) - 1])
+
             if phase not in self.mpPaths.keys():
                 self.mpPaths[phase] = mpPath
                 self.ui.listPhases.addItem(phase)
-    
+
     def removePhase(self):
         self.mpPaths.pop(str(self.ui.listPhases.currentItem().text()))
         self.ui.listPhases.takeItem(self.ui.listPhases.currentRow())
@@ -120,13 +127,13 @@ class PatterCenterDialog(QDialog):
 
         self.s_cal.remove_static_background()
         self.s_cal.remove_dynamic_background()
-        
+
         self.indexer = ebsd_index.EBSDIndexer(
             phaselist=["FCC", "BCC"],
             vendor="bruker",
             sampleTilt=self.s_cal.detector.sample_tilt,
             camElev=self.s_cal.detector.tilt,
-            patDim=sig_shape
+            patDim=sig_shape,
         )
 
     def refinePatternCenter(self):
@@ -138,14 +145,16 @@ class PatterCenterDialog(QDialog):
             vendor="bruker",
             sampleTilt=self.s_cal.detector.sample_tilt,
             camElev=0,
-            patDim=sig_shape
+            patDim=sig_shape,
         )
         self.pc = pcopt.optimize(pattern, indexer, self.pc)
         self.updatePCSpinBox()
 
         data = indexer.index_pats(pattern, PC=self.pc)
         try:
-            self.ui.labelMisfit.setText("Misfit(°): "+str(data["fit"][-1][self.pattern_index]))
+            self.ui.labelMisfit.setText(
+                "Misfit(°): " + str(data["fit"][-1][self.pattern_index])
+            )
         except:
             self.ui.labelMisfit.setText("Misfit(°): Coming in kikuchipy version 0.7")
         self.plotData()
@@ -163,37 +172,47 @@ class PatterCenterDialog(QDialog):
                 path.join(h5path, str(f"{name}_mc_mp_20kv.h5")),
                 projection="lambert",
                 energy=self.s_cal.metadata.Acquisition_instrument.SEM.beam_energy,
-                hemisphere="upper"
+                hemisphere="upper",
             )
             self.mp_dict[name] = mp_i
 
         ref_dict = {}
         for name in self.mpPaths.keys():
-            ref_i = ReciprocalLatticeVector(phase=self.mp_dict[name].phase, hkl=find_hkl(name))
+            ref_i = ReciprocalLatticeVector(
+                phase=self.mp_dict[name].phase, hkl=find_hkl(name)
+            )
             ref_i = ref_i.symmetrise().unique()
             ref_dict[name] = ref_i
 
         simulator_dict = {}
         for name in self.mpPaths.keys():
-            simulator_dict[name] = kp.simulations.KikuchiPatternSimulator(ref_dict[name])
+            simulator_dict[name] = kp.simulations.KikuchiPatternSimulator(
+                ref_dict[name]
+            )
 
         detector = kp.detectors.EBSDDetector(
             shape=self.s_cal.detector.shape,
             sample_tilt=self.s_cal.detector.sample_tilt,
             tilt=self.s_cal.detector.tilt,
             pc=self.pc,
-            convention=self.indexer.vendor
+            convention=self.indexer.vendor,
         )
 
-        data = self.indexer.index_pats(self.s_cal.data[self.pattern_index], PC=self.pc)[0]
-        rot = Rotation(data["quat"][-1]) * Rotation.from_axes_angles([0, 0, -1], np.pi / 2)
+        data = self.indexer.index_pats(self.s_cal.data[self.pattern_index], PC=self.pc)[
+            0
+        ]
+        rot = Rotation(data["quat"][-1]) * Rotation.from_axes_angles(
+            [0, 0, -1], np.pi / 2
+        )
 
         geosim_dict = {}
         for name in self.mpPaths.keys():
             geosim_dict[name] = simulator_dict[name].on_detector(detector, rot)
 
         self.ui.MplWidget.canvas.ax.clear()
-        self.ui.MplWidget.canvas.ax.imshow(self.s_cal.data[self.pattern_index], cmap="gray")
+        self.ui.MplWidget.canvas.ax.imshow(
+            self.s_cal.data[self.pattern_index], cmap="gray"
+        )
         lines, zone_axes, zone_axes_labels = geosim_dict[phase_chosen].as_collections(
             zone_axes=True,
             zone_axes_labels=True,
@@ -204,17 +223,18 @@ class PatterCenterDialog(QDialog):
         self.ui.MplWidget.canvas.draw()
 
     def saveAndExit(self):
+        self.updatePCArrayFromSpinBox()
         self.sf.write("X star:", str(self.pc[0]))
         self.sf.write("Y star:", str(self.pc[1]))
         self.sf.write("Z star:", str(self.pc[2]))
-
+           
         for i in range(1, 5):
             try:
-                self.sf.remove("Master pattern "+str(i+1)+':')
+                self.sf.remove("Master pattern " + str(i + 1) + ":")
             except:
                 pass
         for i, path in enumerate(self.mpPaths.values()):
-            self.sf.write("Master pattern "+str(i+1)+':', path)
-
+            self.sf.write("Master pattern " + str(i + 1) + ":", path)
+        
         self.sf.save()
         self.close()
