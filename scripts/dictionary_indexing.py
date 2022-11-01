@@ -1,6 +1,7 @@
 from os import path, mkdir
 
 from PySide6.QtWidgets import QDialog
+from scripts.setting_file import SettingFile
 
 from utils.filebrowser import FileBrowser
 from utils.worker import Worker
@@ -17,6 +18,7 @@ import gc
 
 # Turn interactive plotting off
 plt.ioff()
+
 
 class DiSetupDialog(QDialog):
     """
@@ -37,7 +39,6 @@ class DiSetupDialog(QDialog):
             self.pattern_path = pattern_path
 
         # Defining phase dictionary
-        # TODO: move point group dictionary to an external file that can be edited from GUI
 
         # Standard settings for dictionary indexing
         self.savefig_kwargs = dict(bbox_inches="tight", pad_inches=0, dpi=150)
@@ -52,12 +53,17 @@ class DiSetupDialog(QDialog):
         # standard directory of simulated masterpattern is C:\EBSD data\kikuchipy\ebsd_simulations
         self.sim_dir = self.ui.lineEditPath.text()
 
-                # Load pattern-file to get acquisition resolution
+        # Load pattern-file to get acquisition resolution
         try:
             self.s = kp.load(self.pattern_path, lazy=True)
         except Exception as e:
             raise e
 
+        self.setupBinningShapes()
+
+        self.setupInitialSettings()
+
+    def setupBinningShapes(self):
         self.sig_shape = self.s.axes_manager.signal_shape[::-1]
         bin_shapes_1D = np.array([10, 20, 30, 40, 50, 60, 12, 24, 32, 48])
         bin_shapes_2D = np.array(
@@ -79,8 +85,63 @@ class DiSetupDialog(QDialog):
         ]
         self.ui.comboBoxBinning.addItems(self.bin_shapes_to_comboBox)
 
-        del self.s
-        gc.collect()
+    def setupInitialSettings(self):
+        print("hei")
+        self.sf = SettingFile(path.join(self.working_dir, "project_settings.txt"))
+        try:
+            self.pc = np.array(
+                [
+                    float(self.sf.read("X star:")),
+                    float(self.sf.read("Y star:")),
+                    float(self.sf.read("Z star:")),
+                ]
+            )
+        except:
+            self.pc = np.array([0.000, 0.000, 0.000])
+
+        self.updatePCpatternCenter()
+        
+        self.mpPaths = {}
+        
+        i = 1
+        while True:
+            try:
+                mpPath = self.sf.read("Master pattern " + str(i) + ":")
+                print(mpPath)
+                phase = mpPath.split("/").pop()
+                self.mpPaths[phase] = mpPath
+                self.ui.listWidgetPhase.addItem(phase)
+                i += 1
+            except:
+                break                
+
+    def updatePCpatternCenter(self):
+        self.ui.patternCenterX.setValue(self.pc[0])
+        self.ui.patternCenterY.setValue(self.pc[1])
+        self.ui.patternCenterZ.setValue(self.pc[2])
+
+    def updatePCArrayFrompatternCenter(self):
+        self.pc[0] = self.ui.patternCenterX.value()
+        self.pc[1] = self.ui.patternCenterY.value()
+        self.pc[2] = self.ui.patternCenterZ.value()
+
+    def addPhase(self):
+        if self.fileBrowserOD.getFile():
+            mpPath = self.fileBrowserOD.getPaths()[0]
+            phase = mpPath.split("/").pop()
+            self.fileBrowserOD.setDefaultDir(mpPath[0 : -len(phase) - 1])
+
+            if phase not in self.mpPaths.keys():
+                self.mpPaths[phase] = mpPath
+                self.ui.listWidgetPhase.addItem(phase)
+
+    def removePhase(self):
+        self.mpPaths.pop(str(self.ui.listWidgetPhase.currentItem().text()))
+        self.ui.listWidgetPhase.takeItem(self.ui.listWidgetPhase.currentRow())
+
+    def getPhases(self):
+        lw = self.ui.listWidgetPhase
+        self.phases = [lw.item(x).text() for x in range(lw.count())]
 
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_dictionary_indexing())
@@ -89,12 +150,12 @@ class DiSetupDialog(QDialog):
         # user can change directory for stored master patterns
         self.ui.pushButtonBrowse.clicked.connect(lambda: self.setSimDir())
 
+        self.ui.pushButtonAddPhase.clicked.connect(lambda: self.addPhase())
+        self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.removePhase())
+
     # read options from interactive elements in dialog box
     def getOptions(self) -> dict:
         return {
-            "PC_x": self.ui.patternCenterX.value(),
-            "PC_y": self.ui.patternCenterY.value(),
-            "PC_z": self.ui.patternCenterZ.value(),
             "Phase": self.ui.listWidgetPhase.selectedItems(),
             "Refine": self.ui.checkBoxRefine.isChecked(),
             "Lazy": self.ui.checkBoxLazy.isChecked(),
@@ -133,7 +194,7 @@ class DiSetupDialog(QDialog):
             )
 
             plt.close(fig)
-        
+
         except Exception as e:
             raise e
 
@@ -142,8 +203,12 @@ class DiSetupDialog(QDialog):
 
     def mean_intensity_map(self):
         mean_intensity = self.s.mean(axis=(2, 3))
-        plt.imsave(path.join(self.results_dir, "mean_intensity.png", mean_intensity.data, cmap="gray"))
-    
+        plt.imsave(
+            path.join(
+                self.results_dir, "mean_intensity.png", mean_intensity.data, cmap="gray"
+            )
+        )
+
     def VBSE_imaging(self):
         vbse_gen = kp.generators.VirtualBSEGenerator(self.s)
         red = (2, 1)
@@ -151,17 +216,18 @@ class DiSetupDialog(QDialog):
         blue = (2, 3)
 
         p = vbse_gen.plot_grid(rgb_channels=[red, green, blue])
-        p._plot.signal_plot.figure.savefig(path.join(self.results_dir, "vbse_rgb_grid.png"), **self.savefig_kwargs)
+        p._plot.signal_plot.figure.savefig(
+            path.join(self.results_dir, "vbse_rgb_grid.png"), **self.savefig_kwargs
+        )
 
         vbse_rgb_img = vbse_gen.get_rgb_image(r=red, g=green, b=blue)
         vbse_rgb_img.change_dtype("uint8")
         plt.imsave(path.join(self.results_dir, "vbse_rgb.png"), vbse_rgb_img.data)
-        
 
         plt.close("all")
 
     def pre_indexing_maps(self):
-        
+
         # Image quality
         iq = self.s.get_image_quality()
         plt.imsave(path.join(self.results_dir, "iq.png"), iq, cmap="gray")
@@ -196,14 +262,11 @@ class DiSetupDialog(QDialog):
             raise e
 
         # set pattern center values
-        self.pc = (
-            self.options["PC_x"],
-            self.options["PC_y"],
-            self.options["PC_z"],
-        )
+        self.updatePCArrayFrompatternCenter()
 
-        # Get phase
-        self.phases = [phase.text() for phase in self.options["Phase"]]
+        # Get phases
+        self.getPhases()
+        # self.phases = [phase.text() for phase in self.options["Phase"]]
 
         # Refinement
         self.refine = self.options["Refine"]
@@ -220,9 +283,8 @@ class DiSetupDialog(QDialog):
             self.n_per_iteration = self.options["N_iter"]
 
         # Read metadata from pattern file
-        self.sem_md = self.s.metadata.Acquisition_instrument.SEM
-        self.energy = self.sem_md.beam_energy
-        self.sample_tilt = self.sem_md.Detector.EBSD.sample_tilt
+        self.energy = self.s.metadata.Acquisition_instrument.SEM.beam_energy
+        self.sample_tilt = self.s.detector.sample_tilt
 
         ### Dictionary indexing
 
@@ -290,11 +352,11 @@ class DiSetupDialog(QDialog):
                 compute=True,  # if False, sim.compute() must be called at a later time
             )
 
-            fig, _ = self.detector.plot(
+            fig = self.detector.plot(
                 pattern=self.sim.squeeze().data,
                 draw_gnomonic_circles=True,
                 coordinates="gnomonic",
-                return_fig_ax=True,
+                return_figure=True,
             )
 
             fig.savefig(
