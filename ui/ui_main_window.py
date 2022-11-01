@@ -18,14 +18,16 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QHeaderView,
     QLabel, QLineEdit, QMainWindow, QMenu,
-    QMenuBar, QPlainTextEdit, QSizePolicy, QSpacerItem,
-    QStatusBar, QTreeView, QVBoxLayout, QWidget)
+    QMenuBar, QPlainTextEdit, QSizePolicy, QStatusBar,
+    QTreeView, QVBoxLayout, QWidget)
+
+from mplwidget import MplWidget
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1087, 769)
+        MainWindow.resize(865, 685)
         MainWindow.setLayoutDirection(Qt.LeftToRight)
         MainWindow.setAutoFillBackground(False)
         self.actionOpen_Workfolder = QAction(MainWindow)
@@ -44,10 +46,60 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout = QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName(u"gridLayout")
+        self.verticalLayout = QVBoxLayout()
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.topLayout = QHBoxLayout()
+        self.topLayout.setObjectName(u"topLayout")
+        self.systemViewerLayout = QVBoxLayout()
+        self.systemViewerLayout.setObjectName(u"systemViewerLayout")
+        self.folderLabel = QLabel(self.centralwidget)
+        self.folderLabel.setObjectName(u"folderLabel")
+        sizePolicy = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.folderLabel.sizePolicy().hasHeightForWidth())
+        self.folderLabel.setSizePolicy(sizePolicy)
+
+        self.systemViewerLayout.addWidget(self.folderLabel)
+
+        self.systemViewer = QTreeView(self.centralwidget)
+        self.systemViewer.setObjectName(u"systemViewer")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.systemViewer.sizePolicy().hasHeightForWidth())
+        self.systemViewer.setSizePolicy(sizePolicy1)
+        self.systemViewer.setMinimumSize(QSize(240, 0))
+        self.systemViewer.setStyleSheet(u"")
+        self.systemViewer.setAnimated(True)
+        self.systemViewer.header().setStretchLastSection(True)
+
+        self.systemViewerLayout.addWidget(self.systemViewer)
+
+
+        self.topLayout.addLayout(self.systemViewerLayout)
+
+        self.MplWidget = MplWidget(self.centralwidget)
+        self.MplWidget.setObjectName(u"MplWidget")
+        sizePolicy1.setHeightForWidth(self.MplWidget.sizePolicy().hasHeightForWidth())
+        self.MplWidget.setSizePolicy(sizePolicy1)
+        self.MplWidget.setMinimumSize(QSize(200, 200))
+
+        self.topLayout.addWidget(self.MplWidget)
+
+        self.topLayout.setStretch(1, 1)
+
+        self.verticalLayout.addLayout(self.topLayout)
+
         self.bottomLayout = QVBoxLayout()
         self.bottomLayout.setObjectName(u"bottomLayout")
         self.consoleLog = QPlainTextEdit(self.centralwidget)
         self.consoleLog.setObjectName(u"consoleLog")
+        sizePolicy2 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.consoleLog.sizePolicy().hasHeightForWidth())
+        self.consoleLog.setSizePolicy(sizePolicy2)
 
         self.bottomLayout.addWidget(self.consoleLog)
 
@@ -68,41 +120,17 @@ class Ui_MainWindow(object):
 
         self.bottomLayout.setStretch(0, 2)
 
-        self.gridLayout.addLayout(self.bottomLayout, 2, 0, 1, 1)
+        self.verticalLayout.addLayout(self.bottomLayout)
 
-        self.topLayout = QHBoxLayout()
-        self.topLayout.setObjectName(u"topLayout")
-        self.systemViewerLayout = QVBoxLayout()
-        self.systemViewerLayout.setObjectName(u"systemViewerLayout")
-        self.folderLabel = QLabel(self.centralwidget)
-        self.folderLabel.setObjectName(u"folderLabel")
+        self.verticalLayout.setStretch(0, 2)
+        self.verticalLayout.setStretch(1, 1)
 
-        self.systemViewerLayout.addWidget(self.folderLabel)
-
-        self.systemViewer = QTreeView(self.centralwidget)
-        self.systemViewer.setObjectName(u"systemViewer")
-        self.systemViewer.setMinimumSize(QSize(500, 0))
-        self.systemViewer.setStyleSheet(u"")
-        self.systemViewer.setAnimated(True)
-        self.systemViewer.header().setStretchLastSection(True)
-
-        self.systemViewerLayout.addWidget(self.systemViewer)
-
-
-        self.topLayout.addLayout(self.systemViewerLayout)
-
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.topLayout.addItem(self.horizontalSpacer)
-
-        self.topLayout.setStretch(1, 1)
-
-        self.gridLayout.addLayout(self.topLayout, 1, 0, 1, 1)
+        self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1087, 22))
+        self.menubar.setGeometry(QRect(0, 0, 865, 22))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuProcessing = QMenu(self.menubar)
@@ -146,8 +174,8 @@ class Ui_MainWindow(object):
         self.actionDictinary_indexing_setup.setText(QCoreApplication.translate("MainWindow", u"Dictinary indexing setup", None))
         self.actionPattern_Center.setText(QCoreApplication.translate("MainWindow", u"Pattern center", None))
         self.actionROI.setText(QCoreApplication.translate("MainWindow", u"ROI", None))
-        self.consolePrompt.setText(QCoreApplication.translate("MainWindow", u">>>", None))
         self.folderLabel.setText(QCoreApplication.translate("MainWindow", u"NO FOLDER OPENED", None))
+        self.consolePrompt.setText(QCoreApplication.translate("MainWindow", u">>>", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuProcessing.setTitle(QCoreApplication.translate("MainWindow", u"Processing", None))
         self.menuPlot.setTitle(QCoreApplication.translate("MainWindow", u"Plotting", None))

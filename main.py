@@ -3,6 +3,7 @@ from os.path import basename
 from PySide6.QtCore import QDir
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
 from ui.ui_main_window import Ui_MainWindow
+import matplotlib.image as mpimg
 import warnings
 
 from scripts.filebrowser import FileBrowser
@@ -49,7 +50,6 @@ class AppWindow(QMainWindow):
         self.ui.actionPattern_Center.triggered.connect(lambda: self.selectPatternCenter())
 
 
-
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
             self.working_dir = self.fileBrowserOD.getPaths()[0]
@@ -85,6 +85,10 @@ class AppWindow(QMainWindow):
 
     def onSystemViewClicked(self, index):
         self.file_selected = self.systemModel.filePath(index)
+        try:
+            self.showImage(self.file_selected)
+        except:
+            pass
 
     def selectSignalNavigation(self):
         try:
@@ -118,6 +122,14 @@ class AppWindow(QMainWindow):
         except Exception as e:
             print(e)
             print("Could not initialize pattern center refinement")
+
+    def showImage(self, imagePath):
+        image = mpimg.imread(imagePath)
+
+        self.ui.MplWidget.canvas.ax.clear()
+        self.ui.MplWidget.canvas.ax.imshow(image)
+        self.ui.MplWidget.canvas.ax.draw()
+        
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

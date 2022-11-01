@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1087</width>
-    <height>769</height>
+    <width>865</width>
+    <height>685</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,71 +21,97 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="2" column="0">
-     <layout class="QVBoxLayout" name="bottomLayout" stretch="2,0">
+    <item row="0" column="0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="2,1">
       <item>
-       <widget class="QPlainTextEdit" name="consoleLog"/>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="inputLayout">
+       <layout class="QHBoxLayout" name="topLayout" stretch="0,1">
         <item>
-         <widget class="QLabel" name="consolePrompt">
-          <property name="text">
-           <string>&gt;&gt;&gt;</string>
+         <layout class="QVBoxLayout" name="systemViewerLayout">
+          <item>
+           <widget class="QLabel" name="folderLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>NO FOLDER OPENED</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTreeView" name="systemViewer">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>240</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="animated">
+             <bool>true</bool>
+            </property>
+            <attribute name="headerStretchLastSection">
+             <bool>true</bool>
+            </attribute>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="MplWidget" name="MplWidget" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="consoleInput"/>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </item>
-    <item row="1" column="0">
-     <layout class="QHBoxLayout" name="topLayout" stretch="0,1">
-      <item>
-       <layout class="QVBoxLayout" name="systemViewerLayout">
-        <item>
-         <widget class="QLabel" name="folderLabel">
-          <property name="text">
-           <string>NO FOLDER OPENED</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QTreeView" name="systemViewer">
           <property name="minimumSize">
            <size>
-            <width>500</width>
-            <height>0</height>
+            <width>200</width>
+            <height>200</height>
            </size>
           </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-          <property name="animated">
-           <bool>true</bool>
-          </property>
-          <attribute name="headerStretchLastSection">
-           <bool>true</bool>
-          </attribute>
          </widget>
         </item>
        </layout>
       </item>
       <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
+       <layout class="QVBoxLayout" name="bottomLayout" stretch="2,0">
+        <item>
+         <widget class="QPlainTextEdit" name="consoleLog">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="inputLayout">
+          <item>
+           <widget class="QLabel" name="consolePrompt">
+            <property name="text">
+             <string>&gt;&gt;&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="consoleInput"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -96,8 +122,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1087</width>
-     <height>22</height>
+     <width>865</width>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -169,6 +195,14 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MplWidget</class>
+   <extends>QWidget</extends>
+   <header>mplwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

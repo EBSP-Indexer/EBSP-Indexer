@@ -45,13 +45,17 @@ class PatterCenterDialog(QDialog):
 
     def setupInitialSettings(self):
         self.sf = SettingFile("project_settings.txt")
-        self.pc = np.array([
-            float(self.sf.read("X star:")), 
-            float(self.sf.read("Y star:")), 
-            float(self.sf.read("Z star:"))
-        ])
+        try:
+            self.pc = np.array([
+                float(self.sf.read("X star:")), 
+                float(self.sf.read("Y star:")), 
+                float(self.sf.read("Z star:"))
+            ])
+        except:
+            self.pc = np.array([0.000, 0.000, 0.000])
+
         self.updatePCSpinBox()
-        
+
         self.mpPaths = {}
         for i in range(1, 5):
             try:
