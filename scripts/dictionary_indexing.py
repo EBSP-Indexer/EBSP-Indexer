@@ -1,6 +1,7 @@
 from os import path, mkdir
 
 from PySide6.QtWidgets import QDialog
+from scripts.setting_file import SettingFile
 
 from utils.filebrowser import FileBrowser
 from utils.worker import Worker
@@ -14,6 +15,9 @@ from orix import io, sampling, plot
 
 # TODO: from time import time
 import gc
+
+# Turn interactive plotting off
+plt.ioff()
 
 
 class DiSetupDialog(QDialog):
@@ -35,7 +39,9 @@ class DiSetupDialog(QDialog):
             self.pattern_path = pattern_path
 
         # Defining phase dictionary
-        # TODO: move point group dictionary to an external file that can be edited from GU
+
+        # Standard settings for dictionary indexing
+        self.savefig_kwargs = dict(bbox_inches="tight", pad_inches=0, dpi=150)
 
         # Dialog box ui setup
         self.ui = Ui_DiSetupDialog()
@@ -47,6 +53,96 @@ class DiSetupDialog(QDialog):
         # standard directory of simulated masterpattern is C:\EBSD data\kikuchipy\ebsd_simulations
         self.sim_dir = self.ui.lineEditPath.text()
 
+        # Load pattern-file to get acquisition resolution
+        try:
+            self.s = kp.load(self.pattern_path, lazy=True)
+        except Exception as e:
+            raise e
+
+        self.setupBinningShapes()
+
+        self.setupInitialSettings()
+
+    def setupBinningShapes(self):
+        self.sig_shape = self.s.axes_manager.signal_shape[::-1]
+        bin_shapes_1D = np.array([10, 20, 30, 40, 50, 60, 12, 24, 32, 48])
+        bin_shapes_2D = np.array(
+            [
+                "(10, 10)",
+                "(20, 20)",
+                "(30, 30)",
+                "(40, 40)",
+                "(50, 50)",
+                "(60, 60)",
+                "(12, 12)",
+                "(24, 24)",
+                "(32, 32)",
+                "(48, 48)",
+            ]
+        )
+        self.bin_shapes_to_comboBox = bin_shapes_2D[
+            np.where(np.array(self.sig_shape[0] % bin_shapes_1D) == 0)[0]
+        ]
+        self.ui.comboBoxBinning.addItems(self.bin_shapes_to_comboBox)
+
+    def setupInitialSettings(self):
+        print("hei")
+        self.sf = SettingFile(path.join(self.working_dir, "project_settings.txt"))
+        try:
+            self.pc = np.array(
+                [
+                    float(self.sf.read("X star:")),
+                    float(self.sf.read("Y star:")),
+                    float(self.sf.read("Z star:")),
+                ]
+            )
+        except:
+            self.pc = np.array([0.000, 0.000, 0.000])
+
+        self.updatePCpatternCenter()
+        
+        self.mpPaths = {}
+        
+        i = 1
+        while True:
+            try:
+                mpPath = self.sf.read("Master pattern " + str(i) + ":")
+                print(mpPath)
+                phase = mpPath.split("/").pop()
+                self.mpPaths[phase] = mpPath
+                self.ui.listWidgetPhase.addItem(phase)
+                i += 1
+            except:
+                break                
+
+    def updatePCpatternCenter(self):
+        self.ui.patternCenterX.setValue(self.pc[0])
+        self.ui.patternCenterY.setValue(self.pc[1])
+        self.ui.patternCenterZ.setValue(self.pc[2])
+
+    def updatePCArrayFrompatternCenter(self):
+        self.pc[0] = self.ui.patternCenterX.value()
+        self.pc[1] = self.ui.patternCenterY.value()
+        self.pc[2] = self.ui.patternCenterZ.value()
+
+    def addPhase(self):
+        if self.fileBrowserOD.getFile():
+            mpPath = self.fileBrowserOD.getPaths()[0]
+            phase = mpPath.split("/").pop()
+            self.fileBrowserOD.setDefaultDir(mpPath[0 : -len(phase) - 1])
+
+            if phase not in self.mpPaths.keys():
+                self.mpPaths[phase] = mpPath
+                self.ui.listWidgetPhase.addItem(phase)
+
+    def removePhase(self):
+        self.mpPaths.pop(str(self.ui.listWidgetPhase.currentItem().text()))
+        self.ui.listWidgetPhase.takeItem(self.ui.listWidgetPhase.currentRow())
+
+    def getPhases(self):
+        lw = self.ui.listWidgetPhase
+        self.phases = [lw.item(x).text() for x in range(lw.count())]
+
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_dictionary_indexing())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
@@ -54,15 +150,19 @@ class DiSetupDialog(QDialog):
         # user can change directory for stored master patterns
         self.ui.pushButtonBrowse.clicked.connect(lambda: self.setSimDir())
 
+        self.ui.pushButtonAddPhase.clicked.connect(lambda: self.addPhase())
+        self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.removePhase())
+
     # read options from interactive elements in dialog box
     def getOptions(self) -> dict:
         return {
-            "PC_x": float(self.ui.patternCenterX.value()),
-            "PC_y": float(self.ui.patternCenterY.value()),
-            "PC_z": float(self.ui.patternCenterZ.value()),
             "Phase": self.ui.listWidgetPhase.selectedItems(),
             "Refine": self.ui.checkBoxRefine.isChecked(),
             "Lazy": self.ui.checkBoxLazy.isChecked(),
+            "Mask": [self.ui.checkBoxMask.isChecked(), lambda: self.signal_mask()],
+            "N_iter": int(self.ui.spinBoxNumIter.value()),
+            "Disori": float(self.ui.doubleSpinBoxStepSize.value()),
+            "Binning": self.ui.comboBoxBinning.currentText(),
         }
 
     def setSimDir(self):
@@ -72,41 +172,73 @@ class DiSetupDialog(QDialog):
 
     def run_dictionary_indexing(self):
         # Pass the function to execute
-        worker = Worker(self.dictionary_indexing)
+        di_worker = Worker(self.dictionary_indexing)
         # Execute
-        self.threadPool.start(worker)
+        self.threadPool.start(di_worker)
         self.accept()
 
-    def dictionary_indexing(self):
-        # get options from input
-        self.options = self.getOptions()
+    def signal_mask(self):
+        self.signal_mask = ~kp.filters.Window("circular", self.sig_shape).astype(bool)
 
-        # load selected EBSD pattern
+        # Save figure of signal mask for visualization
         try:
-            self.s = kp.load(self.pattern_path, lazy=self.options["Lazy"])
+            p = self.s2.inav[0, 0].data
+            fig, ax = plt.subplots(ncols=2, figsize=(10, 5))
+            ax[0].imshow(p * self.signal_mask, cmap="gray")
+            ax[0].set_title("Not used in matching")
+            ax[1].imshow(p * ~self.signal_mask, cmap="gray")
+            ax[1].set_title("Used in matching")
+            fig.savefig(
+                path.join(self.results_dir, "circular_mask_for_di.png"),
+                **self.savefig_kwargs,
+            )
+
+            plt.close(fig)
+
         except Exception as e:
             raise e
 
-        # set pattern center values
-        self.pc = (
-            self.options["PC_x"],
-            self.options["PC_y"],
-            self.options["PC_z"],
+        # Set signal mask for dictionary indexing
+        self.di_kwargs["signal_mask"] = self.signal_mask
+
+    def mean_intensity_map(self):
+        mean_intensity = self.s.mean(axis=(2, 3))
+        plt.imsave(
+            path.join(
+                self.results_dir, "mean_intensity.png", mean_intensity.data, cmap="gray"
+            )
         )
 
-        # Get phase
-        self.phases = [phase.text() for phase in self.options["Phase"]]
+    def VBSE_imaging(self):
+        vbse_gen = kp.generators.VirtualBSEGenerator(self.s)
+        red = (2, 1)
+        green = (2, 2)
+        blue = (2, 3)
 
-        # Refinement
-        self.refine = self.options["Refine"]
+        p = vbse_gen.plot_grid(rgb_channels=[red, green, blue])
+        p._plot.signal_plot.figure.savefig(
+            path.join(self.results_dir, "vbse_rgb_grid.png"), **self.savefig_kwargs
+        )
 
-        # TODO: Settings that can be set as user input later
-        self.savefig_kwargs = dict(bbox_inches="tight", pad_inches=0, dpi=150)
-        self.new_signal_shape = (30, 30)
-        self.disori = 2
-        self.use_signal_mask = False
-        self.n_per_iteration = None
+        vbse_rgb_img = vbse_gen.get_rgb_image(r=red, g=green, b=blue)
+        vbse_rgb_img.change_dtype("uint8")
+        plt.imsave(path.join(self.results_dir, "vbse_rgb.png"), vbse_rgb_img.data)
 
+        plt.close("all")
+
+    def pre_indexing_maps(self):
+
+        # Image quality
+        iq = self.s.get_image_quality()
+        plt.imsave(path.join(self.results_dir, "iq.png"), iq, cmap="gray")
+
+        # Average dot product map
+        adp = self.s.get_average_neighbour_dot_product_map()
+        plt.imsave(path.join(self.results_dir, "adp.png"), adp, cmap="gray")
+
+        plt.close("all")
+
+    def dictionary_indexing(self):
         # Create folder for storing DI results in working directory
         i = 1
         while True:
@@ -120,10 +252,39 @@ class DiSetupDialog(QDialog):
                 )
             i += 1
 
+        # get options from input
+        self.options = self.getOptions()
+
+        # load selected EBSD pattern with current options
+        try:
+            self.s = kp.load(self.pattern_path, lazy=self.options["Lazy"])
+        except Exception as e:
+            raise e
+
+        # set pattern center values
+        self.updatePCArrayFrompatternCenter()
+
+        # Get phases
+        self.getPhases()
+        # self.phases = [phase.text() for phase in self.options["Phase"]]
+
+        # Refinement
+        self.refine = self.options["Refine"]
+
+        # Remaining user input values
+        self.new_signal_shape = eval(self.options["Binning"])
+        self.disori = self.options["Disori"]
+        self.use_signal_mask = self.options["Mask"]
+
+        # If n per iteration is 0
+        self.n_per_iteration = None
+
+        if self.options["N_iter"] != 0:
+            self.n_per_iteration = self.options["N_iter"]
+
         # Read metadata from pattern file
-        self.sem_md = self.s.metadata.Acquisition_instrument.SEM
-        self.energy = self.sem_md.beam_energy
-        self.sample_tilt = self.sem_md.Detector.EBSD.sample_tilt
+        self.energy = self.s.metadata.Acquisition_instrument.SEM.beam_energy
+        self.sample_tilt = self.s.detector.sample_tilt
 
         ### Dictionary indexing
 
@@ -142,32 +303,17 @@ class DiSetupDialog(QDialog):
             convention="tsl",  # Default is Bruker, TODO: let user choose convention
         )
 
-        ### Create signal mask
-        if self.use_signal_mask:
-            self.signal_mask = ~kp.filters.Window("circular", self.sig_shape).astype(
-                bool
-            )
-
-            p = self.s2.inav[0, 0].data
-            fig, ax = plt.subplots(ncols=2, figsize=(10, 5))
-            ax[0].imshow(p * self.signal_mask, cmap="gray")
-            ax[0].set_title("Not used in matching")
-            ax[1].imshow(p * ~self.signal_mask, cmap="gray")
-            ax[1].set_title("Used in matching")
-            fig.savefig(
-                path.join(self.results_dir, "circular_mask_for_di.png"),
-                **self.savefig_kwargs,
-            )
-
-        plt.close("all")
-
         ### Set up dictionary indexing parameters
 
         self.di_kwargs = dict(
             metric="ncc", keep_n=20, n_per_iteration=self.n_per_iteration
         )
-        if self.use_signal_mask:
-            self.di_kwargs["signal_mask"] = self.signal_mask
+        keys = ["Mask"]
+
+        for key in keys:
+            optionEnabled, optionExecute = self.options[key]
+            if optionEnabled:
+                optionExecute()
 
         ### Dictionaries for use with several phases
         # Master pattern dictionary
@@ -206,18 +352,18 @@ class DiSetupDialog(QDialog):
                 compute=True,  # if False, sim.compute() must be called at a later time
             )
 
-            fig, _ = self.detector.plot(
+            fig = self.detector.plot(
                 pattern=self.sim.squeeze().data,
                 draw_gnomonic_circles=True,
                 coordinates="gnomonic",
-                return_fig_ax=True,
+                return_figure=True,
             )
 
             fig.savefig(
                 path.join(self.results_dir, f"pc_{ph}.png"), **self.savefig_kwargs
             )
 
-            plt.close("all")
+            plt.close(fig)
 
             ### Generate dictionary
 
@@ -258,6 +404,8 @@ class DiSetupDialog(QDialog):
                 path.join(self.results_dir, f"ncc_{ph}.png"), **self.savefig_kwargs
             )
 
+            plt.close(fig)
+
             ### Calculate and save orientation similairty map
 
             osm = kp.indexing.orientation_similarity_map(self.xmaps[f"xmap_{ph}"])
@@ -273,6 +421,8 @@ class DiSetupDialog(QDialog):
             fig.savefig(
                 path.join(self.results_dir, f"osm_{ph}.png"), **self.savefig_kwargs
             )
+
+            plt.close(fig)
 
             self.ckey = plot.IPFColorKeyTSL(self.mp[f"mp_{ph}"].phase.point_group)
 
@@ -295,7 +445,7 @@ class DiSetupDialog(QDialog):
                     self.xmaps_ref[f"xmap_ref_{ph}"],
                 )  # .ang
 
-                self.fig = self.xmaps_ref[f"xmap_ref_{ph}"].plot(
+                fig = self.xmaps_ref[f"xmap_ref_{ph}"].plot(
                     self.ckey.orientation2color(
                         self.xmaps_ref[f"xmap_ref_{ph}"].orientations
                     ),
@@ -303,33 +453,35 @@ class DiSetupDialog(QDialog):
                     return_figure=True,
                 )
 
-                self.fig.savefig(
+                fig.savefig(
                     path.join(self.results_dir, f"ipf_ref{ph}.png"),
                     **self.savefig_kwargs,
                 )
 
-            self.fig = self.xmaps[f"xmap_{ph}"].plot(
+                plt.close(fig)
+
+            fig = self.xmaps[f"xmap_{ph}"].plot(
                 self.ckey.orientation2color(self.xmaps[f"xmap_{ph}"].orientations),
                 remove_padding=True,
                 return_figure=True,
             )
 
-            self.fig.savefig(
+            fig.savefig(
                 path.join(self.results_dir, f"ipf_{ph}.png"), **self.savefig_kwargs
             )
 
-            plt.close("all")
+            plt.close(fig)
             del self.sim_dict
             gc.collect()
 
         if len(self.phases) > 1:
 
-            self.cm = [self.xmaps[f"xmap_{ph}"] for ph in self.phases]
+            cm = [self.xmaps[f"xmap_{ph}"] for ph in self.phases]
 
             # Merge xmaps from indexed phases
 
             self.xmap_merged = kp.indexing.merge_crystal_maps(
-                crystal_maps=self.cm,
+                crystal_maps=cm,
                 mean_n_best=1,
                 scores_prop="scores",
                 simulation_indices_prop="simulation_indices",

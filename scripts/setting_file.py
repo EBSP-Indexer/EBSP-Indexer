@@ -4,16 +4,17 @@ import warnings
 class SettingFile:
     def __init__(self, file_path):
         self.path = file_path
-        self.file = open(file_path, "r")
         self.dict = {}
-        for line in self.file:
-            try:
+        try:
+            self.file = open(file_path, "r")
+
+            for line in self.file:
                 (key, value) = line.split("\t")
                 self.dict[key] = value
-            except:
-                pass
-
-        self.file.close()
+            self.file.close()
+        except:
+            pass
+        
 
     def write(self, key, value):
         try:
@@ -25,8 +26,9 @@ class SettingFile:
         try:
             return self.dict[key].strip()
         except:
-            warnings.warn(f"Could not read '{key}' from settings file.")
-
+            pass
+            # warnings.warn(f"Could not read '{key}' from settings file.")
+    
     def remove(self, key):
         try:
             self.dict.pop(key)
@@ -35,7 +37,7 @@ class SettingFile:
 
     def save(self):
         try:
-            self.file = open(self.path, "w+")
+            self.file = open(self.path, "w")
             for key, value in self.dict.items():
                 self.file.write(key+'\t'+value)
             self.file.close()
