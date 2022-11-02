@@ -1,5 +1,5 @@
 import sys
-from os.path import basename
+from os.path import basename, splitext
 from contextlib import redirect_stdout, redirect_stderr
 from PySide6.QtCore import QDir, QThreadPool
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
@@ -7,7 +7,6 @@ from PySide6.QtGui import QFont
 from scripts.hough_indexing import HiSetupDialog
 from ui.ui_main_window import Ui_MainWindow
 import matplotlib.image as mpimg
-import warnings
 
 from utils.filebrowser import FileBrowser
 from scripts.pattern_processing import PatternProcessingDialog
@@ -43,10 +42,6 @@ class AppWindow(QMainWindow):
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         self.systemModel = QFileSystemModel()
 
-        # variables = (
-        #     globals()
-        # )  # TEMPERORY!!!: accessing variables in different thread may lead to crash
-        # self.console = ConsoleWidget(self.ui, variables)
         self.console = Console(parent=self, context=globals())
         self.console.setfont(QFont("Lucida Sans Typewriter", 10))
 
@@ -97,18 +92,21 @@ class AppWindow(QMainWindow):
             )
             self.processingDialog.exec()
         except Exception as e:
-            print(f"Could not initialize processing dialog:\n{str(e)}\n")
+            self.console.errorwrite(f"Could not initialize processing dialog:\n{str(e)}\n")
 
     def selectROI(self):
         try:
             self.ROIDialog = RegionOfInteresDialog(pattern_path=self.file_selected)
             self.ROIDialog.exec()
         except Exception as e:
-            print(f"Could not initialize ROI dialog:\n{str(e)}\n")
+            self.console.errorwrite(f"Could not initialize ROI dialog:\n{str(e)}\n")
 
     def onSystemViewClicked(self, index):
         self.file_selected = self.systemModel.filePath(index)
-        self.showImage(self.file_selected)
+        if splitext(self.file_selected)[1] in [".jpg", ".png", ".gif", ".bmp"]:
+            self.showImage(self.file_selected)
+        else:
+            self.showImage()
 
     def selectSignalNavigation(self):
         try:
@@ -121,28 +119,28 @@ class AppWindow(QMainWindow):
                 dlg.setStandardButtons(QMessageBox.Ok)
                 dlg.setIcon(QMessageBox.Warning)
                 dlg.exec()
-            print(f"Could not initialize signal navigation:\n{str(e)}\n")
+            self.console.errorwrite(f"Could not initialize signal navigation:\n{str(e)}\n")
 
     def selectDictionaryIndexingSetup(self):
         try:
             self.diSetup = DiSetupDialog(parent=self, pattern_path=self.file_selected)
             self.diSetup.show()
         except Exception as e:
-            print(f"Could not initialize dictionary indexing:\n{str(e)}\n")
+            self.console.errorwrite(f"Could not initialize dictionary indexing:\n{str(e)}\n")
 
     def selectHoughIndexingSetup(self):
         try:
             self.hiSetup = HiSetupDialog(parent=self, pattern_path=self.file_selected)
             self.hiSetup.show()
         except Exception as e:
-            print(f"Could not initialize hough indexing:\n{str(e)}\n")
+            self.console.errorwrite(f"Could not initialize hough indexing:\n{str(e)}\n")
 
     def selectPatternCenter(self):
         try:
             self.patternCenter = PatterCenterDialog(self.working_dir)
             self.patternCenter.show()
         except Exception as e:
-            print(f"Could not initialize pattern center refinement:\n{str(e)}\n")
+            self.console.errorwrite(f"Could not initialize pattern center refinement:\n{str(e)}\n")
 
     def showImage(self, imagePath="resources/kikuchipy_banner.png"):
         image = mpimg.imread(imagePath)
@@ -155,17 +153,30 @@ class AppWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    appWindow = AppWindow()
+    APP = AppWindow()
 
     # Redirect stdout to console.write and stderr to console.errorwrite
-    redirect = Redirect(appWindow.console.errorwrite)
-    with redirect_stdout(appWindow.console), redirect_stderr(redirect):
-        appWindow.show()
+    redirect = Redirect(APP.console.errorwrite)
+    debug = True
+    if debug:
+        APP.show()
         print(
-            f"Multithreading with maximum {appWindow.threadPool.maxThreadCount()} threads"
+            f"Multithreading with maximum {APP.threadPool.maxThreadCount()} threads"
         )
         try:
             sys.exit(app.exec())
         except Exception as e:
             print(e)
             print("A clean exit was not performed")
+    else:
+        with redirect_stdout(APP.console), redirect_stderr(redirect):
+            APP.show()
+            print(
+                f"Multithreading with maximum {APP.threadPool.maxThreadCount()} threads"
+            )
+            print("""Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'""")
+            try:
+                sys.exit(app.exec())
+            except Exception as e:
+                print(e)
+                print("A clean exit was not performed")

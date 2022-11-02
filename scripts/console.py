@@ -5,14 +5,12 @@ in a GUI application.
 created by deanhystad, sourcecode from https://python-forum.io/thread-25117.html
 """
  
-import sys
 import code
 import re
 from typing import Dict, Callable
 import PySide6.QtWidgets as QtWidgets
 import PySide6.QtCore as QtCore
 import PySide6.QtGui as QtGui
-from contextlib import redirect_stdout, redirect_stderr
  
 class LineEdit(QtWidgets.QLineEdit):
     """QLIneEdit with a history buffer for recalling previous lines.
@@ -132,7 +130,7 @@ class Console(QtWidgets.QWidget):
         # self.promptdisp.setFixedWidth(15)
         # self.promptdisp.setFrame(False)
         # self.content.addWidget(self.promptdisp, 1, 0)
-        self.setprompt('> ')
+        self.setprompt('>>>')
  
         # Enter commands here
         self.parent.ui.consoleInput = LineEdit(parent=self.parent.ui.centralwidget, history = history)
@@ -152,7 +150,10 @@ class Console(QtWidgets.QWidget):
  
     def setprompt(self, text: str):
         self.prompt = text
-        self.parent.ui.consolePrompt.setText(text)
+    
+    # def flush(self):
+    #     self.inpedit.clearhistory()
+    #     self.outdisplay.clear()
  
     def push(self, line: str) -> None:
         """Execute entered command.  Command may span multiple lines"""
@@ -171,7 +172,7 @@ class Console(QtWidgets.QWidget):
             source = "\n".join(self.buffer)
             more = self.interp.runsource(source, '<console>')
             if not more:
-                self.setprompt('> ')
+                self.setprompt('>>> ')
                 self.resetbuffer()
  
     def setfont(self, font: QtGui.QFont) -> None:
@@ -193,17 +194,3 @@ class Console(QtWidgets.QWidget):
         if fmt is not None:
             self.outdisplay.setCurrentCharFormat(fmt)
         self.outdisplay.appendPlainText(line.rstrip())
- 
-       
-# if __name__ == '__main__':
-#     app = QtWidgets.QApplication(sys.argv)
-#     console = Console()
-#     console.setWindowTitle('Console')
-#     console.setfont(QtGui.QFont('Lucida Sans Typewriter', 10))
- 
-#     # Redirect stdout to console.write and stderr to console.errorwrite
-#     redirect = Redirect(console.errorwrite)
-#     with redirect_stdout(console), redirect_stderr(redirect):
-#         console.show()
-#         print("HELLO")
-#         sys.exit(app.exec())
