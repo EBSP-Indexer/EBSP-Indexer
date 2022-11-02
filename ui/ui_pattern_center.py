@@ -16,9 +16,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialog, QDialogButtonBox,
-    QDoubleSpinBox, QHBoxLayout, QLabel, QListWidget,
-    QListWidgetItem, QPushButton, QSizePolicy, QSpacerItem,
-    QToolButton, QVBoxLayout, QWidget)
+    QDoubleSpinBox, QGridLayout, QHBoxLayout, QLabel,
+    QListWidget, QListWidgetItem, QPushButton, QSizePolicy,
+    QSpacerItem, QToolButton, QVBoxLayout, QWidget)
 
 from mplwidget import MplWidget
 
@@ -102,6 +102,8 @@ class Ui_PatternCenterDialog(object):
 
         self.verticalLayout.addItem(self.verticalSpacer)
 
+        self.gridLayout_2 = QGridLayout()
+        self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.labelXStar = QLabel(PatternCenterDialog)
         self.labelXStar.setObjectName(u"labelXStar")
         sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
@@ -109,8 +111,9 @@ class Ui_PatternCenterDialog(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.labelXStar.sizePolicy().hasHeightForWidth())
         self.labelXStar.setSizePolicy(sizePolicy1)
+        self.labelXStar.setMaximumSize(QSize(16777215, 16777215))
 
-        self.verticalLayout.addWidget(self.labelXStar)
+        self.gridLayout_2.addWidget(self.labelXStar, 0, 0, 1, 1)
 
         self.spinBoxX = QDoubleSpinBox(PatternCenterDialog)
         self.spinBoxX.setObjectName(u"spinBoxX")
@@ -123,12 +126,7 @@ class Ui_PatternCenterDialog(object):
         self.spinBoxX.setMaximum(10.000000000000000)
         self.spinBoxX.setSingleStep(0.001000000000000)
 
-        self.verticalLayout.addWidget(self.spinBoxX)
-
-        self.labelYStar = QLabel(PatternCenterDialog)
-        self.labelYStar.setObjectName(u"labelYStar")
-
-        self.verticalLayout.addWidget(self.labelYStar)
+        self.gridLayout_2.addWidget(self.spinBoxX, 0, 1, 1, 1)
 
         self.spinBoxY = QDoubleSpinBox(PatternCenterDialog)
         self.spinBoxY.setObjectName(u"spinBoxY")
@@ -136,12 +134,17 @@ class Ui_PatternCenterDialog(object):
         self.spinBoxY.setMaximum(10.000000000000000)
         self.spinBoxY.setSingleStep(0.001000000000000)
 
-        self.verticalLayout.addWidget(self.spinBoxY)
+        self.gridLayout_2.addWidget(self.spinBoxY, 1, 1, 1, 1)
+
+        self.labelYStar = QLabel(PatternCenterDialog)
+        self.labelYStar.setObjectName(u"labelYStar")
+
+        self.gridLayout_2.addWidget(self.labelYStar, 1, 0, 1, 1)
 
         self.labelZStar = QLabel(PatternCenterDialog)
         self.labelZStar.setObjectName(u"labelZStar")
 
-        self.verticalLayout.addWidget(self.labelZStar)
+        self.gridLayout_2.addWidget(self.labelZStar, 2, 0, 1, 1)
 
         self.spinBoxZ = QDoubleSpinBox(PatternCenterDialog)
         self.spinBoxZ.setObjectName(u"spinBoxZ")
@@ -149,7 +152,10 @@ class Ui_PatternCenterDialog(object):
         self.spinBoxZ.setMaximum(10.000000000000000)
         self.spinBoxZ.setSingleStep(0.001000000000000)
 
-        self.verticalLayout.addWidget(self.spinBoxZ)
+        self.gridLayout_2.addWidget(self.spinBoxZ, 2, 1, 1, 1)
+
+
+        self.verticalLayout.addLayout(self.gridLayout_2)
 
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
