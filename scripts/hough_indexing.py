@@ -1,5 +1,6 @@
-import os
+from os import path, mkdir
 from PySide6.QtWidgets import QDialog, QDialogButtonBox
+from scripts.setting_file import SettingFile
 
 from utils.filebrowser import FileBrowser
 from utils.worker import Worker
@@ -27,25 +28,23 @@ class HiSetupDialog(QDialog):
         "ti_beta": (0.33065, 229, "BCC"),
     }
 
-    def __init__(self, parent, pattern_path):
+    def __init__(self, parent, pattern_path=None):
         super().__init__(parent)
         self.threadPool = parent.threadPool
         self.pattern_path = pattern_path
-        self.pattern_name = os.path.splitext(os.path.basename(pattern_path))[0]
-        self.working_dir = os.path.dirname(pattern_path)
+        self.pattern_name = path.splitext(path.basename(pattern_path))[0]
+        self.working_dir = path.dirname(pattern_path)
 
         self.ui = Ui_HISetupDialog()
         self.ui.setupUi(self)
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
+
+        self.setupInitialSettings()
+
         self.setupConnections()
         self.checkPhaseSelected()
 
-        self.pc = (
-            0.000,
-            0.000,
-            0.000,
-        )  # Temperory, should be read after pattern refinement
         self.phases = []
         self.lat_param = []
         self.space_groups = []
@@ -57,16 +56,69 @@ class HiSetupDialog(QDialog):
         plt.rcParams.update({"font.size": 20})
         self.savefig_kwds = dict(pad_inches=0, bbox_inches="tight", dpi=150)
 
+    def setupInitialSettings(self):
+        self.sf = SettingFile(path.join(self.working_dir, "project_settings.txt"))
+
+        try:
+            self.pc = np.array(
+                [
+                    float(self.sf.read("X star:")),
+                    float(self.sf.read("Y star:")),
+                    float(self.sf.read("Z star:")),
+                ]
+            )
+        except:
+            self.pc = np.array([0.000, 0.000, 0.000])
+
+        self.updatePCpatternCenter()
+
+        self.mpPaths = {}
+
+        i = 1
+        while True:
+            try:
+                mpPath = self.sf.read("Master pattern " + str(i) + ":")
+                phase = mpPath.split("/").pop()
+                self.mpPaths[phase] = mpPath
+                self.ui.listWidgetPhase.addItem(phase)
+                i += 1
+            except:
+                break
+
+    def updatePCpatternCenter(self):
+        self.ui.patternCenterX.setValue(self.pc[0])
+        self.ui.patternCenterY.setValue(self.pc[1])
+        self.ui.patternCenterZ.setValue(self.pc[2])
+
+    def updatePCArrayFrompatternCenter(self):
+        self.pc[0] = self.ui.patternCenterX.value()
+        self.pc[1] = self.ui.patternCenterY.value()
+        self.pc[2] = self.ui.patternCenterZ.value()
+
+    def addPhase(self):
+        if self.fileBrowserOD.getFile():
+            mpPath = self.fileBrowserOD.getPaths()[0]
+            phase = mpPath.split("/").pop()
+            self.fileBrowserOD.setDefaultDir(mpPath[0 : -len(phase) - 1])
+
+            if phase not in self.mpPaths.keys():
+                self.mpPaths[phase] = mpPath
+                self.ui.listWidgetPhase.addItem(phase)
+
+    def removePhase(self):
+        self.mpPaths.pop(str(self.ui.listWidgetPhase.currentItem().text()))
+        self.ui.listWidgetPhase.takeItem(self.ui.listWidgetPhase.currentRow())
+
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_hough_indexing())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
         self.ui.listWidgetPhase.clicked.connect(lambda: self.checkPhaseSelected())
 
+        self.ui.pushButtonAddPhase.clicked.connect(lambda: self.addPhase())
+        self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.removePhase())
+
     def getOptions(self) -> dict:
         return {
-            "pc_x": float(self.ui.patternCenterX.text()),
-            "pc_y": float(self.ui.patternCenterY.text()),
-            "pc_z": float(self.ui.patternCenterZ.text()),
             "phase_list": self.ui.listWidgetPhase.selectedItems(),
             "lazy": self.ui.checkBoxLazy.isChecked(),
             "pre": [self.ui.checkBoxPre.isChecked(), self.generate_pre_maps],
@@ -83,23 +135,23 @@ class HiSetupDialog(QDialog):
 
     def checkPhaseSelected(self):
         flag = False
-        if self.ui.listWidgetPhase.selectedItems():
+        if self.ui.listWidgetPhase.count() != 0:
             flag = True
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(flag)
 
     def hough_indexing(self):
         for i in range(1, 100):
             try:
-                self.dir_out = os.path.join(self.working_dir, "hi_results" + str(i))
-                os.mkdir(self.dir_out)
+                self.dir_out = path.join(self.working_dir, "hi_results" + str(i))
+                mkdir(self.dir_out)
                 break
             except FileExistsError:
                 print(
                     f"Directory '{self.dir_out}' exists, will try to create directory '{self.dir_out[:-1] + str(i + 1)}'"
                 )
 
+        self.updatePCArrayFrompatternCenter()
         options = self.getOptions()
-        self.pc = (options["pc_x"], options["pc_y"], options["pc_z"])
         self.phases = [phase.text() for phase in options["phase_list"]]
         self.set_phases_properties()
         try:
@@ -111,15 +163,16 @@ class HiSetupDialog(QDialog):
             optionExecute()
         self.sig_shape = self.s.axes_manager.signal_shape[::-1]
         self.s.save(
-            os.path.join(self.dir_out, "pattern.h5")
+            path.join(self.dir_out, "pattern.h5")
         )  # Not sure if the file must be converted to H5
-        file_h5 = File(os.path.join(self.dir_out, "pattern.h5"), mode="r")
+        file_h5 = File(path.join(self.dir_out, "pattern.h5"), mode="r")
         dset_h5 = file_h5["Scan 1/EBSD/Data/patterns"]
         print(dset_h5.shape)  # Navigation dimension is flattened
 
-        md = self.s.metadata.Acquisition_instrument.SEM
-        sample_tilt = md.Detector.EBSD.sample_tilt
-        camera_tilt = md.Detector.EBSD.elevation_angle
+        # Read metadata from pattern file
+        #md = self.s.metadata.Acquisition_instrument.SEM
+        sample_tilt = self.s.detector.sample_tilt
+        camera_tilt = self.s.detector.tilt
 
         indexer = ebsd_index.EBSDIndexer(
             phaselist=self.phase_proxys,
@@ -160,9 +213,9 @@ class HiSetupDialog(QDialog):
             ),
             scan_unit="um",
         )
-        io.save(os.path.join(self.dir_out, "xmap_hi.h5"), self.xmap)
+        io.save(path.join(self.dir_out, "xmap_hi.h5"), self.xmap)
         io.save(
-            os.path.join(self.dir_out, "xmap_hi.ang"),
+            path.join(self.dir_out, "xmap_hi.ang"),
             self.xmap,
             image_quality_prop="pq",
             confidence_index_prop="cm",
@@ -191,7 +244,7 @@ class HiSetupDialog(QDialog):
     def generate_pre_maps(self):
         mean_intensity = self.s.mean(axis=(2, 3))
         plt.imsave(
-            os.path.join(self.dir_out, "mean_intensity.png"),
+            path.join(self.dir_out, "mean_intensity.png"),
             mean_intensity.data,
             cmap="gray",
         )
@@ -202,12 +255,12 @@ class HiSetupDialog(QDialog):
         blue = (2, 3)
         vbse_rgb_img = vbse_gen.get_rgb_image(r=red, g=green, b=blue)
         vbse_rgb_img.change_dtype("uint8")
-        plt.imsave(os.path.join(self.dir_out, "vbse_rgb.png"), vbse_rgb_img.data)
+        plt.imsave(path.join(self.dir_out, "vbse_rgb.png"), vbse_rgb_img.data)
 
         iq = self.s.get_image_quality()
         adp = self.s.get_average_neighbour_dot_product_map()
-        plt.imsave(os.path.join(self.dir_out, "maps_iq.png"), iq, cmap="gray")
-        plt.imsave(os.path.join(self.dir_out, "maps_adp.png"), adp, cmap="gray")
+        plt.imsave(path.join(self.dir_out, "maps_iq.png"), iq, cmap="gray")
+        plt.imsave(path.join(self.dir_out, "maps_adp.png"), adp, cmap="gray")
 
     def generate_combined_map(self):
         """
@@ -222,12 +275,12 @@ class HiSetupDialog(QDialog):
                 a.axis("off")
                 fig.colorbar(im, ax=a, label=to_plot[i])
                 plt.imsave(
-                    os.path.join(self.dir_out, f"maps_{to_plot[i]}.png"),
+                    path.join(self.dir_out, f"maps_{to_plot[i]}.png"),
                     arr,
                     cmap="gray",
                 )
             fig.tight_layout()
-            fig.savefig(os.path.join(self.dir_out, "maps_all.png"), **self.savefig_kwds)
+            fig.savefig(path.join(self.dir_out, "maps_all.png"), **self.savefig_kwds)
         except Exception as e:
             raise e
 
@@ -238,7 +291,7 @@ class HiSetupDialog(QDialog):
         try:
             fig = self.xmap.plot(return_figure=True, remove_padding=True)
             fig.savefig(
-                os.path.join(self.dir_out, "maps_phase.png"), **self.savefig_kwds
+                path.join(self.dir_out, "maps_phase.png"), **self.savefig_kwds
             )
         except Exception as e:
             raise e
@@ -253,7 +306,7 @@ class HiSetupDialog(QDialog):
             )
             fig = ckey.plot(return_figure=True)
             fig.savefig(
-                os.path.join(self.dir_out, "orientation_colour_key.png"),
+                path.join(self.dir_out, "orientation_colour_key.png"),
                 **self.savefig_kwds,
             )
 
@@ -265,7 +318,7 @@ class HiSetupDialog(QDialog):
 
                 fig = self.xmap.plot(rgb_all, remove_padding=True, return_figure=True)
                 fig.savefig(
-                    os.path.join(self.dir_out, "maps_ipfz.png"), **self.savefig_kwds
+                    path.join(self.dir_out, "maps_ipfz.png"), **self.savefig_kwds
                 )
         except Exception as e:
             raise e
