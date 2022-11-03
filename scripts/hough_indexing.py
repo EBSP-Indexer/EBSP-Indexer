@@ -9,6 +9,7 @@ from ui.ui_hi_setup import Ui_HISetupDialog
 import kikuchipy as kp
 import matplotlib.pyplot as plt
 import numpy as np
+import warnings
 from h5py import File
 from orix import io, plot
 from orix.crystal_map import CrystalMap, create_coordinate_arrays, PhaseList
@@ -16,6 +17,8 @@ from orix.quaternion import Rotation
 from orix.vector import Vector3d
 from pyebsdindex import ebsd_index
 
+# Ignore warnings to avoid crash with integrated console
+warnings.filterwarnings("ignore")
 
 class HiSetupDialog(QDialog):
 
@@ -225,6 +228,7 @@ class HiSetupDialog(QDialog):
             optionEnabled, optionExecute = options[key]
             if optionEnabled:
                 optionExecute()
+        print(f"Finished indexing {self.pattern_name}")
 
     def run_hough_indexing(self):
         # Pass the function to execute

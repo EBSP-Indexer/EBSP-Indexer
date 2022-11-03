@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from orix.quaternion import Rotation
 from orix import io, sampling, plot
+import warnings
 
 # TODO: from time import time
 import gc
@@ -19,6 +20,8 @@ import gc
 # Turn interactive plotting off
 plt.ioff()
 
+# Ignore warnings to avoid crash with integrated console
+warnings.filterwarnings("ignore")
 
 class DiSetupDialog(QDialog):
     """
