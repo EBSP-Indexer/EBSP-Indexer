@@ -30,15 +30,11 @@ class DiSetupDialog(QDialog):
         # initate threadpool
         self.threadPool = parent.threadPool
 
+        # pattern path
+        self.pattern_path = pattern_path
+
         # working directory
-        self.working_dir = path.dirname(pattern_path)
-
-        if pattern_path == None:
-            self.pattern_path = path.join(self.working_dir, "Pattern.dat")
-        else:
-            self.pattern_path = pattern_path
-
-        # Defining phase dictionary
+        self.working_dir = path.dirname(self.pattern_path)
 
         # Standard settings for dictionary indexing
         self.savefig_kwargs = dict(bbox_inches="tight", pad_inches=0, dpi=150)
@@ -50,20 +46,17 @@ class DiSetupDialog(QDialog):
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         self.setupConnections()
 
-        # standard directory of simulated masterpattern is C:\EBSD data\kikuchipy\ebsd_simulations
-        self.sim_dir = self.ui.lineEditPath.text()
+        self.setupBinningShapes()
 
+        self.setupInitialSettings()
+
+    def setupBinningShapes(self):
         # Load pattern-file to get acquisition resolution
         try:
             self.s = kp.load(self.pattern_path, lazy=True)
         except Exception as e:
             raise e
 
-        self.setupBinningShapes()
-
-        self.setupInitialSettings()
-
-    def setupBinningShapes(self):
         self.sig_shape = self.s.axes_manager.signal_shape[::-1]
         bin_shapes_1D = np.array([10, 20, 30, 40, 50, 60, 12, 24, 32, 48])
         bin_shapes_2D = np.array(
@@ -86,7 +79,6 @@ class DiSetupDialog(QDialog):
         self.ui.comboBoxBinning.addItems(self.bin_shapes_to_comboBox)
 
     def setupInitialSettings(self):
-        print("hei")
         self.sf = SettingFile(path.join(self.working_dir, "project_settings.txt"))
         try:
             self.pc = np.array(
@@ -107,7 +99,6 @@ class DiSetupDialog(QDialog):
         while True:
             try:
                 mpPath = self.sf.read("Master pattern " + str(i) + ":")
-                print(mpPath)
                 phase = mpPath.split("/").pop()
                 self.mpPaths[phase] = mpPath
                 self.ui.listWidgetPhase.addItem(phase)
@@ -147,9 +138,6 @@ class DiSetupDialog(QDialog):
         self.ui.buttonBox.accepted.connect(lambda: self.run_dictionary_indexing())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
 
-        # user can change directory for stored master patterns
-        self.ui.pushButtonBrowse.clicked.connect(lambda: self.setSimDir())
-
         self.ui.pushButtonAddPhase.clicked.connect(lambda: self.addPhase())
         self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.removePhase())
 
@@ -159,16 +147,15 @@ class DiSetupDialog(QDialog):
             "Phase": self.ui.listWidgetPhase.selectedItems(),
             "Refine": self.ui.checkBoxRefine.isChecked(),
             "Lazy": self.ui.checkBoxLazy.isChecked(),
-            "Mask": [self.ui.checkBoxMask.isChecked(), lambda: self.signal_mask()],
             "N_iter": int(self.ui.spinBoxNumIter.value()),
             "Disori": float(self.ui.doubleSpinBoxStepSize.value()),
             "Binning": self.ui.comboBoxBinning.currentText(),
+            "Mask": [self.ui.checkBoxMask.isChecked(), lambda: self.signal_mask()],
+            "IQ": [self.ui.checkBoxIQ.isChecked(), lambda: self.image_quality_map()],
+            "ADP": [self.ui.checkBoxADP.isChecked(), lambda: self.average_dot_product()],
+            "MI": [self.ui.checkBoxMI.isChecked(), lambda: self.mean_intensity_map()],
+            "VBSE": [self.ui.checkBoxVBSE.isChecked(), lambda: self.vbse_image()]
         }
-
-    def setSimDir(self):
-        if self.fileBrowserOD.getFile():
-            self.sim_dir = self.fileBrowserOD.getPaths()[0]
-            self.ui.lineEditPath.setText(self.sim_dir)
 
     def run_dictionary_indexing(self):
         # Pass the function to execute
@@ -205,11 +192,10 @@ class DiSetupDialog(QDialog):
         mean_intensity = self.s.mean(axis=(2, 3))
         plt.imsave(
             path.join(
-                self.results_dir, "mean_intensity.png", mean_intensity.data, cmap="gray"
+                self.results_dir, "mean_intensity.png"), mean_intensity.data, cmap="gray"
             )
-        )
 
-    def VBSE_imaging(self):
+    def vbse_image(self):
         vbse_gen = kp.generators.VirtualBSEGenerator(self.s)
         red = (2, 1)
         green = (2, 2)
@@ -226,13 +212,17 @@ class DiSetupDialog(QDialog):
 
         plt.close("all")
 
-    def pre_indexing_maps(self):
-
+    def image_quality_map(self):
         # Image quality
+
         iq = self.s.get_image_quality()
         plt.imsave(path.join(self.results_dir, "iq.png"), iq, cmap="gray")
 
+        plt.close("all")
+
+    def average_dot_product(self):
         # Average dot product map
+
         adp = self.s.get_average_neighbour_dot_product_map()
         plt.imsave(path.join(self.results_dir, "adp.png"), adp, cmap="gray")
 
@@ -266,7 +256,6 @@ class DiSetupDialog(QDialog):
 
         # Get phases
         self.getPhases()
-        # self.phases = [phase.text() for phase in self.options["Phase"]]
 
         # Refinement
         self.refine = self.options["Refine"]
@@ -308,7 +297,9 @@ class DiSetupDialog(QDialog):
         self.di_kwargs = dict(
             metric="ncc", keep_n=20, n_per_iteration=self.n_per_iteration
         )
-        keys = ["Mask"]
+        
+        ### additional functions to be performed
+        keys = ["Mask", "IQ", "VBSE", "MI", "ADP"]
 
         for key in keys:
             optionEnabled, optionExecute = self.options[key]
@@ -316,10 +307,11 @@ class DiSetupDialog(QDialog):
                 optionExecute()
 
         ### Dictionaries for use with several phases
+
         # Master pattern dictionary
         self.mp = {}
         for ph in self.phases:
-            self.file_mp = path.join(self.sim_dir, ph, f"{ph}_mc_mp_20kv.h5")
+            self.file_mp = path.join(self.mpPaths[ph], f"{ph}_mc_mp_20kv.h5")
             self.mp[f"mp_{ph}"] = kp.load(
                 self.file_mp,
                 energy=self.energy,  # single energies like 10, 11, 12 etc. or a range like (10, 20)
