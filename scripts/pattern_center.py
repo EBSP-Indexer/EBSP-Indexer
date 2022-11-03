@@ -32,29 +32,40 @@ def find_hkl(phase):
 
 #TODO: Better way to load file from file browser widget.
 class PatterCenterDialog(QDialog):
-    def __init__(self, parent, working_dir):
+    def __init__(self, parent=None, file_selected=None):
         super().__init__(parent)
-        self.setting_path = path.join(working_dir, "Setting.txt")
-        self.working_dir = working_dir
-        self.pattern_index = 0
+        self.file_selected = file_selected
+        self.setting_path = self.findSettingsFile()
         self.ui = Ui_PatternCenterDialog()
         self.ui.setupUi(self)
         self.setupConnections()
-        self.setupInitialSettings()
         self.setupCalibrationPatterns()
+        self.setupInitialSettings()
+        
 
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
 
+    def findSettingsFile(self):
+        if self.file_selected[-11:] == "Setting.txt":
+            setting_path = self.file_selected
+            return setting_path
+
+        if path.exists(path.join(self.file_selected, "Setting.txt")):
+            setting_path = path.join(self.file_selected, "Setting.txt")
+            return setting_path
+
+        if path.exists(path.join(path.dirname(self.file_selected), "Setting.txt")):
+            setting_path = path.join(path.dirname(self.file_selected), "Setting.txt")
+            return setting_path
+
     def setupInitialSettings(self):
-        self.setting_file_dict = SettingFile(path.join(self.working_dir,"project_settings.txt"))
+        self.setting_file_dict = SettingFile(path.join(path.dirname(self.setting_path),"project_settings.txt"))
         try:
-            self.pc = np.array(
-                [
+            self.pc = [
                     float(self.setting_file_dict.read("X star:")),
                     float(self.setting_file_dict.read("Y star:")),
                     float(self.setting_file_dict.read("Z star:")),
-                ]
-            )
+            ]
 
         except:
             self.pc = np.array([0.5000, 0.3000, 0.5000])
@@ -70,6 +81,33 @@ class PatterCenterDialog(QDialog):
             except:
                 pass
         self.is_mp_paths_updated = True
+    
+    def setupCalibrationPatterns(self):
+        self.pattern_index = 0
+        self.s_cal = kp.load(self.setting_path)
+        sig_shape = self.s_cal.axes_manager.signal_shape[::-1]
+        self.nav_size = self.s_cal.axes_manager.navigation_size
+
+        self.s_cal.remove_static_background()
+        self.s_cal.remove_dynamic_background()
+
+        #TODO: Why does only BRUKER convension work?
+        self.indexer = ebsd_index.EBSDIndexer(
+            phaselist=["FCC", "BCC"],
+            vendor="BRUKER", 
+            sampleTilt=self.s_cal.detector.sample_tilt,
+            camElev=self.s_cal.detector.tilt,
+            patDim=sig_shape,
+        )
+
+        self.ui.counterLabel.setText(
+            "Calibration Pattern: "+str(self.pattern_index+1)+"/"+str(self.nav_size)
+        )
+        self.ui.MplWidget.canvas.ax.imshow(self.s_cal.data[0], cmap="gray")
+
+        self.pcs = {}
+        for i in range(self.nav_size):
+            self.pcs[i] = ["", [0.0, 0.0, 0.0]]
 
     def setupConnections(self):
         self.ui.buttonAddPhase.clicked.connect(lambda: self.addPhase())
@@ -77,37 +115,55 @@ class PatterCenterDialog(QDialog):
         self.ui.toolButtonLeft.clicked.connect(lambda: self.previousPattern())
         self.ui.toolButtonRight.clicked.connect(lambda: self.nextPattern())
         self.ui.buttonTune.clicked.connect(lambda: self.refinePatternCenter())
-        self.ui.buttonPlot.clicked.connect(lambda: self.plotData())
+        self.ui.buttonPlot.clicked.connect(lambda: self.plotClicked())
         self.ui.buttonBox.accepted.connect(lambda: self.saveAndExit())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
 
     def previousPattern(self):
         if self.pattern_index > 0:
+
+            self.pcs[self.pattern_index][1] = self.pc
+            self.pcs[self.pattern_index][0] = self.phase
             self.pattern_index -= 1
+            self.pc = self.pcs[self.pattern_index][1]
+            self.phase = self.pcs[self.pattern_index][0]
             self.ui.counterLabel.setText(
                 "Calibration Pattern: "+str(self.pattern_index+1)+"/"+str(self.nav_size)
                 )
-            self.plotData()
             
-        else:
-            pass
+            self.updatePCSpinBox()
+            self.plotData()
 
     #TODO: Make the program remeber the last phase and pc when moving between calibration patterns
     def nextPattern(self):
         if self.pattern_index < self.nav_size - 1:
+
+            self.pcs[self.pattern_index][1] = self.pc
+            self.pcs[self.pattern_index][0] = self.phase
             self.pattern_index += 1
+            if self.pcs[self.pattern_index][1][0] == 0.0:
+                self.pc = self.pcs[self.pattern_index-1][1]
+            else:
+                self.pc = self.pcs[self.pattern_index][1]
+            if self.pcs[self.pattern_index][0] == "":
+                self.phase = self.pcs[self.pattern_index-1][0]
+            else:
+                self.phase = self.pcs[self.pattern_index][0]
+
+
             self.ui.counterLabel.setText(
                 "Calibration Pattern: "+str(self.pattern_index+1)+"/"+str(self.nav_size)
                 )
+
+            self.updatePCSpinBox()
             self.plotData()
-        else:
-            pass
 
     def addPhase(self):
         if self.fileBrowserOD.getFile():
             mp_path = self.fileBrowserOD.getPaths()[0]
             phase = mp_path.split("/").pop()
-            self.fileBrowserOD.setDefaultDir(mp_path[0 : -len(phase) - 1])
+            self.fileBrowserOD.setDefaultDir(path.dirname(mp_path))
+
             if phase not in self.mp_paths.keys():
                 self.mp_paths[phase] = mp_path
                 self.ui.listPhases.addItem(phase)
@@ -127,38 +183,30 @@ class PatterCenterDialog(QDialog):
         self.pc[0] = self.ui.spinBoxX.value()
         self.pc[1] = self.ui.spinBoxY.value()
         self.pc[2] = self.ui.spinBoxZ.value()
+    
+    def updatePCDict(self, pattern_index, phase, pc):
+        self.pcs[pattern_index] = [phase, pc]
+    
+    def plotClicked(self):
+        self.updatePCArrayFromSpinBox()
 
-    def setupCalibrationPatterns(self):
-        self.s_cal = kp.load(self.setting_path)
-        sig_shape = self.s_cal.axes_manager.signal_shape[::-1]
-        self.nav_size = self.s_cal.axes_manager.navigation_size
-        self.pcs = np.zeros(self.nav_size)
-
+        #Checks which phase to use from list of phases
         try:
-            self.s_cal.detector["shape"] = self.s_cal.axes_manager.signal_shape[::-1]
-            self.s_cal.detector = kp.detectors.EBSDDetector(**self.s_cal.detector)
+            self.phase = self.ui.listPhases.currentItem().text()
         except:
-            print("setupCalibrationPatterns has an error!")
-
-        self.s_cal.remove_static_background()
-        self.s_cal.remove_dynamic_background()
-
-        #TODO: Why does only BRUKER convension work?
-        self.indexer = ebsd_index.EBSDIndexer(
-            phaselist=["FCC", "BCC"],
-            vendor="BRUKER", 
-            sampleTilt=self.s_cal.detector.sample_tilt,
-            camElev=self.s_cal.detector.tilt,
-            patDim=sig_shape,
-        )
-
-        self.ui.counterLabel.setText(
-            "Calibration Pattern: "+str(self.pattern_index+1)+"/"+str(self.nav_size)
-        )
-        self.ui.MplWidget.canvas.ax.imshow(self.s_cal.data[0], cmap="gray")
+            self.phase = self.mp_paths.keys()[0]
+        
+        self.plotData()
 
     def refinePatternCenter(self):
         self.updatePCArrayFromSpinBox()
+
+        #Checks which phase to use from list of phases
+        try:
+            self.phase = self.ui.listPhases.currentItem().text()
+        except:
+            self.phase = self.mp_paths.keys()[0]
+
         pattern = self.s_cal.data[self.pattern_index]
         self.pc = pcopt.optimize(pattern, self.indexer, self.pc)
         self.updatePCSpinBox()
@@ -193,13 +241,7 @@ class PatterCenterDialog(QDialog):
         self.is_mp_paths_updated = False
 
     def plotData(self):
-        self.updatePCArrayFromSpinBox()
-
-        #Checks which phase to use from list of phases
-        try:
-            phase_chosen = self.ui.listPhases.currentItem().text()
-        except:
-            phase_chosen = self.mp_paths.keys()[0]
+        self.updatePCDict(self.pattern_index, self.phase, self.pc)
 
         #Updates data from master pattern (simulator_dict) if phase list has been updated
         if self.is_mp_paths_updated:
@@ -226,7 +268,7 @@ class PatterCenterDialog(QDialog):
         self.ui.MplWidget.canvas.ax.clear()
         self.ui.MplWidget.canvas.ax.axis("off")
         self.ui.MplWidget.canvas.ax.imshow(pattern_image_array, cmap="gray")
-        lines, zone_axes, zone_axes_labels = geosim_dict[phase_chosen].as_collections(
+        lines, zone_axes, zone_axes_labels = geosim_dict[self.phase].as_collections(
             0,
             zone_axes=True,
             zone_axes_labels=True,
@@ -243,10 +285,23 @@ class PatterCenterDialog(QDialog):
 
     #TODO: Save average pattern center from calibration patterns
     def saveAndExit(self):
-        self.updatePCArrayFromSpinBox()
-        self.setting_file_dict.write("X star:", str(self.pc[0]))
-        self.setting_file_dict.write("Y star:", str(self.pc[1]))
-        self.setting_file_dict.write("Z star:", str(self.pc[2]))
+        self.updatePCDict(self.pattern_index, self.phase, self.pc)
+        x_average, y_average, z_average = 0, 0, 0
+        n = 0
+        for i in range(self.nav_size):
+            if self.pcs[i][1][0] > 0:
+                x_average += self.pcs[i][1][0]
+                y_average += self.pcs[i][1][1]
+                z_average += self.pcs[i][1][2]
+                n += 1
+
+        x_average = x_average/n
+        y_average = y_average/n
+        z_average = z_average/n
+
+        self.setting_file_dict.write("X star:", str(x_average))
+        self.setting_file_dict.write("Y star:", str(y_average))
+        self.setting_file_dict.write("Z star:", str(z_average))
            
         for i in range(1, 5):
             try:

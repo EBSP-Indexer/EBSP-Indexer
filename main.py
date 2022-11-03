@@ -154,7 +154,7 @@ class AppWindow(QMainWindow):
 
     def selectPatternCenter(self):
         try:
-            self.patternCenter = PatterCenterDialog(parent=self, working_dir=self.working_dir)
+            self.patternCenter = PatterCenterDialog(parent=self, file_selected=self.file_selected)
             self.patternCenter.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.patternCenter.show()
         except Exception as e:
