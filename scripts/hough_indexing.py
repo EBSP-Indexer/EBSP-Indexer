@@ -9,6 +9,7 @@ from ui.ui_hi_setup import Ui_HISetupDialog
 import kikuchipy as kp
 import matplotlib.pyplot as plt
 import numpy as np
+import warnings
 from h5py import File
 from orix import io, plot
 from orix.crystal_map import CrystalMap, create_coordinate_arrays, PhaseList
@@ -16,6 +17,8 @@ from orix.quaternion import Rotation
 from orix.vector import Vector3d
 from pyebsdindex import ebsd_index
 
+# Ignore warnings to avoid crash with integrated console
+warnings.filterwarnings("ignore")
 
 class HiSetupDialog(QDialog):
 
@@ -167,10 +170,8 @@ class HiSetupDialog(QDialog):
         )  # Not sure if the file must be converted to H5
         file_h5 = File(path.join(self.dir_out, "pattern.h5"), mode="r")
         dset_h5 = file_h5["Scan 1/EBSD/Data/patterns"]
-        print(dset_h5.shape)  # Navigation dimension is flattened
+        print(f"Dataset has shape: {dset_h5.shape}")  # Navigation dimension is flattened
 
-        # Read metadata from pattern file
-        #md = self.s.metadata.Acquisition_instrument.SEM
         sample_tilt = self.s.detector.sample_tilt
         camera_tilt = self.s.detector.tilt
 
@@ -183,7 +184,7 @@ class HiSetupDialog(QDialog):
             patDim=self.sig_shape,
         )
 
-        print("Starting indexing")
+        print("Indexing ...")
         self.data = indexer.index_pats(patsin=dset_h5, verbose=1)
         # Verbose = 2 will crash because a Matplotlib GUI outside of the main thread will likely fail.
 
@@ -222,11 +223,12 @@ class HiSetupDialog(QDialog):
             pattern_fit_prop="fit",
             extra_prop=["nmatch", "matchattempts0", "matchattempts1", "totvotes"],
         )
+        print("Result was saved as xmap_hi.h5 and xmap_hi.ang")
         for key in ["quality", "phase", "orientation"]:
             optionEnabled, optionExecute = options[key]
             if optionEnabled:
                 optionExecute()
-                plt.show()
+        print(f"Finished indexing {self.pattern_name}")
 
     def run_hough_indexing(self):
         # Pass the function to execute
@@ -242,6 +244,7 @@ class HiSetupDialog(QDialog):
             self.phase_proxys.append(phase_proxy)
 
     def generate_pre_maps(self):
+        print("Generating maps of input data ...")
         mean_intensity = self.s.mean(axis=(2, 3))
         plt.imsave(
             path.join(self.dir_out, "mean_intensity.png"),
@@ -266,6 +269,7 @@ class HiSetupDialog(QDialog):
         """
         Plot quality metrics for combined map
         """
+        print("Generating quality metric for combined map ...")
         try:
             to_plot = ["pq", "cm", "fit", "nmatch", "matchattempts0", "totvotes"]
             fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(20, 10))
@@ -288,6 +292,7 @@ class HiSetupDialog(QDialog):
         """
         Plot phase map
         """
+        print("Generating phase map ...")
         try:
             fig = self.xmap.plot(return_figure=True, remove_padding=True)
             fig.savefig(
@@ -300,6 +305,7 @@ class HiSetupDialog(QDialog):
         """
         Plot orientation colour key
         """
+        print("Generating orientation-colored map ...")
         try:
             ckey = plot.IPFColorKeyTSL(
                 self.xmap.phases[0].point_group, direction=Vector3d((0, 0, 1))

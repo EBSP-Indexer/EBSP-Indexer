@@ -84,9 +84,6 @@
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QLineEdit" name="consoleInput"/>
-            </item>
            </layout>
           </item>
          </layout>
@@ -126,7 +123,7 @@
      <x>0</x>
      <y>0</y>
      <width>695</width>
-     <height>24</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

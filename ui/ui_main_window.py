@@ -17,9 +17,9 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
-    QHeaderView, QLabel, QLineEdit, QMainWindow,
-    QMenu, QMenuBar, QPlainTextEdit, QSizePolicy,
-    QStatusBar, QTreeView, QVBoxLayout, QWidget)
+    QHeaderView, QLabel, QMainWindow, QMenu,
+    QMenuBar, QPlainTextEdit, QSizePolicy, QStatusBar,
+    QTreeView, QVBoxLayout, QWidget)
 
 from mplwidget import MplWidget
 
@@ -95,11 +95,6 @@ class Ui_MainWindow(object):
 
         self.inputLayout.addWidget(self.consolePrompt)
 
-        self.consoleInput = QLineEdit(self.centralwidget)
-        self.consoleInput.setObjectName(u"consoleInput")
-
-        self.inputLayout.addWidget(self.consoleInput)
-
 
         self.systemViewerLayout.addLayout(self.inputLayout)
 
@@ -134,7 +129,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 695, 24))
+        self.menubar.setGeometry(QRect(0, 0, 695, 26))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuProcessing = QMenu(self.menubar)

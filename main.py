@@ -1,22 +1,26 @@
 import sys
-from os.path import basename
+from os.path import basename, splitext
+from contextlib import redirect_stdout, redirect_stderr
 from PySide6.QtCore import QDir, QThreadPool, Qt
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
+from PySide6.QtGui import QFont
 from scripts.hough_indexing import HiSetupDialog
 from ui.ui_main_window import Ui_MainWindow
 import matplotlib.image as mpimg
-import warnings
 
 from utils.filebrowser import FileBrowser
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.signal_navigation import SignalNavigation
 from scripts.dictionary_indexing import DiSetupDialog
-from scripts.interpreter import ConsoleWidget
+
+# from scripts.interpreter import ConsoleWidget
+from scripts.console import Console, Redirect
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
 from scripts.setting_file import SettingFile
 
 SYSTEM_VIEWER_FILTER = ["*.h5", "*.dat", "*.ang", "*.jpg", "*.png", "*.gif", "*.txt", ".bmp"]
+
 
 class AppWindow(QMainWindow):
     """
@@ -33,18 +37,13 @@ class AppWindow(QMainWindow):
         self.showMaximized()
         self.setupConnections()
         self.showImage()
-        
         self.threadPool = QThreadPool()
-        print(
-            "Multithreading with maximum %d threads" % self.threadPool.maxThreadCount()
-        )
+
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         self.systemModel = QFileSystemModel()
 
-        variables = (
-            globals()
-        )  # TEMPERORY!!!: accessing variables in different thread may lead to crash
-        self.console = ConsoleWidget(self.ui, variables)
+        self.console = Console(parent=self, context=globals())
+        self.console.setfont(QFont("Lucida Sans Typewriter", 10))
 
     def setupConnections(self):
         self.ui.actionOpen_Workfolder.triggered.connect(
@@ -89,15 +88,12 @@ class AppWindow(QMainWindow):
     def selectProcessing(self):
         try:
             self.processingDialog = PatternProcessingDialog(
-                parent = self,
-                pattern_path=self.file_selected
+                parent=self, pattern_path=self.file_selected
             )
             self.processingDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.processingDialog.exec()
         except Exception as e:
-            self.console.send_console_log(
-                f"Could not initialize processing dialog:\n{str(e)}\n"
-            )
+            self.console.errorwrite(f"Could not initialize processing dialog:\n{str(e)}\n")
 
     def selectROI(self):
         try:
@@ -105,12 +101,14 @@ class AppWindow(QMainWindow):
             self.ROIDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.ROIDialog.exec()
         except Exception as e:
-            print(e)
-            print("Could not initialize ROI dialog")
+            self.console.errorwrite(f"Could not initialize ROI dialog:\n{str(e)}\n")
 
     def onSystemViewClicked(self, index):
         self.file_selected = self.systemModel.filePath(index)
-        self.showImage(self.file_selected)
+        if splitext(self.file_selected)[1] in [".jpg", ".png", ".gif", ".bmp"]:
+            self.showImage(self.file_selected)
+        else:
+            self.showImage()
 
     def selectSignalNavigation(self):
         try:
@@ -123,12 +121,7 @@ class AppWindow(QMainWindow):
                 dlg.setStandardButtons(QMessageBox.Ok)
                 dlg.setIcon(QMessageBox.Warning)
                 dlg.exec()
-            else:
-                print(e)
-                print("Could not initialize signal navigation")
-            self.console.send_console_log(
-                f"Could not initialize signal navigation:\n{str(e)}\n"
-            )
+            self.console.errorwrite(f"Could not initialize signal navigation:\n{str(e)}\n")
 
     def selectDictionaryIndexingSetup(self):
         try:
@@ -136,11 +129,7 @@ class AppWindow(QMainWindow):
             self.diSetup.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.diSetup.show()
         except Exception as e:
-            self.console.send_console_log(
-                f"Could not initialize dictionary indexing:\n{str(e)}\n"
-            )
-            print(e)
-            print("Could not initialize dictionary indexing")
+            self.console.errorwrite(f"Could not initialize dictionary indexing:\n{str(e)}\n")
 
     def selectHoughIndexingSetup(self):
         try:
@@ -148,9 +137,7 @@ class AppWindow(QMainWindow):
             self.hiSetup.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.hiSetup.show()
         except Exception as e:
-            self.console.send_console_log(
-                f"Could not initialize hough indexing:\n{str(e)}\n"
-            )
+            self.console.errorwrite(f"Could not initialize hough indexing:\n{str(e)}\n")
 
     def selectPatternCenter(self):
         try:
@@ -158,8 +145,7 @@ class AppWindow(QMainWindow):
             self.patternCenter.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.patternCenter.show()
         except Exception as e:
-            print(e)
-            print("Could not initialize pattern center refinement")
+            self.console.errorwrite(f"Could not initialize pattern center refinement:\n{str(e)}\n")
 
     def showImage(self, imagePath="resources/kikuchipy_banner.png"):
         image = mpimg.imread(imagePath)
@@ -172,10 +158,30 @@ class AppWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    appWindow = AppWindow()
-    appWindow.show()
-    try:
-        sys.exit(app.exec())
-    except Exception as e:
-        print(e)
-        print("A clean exit was not performed")
+    APP = AppWindow()
+
+    # Redirect stdout to console.write and stderr to console.errorwrite
+    redirect = Redirect(APP.console.errorwrite)
+    debug = True
+    if debug:
+        APP.show()
+        print(
+            f"Multithreading with maximum {APP.threadPool.maxThreadCount()} threads"
+        )
+        try:
+            sys.exit(app.exec())
+        except Exception as e:
+            print(e)
+            print("A clean exit was not performed")
+    else:
+        with redirect_stdout(APP.console), redirect_stderr(redirect):
+            APP.show()
+            print(
+                f"Multithreading with maximum {APP.threadPool.maxThreadCount()} threads"
+            )
+            print("""Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'""")
+            try:
+                sys.exit(app.exec())
+            except Exception as e:
+                print(e)
+                print("A clean exit was not performed")
