@@ -65,10 +65,15 @@ class Ui_PatternCenterDialog(object):
 
         self.horizontalLayout.addWidget(self.toolButtonRight)
 
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.counterLabel = QLabel(PatternCenterDialog)
+        self.counterLabel.setObjectName(u"counterLabel")
 
-        self.horizontalLayout.addItem(self.horizontalSpacer_2)
+        self.horizontalLayout.addWidget(self.counterLabel, 0, Qt.AlignRight)
 
+        self.horizontalLayout.setStretch(0, 3)
+        self.horizontalLayout.setStretch(1, 1)
+        self.horizontalLayout.setStretch(2, 1)
+        self.horizontalLayout.setStretch(3, 3)
 
         self.verticalLayout_4.addLayout(self.horizontalLayout)
 
@@ -122,16 +127,16 @@ class Ui_PatternCenterDialog(object):
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.spinBoxX.sizePolicy().hasHeightForWidth())
         self.spinBoxX.setSizePolicy(sizePolicy2)
-        self.spinBoxX.setDecimals(3)
-        self.spinBoxX.setMaximum(10.000000000000000)
+        self.spinBoxX.setDecimals(4)
+        self.spinBoxX.setMaximum(1.000000000000000)
         self.spinBoxX.setSingleStep(0.001000000000000)
 
         self.gridLayout_2.addWidget(self.spinBoxX, 0, 1, 1, 1)
 
         self.spinBoxY = QDoubleSpinBox(PatternCenterDialog)
         self.spinBoxY.setObjectName(u"spinBoxY")
-        self.spinBoxY.setDecimals(3)
-        self.spinBoxY.setMaximum(10.000000000000000)
+        self.spinBoxY.setDecimals(4)
+        self.spinBoxY.setMaximum(1.000000000000000)
         self.spinBoxY.setSingleStep(0.001000000000000)
 
         self.gridLayout_2.addWidget(self.spinBoxY, 1, 1, 1, 1)
@@ -148,8 +153,8 @@ class Ui_PatternCenterDialog(object):
 
         self.spinBoxZ = QDoubleSpinBox(PatternCenterDialog)
         self.spinBoxZ.setObjectName(u"spinBoxZ")
-        self.spinBoxZ.setDecimals(3)
-        self.spinBoxZ.setMaximum(10.000000000000000)
+        self.spinBoxZ.setDecimals(4)
+        self.spinBoxZ.setMaximum(3.000000000000000)
         self.spinBoxZ.setSingleStep(0.001000000000000)
 
         self.gridLayout_2.addWidget(self.spinBoxZ, 2, 1, 1, 1)
@@ -208,6 +213,7 @@ class Ui_PatternCenterDialog(object):
         PatternCenterDialog.setWindowTitle(QCoreApplication.translate("PatternCenterDialog", u"Pattern Center Refinement", None))
         self.toolButtonLeft.setText(QCoreApplication.translate("PatternCenterDialog", u"...", None))
         self.toolButtonRight.setText(QCoreApplication.translate("PatternCenterDialog", u"...", None))
+        self.counterLabel.setText(QCoreApplication.translate("PatternCenterDialog", u"Calibration Pattern: 0/0", None))
         self.buttonAddPhase.setText(QCoreApplication.translate("PatternCenterDialog", u"Add Phase", None))
         self.buttonRemovePhase.setText(QCoreApplication.translate("PatternCenterDialog", u"Remove Phase", None))
         self.labelXStar.setText(QCoreApplication.translate("PatternCenterDialog", u"X-Star", None))

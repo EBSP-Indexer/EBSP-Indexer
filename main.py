@@ -1,7 +1,7 @@
 import sys
 from os.path import basename, splitext
 from contextlib import redirect_stdout, redirect_stderr
-from PySide6.QtCore import QDir, QThreadPool
+from PySide6.QtCore import QDir, QThreadPool, Qt
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
 from PySide6.QtGui import QFont
 from scripts.hough_indexing import HiSetupDialog
@@ -90,13 +90,15 @@ class AppWindow(QMainWindow):
             self.processingDialog = PatternProcessingDialog(
                 parent=self, pattern_path=self.file_selected
             )
+            self.processingDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.processingDialog.exec()
         except Exception as e:
             self.console.errorwrite(f"Could not initialize processing dialog:\n{str(e)}\n")
 
     def selectROI(self):
         try:
-            self.ROIDialog = RegionOfInteresDialog(pattern_path=self.file_selected)
+            self.ROIDialog = RegionOfInteresDialog(parent=self, pattern_path=self.file_selected)
+            self.ROIDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.ROIDialog.exec()
         except Exception as e:
             self.console.errorwrite(f"Could not initialize ROI dialog:\n{str(e)}\n")
@@ -124,6 +126,7 @@ class AppWindow(QMainWindow):
     def selectDictionaryIndexingSetup(self):
         try:
             self.diSetup = DiSetupDialog(parent=self, pattern_path=self.file_selected)
+            self.diSetup.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.diSetup.show()
         except Exception as e:
             self.console.errorwrite(f"Could not initialize dictionary indexing:\n{str(e)}\n")
@@ -131,13 +134,15 @@ class AppWindow(QMainWindow):
     def selectHoughIndexingSetup(self):
         try:
             self.hiSetup = HiSetupDialog(parent=self, pattern_path=self.file_selected)
+            self.hiSetup.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.hiSetup.show()
         except Exception as e:
             self.console.errorwrite(f"Could not initialize hough indexing:\n{str(e)}\n")
 
     def selectPatternCenter(self):
         try:
-            self.patternCenter = PatterCenterDialog(self.working_dir)
+            self.patternCenter = PatterCenterDialog(parent=self, working_dir=self.working_dir)
+            self.patternCenter.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.patternCenter.show()
         except Exception as e:
             self.console.errorwrite(f"Could not initialize pattern center refinement:\n{str(e)}\n")
