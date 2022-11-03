@@ -9,9 +9,10 @@ from ui.ui_roi_dialog import Ui_ROIDialog
 class RegionOfInteresDialog(QDialog):
     def __init__(
         self,
+        parent,
         pattern_path=None,
     ):
-        super().__init__()
+        super().__init__(parent)
 
         self.working_dir = path.dirname(pattern_path)
 
