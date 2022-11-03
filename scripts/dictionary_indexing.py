@@ -8,6 +8,7 @@ from utils.worker import Worker
 from ui.ui_di_setup import Ui_DiSetupDialog
 
 import kikuchipy as kp
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from orix.quaternion import Rotation
@@ -17,7 +18,7 @@ from orix import io, sampling, plot
 import gc
 
 # Turn interactive plotting off
-plt.ioff()
+print(mpl.get_backend())
 
 
 class DiSetupDialog(QDialog):
@@ -37,6 +38,9 @@ class DiSetupDialog(QDialog):
         self.working_dir = path.dirname(self.pattern_path)
 
         # Standard settings for dictionary indexing
+        #mpl.rcParams["backend"] = "agg"
+        mpl.use("agg")
+        plt.rcParams.update({"font.size": 20})
         self.savefig_kwargs = dict(bbox_inches="tight", pad_inches=0, dpi=150)
 
         # Dialog box ui setup
@@ -92,9 +96,9 @@ class DiSetupDialog(QDialog):
             self.pc = np.array([0.000, 0.000, 0.000])
 
         self.updatePCpatternCenter()
-        
+
         self.mpPaths = {}
-        
+
         i = 1
         while True:
             try:
@@ -104,7 +108,7 @@ class DiSetupDialog(QDialog):
                 self.ui.listWidgetPhase.addItem(phase)
                 i += 1
             except:
-                break                
+                break
 
     def updatePCpatternCenter(self):
         self.ui.patternCenterX.setValue(self.pc[0])
@@ -152,9 +156,12 @@ class DiSetupDialog(QDialog):
             "Binning": self.ui.comboBoxBinning.currentText(),
             "Mask": [self.ui.checkBoxMask.isChecked(), lambda: self.signal_mask()],
             "IQ": [self.ui.checkBoxIQ.isChecked(), lambda: self.image_quality_map()],
-            "ADP": [self.ui.checkBoxADP.isChecked(), lambda: self.average_dot_product()],
+            "ADP": [
+                self.ui.checkBoxADP.isChecked(),
+                lambda: self.average_dot_product(),
+            ],
             "MI": [self.ui.checkBoxMI.isChecked(), lambda: self.mean_intensity_map()],
-            "VBSE": [self.ui.checkBoxVBSE.isChecked(), lambda: self.vbse_image()]
+            "VBSE": [self.ui.checkBoxVBSE.isChecked(), lambda: self.vbse_image()],
         }
 
     def run_dictionary_indexing(self):
@@ -191,9 +198,10 @@ class DiSetupDialog(QDialog):
     def mean_intensity_map(self):
         mean_intensity = self.s.mean(axis=(2, 3))
         plt.imsave(
-            path.join(
-                self.results_dir, "mean_intensity.png"), mean_intensity.data, cmap="gray"
-            )
+            path.join(self.results_dir, "mean_intensity.png"),
+            mean_intensity.data,
+            cmap="gray",
+        )
 
     def vbse_image(self):
         vbse_gen = kp.generators.VirtualBSEGenerator(self.s)
@@ -227,6 +235,116 @@ class DiSetupDialog(QDialog):
         plt.imsave(path.join(self.results_dir, "adp.png"), adp, cmap="gray")
 
         plt.close("all")
+
+    def master_pattern_sample(self):
+        ### Simulate one pattern to check the parameters. The master pattern sampling was implemented by Lars Lervik.
+
+        self.sim = self.mp[f"mp_{ph}"].get_patterns(
+            rotations=Rotation.from_euler(np.deg2rad([0, 0, 0])),
+            # rotations=rot[0],
+            detector=self.detector,
+            energy=self.energy,  # Defined above
+            compute=True,  # if False, sim.compute() must be called at a later time
+        )
+
+        fig = self.detector.plot(
+            pattern=self.sim.squeeze().data,
+            draw_gnomonic_circles=True,
+            coordinates="gnomonic",
+            return_figure=True,
+        )
+
+        fig.savefig(path.join(self.results_dir, f"pc_{ph}.png"), **self.savefig_kwargs)
+
+        plt.close(fig)
+
+    def save_ncc_figure(self):
+
+        ### Inspect dictionary indexing results for phase
+
+        fig = self.xmaps[f"xmap_{ph}"].plot(
+            value=self.xmaps[f"xmap_{ph}"].scores[:, 0],
+            colorbar=True,
+            colorbar_label="Normalized cross correlation score",
+            return_figure=True,
+            cmap="gray",
+        )
+
+        fig.savefig(path.join(self.results_dir, f"ncc_{ph}.png"), **self.savefig_kwargs)
+
+        plt.close(fig)
+
+    def save_orientation_similairty_map(self):
+
+        ### Calculate and save orientation similairty map
+
+        osm = kp.indexing.orientation_similarity_map(self.xmaps[f"xmap_{ph}"])
+
+        fig = self.xmaps[f"xmap_{ph}"].plot(
+            value=osm.ravel(),
+            colorbar=True,
+            colorbar_label="Orientation similarity",
+            return_figure=True,
+            cmap="gray",
+        )
+
+        fig.savefig(path.join(self.results_dir, f"osm_{ph}.png"), **self.savefig_kwargs)
+
+        plt.close(fig)
+
+    def save_inverse_pole_figure(self):
+
+        fig = self.xmaps[f"xmap_{ph}"].plot(
+            self.ckey.orientation2color(self.xmaps[f"xmap_{ph}"].orientations),
+            remove_padding=True,
+            return_figure=True,
+        )
+
+        fig.savefig(path.join(self.results_dir, f"ipf_{ph}.png"), **self.savefig_kwargs)
+
+        plt.close(fig)
+
+    def refine_orientations(self):
+
+        ### Refine xmaps
+        self.xmap_ref = self.s2.refine_orientation(
+            xmap=self.xmaps[f"xmap_{ph}"],
+            master_pattern=self.mp[f"mp_{ph}"],
+            trust_region=[1, 1, 1],
+            **self.ref_kw,
+        )
+        self.xmaps_ref[f"xmap_ref_{ph}"] = self.xmap_ref
+
+        io.save(
+            path.join(self.results_dir, f"di_ref_results_{ph}.ang"),
+            self.xmaps_ref[f"xmap_ref_{ph}"],
+        )  # .ang
+
+    def merge_crystal_maps(self):
+
+        cm = [self.xmaps[f"xmap_{ph}"] for ph in self.phases]
+
+        # Merge xmaps from indexed phases
+
+        self.xmap_merged = kp.indexing.merge_crystal_maps(
+            crystal_maps=cm,
+            mean_n_best=1,
+            scores_prop="scores",
+            simulation_indices_prop="simulation_indices",
+        )
+
+        self.colors = ["lime", "r", "b", "yellow"]
+
+        for i in range(len(self.phases)):
+            self.xmap_merged.phases[i].color = self.colors[i]
+
+        io.save(
+            path.join(self.results_dir, "di_results_merged.h5"), self.xmap_merged
+        )  # orix' HDF5
+        io.save(
+            path.join(self.results_dir, "di_results_merged.ang"), self.xmap_merged
+        )  # .ang
+
 
     def dictionary_indexing(self):
         # Create folder for storing DI results in working directory
@@ -297,7 +415,7 @@ class DiSetupDialog(QDialog):
         self.di_kwargs = dict(
             metric="ncc", keep_n=20, n_per_iteration=self.n_per_iteration
         )
-        
+
         ### additional functions to be performed
         keys = ["Mask", "IQ", "VBSE", "MI", "ADP"]
 
@@ -316,7 +434,7 @@ class DiSetupDialog(QDialog):
                 self.file_mp,
                 energy=self.energy,  # single energies like 10, 11, 12 etc. or a range like (10, 20)
                 projection="lambert",  # stereographic, lambert
-                hemisphere="both",  # north, south, both
+                hemisphere="upper",  # upper, lower
             )
 
         # Xmaps dictionary for storing crystalmaps
@@ -334,36 +452,13 @@ class DiSetupDialog(QDialog):
                 point_group=self.mp[f"mp_{ph}"].phase.point_group,
             )
 
-            ### Simulate one pattern to check the parameters. The master pattern sampling was implemented by Lars Lervik.
-
-            self.sim = self.mp[f"mp_{ph}"].get_patterns(
-                rotations=Rotation.from_euler(np.deg2rad([0, 0, 0])),
-                # rotations=rot[0],
-                detector=self.detector,
-                energy=self.energy,  # Defined above
-                compute=True,  # if False, sim.compute() must be called at a later time
-            )
-
-            fig = self.detector.plot(
-                pattern=self.sim.squeeze().data,
-                draw_gnomonic_circles=True,
-                coordinates="gnomonic",
-                return_figure=True,
-            )
-
-            fig.savefig(
-                path.join(self.results_dir, f"pc_{ph}.png"), **self.savefig_kwargs
-            )
-
-            plt.close(fig)
-
             ### Generate dictionary
 
             self.sim_dict = self.mp[f"mp_{ph}"].get_patterns(
                 rotations=self.rot,
                 detector=self.detector,
                 energy=self.energy,
-                compute=True,
+                compute=False,
             )
 
             self.xmaps[f"xmap_{ph}"] = self.s2.dictionary_indexing(
@@ -371,7 +466,7 @@ class DiSetupDialog(QDialog):
             )
             self.xmaps[f"xmap_{ph}"].scan_unit = "um"
 
-            ### Save results from DI for phase
+            ### Save results from DI for phase, TODO: let user choose file type to be saved
 
             io.save(
                 path.join(self.results_dir, f"di_results_{ph}.h5"),
@@ -382,44 +477,10 @@ class DiSetupDialog(QDialog):
                 self.xmaps[f"xmap_{ph}"],
             )  # .ang
 
-            ### Inspect dictionary indexing results for phase
-
-            fig = self.xmaps[f"xmap_{ph}"].plot(
-                value=self.xmaps[f"xmap_{ph}"].scores[:, 0],
-                colorbar=True,
-                colorbar_label="Normalized cross correlation score",
-                return_figure=True,
-                cmap="gray",
-            )
-
-            fig.savefig(
-                path.join(self.results_dir, f"ncc_{ph}.png"), **self.savefig_kwargs
-            )
-
-            plt.close(fig)
-
-            ### Calculate and save orientation similairty map
-
-            osm = kp.indexing.orientation_similarity_map(self.xmaps[f"xmap_{ph}"])
-
-            fig = self.xmaps[f"xmap_{ph}"].plot(
-                value=osm.ravel(),
-                colorbar=True,
-                colorbar_label="Orientation similarity",
-                return_figure=True,
-                cmap="gray",
-            )
-
-            fig.savefig(
-                path.join(self.results_dir, f"osm_{ph}.png"), **self.savefig_kwargs
-            )
-
-            plt.close(fig)
-
-            self.ckey = plot.IPFColorKeyTSL(self.mp[f"mp_{ph}"].phase.point_group)
-
             # Refinemenet kwargs
             self.ref_kw = dict(detector=self.detector, energy=self.energy, compute=True)
+
+            self.ckey = plot.IPFColorKeyTSL(self.mp[f"mp_{ph}"].phase.point_group)
 
             if self.refine:
 
@@ -452,19 +513,7 @@ class DiSetupDialog(QDialog):
 
                 plt.close(fig)
 
-            fig = self.xmaps[f"xmap_{ph}"].plot(
-                self.ckey.orientation2color(self.xmaps[f"xmap_{ph}"].orientations),
-                remove_padding=True,
-                return_figure=True,
-            )
-
-            fig.savefig(
-                path.join(self.results_dir, f"ipf_{ph}.png"), **self.savefig_kwargs
-            )
-
-            plt.close(fig)
             del self.sim_dict
-            gc.collect()
 
         if len(self.phases) > 1:
 
