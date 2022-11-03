@@ -168,6 +168,7 @@ class HiSetupDialog(QDialog):
             pattern_fit_prop="fit",
             extra_prop=["nmatch", "matchattempts0", "matchattempts1", "totvotes"],
         )
+        print("Result was saved as xmap_hi.h5 and xmap_hi.ang")
         for key in ["quality", "phase", "orientation"]:
             optionEnabled, optionExecute = options[key]
             if optionEnabled:

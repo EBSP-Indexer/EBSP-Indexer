@@ -57,15 +57,15 @@ class PatternProcessingDialog(QDialog):
         return {
             "static": {
                 self.ui.staticBackgroundBox.isChecked(),
-                self.s.remove_static_background(),
+                self.s.remove_static_background(show_progressbar=True),
             },
             "dynamic": {
                 self.ui.dynamicBackgroundBox.isChecked(),
-                self.s.remove_dynamic_background(),
+                self.s.remove_dynamic_background(show_progressbar=True),
             },
             "average": {
                 self.ui.averageBox.isChecked(),
-                self.s.average_neighbour_patterns(self.gaussian_window),
+                self.s.average_neighbour_patterns(self.gaussian_window, show_progressbar=True),
             },
         }
 
@@ -77,6 +77,7 @@ class PatternProcessingDialog(QDialog):
         self.accept()
 
     def apply_processing(self):
+        print("Applying processing ...")
         self.options = self.getOptions()
         for optionName, optionInfo in self.options.items():
             optionEnabled, optionExecute = optionInfo

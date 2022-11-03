@@ -112,7 +112,7 @@ class Console(QtWidgets.QWidget):
         # self.content.setSpacing(0)
  
         # Display for output and stderr
-        self.outdisplay = self.parent.ui.consoleLog
+        self.outdisplay: QtWidgets.QPlainTextEdit = self.parent.ui.consoleLog
         self.outdisplay.setMaximumBlockCount(blockcount)
         self.outdisplay.setReadOnly(True)
         #self.content.addWidget(self.outdisplay, 0, 0, 1, 2)
@@ -151,9 +151,20 @@ class Console(QtWidgets.QWidget):
     def setprompt(self, text: str):
         self.prompt = text
     
-    # def flush(self):
-    #     self.inpedit.clearhistory()
-    #     self.outdisplay.clear()
+    def flush(self):
+        content_text = self.outdisplay.toPlainText()
+        content = content_text.split("\n")
+        found = 0
+        if len(content) == 0:
+            return
+        for i in range(len(content)-1, -1, -1):
+            if content[i] != "" and content[i][0] == '[':
+                found += 1  
+            if found == 2:
+                del content[i]
+                self.outdisplay.setPlainText("\n".join(content))
+                break
+        #self.outdisplay.appendPlainText(str(len(content)).rstrip())
  
     def push(self, line: str) -> None:
         """Execute entered command.  Command may span multiple lines"""
