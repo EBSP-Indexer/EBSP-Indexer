@@ -1,10 +1,13 @@
 from kikuchipy import load
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 class SignalNavigation():
 
     def __init__(self, file_path):
         super().__init__()
+        mpl.use("qt5agg")
+        print(mpl.get_backend())
         self.file_path = file_path
         try:
             self.s = load(self.file_path, lazy=True)
@@ -12,4 +15,3 @@ class SignalNavigation():
             raise e
         self.s.plot()
         plt.show()
-        
