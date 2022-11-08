@@ -19,7 +19,7 @@ from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
 from scripts.setting_file import SettingFile
 
-SYSTEM_VIEWER_FILTER = ["*.h5", "*.dat", "*.ang", "*.jpg", "*.png", "*.gif", "*.txt", ".bmp"]
+SYSTEM_VIEWER_FILTER = ["*.h5", "*.dat", "*.ang", "*.jpg", "*.png", "*.gif", "*.txt", "*.bmp"]
 
 
 class AppWindow(QMainWindow):
