@@ -1,10 +1,18 @@
 from os import path
-from kikuchipy import load
+from kikuchipy import load, generators
 from PySide6.QtWidgets import QDialog
 
 from utils.filebrowser import FileBrowser
 from ui.ui_roi_dialog import Ui_ROIDialog
 
+from matplotlib.widgets import RectangleSelector
+import numpy as np
+import matplotlib.pyplot as plt
+
+#TODO: show image shape in dialog window
+#TODO: let user change rectangle shape with spinBox
+#TODO: clean up save_file name
+#TODO: display x, y coordinates onn hover
 
 class RegionOfInteresDialog(QDialog):
     def __init__(
@@ -22,11 +30,14 @@ class RegionOfInteresDialog(QDialog):
 
         else:
             self.pattern_path = pattern_path
-            
+
         self.filenamebase = path.basename(self.pattern_path).split(".")[0]
 
+
         # Standard filename of processed pattern
-        self.save_path = path.join(self.working_dir, f"{self.filenamebase}_ROI_x0_x1_y0_y1.h5")
+        self.save_path = path.join(
+            self.working_dir, f"{self.filenamebase}_ROI_x0_x1_y0_y1.h5"
+        )
 
         self.ui = Ui_ROIDialog()
         self.ui.setupUi(self)
@@ -38,25 +49,39 @@ class RegionOfInteresDialog(QDialog):
         except Exception as e:
             raise e
 
+        self.x_len, self.y_len = self.s.axes_manager.navigation_shape
+
+        self.ui.spinBoxXstart.setMaximum(self.x_len)
+        self.ui.spinBoxXend.setMaximum(self.x_len)
+        self.ui.spinBoxYstart.setMaximum(self.y_len)
+        self.ui.spinBoxYend.setMaximum(self.y_len)
+
+
         self.fileBrowser = FileBrowser(
             mode=FileBrowser.SaveFile,
             dirpath=self.working_dir,
             filter_name="Hierarchical Data Format (*.h5);;NordifUF Pattern Files (*.dat)",
         )
 
+        self.plot()
+
     def setSavePath(self):
         if self.fileBrowser.getFile():
             self.save_path = self.fileBrowser.getPaths()[0]
             self.ui.pathLineEdit.setText(self.save_path)
+            self.ui.pathLineEdit
 
     def updateSavePath(self):
         self.options = self.getOptions()
-        x_start = self.options["x-start"]
-        x_end = self.options["x-end"]
-        y_start = self.options["y-start"]
-        y_end = self.options["y-end"]
+        self.x0 = self.options["x-start"]
+        self.x1 = self.options["x-end"]
+        self.y0 = self.options["y-start"]
+        self.y1 = self.options["y-end"]
 
-        self.save_path = path.join(self.working_dir, f"{self.filenamebase}_{x_start}_{x_end}_{y_start}_{y_end}.h5")
+        self.save_path = path.join(
+            self.working_dir,
+            f"{self.filenamebase}_{self.x0}_{self.x1}_{self.y0}_{self.y1}.h5",
+        )
         self.ui.pathLineEdit.setText(self.save_path)
 
     def setupConnections(self):
@@ -64,27 +89,63 @@ class RegionOfInteresDialog(QDialog):
         self.ui.buttonBox.accepted.connect(lambda: self.run_roi_selection())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
         self.ui.pathLineEdit.setText(self.save_path)
-        self.ui.lineEditXstart.textChanged.connect(lambda: self.updateSavePath())
-        self.ui.lineEditXend.textChanged.connect(lambda: self.updateSavePath())
-        self.ui.lineEditYstart.textChanged.connect(lambda: self.updateSavePath()) 
-        self.ui.lineEditYend.textChanged.connect(lambda: self.updateSavePath())
+        self.ui.spinBoxXstart.textChanged.connect(lambda: self.updateSavePath())
+        self.ui.spinBoxXend.textChanged.connect(lambda: self.updateSavePath())
+        self.ui.spinBoxYstart.textChanged.connect(lambda: self.updateSavePath())
+        self.ui.spinBoxYend.textChanged.connect(lambda: self.updateSavePath())
 
     def getOptions(self) -> dict:
         return {
-            "x-start": int(self.ui.lineEditXstart.text()),
-            "x-end": int(self.ui.lineEditXend.text()),
-            "y-start": int(self.ui.lineEditYstart.text()),
-            "y-end": int(self.ui.lineEditYend.text()),
+            "x-start": self.ui.spinBoxXstart.value(),
+            "x-end": self.ui.spinBoxXend.value(),
+            "y-start": self.ui.spinBoxYstart.value(),
+            "y-end": self.ui.spinBoxYend.value(),
         }
+
+    def plot(self):
+
+        #generate VBSE image
+        self.vbse_gen = generators.VirtualBSEGenerator(self.s)
+        self.vbse_rgb = self.vbse_gen.get_rgb_image(r=(3, 1), b=(3, 2), g=(3, 3))
+        self.vbse_rgb.change_dtype("uint8")
+
+        #image = mpimg.imread()
+        self.ui.mplWidget.vbl.setContentsMargins(0, 0, 0, 0)
+        self.ui.mplWidget.canvas.ax.clear()
+        self.ui.mplWidget.canvas.ax.axis(False)
+        self.ui.mplWidget.canvas.ax.imshow(self.vbse_rgb)
+        self.ui.mplWidget.canvas.draw()
+
+        self.rs = RectangleSelector(self.ui.mplWidget.canvas.ax, self.line_select_callback,
+                                                drawtype='box', useblit=True,
+                                                button=[1, 3],  # don't use middle button
+                                                minspanx=5, minspany=5,
+                                                spancoords='data',
+                                                interactive=True)
+
+        self.ui.mplWidget.canvas.mpl_connect('button_press_event', self.on_click)
+        
+    def on_click(self, event):
+        if event.button == 1 or event.button == 3 and not self.rs.active:
+            self.rs.set_active(True)
+        else:
+            self.rs.set_active(False) 
+
+    def line_select_callback(self, eclick, erelease):
+
+        self.ui.spinBoxXstart.setValue(int(eclick.xdata))
+        self.ui.spinBoxXend.setValue(int(erelease.xdata))
+        self.ui.spinBoxYstart.setValue(int(eclick.ydata))
+        self.ui.spinBoxYend.setValue(int(erelease.ydata))
 
     def run_roi_selection(self):
         self.options = self.getOptions()
-        x_start = self.options["x-start"]
-        x_end = self.options["x-end"]
-        y_start = self.options["y-start"]
-        y_end = self.options["y-end"]
-        print(x_start, x_end, y_start, y_end)
-        self.s2 = self.s.inav[x_start:x_end, y_start:y_end]
+        self.x0 = self.options["x-start"]
+        self.x1 = self.options["x-end"]
+        self.y0 = self.options["y-start"]
+        self.y1 = self.options["y-end"]
+
+        self.s2 = self.s.inav[self.x0:self.x1, self.y0:self.y1]
         try:
             filepath = self.ui.pathLineEdit.text()
 
