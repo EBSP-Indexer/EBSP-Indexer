@@ -231,6 +231,9 @@ class Ui_DiSetupDialog(object):
 
         self.doubleSpinBoxStepSize = QDoubleSpinBox(self.centralwidget)
         self.doubleSpinBoxStepSize.setObjectName(u"doubleSpinBoxStepSize")
+        self.doubleSpinBoxStepSize.setMinimum(0.010000000000000)
+        self.doubleSpinBoxStepSize.setMaximum(3.000000000000000)
+        self.doubleSpinBoxStepSize.setSingleStep(0.100000000000000)
         self.doubleSpinBoxStepSize.setValue(2.000000000000000)
 
         self.gridLayout_5.addWidget(self.doubleSpinBoxStepSize, 0, 1, 1, 1)
