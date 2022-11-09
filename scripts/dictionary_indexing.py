@@ -510,7 +510,7 @@ class DiSetupDialog(QDialog):
                 )
 
                 fig.savefig(
-                    path.join(self.results_dir, f"ipf_ref{ph}.png"),
+                    path.join(self.results_dir, f"ipf_ref_{ph}.png"),
                     **self.savefig_kwargs,
                 )
 

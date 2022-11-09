@@ -33,3 +33,12 @@
 2022-11-08 11:11:26,286 - hyperspy.io - WARNING - `signal_type='VirtualBSEImage'` not understood. See `hs.print_known_signal_types()` for a list of installed signal types or https://github.com/hyperspy/hyperspy-extensions-list for the list of all hyperspy extensions providing signals.
 2022-11-08 11:11:26,405 - hyperspy.io - WARNING - `signal_type='VirtualBSEImage'` not understood. See `hs.print_known_signal_types()` for a list of installed signal types or https://github.com/hyperspy/hyperspy-extensions-list for the list of all hyperspy extensions providing signals.
 2022-11-08 11:11:26,487 - hyperspy.io - WARNING - `signal_type='VirtualBSEImage'` not understood. See `hs.print_known_signal_types()` for a list of installed signal types or https://github.com/hyperspy/hyperspy-extensions-list for the list of all hyperspy extensions providing signals.
+2022-11-09 11:49:57,848 - kikuchipy.io.plugins.ebsd_directory - INFO - 1 patterns found in directory
+2022-11-09 11:49:57,850 - kikuchipy.io.plugins.ebsd_directory - INFO - Navigation shape is (1,)
+2022-11-09 11:49:57,854 - kikuchipy.io.plugins.ebsd_directory - INFO - Sample pattern has shape (120, 120) and dtype uint8
+2022-11-09 11:50:41,236 - kikuchipy.io.plugins.ebsd_directory - INFO - 1 patterns found in directory
+2022-11-09 11:50:41,238 - kikuchipy.io.plugins.ebsd_directory - INFO - Navigation shape is (1,)
+2022-11-09 11:50:41,240 - kikuchipy.io.plugins.ebsd_directory - INFO - Sample pattern has shape (120, 120) and dtype uint8
+2022-11-09 12:02:15,045 - kikuchipy.io.plugins.ebsd_directory - INFO - 1 patterns found in directory
+2022-11-09 12:02:15,045 - kikuchipy.io.plugins.ebsd_directory - INFO - Navigation shape is (1,)
+2022-11-09 12:02:15,047 - kikuchipy.io.plugins.ebsd_directory - INFO - Sample pattern has shape (120, 120) and dtype uint8
