@@ -26,7 +26,7 @@ class Ui_ROIDialog(object):
     def setupUi(self, ROIDialog):
         if not ROIDialog.objectName():
             ROIDialog.setObjectName(u"ROIDialog")
-        ROIDialog.resize(812, 344)
+        ROIDialog.resize(871, 528)
         self.gridLayout_2 = QGridLayout(ROIDialog)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.centralwidget = QFrame(ROIDialog)
@@ -40,6 +40,10 @@ class Ui_ROIDialog(object):
         self.gridLayout_5.setObjectName(u"gridLayout_5")
         self.verticalLayout_3 = QVBoxLayout()
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_3.addItem(self.verticalSpacer)
+
         self.label_6 = QLabel(self.centralwidget)
         self.label_6.setObjectName(u"label_6")
 
@@ -102,16 +106,16 @@ class Ui_ROIDialog(object):
 
         self.verticalLayout_3.addLayout(self.gridLayout_4)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        self.verticalLayout_3.addItem(self.verticalSpacer)
-
         self.line = QFrame(self.centralwidget)
         self.line.setObjectName(u"line")
         self.line.setFrameShape(QFrame.HLine)
         self.line.setFrameShadow(QFrame.Sunken)
 
         self.verticalLayout_3.addWidget(self.line)
+
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_3.addItem(self.verticalSpacer_2)
 
 
         self.gridLayout_5.addLayout(self.verticalLayout_3, 2, 0, 1, 1)
@@ -129,24 +133,45 @@ class Ui_ROIDialog(object):
 
         self.gridLayout_5.addWidget(self.buttonBox, 4, 1, 1, 1)
 
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.folderLabel = QLabel(self.centralwidget)
+        self.folderLabel.setObjectName(u"folderLabel")
 
-        self.horizontalLayout.addLayout(self.verticalLayout)
+        self.horizontalLayout_3.addWidget(self.folderLabel)
 
-        self.label_5 = QLabel(self.centralwidget)
-        self.label_5.setObjectName(u"label_5")
-        self.label_5.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.folderEdit = QLabel(self.centralwidget)
+        self.folderEdit.setObjectName(u"folderEdit")
 
-        self.horizontalLayout.addWidget(self.label_5)
+        self.horizontalLayout_3.addWidget(self.folderEdit)
 
-        self.pathLineEdit = QLineEdit(self.centralwidget)
-        self.pathLineEdit.setObjectName(u"pathLineEdit")
-        self.pathLineEdit.setMinimumSize(QSize(200, 0))
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.horizontalLayout.addWidget(self.pathLineEdit)
+        self.horizontalLayout_3.addItem(self.horizontalSpacer)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
+
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.filenameLabel = QLabel(self.centralwidget)
+        self.filenameLabel.setObjectName(u"filenameLabel")
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.filenameLabel.sizePolicy().hasHeightForWidth())
+        self.filenameLabel.setSizePolicy(sizePolicy)
+        self.filenameLabel.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.horizontalLayout.addWidget(self.filenameLabel)
+
+        self.filenameEdit = QLineEdit(self.centralwidget)
+        self.filenameEdit.setObjectName(u"filenameEdit")
+        self.filenameEdit.setMinimumSize(QSize(200, 0))
+
+        self.horizontalLayout.addWidget(self.filenameEdit)
 
         self.browseButton = QPushButton(self.centralwidget)
         self.browseButton.setObjectName(u"browseButton")
@@ -158,11 +183,10 @@ class Ui_ROIDialog(object):
         self.horizontalLayout.addWidget(self.browseButton)
 
 
-        self.gridLayout_5.addLayout(self.horizontalLayout, 3, 0, 1, 1)
+        self.verticalLayout.addLayout(self.horizontalLayout)
 
-        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.gridLayout_5.addItem(self.verticalSpacer_2, 4, 0, 1, 1)
+        self.gridLayout_5.addLayout(self.verticalLayout, 3, 0, 1, 1)
 
 
         self.gridLayout.addLayout(self.gridLayout_5, 3, 0, 1, 1)
@@ -183,7 +207,9 @@ class Ui_ROIDialog(object):
         self.label_3.setText(QCoreApplication.translate("ROIDialog", u"y-start [px]", None))
         self.label_2.setText(QCoreApplication.translate("ROIDialog", u"x-end [px]", None))
         self.label.setText(QCoreApplication.translate("ROIDialog", u"x-start [px]", None))
-        self.label_5.setText(QCoreApplication.translate("ROIDialog", u"Savepath", None))
+        self.folderLabel.setText(QCoreApplication.translate("ROIDialog", u"Working folder:", None))
+        self.folderEdit.setText(QCoreApplication.translate("ROIDialog", u"TextLabel", None))
+        self.filenameLabel.setText(QCoreApplication.translate("ROIDialog", u"Filename:", None))
         self.browseButton.setText(QCoreApplication.translate("ROIDialog", u"Browse", None))
     # retranslateUi
 
