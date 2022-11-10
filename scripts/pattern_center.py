@@ -15,7 +15,7 @@ from orix.quaternion import Rotation
 from orix.crystal_map import Phase
 
 from utils.filebrowser import FileBrowser
-from scripts.setting_file import SettingFile
+from utils.setting_file import SettingFile
 from ui.ui_pattern_center import Ui_PatternCenterDialog
 
 from mplwidget import MplWidget

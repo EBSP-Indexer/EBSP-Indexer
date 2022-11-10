@@ -1,6 +1,6 @@
 from os import path, mkdir
 from PySide6.QtWidgets import QDialog, QDialogButtonBox
-from scripts.setting_file import SettingFile
+from utils.setting_file import SettingFile
 
 from utils.filebrowser import FileBrowser
 from utils.worker import Worker

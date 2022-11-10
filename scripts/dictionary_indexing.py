@@ -1,7 +1,7 @@
 from os import path, mkdir
 
 from PySide6.QtWidgets import QDialog
-from scripts.setting_file import SettingFile
+from utils.setting_file import SettingFile
 
 from utils.filebrowser import FileBrowser
 from utils.worker import Worker
@@ -16,13 +16,6 @@ from orix import io, sampling, plot
 import warnings
 
 # TODO: from time import time
-import gc
-
-# Turn interactive plotting off
-print(mpl.get_backend())
-
-# Ignore warnings to avoid crash with integrated console
-warnings.filterwarnings("ignore")
 
 class DiSetupDialog(QDialog):
     """
@@ -40,30 +33,27 @@ class DiSetupDialog(QDialog):
         # working directory
         self.working_dir = path.dirname(self.pattern_path)
 
-        # Standard settings for dictionary indexing
-        #mpl.rcParams["backend"] = "agg"
-        mpl.use("agg")
-        plt.rcParams.update({"font.size": 20})
-        self.savefig_kwargs = dict(bbox_inches="tight", pad_inches=0, dpi=150)
-
         # Dialog box ui setup
         self.ui = Ui_DiSetupDialog()
         self.ui.setupUi(self)
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
+
+        self.load_pattern()
         self.setupConnections()
-
         self.setupBinningShapes()
-
         self.setupInitialSettings()
 
-    def setupBinningShapes(self):
+    # Initial settup functions
+
+    def load_pattern(self):
         # Load pattern-file to get acquisition resolution
         try:
             self.s = kp.load(self.pattern_path, lazy=True)
         except Exception as e:
             raise e
 
+    def setupBinningShapes(self):
         self.sig_shape = self.s.axes_manager.signal_shape[::-1]
         bin_shapes_1D = np.array([10, 20, 30, 40, 50, 60, 12, 24, 32, 48])
         bin_shapes_2D = np.array(
@@ -86,7 +76,17 @@ class DiSetupDialog(QDialog):
         self.ui.comboBoxBinning.addItems(self.bin_shapes_to_comboBox)
 
     def setupInitialSettings(self):
+        # matplotlib settings
+        mpl.use("agg")
+        self.savefig_kwargs = dict(bbox_inches="tight", pad_inches=0, dpi=150)
+
+        # standard dictionary indexing kwargs
+        self.di_kwargs = dict(metric="ncc", keep_n=20)
+
+        # read current setting from project_settings.txt
         self.sf = SettingFile(path.join(self.working_dir, "project_settings.txt"))
+
+        # Update pattern center to be displayed in UI
         try:
             self.pc = np.array(
                 [
@@ -96,10 +96,11 @@ class DiSetupDialog(QDialog):
                 ]
             )
         except:
-            self.pc = np.array([0.000, 0.000, 0.000])
+            self.pc = np.array([0.400, 0.200, 0.400])
 
         self.updatePCpatternCenter()
 
+        # Paths for master patterns
         self.mpPaths = {}
 
         i = 1
@@ -113,6 +114,15 @@ class DiSetupDialog(QDialog):
             except:
                 break
 
+    def setupConnections(self):
+        self.ui.buttonBox.accepted.connect(lambda: self.run_dictionary_indexing())
+        self.ui.buttonBox.rejected.connect(lambda: self.reject())
+
+        self.ui.pushButtonAddPhase.clicked.connect(lambda: self.addPhase())
+        self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.removePhase())
+
+    # Pattern center
+
     def updatePCpatternCenter(self):
         self.ui.patternCenterX.setValue(self.pc[0])
         self.ui.patternCenterY.setValue(self.pc[1])
@@ -120,9 +130,11 @@ class DiSetupDialog(QDialog):
 
     def updatePCArrayFrompatternCenter(self):
         self.pc[0] = self.ui.patternCenterX.value()
+        # BRUKER convention
         self.pc[1] = self.ui.patternCenterY.value()
         self.pc[2] = self.ui.patternCenterZ.value()
 
+    # Phases
     def addPhase(self):
         if self.fileBrowserOD.getFile():
             mpPath = self.fileBrowserOD.getPaths()[0]
@@ -141,17 +153,9 @@ class DiSetupDialog(QDialog):
         lw = self.ui.listWidgetPhase
         self.phases = [lw.item(x).text() for x in range(lw.count())]
 
-    def setupConnections(self):
-        self.ui.buttonBox.accepted.connect(lambda: self.run_dictionary_indexing())
-        self.ui.buttonBox.rejected.connect(lambda: self.reject())
-
-        self.ui.pushButtonAddPhase.clicked.connect(lambda: self.addPhase())
-        self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.removePhase())
-
-    # read options from interactive elements in dialog box
+    # Read options from interactive elements in dialog box
     def getOptions(self) -> dict:
         return {
-            "Phase": self.ui.listWidgetPhase.selectedItems(),
             "Refine": self.ui.checkBoxRefine.isChecked(),
             "Lazy": self.ui.checkBoxLazy.isChecked(),
             "N_iter": int(self.ui.spinBoxNumIter.value()),
@@ -167,6 +171,7 @@ class DiSetupDialog(QDialog):
             "VBSE": [self.ui.checkBoxVBSE.isChecked(), lambda: self.vbse_image()],
         }
 
+    # Call worker to start DI in separate thread
     def run_dictionary_indexing(self):
         # Pass the function to execute
         di_worker = Worker(self.dictionary_indexing)
@@ -174,7 +179,8 @@ class DiSetupDialog(QDialog):
         self.threadPool.start(di_worker)
         self.accept()
 
-    def signal_mask(self):
+    def signal_mask(self):  # Add signal mask
+
         self.signal_mask = ~kp.filters.Window("circular", self.sig_shape).astype(bool)
 
         # Save figure of signal mask for visualization
@@ -197,6 +203,8 @@ class DiSetupDialog(QDialog):
 
         # Set signal mask for dictionary indexing
         self.di_kwargs["signal_mask"] = self.signal_mask
+
+    # Pre-indexing operations
 
     def mean_intensity_map(self):
         mean_intensity = self.s.mean(axis=(2, 3))
@@ -221,15 +229,11 @@ class DiSetupDialog(QDialog):
         vbse_rgb_img.change_dtype("uint8")
         plt.imsave(path.join(self.results_dir, "vbse_rgb.png"), vbse_rgb_img.data)
 
-        plt.close("all")
-
     def image_quality_map(self):
         # Image quality
 
         iq = self.s.get_image_quality()
         plt.imsave(path.join(self.results_dir, "iq.png"), iq, cmap="gray")
-
-        plt.close("all")
 
     def average_dot_product(self):
         # Average dot product map
@@ -237,12 +241,11 @@ class DiSetupDialog(QDialog):
         adp = self.s.get_average_neighbour_dot_product_map()
         plt.imsave(path.join(self.results_dir, "adp.png"), adp, cmap="gray")
 
-        plt.close("all")
-
-    def master_pattern_sample(self):
+    # Master pattern sample, TODO: add in dialog
+    def master_pattern_sample(self, ph):
         ### Simulate one pattern to check the parameters. The master pattern sampling was implemented by Lars Lervik.
 
-        self.sim = self.mp[f"mp_{ph}"].get_patterns(
+        self.sim = self.mp[f"{ph}"].get_patterns(
             rotations=Rotation.from_euler(np.deg2rad([0, 0, 0])),
             # rotations=rot[0],
             detector=self.detector,
@@ -261,93 +264,130 @@ class DiSetupDialog(QDialog):
 
         plt.close(fig)
 
-    def save_ncc_figure(self):
+    # Normal correlation
+    def save_ncc_figure(self, ph):
 
         ### Inspect dictionary indexing results for phase
+        for ph in self.phases:
 
-        fig = self.xmaps[f"xmap_{ph}"].plot(
-            value=self.xmaps[f"xmap_{ph}"].scores[:, 0],
+            fig = self.xmaps[f"{ph}"].plot(
+                value=self.xmaps[f"{ph}"].scores[:, 0],
+                colorbar=True,
+                colorbar_label="Normalized cross correlation score",
+                return_figure=True,
+                cmap="gray",
+            )
+
+            fig.savefig(
+                path.join(self.results_dir, f"ncc_{ph}.png"), **self.savefig_kwargs
+            )
+
+            plt.close(fig)
+
+    def save_orientation_similairty_map(self):
+
+        for ph in self.phases:
+
+            ### Calculate and save orientation similairty map
+
+            osm = kp.indexing.orientation_similarity_map(self.xmaps[f"{ph}"])
+
+            fig = self.xmaps[f"{ph}"].plot(
+                value=osm.ravel(),
+                colorbar=True,
+                colorbar_label="Orientation similarity",
+                return_figure=True,
+                cmap="gray",
+            )
+
+            fig.savefig(
+                path.join(self.results_dir, f"osm_{ph}.png"), **self.savefig_kwargs
+            )
+
+            plt.close(fig)
+
+    def save_inverse_pole_figure(self, xmap_dict):
+
+        for ph in self.phases:
+
+            self.ckey = plot.IPFColorKeyTSL(self.mp[f"{ph}"].phase.point_group)
+
+            fig = xmap_dict[f"{ph}"].plot(
+                self.ckey.orientation2color(xmap_dict[f"{ph}"].orientations),
+                remove_padding=True,
+                return_figure=True,
+            )
+
+            fig.savefig(
+                path.join(self.results_dir, f"ipf_{ph}_{xmap_dict['Type']}.png"),
+                **self.savefig_kwargs,
+            )
+
+            plt.close(fig)
+
+    def refine_orientations(self):
+        self.ref_kw = dict(detector=self.detector, energy=self.energy, compute=True)
+
+        for ph in self.phases:
+            ### Refine xmaps
+            self.xmaps_ref[f"{ph}"] = self.s2.refine_orientation(
+                xmap=self.xmaps[f"{ph}"],
+                master_pattern=self.mp[f"{ph}"],
+                trust_region=[1, 1, 1],
+                **self.ref_kw,
+            )
+
+            io.save(
+                path.join(self.results_dir, f"di_ref_results_{ph}.ang"),
+                self.xmaps_ref[f"{ph}"],
+            )  # .ang
+
+    def merge_refined_crystal_maps(self, xmap_dict):
+
+        cm = [xmap_dict[f"{ph}"] for ph in self.phases]
+
+        # Merge xmaps from indexed phases
+
+        self.merged = kp.indexing.merge_crystal_maps(
+            crystal_maps=cm,
+        )
+
+        self.colors = ["lime", "r", "b", "yellow"]
+
+        for i, ph in enumerate(self.phases):
+            self.merged.phases[ph].color = self.colors[i]
+
+        io.save(
+            path.join(self.results_dir, f"di_results_merged_{xmap_dict['Type']}.h5"),
+            self.merged,
+        )  # orix' HDF5
+        io.save(
+            path.join(self.results_dir, f"di_results_merged_{xmap_dict['Type']}.ang"),
+            self.merged,
+        )  # .ang
+
+        ### Plot and save the normalized cross correlation score
+
+        fig = self.merged.plot(
+            value=self.merged.scores,
             colorbar=True,
             colorbar_label="Normalized cross correlation score",
             return_figure=True,
             cmap="gray",
         )
 
-        fig.savefig(path.join(self.results_dir, f"ncc_{ph}.png"), **self.savefig_kwargs)
-
-        plt.close(fig)
-
-    def save_orientation_similairty_map(self):
-
-        ### Calculate and save orientation similairty map
-
-        osm = kp.indexing.orientation_similarity_map(self.xmaps[f"xmap_{ph}"])
-
-        fig = self.xmaps[f"xmap_{ph}"].plot(
-            value=osm.ravel(),
-            colorbar=True,
-            colorbar_label="Orientation similarity",
-            return_figure=True,
-            cmap="gray",
+        fig.savefig(
+            path.join(self.results_dir, f"ncc_merged_{xmap_dict['Type']}.png"),
+            **self.savefig_kwargs,
         )
 
-        fig.savefig(path.join(self.results_dir, f"osm_{ph}.png"), **self.savefig_kwargs)
+        ### Phase map
 
-        plt.close(fig)
-
-    def save_inverse_pole_figure(self):
-
-        fig = self.xmaps[f"xmap_{ph}"].plot(
-            self.ckey.orientation2color(self.xmaps[f"xmap_{ph}"].orientations),
-            remove_padding=True,
-            return_figure=True,
+        fig = self.merged.plot(remove_padding=True, return_figure=True)
+        fig.savefig(
+            path.join(self.results_dir, f"phase_map_{xmap_dict['Type']}.png"),
+            **self.savefig_kwargs,
         )
-
-        fig.savefig(path.join(self.results_dir, f"ipf_{ph}.png"), **self.savefig_kwargs)
-
-        plt.close(fig)
-
-    def refine_orientations(self):
-
-        ### Refine xmaps
-        self.xmap_ref = self.s2.refine_orientation(
-            xmap=self.xmaps[f"xmap_{ph}"],
-            master_pattern=self.mp[f"mp_{ph}"],
-            trust_region=[1, 1, 1],
-            **self.ref_kw,
-        )
-        self.xmaps_ref[f"xmap_ref_{ph}"] = self.xmap_ref
-
-        io.save(
-            path.join(self.results_dir, f"di_ref_results_{ph}.ang"),
-            self.xmaps_ref[f"xmap_ref_{ph}"],
-        )  # .ang
-
-    def merge_crystal_maps(self):
-
-        cm = [self.xmaps[f"xmap_{ph}"] for ph in self.phases]
-
-        # Merge xmaps from indexed phases
-
-        self.xmap_merged = kp.indexing.merge_crystal_maps(
-            crystal_maps=cm,
-            mean_n_best=1,
-            scores_prop="scores",
-            simulation_indices_prop="simulation_indices",
-        )
-
-        self.colors = ["lime", "r", "b", "yellow"]
-
-        for i in range(len(self.phases)):
-            self.xmap_merged.phases[i].color = self.colors[i]
-
-        io.save(
-            path.join(self.results_dir, "di_results_merged.h5"), self.xmap_merged
-        )  # orix' HDF5
-        io.save(
-            path.join(self.results_dir, "di_results_merged.ang"), self.xmap_merged
-        )  # .ang
-
 
     def dictionary_indexing(self):
         # Create folder for storing DI results in working directory
@@ -392,11 +432,11 @@ class DiSetupDialog(QDialog):
         if self.options["N_iter"] != 0:
             self.n_per_iteration = self.options["N_iter"]
 
+        self.di_kwargs["n_per_iteration"] = self.n_per_iteration
+
         # Read metadata from pattern file
         self.energy = self.s.metadata.Acquisition_instrument.SEM.beam_energy
         self.sample_tilt = self.s.detector.sample_tilt
-
-        ### Dictionary indexing
 
         # Rebinning of signal
         self.nav_shape = self.s.axes_manager.navigation_shape
@@ -410,7 +450,7 @@ class DiSetupDialog(QDialog):
             shape=self.sig_shape,
             sample_tilt=self.sample_tilt,  # Degrees
             pc=self.pc,
-            convention="tsl",  # Default is Bruker, TODO: let user choose convention
+            convention="BRUKER",  # Default is Bruker, TODO: let user choose convention
         )
 
         ### Set up dictionary indexing parameters
@@ -420,20 +460,18 @@ class DiSetupDialog(QDialog):
         )
 
         ### additional functions to be performed
-        keys = ["Mask", "IQ", "VBSE", "MI", "ADP"]
+        pre_processing_keys = ["Mask", "IQ", "VBSE", "MI", "ADP"]
 
-        for key in keys:
+        for key in pre_processing_keys:
             optionEnabled, optionExecute = self.options[key]
             if optionEnabled:
                 optionExecute()
-
-        ### Dictionaries for use with several phases
 
         # Master pattern dictionary
         self.mp = {}
         for ph in self.phases:
             self.file_mp = path.join(self.mpPaths[ph], f"{ph}_mc_mp_20kv.h5")
-            self.mp[f"mp_{ph}"] = kp.load(
+            self.mp[f"{ph}"] = kp.load(
                 self.file_mp,
                 energy=self.energy,  # single energies like 10, 11, 12 etc. or a range like (10, 20)
                 projection="lambert",  # stereographic, lambert
@@ -442,9 +480,13 @@ class DiSetupDialog(QDialog):
 
         # Xmaps dictionary for storing crystalmaps
         self.xmaps = {}
+        self.xmaps["Type"] = "unrefined"
         # Refined xmaps dictionary for storing refined crystalmaps
         self.xmaps_ref = {}
-
+        self.xmaps_ref["Type"] = "refined"
+        
+        ### Dictionary indexing
+ 
         for ph in self.phases:
 
             ### Sample orientations
@@ -452,164 +494,104 @@ class DiSetupDialog(QDialog):
             self.rot = sampling.get_sample_fundamental(
                 method="cubochoric",
                 resolution=self.disori,
-                point_group=self.mp[f"mp_{ph}"].phase.point_group,
+                point_group=self.mp[f"{ph}"].phase.point_group,
             )
 
             ### Generate dictionary
 
-            self.sim_dict = self.mp[f"mp_{ph}"].get_patterns(
+            self.sim_dict = self.mp[f"{ph}"].get_patterns(
                 rotations=self.rot,
                 detector=self.detector,
                 energy=self.energy,
                 compute=False,
             )
 
-            self.xmaps[f"xmap_{ph}"] = self.s2.dictionary_indexing(
+            self.xmaps[f"{ph}"] = self.s2.dictionary_indexing(
                 dictionary=self.sim_dict, **self.di_kwargs
             )
-            self.xmaps[f"xmap_{ph}"].scan_unit = "um"
+            self.xmaps[f"{ph}"].scan_unit = "um"
+
+            del self.sim_dict
+
+        ## Single phase
+
+        if len(self.phases) == 1:
 
             ### Save results from DI for phase, TODO: let user choose file type to be saved
 
             io.save(
                 path.join(self.results_dir, f"di_results_{ph}.h5"),
-                self.xmaps[f"xmap_{ph}"],
+                self.xmaps[f"{ph}"],
             )  # orix' HDF5
             io.save(
                 path.join(self.results_dir, f"di_results_{ph}.ang"),
-                self.xmaps[f"xmap_{ph}"],
+                self.xmaps[f"{ph}"],
             )  # .ang
 
-            # Refinemenet kwargs
-            self.ref_kw = dict(detector=self.detector, energy=self.energy, compute=True)
-
-            self.ckey = plot.IPFColorKeyTSL(self.mp[f"mp_{ph}"].phase.point_group)
-
+            # Refine orientations
             if self.refine:
 
-                ### Refine xmaps
-                self.xmap_ref = self.s2.refine_orientation(
-                    xmap=self.xmaps[f"xmap_{ph}"],
-                    master_pattern=self.mp[f"mp_{ph}"],
-                    trust_region=[1, 1, 1],
-                    **self.ref_kw,
-                )
-                self.xmaps_ref[f"xmap_ref_{ph}"] = self.xmap_ref
+                self.refine_orientations()
+                # Save IPF of refined xmaps
+                self.save_inverse_pole_figure(self.xmaps_ref)
 
-                io.save(
-                    path.join(self.results_dir, f"di_ref_results_{ph}.ang"),
-                    self.xmaps_ref[f"xmap_ref_{ph}"],
-                )  # .ang
 
-                fig = self.xmaps_ref[f"xmap_ref_{ph}"].plot(
-                    self.ckey.orientation2color(
-                        self.xmaps_ref[f"xmap_ref_{ph}"].orientations
-                    ),
-                    remove_padding=True,
-                    return_figure=True,
-                )
-
+            else:
+                # If xmaps are not refined, an unrefined IPF is saved
+                self.save_inverse_pole_figure(self.xmaps)
+                
                 fig.savefig(
                     path.join(self.results_dir, f"ipf_ref_{ph}.png"),
                     **self.savefig_kwargs,
                 )
 
-                plt.close(fig)
+            # NCC plot
 
-            del self.sim_dict
+            ncc_map = self.xmaps[f"{ph}"].scores[:, 0].reshape(*self.xmaps[f"{ph}"].shape)
 
+            plt.imsave(path.join(self.results_dir, f"ncc_{ph}.png"), ncc_map, cmap="gray")
+            
+            
+        ## Multiple phase
+        
         if len(self.phases) > 1:
 
-            cm = [self.xmaps[f"xmap_{ph}"] for ph in self.phases]
+            ### Save results from DI for phase, TODO: let user choose file type to be saved
 
-            # Merge xmaps from indexed phases
+            #io.save(
+            #    path.join(self.results_dir, f"di_results_{ph}.h5"),
+            #    self.xmaps[f"{ph}"],
+            #)  # orix' HDF5
+            #io.save(
+            #    path.join(self.results_dir, f"di_results_{ph}.ang"),
+            #    self.xmaps[f"{ph}"],
+            #)  # .ang
+            
 
-            self.xmap_merged = kp.indexing.merge_crystal_maps(
-                crystal_maps=cm,
-                mean_n_best=1,
-                scores_prop="scores",
-                simulation_indices_prop="simulation_indices",
-            )
+            ## When dealing with multiple phases, the orientations are always refined
+            self.refine_orientations()
 
-            self.colors = ["lime", "r", "b", "yellow"]
+            self.merge_refined_crystal_maps(self.xmaps_ref)
 
-            for i in range(len(self.phases)):
-                self.xmap_merged.phases[i].color = self.colors[i]
+            self.ckey = plot.IPFColorKeyTSL(self.mp[f"{self.phases[0]}"].phase.point_group)
 
-            io.save(
-                path.join(self.results_dir, "di_results_merged.h5"), self.xmap_merged
-            )  # orix' HDF5
-            io.save(
-                path.join(self.results_dir, "di_results_merged.ang"), self.xmap_merged
-            )  # .ang
-
-            ### Plot and save the normalized cross correlation score
-
-            fig = self.xmap_merged.plot(
-                value=self.xmap_merged.scores[:, 0],
-                colorbar=True,
-                colorbar_label="Normalized cross correlation score",
-                return_figure=True,
-                cmap="gray",
-            )
-
+            fig = self.ckey.plot(return_figure=True)
             fig.savefig(
-                path.join(self.results_dir, "ncc_merged.png"), **self.savefig_kwargs
+                path.join(self.results_dir, "orientation_color_key.png"),
+                **self.savefig_kwargs,
             )
 
-            ### Phase map
+            rgb_all = np.zeros((self.merged.size, 3))
+            for i, phase in self.merged.phases:
+                if i != -1:
+                    rgb_i = self.ckey.orientation2color(self.merged[phase.name].orientations)
+                    rgb_all[self.merged.phase_id == i] = rgb_i
 
-            fig = self.xmap_merged.plot(remove_padding=True, return_figure=True)
-            fig.savefig(
-                path.join(self.results_dir, "phase_map.png"), **self.savefig_kwargs
-            )
-
-            # TODO: NCC histogram
-
-            if self.refine:
-                self.cm_ref = [self.xmaps_ref[f"xmap_ref_{ph}"] for ph in self.phases]
-
-                ### Merge xmaps from indexed phases
-
-                self.xmap_merged_ref = kp.indexing.merge_crystal_maps(
-                    crystal_maps=self.cm_ref,
-                )
-
-                ### Set colors of phases and save merged xmaps to file
-
-                for i in range(len(self.phases)):
-                    self.xmap_merged_ref.phases[i].color = self.colors[i]
-
-                io.save(
-                    path.join(self.results_dir, "di_results_ref_merged.h5"),
-                    self.xmap_merged_ref,
-                )  # orix' HDF5
-                io.save(
-                    path.join(self.results_dir, "di_results_ref_merged.ang"),
-                    self.xmap_merged_ref,
-                )  # .ang
-
-                ### Plot and save the normalized cross correlation score for merged map after refinement
-
-                fig = self.xmap_merged_ref.plot(
-                    value=self.xmap_merged_ref.scores,
-                    colorbar=True,
-                    colorbar_label="Normalized cross correlation score after refinement",
-                    return_figure=True,
-                    cmap="gray",
-                )
-
+                fig = self.merged.plot(rgb_all, remove_padding=True, return_figure=True)
                 fig.savefig(
-                    path.join(self.results_dir, "ncc_merged_ref.png"),
-                    **self.savefig_kwargs,
+                    path.join(self.results_dir, "maps_ipfz.png"), **self.savefig_kwargs
                 )
 
-                ### Phase map
-
-                fig = self.xmap_merged_ref.plot(remove_padding=True, return_figure=True)
-                fig.savefig(
-                    path.join(self.results_dir, "phase_map_ref.png"),
-                    **self.savefig_kwargs,
-                )
+            plt.close(fig)
 
         self.accept()

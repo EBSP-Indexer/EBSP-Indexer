@@ -12,7 +12,9 @@ class SettingFile:
                 (key, value) = line.split("\t")
                 self.dict[key] = value
             self.file.close()
-        except:
+        except Exception as e:
+            #raise e
+            #warnings.warn(f"Could not open settings file '{self.path}'.")
             pass
         
 
