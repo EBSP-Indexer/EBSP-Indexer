@@ -38,18 +38,15 @@
       <property name="spacing">
        <number>10</number>
       </property>
-      <item row="1" column="1">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="18" column="2">
+       <widget class="QDialogButtonBox" name="buttonBox">
+        <property name="standardButtons">
+         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
+        <property name="centerButtons">
+         <bool>false</bool>
         </property>
-       </spacer>
+       </widget>
       </item>
       <item row="1" column="2">
        <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -73,6 +70,9 @@
             <width>16000000</width>
             <height>1699999</height>
            </size>
+          </property>
+          <property name="acceptDrops">
+           <bool>false</bool>
           </property>
           <property name="selectionMode">
            <enum>QAbstractItemView::MultiSelection</enum>
@@ -107,7 +107,7 @@
         <item>
          <widget class="QLabel" name="label_5">
           <property name="text">
-           <string>Pattern center:</string>
+           <string>Pattern center</string>
           </property>
          </widget>
         </item>
@@ -195,6 +195,38 @@
          </layout>
         </item>
         <item>
+         <widget class="Line" name="line_9">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>PC convention</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBoxConvention">
+            <item>
+             <property name="text">
+              <string>BRUKER</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>TSL</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
          <spacer name="verticalSpacer">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -212,20 +244,10 @@
         </item>
        </layout>
       </item>
-      <item row="18" column="2">
-       <widget class="QDialogButtonBox" name="buttonBox">
-        <property name="standardButtons">
-         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-        </property>
-        <property name="centerButtons">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <spacer name="verticalSpacer_3">
+         <spacer name="verticalSpacer_2">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
@@ -389,34 +411,6 @@
         </item>
         <item>
          <layout class="QGridLayout" name="gridLayout_6">
-          <item row="4" column="0">
-           <widget class="QCheckBox" name="checkBoxMI">
-            <property name="text">
-             <string>Mean intensity image</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="checkBoxIQ">
-            <property name="text">
-             <string>IQ map</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QCheckBox" name="checkBoxVBSE">
-            <property name="text">
-             <string>VBSE image</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QCheckBox" name="checkBoxADP">
-            <property name="text">
-             <string>ADP map</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="0">
            <widget class="Line" name="line_4">
             <property name="orientation">
@@ -424,22 +418,75 @@
             </property>
            </widget>
           </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="checkBoxVBSE">
+            <property name="toolTip">
+             <string>Virtual backscatter image </string>
+            </property>
+            <property name="toolTipDuration">
+             <number>-1</number>
+            </property>
+            <property name="text">
+             <string>VBSE image</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="checkBoxADP">
+            <property name="toolTip">
+             <string>Average dot product map</string>
+            </property>
+            <property name="text">
+             <string>ADP map</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="checkBoxIQ">
+            <property name="toolTip">
+             <string>Image quality map</string>
+            </property>
+            <property name="text">
+             <string>IQ map</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QCheckBox" name="checkBoxMI">
+            <property name="text">
+             <string>Mean intensity image</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
          </layout>
         </item>
-        <item>
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
        </layout>
+      </item>
+      <item row="1" column="1">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>

@@ -40,9 +40,11 @@ class DiSetupDialog(QDialog):
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
 
         self.load_pattern()
-        self.setupConnections()
-        self.setupBinningShapes()
+        self.convention = "TSL"
         self.setupInitialSettings()
+        self.setupBinningShapes()
+        
+        self.setupConnections()
 
     # Initial settup functions
 
@@ -76,6 +78,7 @@ class DiSetupDialog(QDialog):
         self.ui.comboBoxBinning.addItems(self.bin_shapes_to_comboBox)
 
     def setupInitialSettings(self):
+
         # matplotlib settings
         mpl.use("agg")
         self.savefig_kwargs = dict(bbox_inches="tight", pad_inches=0, dpi=150)
@@ -85,6 +88,10 @@ class DiSetupDialog(QDialog):
 
         # read current setting from project_settings.txt
         self.sf = SettingFile(path.join(self.working_dir, "project_settings.txt"))
+        
+        # PC convention
+        # TODO: add convention read from settings file
+        self.ui.comboBoxConvention.setCurrentText(self.convention)
 
         # Update pattern center to be displayed in UI
         try:
@@ -114,6 +121,13 @@ class DiSetupDialog(QDialog):
             except:
                 break
 
+    def update_pc_convention(self):
+
+        self.convention = self.ui.comboBoxConvention.currentText()
+
+        self.updatePCpatternCenter()
+        
+
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_dictionary_indexing())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
@@ -121,18 +135,28 @@ class DiSetupDialog(QDialog):
         self.ui.pushButtonAddPhase.clicked.connect(lambda: self.addPhase())
         self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.removePhase())
 
+        self.ui.comboBoxConvention.currentTextChanged.connect(lambda: self.update_pc_convention())
+
     # Pattern center
 
     def updatePCpatternCenter(self):
         self.ui.patternCenterX.setValue(self.pc[0])
-        self.ui.patternCenterY.setValue(self.pc[1])
         self.ui.patternCenterZ.setValue(self.pc[2])
+
+        if self.convention == "TSL":
+            self.ui.patternCenterY.setValue(1-self.pc[1])
+        else:
+            self.ui.patternCenterY.setValue(self.pc[1])
 
     def updatePCArrayFrompatternCenter(self):
         self.pc[0] = self.ui.patternCenterX.value()
-        # BRUKER convention
-        self.pc[1] = self.ui.patternCenterY.value()
         self.pc[2] = self.ui.patternCenterZ.value()
+
+        if self.convention == "TSL":
+            self.pc[1] = 1-self.ui.patternCenterY.value()
+        else:
+            self.pc[1] = self.ui.patternCenterY.value()
+
 
     # Phases
     def addPhase(self):
@@ -203,6 +227,7 @@ class DiSetupDialog(QDialog):
 
         # Set signal mask for dictionary indexing
         self.di_kwargs["signal_mask"] = self.signal_mask
+        self.ref_kw["signal_mask"] = self.signal_mask
 
     # Pre-indexing operations
 
@@ -450,8 +475,12 @@ class DiSetupDialog(QDialog):
             shape=self.sig_shape,
             sample_tilt=self.sample_tilt,  # Degrees
             pc=self.pc,
-            convention="BRUKER",  # Default is Bruker, TODO: let user choose convention
+            convention=self.convention,  # Default is Bruker, TODO: let user choose convention
         )
+
+        # Define refinement kwargs
+
+        self.ref_kw = dict(detector=self.detector, energy=self.energy, compute=True)
 
         ### Set up dictionary indexing parameters
 
