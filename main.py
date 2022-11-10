@@ -1,9 +1,9 @@
 import sys
 from os.path import basename, splitext
 from contextlib import redirect_stdout, redirect_stderr
-from PySide6.QtCore import QDir, QThreadPool, Qt
+from PySide6.QtCore import QDir, QThreadPool, Qt, Signal
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
-from PySide6.QtGui import QFont
+from PySide6.QtGui import QFont, QKeyEvent
 from scripts.hough_indexing import HiSetupDialog
 from ui.ui_main_window import Ui_MainWindow
 import matplotlib.image as mpimg
@@ -54,6 +54,8 @@ class AppWindow(QMainWindow):
         self.ui.systemViewer.clicked.connect(
             lambda index: self.onSystemViewClicked(index)
         )
+        self.ui.systemViewer.keyReleaseEvent = self.onKeyReleaseEvent
+
         self.ui.actionSignalNavigation.triggered.connect(
             lambda: self.selectSignalNavigation()
         )
@@ -66,6 +68,11 @@ class AppWindow(QMainWindow):
         self.ui.actionPattern_Center.triggered.connect(
             lambda: self.selectPatternCenter()
         )
+
+    def onKeyReleaseEvent(self, event):
+        if event.key() == Qt.Key_Up or event.key() == Qt.Key_Down:
+            index = self.ui.systemViewer.currentIndex()
+            self.onSystemViewClicked(index)
 
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
