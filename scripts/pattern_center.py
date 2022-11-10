@@ -62,30 +62,43 @@ class PatterCenterDialog(QDialog):
 
     def setupInitialSettings(self):
         self.setting_file_dict = SettingFile(path.join(path.dirname(self.setting_path),"project_settings.txt"))
-        self.vendor_is_bruker = False
+        
+        try:
+            self.convention = self.sf.read["Convention"]
+
+        except:
+            self.convention = "TSL"
+
+        print(self.convention)
+        
         try:
             self.pc = [
-                    float(self.setting_file_dict.read("X star:")),
-                    float(self.setting_file_dict.read("Y star:")),
-                    float(self.setting_file_dict.read("Z star:")),
+                    float(self.setting_file_dict.read("X star")),
+                    float(self.setting_file_dict.read("Y star")),
+                    float(self.setting_file_dict.read("Z star")),
             ]
 
         except:
-            self.pc = np.array([0.5000, 0.3000, 0.5000])
-        if not self.vendor_is_bruker:
+            self.pc = np.array([0.5000, 0.7000, 0.5000])
+        
+        if self.convention == "TSL":
+            #Store TSL convention in BRUKER convention
             self.pc[1] = 1 - self.pc[1]
 
         self.updatePCSpinBox()
         
         self.mp_paths = {}
-        for i in range(1, 5):
+        i = 1
+
+        while True:
             try:
-                mp_path = self.setting_file_dict.read("Master pattern " + str(i) + ":")
+                mp_path = self.setting_file_dict.read("Master pattern " + str(i))
                 phase = mp_path.split("/").pop()
                 self.mp_paths[phase] = mp_path
                 self.ui.listPhases.addItem(phase)
+                i += 1
             except:
-                pass
+                break
 
         self.is_mp_paths_updated = True
         self.enabled = False
@@ -194,18 +207,19 @@ class PatterCenterDialog(QDialog):
     def updatePCSpinBox(self):
         self.ui.spinBoxX.setValue(self.pc[0])
         self.ui.spinBoxZ.setValue(self.pc[2])
-        if self.vendor_is_bruker:
+        if self.convention == "BRUKER":
             self.ui.spinBoxY.setValue(self.pc[1])
-        elif not self.vendor_is_bruker:
+        elif self.convention == "TSL":
             self.ui.spinBoxY.setValue(1-self.pc[1])
 
     def updatePCArrayFromSpinBox(self):
         self.pc[0] = self.ui.spinBoxX.value()
         self.pc[2] = self.ui.spinBoxZ.value()
-        if self.vendor_is_bruker:
+        if self.convention == "BRUKER":
             self.pc[1] = self.ui.spinBoxY.value()
-        elif not self.vendor_is_bruker:
+        elif self.convention == "TSL":
             self.pc[1] = 1 - self.ui.spinBoxY.value()
+        
 
     def updatePCDict(self, pattern_index, phase, pc, pattern_ignored):
         self.pcs[pattern_index] = [phase, pc, pattern_ignored]
@@ -331,7 +345,23 @@ class PatterCenterDialog(QDialog):
         self.pattern_ignored = self.ui.ignoreCheckBox.checkState()
 
     def saveAndExit(self):
+        self.setting_file_dict.delete_all_entries()
         self.updatePCDict(self.pattern_index, self.phase, self.pc, self.pattern_ignored)
+
+        for i, phase in enumerate(self.mp_paths.keys(), 1):
+            self.setting_file_dict.write(f"Phase {i}", phase)
+
+        self.setting_file_dict.write("", "") #add blank line to file
+
+        #for i in range(1, 5):
+        #    try:
+        #        self.setting_file_dict.remove("Master pattern " + str(i + 1))
+        #    except:
+        #        pass
+        for i, path in enumerate(self.mp_paths.values(), 1):
+            self.setting_file_dict.write(f"Master pattern {i}", path)
+
+
         x_average, y_average, z_average = 0, 0, 0
         n = 0
         for i in range(self.nav_size):
@@ -342,25 +372,19 @@ class PatterCenterDialog(QDialog):
                 z_average += self.pcs.get(i)[1][2]
                 n += 1
 
-        x_average = x_average/n
-        y_average = y_average/n
-        z_average = z_average/n
+        x_average = round(x_average/n, 4)
+        y_average = round(y_average/n, 4)
+        z_average = round(z_average/n, 4)
 
-        self.setting_file_dict.write("X star:", str(x_average))
-        self.setting_file_dict.write("Z star:", str(z_average))
+        self.setting_file_dict.write("Convention", self.convention)
+        self.setting_file_dict.write("X star", f"{x_average}")
         
-        if self.vendor_is_bruker:
-            self.setting_file_dict.write("Y star:", str(y_average))
-        elif not self.vendor_is_bruker:
-            self.setting_file_dict.write("Y star:", str(1-y_average))
+        if self.convention == "BRUKER":
+            self.setting_file_dict.write("Y star", f"{y_average}")
+        elif self.convention == "TSL":
+            self.setting_file_dict.write("Y star", f"{1-y_average}")
 
-        for i in range(1, 5):
-            try:
-                self.setting_file_dict.remove("Master pattern " + str(i + 1) + ":")
-            except:
-                pass
-        for i, path in enumerate(self.mp_paths.values()):
-            self.setting_file_dict.write("Master pattern " + str(i + 1) + ":", path)
+        self.setting_file_dict.write("Z star", f"{z_average}")
         
         self.setting_file_dict.save()
         self.close()
