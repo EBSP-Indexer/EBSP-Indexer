@@ -1,4 +1,5 @@
 from os import path, mkdir
+from datetime import date
 
 from PySide6.QtWidgets import QDialog
 from utils.setting_file import SettingFile
@@ -16,6 +17,7 @@ from orix import io, sampling, plot
 import warnings
 
 # TODO: from time import time
+
 
 class DiSetupDialog(QDialog):
     """
@@ -40,10 +42,9 @@ class DiSetupDialog(QDialog):
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
 
         self.load_pattern()
-        self.convention = "TSL"
         self.setupInitialSettings()
         self.setupBinningShapes()
-        
+
         self.setupConnections()
 
     # Initial settup functions
@@ -57,25 +58,12 @@ class DiSetupDialog(QDialog):
 
     def setupBinningShapes(self):
         self.sig_shape = self.s.axes_manager.signal_shape[::-1]
-        bin_shapes_1D = np.array([10, 20, 30, 40, 50, 60, 12, 24, 32, 48])
-        bin_shapes_2D = np.array(
-            [
-                "(10, 10)",
-                "(20, 20)",
-                "(30, 30)",
-                "(40, 40)",
-                "(50, 50)",
-                "(60, 60)",
-                "(12, 12)",
-                "(24, 24)",
-                "(32, 32)",
-                "(48, 48)",
-            ]
-        )
-        self.bin_shapes_to_comboBox = bin_shapes_2D[
-            np.where(np.array(self.sig_shape[0] % bin_shapes_1D) == 0)[0]
-        ]
-        self.ui.comboBoxBinning.addItems(self.bin_shapes_to_comboBox)
+        self.bin_shapes = np.array([])
+        for num in range(10, self.sig_shape[0]+1):
+            if self.sig_shape[0] % num == 0:
+                self.bin_shapes = np.append(self.bin_shapes, f"({num}, {num})")
+
+        self.ui.comboBoxBinning.addItems(self.bin_shapes[::-1])
 
     def setupInitialSettings(self):
 
@@ -87,9 +75,18 @@ class DiSetupDialog(QDialog):
         self.di_kwargs = dict(metric="ncc", keep_n=20)
 
         # read current setting from project_settings.txt
-        self.sf = SettingFile(path.join(self.working_dir, "project_settings.txt"))
-        
-        # PC convention
+        self.setting_file = SettingFile(
+            path.join(self.working_dir, "project_settings.txt")
+        )
+
+        # PC convention, default is TSL
+
+        try:
+            self.convention = self.setting_file.read["Convention"]
+
+        except:
+            self.convention = "TSL"
+
         # TODO: add convention read from settings file
         self.ui.comboBoxConvention.setCurrentText(self.convention)
 
@@ -97,13 +94,13 @@ class DiSetupDialog(QDialog):
         try:
             self.pc = np.array(
                 [
-                    float(self.sf.read("X star:")),
-                    float(self.sf.read("Y star:")),
-                    float(self.sf.read("Z star:")),
+                    float(self.setting_file.read("X star")),
+                    float(self.setting_file.read("Y star")),
+                    float(self.setting_file.read("Z star")),
                 ]
             )
         except:
-            self.pc = np.array([0.400, 0.200, 0.400])
+            self.pc = np.array([0.400, 0.400, 0.400])
 
         self.updatePCpatternCenter()
 
@@ -113,7 +110,7 @@ class DiSetupDialog(QDialog):
         i = 1
         while True:
             try:
-                mpPath = self.sf.read("Master pattern " + str(i) + ":")
+                mpPath = self.setting_file.read(f"Master pattern {i}")
                 phase = mpPath.split("/").pop()
                 self.mpPaths[phase] = mpPath
                 self.ui.listWidgetPhase.addItem(phase)
@@ -125,8 +122,11 @@ class DiSetupDialog(QDialog):
 
         self.convention = self.ui.comboBoxConvention.currentText()
 
-        self.updatePCpatternCenter()
-        
+        self.ui.patternCenterX.setValue(self.pc[0])
+        self.ui.patternCenterY.setValue(1 - self.pc[1])
+        self.ui.patternCenterZ.setValue(self.pc[2])
+
+        self.updatePCArrayFrompatternCenter()
 
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_dictionary_indexing())
@@ -135,28 +135,21 @@ class DiSetupDialog(QDialog):
         self.ui.pushButtonAddPhase.clicked.connect(lambda: self.addPhase())
         self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.removePhase())
 
-        self.ui.comboBoxConvention.currentTextChanged.connect(lambda: self.update_pc_convention())
+        self.ui.comboBoxConvention.currentTextChanged.connect(
+            lambda: self.update_pc_convention()
+        )
 
     # Pattern center
 
     def updatePCpatternCenter(self):
         self.ui.patternCenterX.setValue(self.pc[0])
+        self.ui.patternCenterY.setValue(self.pc[1])
         self.ui.patternCenterZ.setValue(self.pc[2])
-
-        if self.convention == "TSL":
-            self.ui.patternCenterY.setValue(1-self.pc[1])
-        else:
-            self.ui.patternCenterY.setValue(self.pc[1])
 
     def updatePCArrayFrompatternCenter(self):
         self.pc[0] = self.ui.patternCenterX.value()
+        self.pc[1] = self.ui.patternCenterY.value()
         self.pc[2] = self.ui.patternCenterZ.value()
-
-        if self.convention == "TSL":
-            self.pc[1] = 1-self.ui.patternCenterY.value()
-        else:
-            self.pc[1] = self.ui.patternCenterY.value()
-
 
     # Phases
     def addPhase(self):
@@ -414,17 +407,95 @@ class DiSetupDialog(QDialog):
             **self.savefig_kwargs,
         )
 
+    def save_project_settings(self):
+        self.setting_file.delete_all_entries()  # clean up initial dictionary
+
+        ### Sample parameters
+        for i, path in enumerate(self.mpPaths.values(), 1):
+            self.setting_file.write(f"Master pattern {i}", path)
+
+        self.setting_file.write("Convention", self.convention)
+
+        self.updatePCArrayFrompatternCenter()
+        self.setting_file.write("X star", f"{self.pc[0]}")
+        self.setting_file.write("Y star", f"{self.pc[1]}")
+        self.setting_file.write("Z star", f"{self.pc[2]}")
+
+        self.setting_file.write("Binning", f"{self.new_signal_shape}")
+        self.setting_file.write(
+            "Angular step size [\u00B0]", f"{round(self.disori, 2)}"
+        )
+
+        self.setting_file.save()
+
+    def save_di_settings(self):
+        self.di_setting_file = SettingFile(self.results_dir)
+
+        ### Time and date
+        self.di_setting_file.write("Date", f"{date.today()}\n")
+
+        ### Sample info
+
+        for i, mp_path in enumerate(self.mpPaths, 1):
+            self.di_setting_file.write(f"Master pattern path {i}", mp_path)
+
+        ### SEM parameters
+        self.di_setting_file.write(
+            "Microscope", self.s.metadata.Acquisition_instrument.SEM.microscope
+        )
+        self.di_setting_file.write("Acceleration voltage", f"{self.energy} kV")
+        self.di_setting_file.write("Sample tilt", f"{self.sample_tilt} degrees")
+        self.di_setting_file.write(
+            "Working distance",
+            self.s.metadata.Acquisition_instrument.SEM.working_distance,
+        )
+        self.di_setting_file.write(
+            "Magnification", self.s.metadata.Acquisition_instrument.SEM.magnification
+        )
+        self.di_setting_file.write(
+            "Navigation shape (rows, columns)",
+            self.s.axes_manager.navigation_shape[::-1],
+        )
+        self.di_setting_file.write(
+            "Signal shape (rows, columns)", self.s.axes_manager.signal_shape[::-1]
+        )
+        self.di_setting_file.write("Step size", f"{self.s.axes_manager[0].scale} um\n")
+
+        ### DI parameteres
+
+        self.di_setting_file.write("kikuchipy version", kp.__version__)
+        self.di_setting_file.write("PC (x*, y*, z*)", f"{self.pc}")
+        self.di_setting_file.write("PC convention", f"{self.convention}")
+        for i, ph in enumerate(self.phases, 1):
+            self.di_setting_file.write(f"Phase {i}", f"{ph}")
+        self.di_setting_file.write(
+            "Pattern resolution DI (Binning)", self.new_signal_shape
+        )
+        self.di_setting_file.write(
+            "Angular step size [\u00B0]", f"{self.disori} degrees"
+        )
+        self.di_setting_file.write("Circular mask", self.use_signal_mask)
+        self.di_setting_file.write(
+            "Number of experimental patterns matched per iteration [None - all]",
+            self.n_per_iteration,
+        )
+        self.di_setting_file.write("Refinement of orientations", self.refine)
+        for i, mp_path in enumerate(self.mpPaths, 1):
+            self.di_setting_file.write(f"Master pattern path {i}", mp_path)
+
+        self.di_setting_file.save()
+
     def dictionary_indexing(self):
         # Create folder for storing DI results in working directory
         i = 1
         while True:
             try:
-                self.results_dir = path.join(self.working_dir, "di_results" + str(i))
+                self.results_dir = path.join(self.working_dir, f"di_results_{i}")
                 mkdir(self.results_dir)
                 break
             except FileExistsError:
                 print(
-                    f"Directory '{self.results_dir}' exists, will try to create directory '{self.results_dir[:-1] + str(i + 1)}'"
+                    f"Directory {self.results_dir} exists, will try to create directory di_results_{i + 1}"
                 )
             i += 1
 
@@ -513,9 +584,11 @@ class DiSetupDialog(QDialog):
         # Refined xmaps dictionary for storing refined crystalmaps
         self.xmaps_ref = {}
         self.xmaps_ref["Type"] = "refined"
-        
+
+        self.save_project_settings()
+
         ### Dictionary indexing
- 
+
         for ph in self.phases:
 
             ### Sample orientations
@@ -564,11 +637,10 @@ class DiSetupDialog(QDialog):
                 # Save IPF of refined xmaps
                 self.save_inverse_pole_figure(self.xmaps_ref)
 
-
             else:
                 # If xmaps are not refined, an unrefined IPF is saved
                 self.save_inverse_pole_figure(self.xmaps)
-                
+
                 fig.savefig(
                     path.join(self.results_dir, f"ipf_ref_{ph}.png"),
                     **self.savefig_kwargs,
@@ -576,33 +648,37 @@ class DiSetupDialog(QDialog):
 
             # NCC plot
 
-            ncc_map = self.xmaps[f"{ph}"].scores[:, 0].reshape(*self.xmaps[f"{ph}"].shape)
+            ncc_map = (
+                self.xmaps[f"{ph}"].scores[:, 0].reshape(*self.xmaps[f"{ph}"].shape)
+            )
 
-            plt.imsave(path.join(self.results_dir, f"ncc_{ph}.png"), ncc_map, cmap="gray")
-            
-            
+            plt.imsave(
+                path.join(self.results_dir, f"ncc_{ph}.png"), ncc_map, cmap="gray"
+            )
+
         ## Multiple phase
-        
+
         if len(self.phases) > 1:
 
             ### Save results from DI for phase, TODO: let user choose file type to be saved
 
-            #io.save(
+            # io.save(
             #    path.join(self.results_dir, f"di_results_{ph}.h5"),
             #    self.xmaps[f"{ph}"],
-            #)  # orix' HDF5
-            #io.save(
+            # )  # orix' HDF5
+            # io.save(
             #    path.join(self.results_dir, f"di_results_{ph}.ang"),
             #    self.xmaps[f"{ph}"],
-            #)  # .ang
-            
+            # )  # .ang
 
             ## When dealing with multiple phases, the orientations are always refined
             self.refine_orientations()
 
             self.merge_refined_crystal_maps(self.xmaps_ref)
 
-            self.ckey = plot.IPFColorKeyTSL(self.mp[f"{self.phases[0]}"].phase.point_group)
+            self.ckey = plot.IPFColorKeyTSL(
+                self.mp[f"{self.phases[0]}"].phase.point_group
+            )
 
             fig = self.ckey.plot(return_figure=True)
             fig.savefig(
@@ -613,7 +689,9 @@ class DiSetupDialog(QDialog):
             rgb_all = np.zeros((self.merged.size, 3))
             for i, phase in self.merged.phases:
                 if i != -1:
-                    rgb_i = self.ckey.orientation2color(self.merged[phase.name].orientations)
+                    rgb_i = self.ckey.orientation2color(
+                        self.merged[phase.name].orientations
+                    )
                     rgb_all[self.merged.phase_id == i] = rgb_i
 
                 fig = self.merged.plot(rgb_all, remove_padding=True, return_figure=True)
@@ -622,5 +700,4 @@ class DiSetupDialog(QDialog):
                 )
 
             plt.close(fig)
-
-        self.accept()
+        self.save_di_settings()

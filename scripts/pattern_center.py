@@ -61,7 +61,7 @@ class PatterCenterDialog(QDialog):
             return setting_path
 
     def setupInitialSettings(self):
-        self.setting_file_dict = SettingFile(path.join(path.dirname(self.setting_path),"project_settings.txt"))
+        self.setting_file = SettingFile(path.join(path.dirname(self.setting_path),"project_settings.txt"))
         
         try:
             self.convention = self.sf.read["Convention"]
@@ -73,9 +73,9 @@ class PatterCenterDialog(QDialog):
         
         try:
             self.pc = [
-                    float(self.setting_file_dict.read("X star")),
-                    float(self.setting_file_dict.read("Y star")),
-                    float(self.setting_file_dict.read("Z star")),
+                    float(self.setting_file.read("X star")),
+                    float(self.setting_file.read("Y star")),
+                    float(self.setting_file.read("Z star")),
             ]
 
         except:
@@ -92,7 +92,7 @@ class PatterCenterDialog(QDialog):
 
         while True:
             try:
-                mp_path = self.setting_file_dict.read("Master pattern " + str(i))
+                mp_path = self.setting_file.read("Master pattern " + str(i))
                 phase = mp_path.split("/").pop()
                 self.mp_paths[phase] = mp_path
                 self.ui.listPhases.addItem(phase)
@@ -345,22 +345,11 @@ class PatterCenterDialog(QDialog):
         self.pattern_ignored = self.ui.ignoreCheckBox.checkState()
 
     def saveAndExit(self):
-        self.setting_file_dict.delete_all_entries()
-        self.updatePCDict(self.pattern_index, self.phase, self.pc, self.pattern_ignored)
+        self.setting_file.delete_all_entries()  # clean up initial dictionary
 
-        for i, phase in enumerate(self.mp_paths.keys(), 1):
-            self.setting_file_dict.write(f"Phase {i}", phase)
-
-        self.setting_file_dict.write("", "") #add blank line to file
-
-        #for i in range(1, 5):
-        #    try:
-        #        self.setting_file_dict.remove("Master pattern " + str(i + 1))
-        #    except:
-        #        pass
+        ### Sample parameters
         for i, path in enumerate(self.mp_paths.values(), 1):
-            self.setting_file_dict.write(f"Master pattern {i}", path)
-
+            self.setting_file.write(f"Master pattern {i}", path)
 
         x_average, y_average, z_average = 0, 0, 0
         n = 0
@@ -376,15 +365,15 @@ class PatterCenterDialog(QDialog):
         y_average = round(y_average/n, 4)
         z_average = round(z_average/n, 4)
 
-        self.setting_file_dict.write("Convention", self.convention)
-        self.setting_file_dict.write("X star", f"{x_average}")
+        self.setting_file.write("Convention", self.convention)
+        self.setting_file.write("X star", f"{x_average}")
         
         if self.convention == "BRUKER":
-            self.setting_file_dict.write("Y star", f"{y_average}")
+            self.setting_file.write("Y star", f"{y_average}")
         elif self.convention == "TSL":
-            self.setting_file_dict.write("Y star", f"{1-y_average}")
+            self.setting_file.write("Y star", f"{1-y_average}")
 
-        self.setting_file_dict.write("Z star", f"{z_average}")
+        self.setting_file.write("Z star", f"{z_average}")
         
-        self.setting_file_dict.save()
+        self.setting_file.save()
         self.close()
