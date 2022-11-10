@@ -535,9 +535,15 @@ class DiSetupDialog(QDialog):
                 # Save IPF of refined xmaps
                 self.save_inverse_pole_figure(self.xmaps_ref)
 
+
             else:
                 # If xmaps are not refined, an unrefined IPF is saved
                 self.save_inverse_pole_figure(self.xmaps)
+                
+                fig.savefig(
+                    path.join(self.results_dir, f"ipf_ref_{ph}.png"),
+                    **self.savefig_kwargs,
+                )
 
             # NCC plot
 
