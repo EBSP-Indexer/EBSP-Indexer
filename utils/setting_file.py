@@ -13,9 +13,9 @@ class SettingFile:
                 self.dict[key] = value
             self.file.close()
         except Exception as e:
-            raise e
+            #raise e
             #warnings.warn(f"Could not open settings file '{self.path}'.")
-            #pass
+            pass
         
 
     def write(self, key, value):
