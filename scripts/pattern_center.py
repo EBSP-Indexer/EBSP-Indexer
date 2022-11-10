@@ -58,7 +58,7 @@ class PatterCenterDialog(QDialog):
 
     def setupInitialSettings(self):
         self.setting_file_dict = SettingFile(path.join(path.dirname(self.setting_path),"project_settings.txt"))
-        self.vendor_is_bruker = False
+        self.vendor_is_bruker = True
         try:
             self.pc = [
                     float(self.setting_file_dict.read("X star:")),
