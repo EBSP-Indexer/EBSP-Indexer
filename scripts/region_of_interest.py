@@ -24,19 +24,14 @@ class RegionOfInteresDialog(QDialog):
 
         self.working_dir = path.dirname(pattern_path)
 
-        if pattern_path == None:
-            self.filenamebase = "Pattern"
-            self.pattern_path = path.join(self.working_dir, "Pattern.dat")
-
-        else:
-            self.pattern_path = pattern_path
+        self.pattern_path = pattern_path
 
         self.filenamebase = path.basename(self.pattern_path).split(".")[0]
 
 
         # Standard filename of processed pattern
         self.save_path = path.join(
-            self.working_dir, f"{self.filenamebase}_ROI_x0_x1_y0_y1.h5"
+            self.working_dir, f"{self.filenamebase}_x0_x1_y0_y1.h5"
         )
 
         self.ui = Ui_ROIDialog()
@@ -68,8 +63,8 @@ class RegionOfInteresDialog(QDialog):
     def setSavePath(self):
         if self.fileBrowser.getFile():
             self.save_path = self.fileBrowser.getPaths()[0]
-            self.ui.pathLineEdit.setText(self.save_path)
-            self.ui.pathLineEdit
+            self.ui.folderEdit.setText(path.dirname(self.save_path))
+            self.ui.filenameEdit.setText(path.basename(self.save_path))
 
     def updateSavePath(self):
         self.options = self.getOptions()
@@ -82,13 +77,19 @@ class RegionOfInteresDialog(QDialog):
             self.working_dir,
             f"{self.filenamebase}_{self.x0}_{self.x1}_{self.y0}_{self.y1}.h5",
         )
-        self.ui.pathLineEdit.setText(self.save_path)
+        self.ui.folderEdit.setText(path.dirname(self.save_path))
+        self.ui.filenameEdit.setText(path.basename(self.save_path))
 
     def setupConnections(self):
         self.ui.browseButton.clicked.connect(lambda: self.setSavePath())
         self.ui.buttonBox.accepted.connect(lambda: self.run_roi_selection())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
-        self.ui.pathLineEdit.setText(self.save_path)
+
+        #set path names
+        self.ui.folderEdit.setText(path.dirname(self.save_path))
+        self.ui.filenameEdit.setText(path.basename(self.save_path))
+
+        #set inital spinbox values
         self.ui.spinBoxXstart.textChanged.connect(lambda: self.updateSavePath())
         self.ui.spinBoxXend.textChanged.connect(lambda: self.updateSavePath())
         self.ui.spinBoxYstart.textChanged.connect(lambda: self.updateSavePath())
@@ -147,11 +148,8 @@ class RegionOfInteresDialog(QDialog):
 
         self.s2 = self.s.inav[self.x0:self.x1, self.y0:self.y1]
         try:
-            filepath = self.ui.pathLineEdit.text()
-
-            print(filepath)
             self.s2.save(
-                filepath,
+                self.save_path,
                 overwrite=True,
             )
             print("Processing complete")

@@ -108,18 +108,19 @@ class Ui_MainWindow(object):
 
         self.topLayout.addLayout(self.systemViewerLayout)
 
-        self.line = QFrame(self.centralwidget)
-        self.line.setObjectName(u"line")
-        self.line.setFrameShape(QFrame.VLine)
-        self.line.setFrameShadow(QFrame.Sunken)
+        self.line_2 = QFrame(self.centralwidget)
+        self.line_2.setObjectName(u"line_2")
+        self.line_2.setFrameShape(QFrame.VLine)
+        self.line_2.setFrameShadow(QFrame.Sunken)
 
-        self.topLayout.addWidget(self.line)
+        self.topLayout.addWidget(self.line_2)
 
         self.MplWidget = MplWidget(self.centralwidget)
         self.MplWidget.setObjectName(u"MplWidget")
         sizePolicy1.setHeightForWidth(self.MplWidget.sizePolicy().hasHeightForWidth())
         self.MplWidget.setSizePolicy(sizePolicy1)
         self.MplWidget.setMinimumSize(QSize(320, 320))
+        self.MplWidget.setStyleSheet(u"background-color: transparent")
 
         self.topLayout.addWidget(self.MplWidget)
 
@@ -135,7 +136,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 695, 24))
+        self.menubar.setGeometry(QRect(0, 0, 695, 22))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuProcessing = QMenu(self.menubar)

@@ -9,6 +9,8 @@ from ui.ui_main_window import Ui_MainWindow
 import matplotlib.image as mpimg
 
 from utils.filebrowser import FileBrowser
+from utils.setting_file import SettingFile
+
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.signal_navigation import SignalNavigation
 from scripts.dictionary_indexing import DiSetupDialog
@@ -17,9 +19,9 @@ from scripts.dictionary_indexing import DiSetupDialog
 from scripts.console import Console, Redirect
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
-from scripts.setting_file import SettingFile
 
-SYSTEM_VIEWER_FILTER = ["*.h5", "*.dat", "*.ang", "*.jpg", "*.png", "*.gif", "*.txt", "*.bmp"]
+
+SYSTEM_VIEWER_FILTER = ["*.h5", "*.dat", "*.ang", "*.jpg", "*.png", "*.gif", "*.txt"] #, "*.bmp"
 
 
 class AppWindow(QMainWindow):
@@ -109,6 +111,7 @@ class AppWindow(QMainWindow):
             self.ROIDialog.exec()
         except Exception as e:
             self.console.errorwrite(f"Could not initialize ROI dialog:\n{str(e)}\n")
+
 
     def onSystemViewClicked(self, index):
         self.file_selected = self.systemModel.filePath(index)
