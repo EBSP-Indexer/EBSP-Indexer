@@ -16,10 +16,10 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
-    QHeaderView, QLabel, QMainWindow, QMenu,
-    QMenuBar, QPlainTextEdit, QSizePolicy, QStatusBar,
-    QTreeView, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QGridLayout,
+    QHBoxLayout, QHeaderView, QLabel, QMainWindow,
+    QMenu, QMenuBar, QPlainTextEdit, QSizePolicy,
+    QStatusBar, QTreeView, QVBoxLayout, QWidget)
 
 from mplwidget import MplWidget
 
@@ -72,7 +72,14 @@ class Ui_MainWindow(object):
         sizePolicy1.setHeightForWidth(self.systemViewer.sizePolicy().hasHeightForWidth())
         self.systemViewer.setSizePolicy(sizePolicy1)
         self.systemViewer.setMinimumSize(QSize(320, 320))
+        self.systemViewer.setMouseTracking(False)
+        self.systemViewer.setTabletTracking(True)
         self.systemViewer.setStyleSheet(u"")
+        self.systemViewer.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.CurrentChanged|QAbstractItemView.DoubleClicked|QAbstractItemView.SelectedClicked)
+        self.systemViewer.setTabKeyNavigation(True)
+        self.systemViewer.setDragEnabled(False)
+        self.systemViewer.setDragDropOverwriteMode(False)
+        self.systemViewer.setAlternatingRowColors(False)
         self.systemViewer.setAnimated(True)
         self.systemViewer.header().setStretchLastSection(True)
 
@@ -98,7 +105,6 @@ class Ui_MainWindow(object):
 
         self.systemViewerLayout.addLayout(self.inputLayout)
 
-        self.systemViewerLayout.setStretch(1, 1)
 
         self.topLayout.addLayout(self.systemViewerLayout)
 
