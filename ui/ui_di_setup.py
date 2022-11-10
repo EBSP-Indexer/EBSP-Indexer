@@ -247,6 +247,7 @@ class Ui_DiSetupDialog(object):
         self.gridLayout_5.setObjectName(u"gridLayout_5")
         self.label_10 = QLabel(self.centralwidget)
         self.label_10.setObjectName(u"label_10")
+        self.label_10.setEnabled(True)
 
         self.gridLayout_5.addWidget(self.label_10, 1, 0, 1, 1)
 
@@ -266,6 +267,7 @@ class Ui_DiSetupDialog(object):
 
         self.spinBoxNumIter = QSpinBox(self.centralwidget)
         self.spinBoxNumIter.setObjectName(u"spinBoxNumIter")
+        self.spinBoxNumIter.setEnabled(True)
         self.spinBoxNumIter.setMaximum(99)
 
         self.gridLayout_5.addWidget(self.spinBoxNumIter, 1, 1, 1, 1)
@@ -366,7 +368,7 @@ class Ui_DiSetupDialog(object):
         self.checkBoxMask.setText(QCoreApplication.translate("DiSetupDialog", u"Apply circular mask to pattern", None))
         self.label_6.setText(QCoreApplication.translate("DiSetupDialog", u"Dictionary indexing parameters:", None))
         self.label_10.setText(QCoreApplication.translate("DiSetupDialog", u"Matching per iteration", None))
-        self.label_8.setText(QCoreApplication.translate("DiSetupDialog", u"Step-size (\u00b0)", None))
+        self.label_8.setText(QCoreApplication.translate("DiSetupDialog", u"Angular step size (\u00b0)", None))
         self.checkBoxRefine.setText(QCoreApplication.translate("DiSetupDialog", u"Refine orientations", None))
         self.label_11.setText(QCoreApplication.translate("DiSetupDialog", u"Figures to be saved:", None))
 #if QT_CONFIG(tooltip)

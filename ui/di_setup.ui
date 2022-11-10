@@ -336,6 +336,9 @@
          <layout class="QGridLayout" name="gridLayout_5">
           <item row="1" column="0">
            <widget class="QLabel" name="label_10">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="text">
              <string>Matching per iteration</string>
             </property>
@@ -360,12 +363,15 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label_8">
             <property name="text">
-             <string>Step-size (°)</string>
+             <string>Angular step size (°)</string>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
            <widget class="QSpinBox" name="spinBoxNumIter">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="maximum">
              <number>99</number>
             </property>

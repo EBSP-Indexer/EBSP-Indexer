@@ -1,20 +1,19 @@
-from os import path, mkdir
+import warnings
 from datetime import date
-
-from PySide6.QtWidgets import QDialog
-from utils.setting_file import SettingFile
-
-from utils.filebrowser import FileBrowser
-from utils.worker import Worker
-from ui.ui_di_setup import Ui_DiSetupDialog
+from os import mkdir, path
 
 import kikuchipy as kp
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+from orix import io, plot, sampling
 from orix.quaternion import Rotation
-from orix import io, sampling, plot
-import warnings
+from PySide6.QtWidgets import QDialog
+
+from ui.ui_di_setup import Ui_DiSetupDialog
+from utils.filebrowser import FileBrowser
+from utils.setting_file import SettingFile
+from utils.worker import Worker
 
 # TODO: from time import time
 
@@ -429,7 +428,7 @@ class DiSetupDialog(QDialog):
         self.setting_file.save()
 
     def save_di_settings(self):
-        self.di_setting_file = SettingFile(self.results_dir)
+        self.di_setting_file = SettingFile(path.join(self.results_dir, "di_parameters.txt"))
 
         ### Time and date
         self.di_setting_file.write("Date", f"{date.today()}\n")
@@ -474,13 +473,13 @@ class DiSetupDialog(QDialog):
         self.di_setting_file.write(
             "Angular step size [\u00B0]", f"{self.disori} degrees"
         )
-        self.di_setting_file.write("Circular mask", self.use_signal_mask)
+        self.di_setting_file.write("Circular mask", self.ui.checkBoxMask.isChecked())
         self.di_setting_file.write(
             "Number of experimental patterns matched per iteration [None - all]",
             self.n_per_iteration,
         )
         self.di_setting_file.write("Refinement of orientations", self.refine)
-        for i, mp_path in enumerate(self.mpPaths, 1):
+        for i, mp_path in enumerate(self.mpPaths.values(), 1):
             self.di_setting_file.write(f"Master pattern path {i}", mp_path)
 
         self.di_setting_file.save()
@@ -520,7 +519,6 @@ class DiSetupDialog(QDialog):
         # Remaining user input values
         self.new_signal_shape = eval(self.options["Binning"])
         self.disori = self.options["Disori"]
-        self.use_signal_mask = self.options["Mask"]
 
         # If n per iteration is 0
         self.n_per_iteration = None
