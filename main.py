@@ -37,7 +37,7 @@ class AppWindow(QMainWindow):
         self.showMaximized()
         self.setupConnections()
         self.showImage()
-        self.threadPool = QThreadPool()
+        self.threadPool = QThreadPool.globalInstance()
 
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         self.systemModel = QFileSystemModel()
@@ -162,7 +162,7 @@ if __name__ == "__main__":
 
     # Redirect stdout to console.write and stderr to console.errorwrite
     redirect = Redirect(APP.console.errorwrite)
-    debug = True
+    debug = False
     if debug:
         APP.show()
         print(

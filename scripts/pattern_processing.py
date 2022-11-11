@@ -57,15 +57,15 @@ class PatternProcessingDialog(QDialog):
         return {
             "static": {
                 self.ui.staticBackgroundBox.isChecked(),
-                self.s.remove_static_background(show_progressbar=True),
+                self.s.remove_static_background(),
             },
             "dynamic": {
                 self.ui.dynamicBackgroundBox.isChecked(),
-                self.s.remove_dynamic_background(show_progressbar=True),
+                self.s.remove_dynamic_background(),
             },
             "average": {
                 self.ui.averageBox.isChecked(),
-                self.s.average_neighbour_patterns(self.gaussian_window, show_progressbar=True),
+                self.s.average_neighbour_patterns(self.gaussian_window),
             },
         }
 

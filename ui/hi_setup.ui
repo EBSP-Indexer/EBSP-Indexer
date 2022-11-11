@@ -135,11 +135,14 @@
         </item>
         <item>
          <widget class="QListWidget" name="listWidgetPhase">
+          <property name="editTriggers">
+           <set>QAbstractItemView::EditKeyPressed</set>
+          </property>
           <property name="alternatingRowColors">
            <bool>false</bool>
           </property>
           <property name="selectionMode">
-           <enum>QAbstractItemView::MultiSelection</enum>
+           <enum>QAbstractItemView::SingleSelection</enum>
           </property>
          </widget>
         </item>
@@ -310,6 +313,19 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>checkBoxLazy</tabstop>
+  <tabstop>checkBoxPre</tabstop>
+  <tabstop>checkBoxPhase</tabstop>
+  <tabstop>checkBoxOrientation</tabstop>
+  <tabstop>checkBoxQuality</tabstop>
+  <tabstop>listWidgetPhase</tabstop>
+  <tabstop>pushButtonAddPhase</tabstop>
+  <tabstop>pushButtonRemovePhase</tabstop>
+  <tabstop>patternCenterX</tabstop>
+  <tabstop>patternCenterY</tabstop>
+  <tabstop>patternCenterZ</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -319,8 +335,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>297</x>
-     <y>331</y>
+     <x>780</x>
+     <y>547</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -335,8 +351,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>229</x>
-     <y>325</y>
+     <x>752</x>
+     <y>547</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>

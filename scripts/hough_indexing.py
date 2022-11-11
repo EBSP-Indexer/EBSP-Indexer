@@ -1,4 +1,5 @@
 from os import path, mkdir
+from PySide6.QtCore import QThreadPool
 from PySide6.QtWidgets import QDialog, QDialogButtonBox
 from scripts.setting_file import SettingFile
 
@@ -33,7 +34,7 @@ class HiSetupDialog(QDialog):
 
     def __init__(self, parent, pattern_path=None):
         super().__init__(parent)
-        self.threadPool = parent.threadPool
+        self.threadPool = QThreadPool.globalInstance()
         self.pattern_path = pattern_path
         self.pattern_name = path.splitext(path.basename(pattern_path))[0]
         self.working_dir = path.dirname(pattern_path)
@@ -46,7 +47,7 @@ class HiSetupDialog(QDialog):
         self.setupInitialSettings()
 
         self.setupConnections()
-        self.checkPhaseSelected()
+        self.checkPhaseList()
 
         self.phases = []
         self.lat_param = []
@@ -107,15 +108,16 @@ class HiSetupDialog(QDialog):
             if phase not in self.mpPaths.keys():
                 self.mpPaths[phase] = mpPath
                 self.ui.listWidgetPhase.addItem(phase)
+        self.checkPhaseList()
 
     def removePhase(self):
         self.mpPaths.pop(str(self.ui.listWidgetPhase.currentItem().text()))
         self.ui.listWidgetPhase.takeItem(self.ui.listWidgetPhase.currentRow())
+        self.checkPhaseList()
 
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_hough_indexing())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
-        self.ui.listWidgetPhase.clicked.connect(lambda: self.checkPhaseSelected())
 
         self.ui.pushButtonAddPhase.clicked.connect(lambda: self.addPhase())
         self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.removePhase())
@@ -136,11 +138,13 @@ class HiSetupDialog(QDialog):
             ],
         }
 
-    def checkPhaseSelected(self):
+    def checkPhaseList(self):
         flag = False
         if self.ui.listWidgetPhase.count() != 0:
             flag = True
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(flag)
+        print()  
+        print(self.mpPaths)
 
     def hough_indexing(self):
         for i in range(1, 100):
@@ -155,7 +159,7 @@ class HiSetupDialog(QDialog):
 
         self.updatePCArrayFrompatternCenter()
         options = self.getOptions()
-        self.phases = [phase.text() for phase in options["phase_list"]]
+        self.phases = [phase for phase, _ in self.mpPaths.items()]
         self.set_phases_properties()
         try:
             self.s = kp.load(filename=self.pattern_path, lazy=options["lazy"])
@@ -231,9 +235,10 @@ class HiSetupDialog(QDialog):
         print(f"Finished indexing {self.pattern_name}")
 
     def run_hough_indexing(self):
+        #self.hough_indexing()
         # Pass the function to execute
         hi_worker = Worker(lambda: self.hough_indexing())
-        # Execute
+        # # Execute
         self.threadPool.start(hi_worker)
 
     def set_phases_properties(self):
@@ -328,3 +333,5 @@ class HiSetupDialog(QDialog):
                 )
         except Exception as e:
             raise e
+
+
