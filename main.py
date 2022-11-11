@@ -1,14 +1,16 @@
 import sys
 from os.path import basename, splitext
 from contextlib import redirect_stdout, redirect_stderr
-from PySide6.QtCore import QDir, QThreadPool, Qt
+from PySide6.QtCore import QDir, QThreadPool, Qt, Signal
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
-from PySide6.QtGui import QFont
+from PySide6.QtGui import QFont, QKeyEvent
 from scripts.hough_indexing import HiSetupDialog
 from ui.ui_main_window import Ui_MainWindow
 import matplotlib.image as mpimg
 
 from utils.filebrowser import FileBrowser
+from utils.setting_file import SettingFile
+
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.signal_navigation import SignalNavigation
 from scripts.dictionary_indexing import DiSetupDialog
@@ -17,9 +19,9 @@ from scripts.dictionary_indexing import DiSetupDialog
 from scripts.console import Console, Redirect
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
-from scripts.setting_file import SettingFile
 
-SYSTEM_VIEWER_FILTER = ["*.h5", "*.dat", "*.ang", "*.jpg", "*.png", "*.gif", "*.txt", "*.bmp"]
+
+SYSTEM_VIEWER_FILTER = ["*.h5", "*.dat", "*.ang", "*.jpg", "*.png", "*.gif", "*.txt"] #, "*.bmp"
 
 
 class AppWindow(QMainWindow):
@@ -54,6 +56,8 @@ class AppWindow(QMainWindow):
         self.ui.systemViewer.clicked.connect(
             lambda index: self.onSystemViewClicked(index)
         )
+        self.ui.systemViewer.keyReleaseEvent = self.onKeyReleaseEvent
+
         self.ui.actionSignalNavigation.triggered.connect(
             lambda: self.selectSignalNavigation()
         )
@@ -66,6 +70,11 @@ class AppWindow(QMainWindow):
         self.ui.actionPattern_Center.triggered.connect(
             lambda: self.selectPatternCenter()
         )
+
+    def onKeyReleaseEvent(self, event):
+        if event.key() == Qt.Key_Up or event.key() == Qt.Key_Down:
+            index = self.ui.systemViewer.currentIndex()
+            self.onSystemViewClicked(index)
 
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
@@ -102,6 +111,7 @@ class AppWindow(QMainWindow):
             self.ROIDialog.exec()
         except Exception as e:
             self.console.errorwrite(f"Could not initialize ROI dialog:\n{str(e)}\n")
+
 
     def onSystemViewClicked(self, index):
         self.file_selected = self.systemModel.filePath(index)

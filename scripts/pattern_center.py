@@ -15,19 +15,22 @@ from orix.quaternion import Rotation
 from orix.crystal_map import Phase
 
 from utils.filebrowser import FileBrowser
-from scripts.setting_file import SettingFile
+from utils.setting_file import SettingFile
 from ui.ui_pattern_center import Ui_PatternCenterDialog
 
 from mplwidget import MplWidget
 
-
 def find_hkl(phase):
     FCC = ["ni", "al", "austenite", "cu", "si"]
     BCC = ["ferrite"]
+    #TETRAGONAL = ["steel_sigma"]
     if phase.lower() in FCC:
         return [[1, 1, 1], [2, 0, 0], [2, 2, 0], [3, 1, 1]]
     elif phase.lower() in BCC:
         return [[0, 1, 1], [0, 0, 2], [1, 1, 2], [0, 2, 2]]
+    #experimental support for TETRAGONAL sigma phase, not sure if correct...
+    #elif phase.lower() in TETRAGONAL:
+    #    return [[1, 1, 0], [2, 0, 0], [1, 0, 1], [2, 1, 0], [1, 1, 1], [2, 2, 0], [2, 1, 1]]
 
 
 #TODO: Better way to load file from file browser widget.
@@ -42,7 +45,6 @@ class PatterCenterDialog(QDialog):
         self.setupCalibrationPatterns()
         self.setupInitialSettings()
         
-
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
 
     def findSettingsFile(self):
@@ -59,28 +61,48 @@ class PatterCenterDialog(QDialog):
             return setting_path
 
     def setupInitialSettings(self):
-        self.setting_file_dict = SettingFile(path.join(path.dirname(self.setting_path),"project_settings.txt"))
+        self.setting_file = SettingFile(path.join(path.dirname(self.setting_path),"project_settings.txt"))
+        
+        try:
+            self.convention = self.sf.read["Convention"]
+
+        except:
+            self.convention = "TSL"
+
+        print(self.convention)
+        
         try:
             self.pc = [
-                    float(self.setting_file_dict.read("X star:")),
-                    float(self.setting_file_dict.read("Y star:")),
-                    float(self.setting_file_dict.read("Z star:")),
+                    float(self.setting_file.read("X star")),
+                    float(self.setting_file.read("Y star")),
+                    float(self.setting_file.read("Z star")),
             ]
 
         except:
-            self.pc = np.array([0.5000, 0.3000, 0.5000])
+            self.pc = np.array([0.5000, 0.7000, 0.5000])
+        
+        if self.convention == "TSL":
+            #Store TSL convention in BRUKER convention
+            self.pc[1] = 1 - self.pc[1]
+
         self.updatePCSpinBox()
         
         self.mp_paths = {}
-        for i in range(1, 5):
+        i = 1
+
+        while True:
             try:
-                mp_path = self.setting_file_dict.read("Master pattern " + str(i) + ":")
+                mp_path = self.setting_file.read("Master pattern " + str(i))
                 phase = mp_path.split("/").pop()
                 self.mp_paths[phase] = mp_path
                 self.ui.listPhases.addItem(phase)
+                i += 1
             except:
-                pass
+                break
+
         self.is_mp_paths_updated = True
+        self.enabled = False
+        self.ui.bandButton.setDisabled(True)
     
     def setupCalibrationPatterns(self):
         self.pattern_index = 0
@@ -91,7 +113,6 @@ class PatterCenterDialog(QDialog):
         self.s_cal.remove_static_background()
         self.s_cal.remove_dynamic_background()
 
-        #TODO: Why does only BRUKER convension work?
         self.indexer = ebsd_index.EBSDIndexer(
             phaselist=["FCC", "BCC"],
             vendor="BRUKER", 
@@ -103,11 +124,13 @@ class PatterCenterDialog(QDialog):
         self.ui.counterLabel.setText(
             "Calibration Pattern: "+str(self.pattern_index+1)+"/"+str(self.nav_size)
         )
+        self.ui.MplWidget.canvas.ax.axis("off")
         self.ui.MplWidget.canvas.ax.imshow(self.s_cal.data[0], cmap="gray")
 
         self.pcs = {}
+        self.pattern_ignored = False
         for i in range(self.nav_size):
-            self.pcs[i] = ["", [0.0, 0.0, 0.0]]
+            self.pcs[i] = ["", [0.0, 0.0, 0.0], False]
 
     def setupConnections(self):
         self.ui.buttonAddPhase.clicked.connect(lambda: self.addPhase())
@@ -118,43 +141,50 @@ class PatterCenterDialog(QDialog):
         self.ui.buttonPlot.clicked.connect(lambda: self.plotClicked())
         self.ui.buttonBox.accepted.connect(lambda: self.saveAndExit())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
+        self.ui.bandButton.clicked.connect(lambda: self.bandButtonClicked())
+        self.ui.ignoreCheckBox.clicked.connect(lambda: self.ignoreButtonClicked())
 
     def previousPattern(self):
         if self.pattern_index > 0:
-
-            self.pcs[self.pattern_index][1] = self.pc
+            #Saves current phase in pcs dictionary
             self.pcs[self.pattern_index][0] = self.phase
+            self.pcs[self.pattern_index][1] = self.pc
+            self.pcs[self.pattern_index][2] = self.ui.ignoreCheckBox.isChecked()
+
+            #Gets values for previous phase
             self.pattern_index -= 1
-            self.pc = self.pcs[self.pattern_index][1]
-            self.phase = self.pcs[self.pattern_index][0]
+            self.phase = self.pcs.get(self.pattern_index)[0]
+            self.pc = self.pcs.get(self.pattern_index)[1]
+            self.pattern_ignored = self.pcs.get(self.pattern_index)[2]
             self.ui.counterLabel.setText(
                 "Calibration Pattern: "+str(self.pattern_index+1)+"/"+str(self.nav_size)
                 )
-            
+            self.ui.ignoreCheckBox.setChecked(self.pattern_ignored)
             self.updatePCSpinBox()
             self.plotData()
 
     #TODO: Make the program remeber the last phase and pc when moving between calibration patterns
     def nextPattern(self):
-        if self.pattern_index < self.nav_size - 1:
-
-            self.pcs[self.pattern_index][1] = self.pc
+        if self.pattern_index < self.nav_size-1:
             self.pcs[self.pattern_index][0] = self.phase
-            self.pattern_index += 1
-            if self.pcs[self.pattern_index][1][0] == 0.0:
-                self.pc = self.pcs[self.pattern_index-1][1]
-            else:
-                self.pc = self.pcs[self.pattern_index][1]
-            if self.pcs[self.pattern_index][0] == "":
-                self.phase = self.pcs[self.pattern_index-1][0]
-            else:
-                self.phase = self.pcs[self.pattern_index][0]
+            self.pcs[self.pattern_index][1] = self.pc
+            self.pcs[self.pattern_index][2] = self.pattern_ignored
 
+            self.pattern_index += 1
+            if self.pcs.get(self.pattern_index)[1][0] == 0.0:
+                self.pc = self.pcs.get(self.pattern_index-1)[1]
+            else:
+                self.pc = self.pcs.get(self.pattern_index)[1]
+            if self.pcs.get(self.pattern_index)[0] == "":
+                self.phase = self.pcs.get(self.pattern_index-1)[0]
+            else:
+                self.phase = self.pcs.get(self.pattern_index)[0]
+            self.pattern_ignored = self.pcs.get(self.pattern_index)[2]
 
             self.ui.counterLabel.setText(
                 "Calibration Pattern: "+str(self.pattern_index+1)+"/"+str(self.nav_size)
                 )
-
+            self.ui.ignoreCheckBox.setChecked(self.pattern_ignored)
             self.updatePCSpinBox()
             self.plotData()
 
@@ -176,16 +206,23 @@ class PatterCenterDialog(QDialog):
 
     def updatePCSpinBox(self):
         self.ui.spinBoxX.setValue(self.pc[0])
-        self.ui.spinBoxY.setValue(self.pc[1])
         self.ui.spinBoxZ.setValue(self.pc[2])
+        if self.convention == "BRUKER":
+            self.ui.spinBoxY.setValue(self.pc[1])
+        elif self.convention == "TSL":
+            self.ui.spinBoxY.setValue(1-self.pc[1])
 
     def updatePCArrayFromSpinBox(self):
         self.pc[0] = self.ui.spinBoxX.value()
-        self.pc[1] = self.ui.spinBoxY.value()
         self.pc[2] = self.ui.spinBoxZ.value()
-    
-    def updatePCDict(self, pattern_index, phase, pc):
-        self.pcs[pattern_index] = [phase, pc]
+        if self.convention == "BRUKER":
+            self.pc[1] = self.ui.spinBoxY.value()
+        elif self.convention == "TSL":
+            self.pc[1] = 1 - self.ui.spinBoxY.value()
+        
+
+    def updatePCDict(self, pattern_index, phase, pc, pattern_ignored):
+        self.pcs[pattern_index] = [phase, pc, pattern_ignored]
     
     def plotClicked(self):
         self.updatePCArrayFromSpinBox()
@@ -241,7 +278,7 @@ class PatterCenterDialog(QDialog):
         self.is_mp_paths_updated = False
 
     def plotData(self):
-        self.updatePCDict(self.pattern_index, self.phase, self.pc)
+        self.updatePCDict(self.pattern_index, self.phase, self.pc, self.pattern_ignored)
 
         #Updates data from master pattern (simulator_dict) if phase list has been updated
         if self.is_mp_paths_updated:
@@ -264,52 +301,79 @@ class PatterCenterDialog(QDialog):
             geosim_dict[name] = self.simulator_dict[name].on_detector(detector, rot)
 
         #Draws pattern in MplWidget 
-        pattern_image_array = self.s_cal.data[self.pattern_index]
+        self.pattern_image = self.s_cal.data[self.pattern_index]
         self.ui.MplWidget.canvas.ax.clear()
         self.ui.MplWidget.canvas.ax.axis("off")
-        self.ui.MplWidget.canvas.ax.imshow(pattern_image_array, cmap="gray")
-        lines, zone_axes, zone_axes_labels = geosim_dict[self.phase].as_collections(
+        self.ui.MplWidget.canvas.ax.imshow(self.pattern_image, cmap="gray")
+        self.lines, zone_axes, zone_axes_labels = geosim_dict[self.phase].as_collections(
             0,
             zone_axes=True,
             zone_axes_labels=True,
             zone_axes_labels_kwargs=dict(fontsize=12),
         ) #TODO: How does this even work?
 
-        pc_x, pc_y = len(pattern_image_array)*self.pc[0], len(pattern_image_array[0])*self.pc[1]
+        pc_x, pc_y = len(self.pattern_image)*self.pc[0], len(self.pattern_image[0])*self.pc[1]
         self.ui.MplWidget.canvas.ax.plot(pc_x, pc_y, marker="*", markersize=12, color="gold")
-        self.ui.MplWidget.canvas.ax.add_collection(lines)
+        self.ui.MplWidget.canvas.ax.add_collection(self.lines)
         self.ui.MplWidget.canvas.draw()
 
         #Updates misfit label
         self.ui.labelMisfit.setText("Misfit(°): "+str(round(data["fit"][-1][0], 4)))
 
-    #TODO: Save average pattern center from calibration patterns
+        self.bands_enabled = False
+        self.bandButtonClicked()
+        self.ui.bandButton.setEnabled(True)
+
+    def bandButtonClicked(self):
+        if not self.bands_enabled:
+            self.ui.MplWidget.canvas.ax.add_collection(self.lines)
+            self.ui.MplWidget.canvas.draw()
+            self.ui.bandButton.setText("Hide bands")
+            self.bands_enabled = True
+
+        elif self.bands_enabled:
+            self.ui.MplWidget.canvas.ax.clear()
+            self.ui.MplWidget.canvas.ax.axis("off")
+            self.ui.MplWidget.canvas.ax.imshow(self.pattern_image, cmap="gray")
+            pc_x, pc_y = len(self.pattern_image)*self.pc[0], len(self.pattern_image[0])*self.pc[1]
+            self.ui.MplWidget.canvas.ax.plot(pc_x, pc_y, marker="*", markersize=12, color="gold")
+            self.ui.MplWidget.canvas.draw()
+            self.ui.bandButton.setText("Show bands")
+            self.bands_enabled = False
+    
+    def ignoreButtonClicked(self):
+        self.pattern_ignored = self.ui.ignoreCheckBox.checkState()
+
     def saveAndExit(self):
-        self.updatePCDict(self.pattern_index, self.phase, self.pc)
+        self.setting_file.delete_all_entries()  # clean up initial dictionary
+
+        ### Sample parameters
+        for i, path in enumerate(self.mp_paths.values(), 1):
+            self.setting_file.write(f"Master pattern {i}", path)
+
         x_average, y_average, z_average = 0, 0, 0
         n = 0
         for i in range(self.nav_size):
-            if self.pcs[i][1][0] > 0:
-                x_average += self.pcs[i][1][0]
-                y_average += self.pcs[i][1][1]
-                z_average += self.pcs[i][1][2]
+            pattern_included = not self.pcs.get(i)[2]
+            if self.pcs.get(i)[1][0] > 0 and pattern_included:
+                x_average += self.pcs.get(i)[1][0]
+                y_average += self.pcs.get(i)[1][1]
+                z_average += self.pcs.get(i)[1][2]
                 n += 1
 
-        x_average = x_average/n
-        y_average = y_average/n
-        z_average = z_average/n
+        x_average = round(x_average/n, 4)
+        y_average = round(y_average/n, 4)
+        z_average = round(z_average/n, 4)
 
-        self.setting_file_dict.write("X star:", str(x_average))
-        self.setting_file_dict.write("Y star:", str(y_average))
-        self.setting_file_dict.write("Z star:", str(z_average))
-           
-        for i in range(1, 5):
-            try:
-                self.setting_file_dict.remove("Master pattern " + str(i + 1) + ":")
-            except:
-                pass
-        for i, path in enumerate(self.mp_paths.values()):
-            self.setting_file_dict.write("Master pattern " + str(i + 1) + ":", path)
+        self.setting_file.write("Convention", self.convention)
+        self.setting_file.write("X star", f"{x_average}")
         
-        self.setting_file_dict.save()
+        if self.convention == "BRUKER":
+            self.setting_file.write("Y star", f"{y_average}")
+        elif self.convention == "TSL":
+            self.setting_file.write("Y star", f"{1-y_average}")
+
+        self.setting_file.write("Z star", f"{z_average}")
+        
+        self.setting_file.save()
         self.close()

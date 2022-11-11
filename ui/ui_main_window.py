@@ -16,10 +16,10 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
-    QHeaderView, QLabel, QMainWindow, QMenu,
-    QMenuBar, QPlainTextEdit, QSizePolicy, QStatusBar,
-    QTreeView, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QGridLayout,
+    QHBoxLayout, QHeaderView, QLabel, QMainWindow,
+    QMenu, QMenuBar, QPlainTextEdit, QSizePolicy,
+    QStatusBar, QTreeView, QVBoxLayout, QWidget)
 
 from mplwidget import MplWidget
 
@@ -72,7 +72,14 @@ class Ui_MainWindow(object):
         sizePolicy1.setHeightForWidth(self.systemViewer.sizePolicy().hasHeightForWidth())
         self.systemViewer.setSizePolicy(sizePolicy1)
         self.systemViewer.setMinimumSize(QSize(320, 320))
+        self.systemViewer.setMouseTracking(False)
+        self.systemViewer.setTabletTracking(True)
         self.systemViewer.setStyleSheet(u"")
+        self.systemViewer.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.CurrentChanged|QAbstractItemView.DoubleClicked|QAbstractItemView.SelectedClicked)
+        self.systemViewer.setTabKeyNavigation(True)
+        self.systemViewer.setDragEnabled(False)
+        self.systemViewer.setDragDropOverwriteMode(False)
+        self.systemViewer.setAlternatingRowColors(False)
         self.systemViewer.setAnimated(True)
         self.systemViewer.header().setStretchLastSection(True)
 
@@ -98,22 +105,22 @@ class Ui_MainWindow(object):
 
         self.systemViewerLayout.addLayout(self.inputLayout)
 
-        self.systemViewerLayout.setStretch(1, 1)
 
         self.topLayout.addLayout(self.systemViewerLayout)
 
-        self.line = QFrame(self.centralwidget)
-        self.line.setObjectName(u"line")
-        self.line.setFrameShape(QFrame.VLine)
-        self.line.setFrameShadow(QFrame.Sunken)
+        self.line_2 = QFrame(self.centralwidget)
+        self.line_2.setObjectName(u"line_2")
+        self.line_2.setFrameShape(QFrame.VLine)
+        self.line_2.setFrameShadow(QFrame.Sunken)
 
-        self.topLayout.addWidget(self.line)
+        self.topLayout.addWidget(self.line_2)
 
         self.MplWidget = MplWidget(self.centralwidget)
         self.MplWidget.setObjectName(u"MplWidget")
         sizePolicy1.setHeightForWidth(self.MplWidget.sizePolicy().hasHeightForWidth())
         self.MplWidget.setSizePolicy(sizePolicy1)
         self.MplWidget.setMinimumSize(QSize(320, 320))
+        self.MplWidget.setStyleSheet(u"background-color: transparent")
 
         self.topLayout.addWidget(self.MplWidget)
 
@@ -129,7 +136,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 695, 26))
+        self.menubar.setGeometry(QRect(0, 0, 695, 22))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuProcessing = QMenu(self.menubar)

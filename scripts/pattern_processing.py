@@ -1,5 +1,5 @@
 from os import path
-from kikuchipy import load, filters
+from kikuchipy import load, filters, generators
 from PySide6.QtWidgets import QDialog
 
 from utils.filebrowser import FileBrowser
@@ -14,13 +14,14 @@ class PatternProcessingDialog(QDialog):
         self.threadPool = parent.threadPool
         self.working_dir = path.dirname(pattern_path)
 
-        if pattern_path == None:
-            self.pattern_path = path.join(self.working_dir, "Pattern.dat")
-        else:
-            self.pattern_path = pattern_path
+        self.pattern_path = pattern_path
+
+        self.filenamebase = path.basename(self.pattern_path).split(".")[0]
 
         # Standard filename of processed pattern
-        self.save_path = path.join(self.working_dir, "Pattern_processed.h5")
+        self.save_path = path.join(
+            self.working_dir, f"{self.filenamebase}_processed.h5"
+        )
 
         self.ui = Ui_PatternProcessingWindow()
         self.ui.setupUi(self)
@@ -31,7 +32,9 @@ class PatternProcessingDialog(QDialog):
             self.s = load(self.pattern_path, lazy=True)
         except Exception as e:
             raise e
-        
+
+        self.showImage(self.s.inav[1, 1])
+
         self.gaussian_window = filters.Window("gaussian", std=1)
 
         self.options = self.getOptions()
@@ -46,12 +49,24 @@ class PatternProcessingDialog(QDialog):
         self.ui.browseButton.clicked.connect(lambda: self.setSavePath())
         self.ui.buttonBox.accepted.connect(lambda: self.run_processing())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
-        self.ui.pathLineEdit.setText(self.save_path)
-    
+        self.ui.folderEdit.setText(self.working_dir)
+        self.ui.filenameEdit.setText(path.basename(self.save_path))
+
+        # Whenever user checks/unchecks boxes the preview window updates to show the result of current choices
+        self.ui.staticBackgroundBox.stateChanged.connect(
+            lambda: self.preview_processing()
+        )
+        self.ui.dynamicBackgroundBox.stateChanged.connect(
+            lambda: self.preview_processing()
+        )
+        self.ui.averageBox.stateChanged.connect(lambda: self.preview_processing())
+        
+
     def setSavePath(self):
         if self.fileBrowser.getFile():
             self.save_path = self.fileBrowser.getPaths()[0]
-            self.ui.pathLineEdit.setText(self.save_path)
+            self.ui.folderEdit.setText(path.dirname(self.save_path))
+            self.ui.filenameEdit.setText(path.basename(self.save_path))
 
     def getOptions(self) -> dict:
         return {
@@ -69,6 +84,39 @@ class PatternProcessingDialog(QDialog):
             },
         }
 
+    def remove_static(self, dataset):
+        dataset.remove_static_background(show_progressbar=True)
+
+    def remove_dynamic(self, dataset):
+        dataset.remove_dynamic_background(show_progressbar=True)
+
+    def average_neighbour(self, dataset):
+        dataset.average_neighbour_patterns(self.gaussian_window, show_progressbar=True)
+
+    def showImage(self, dataset):
+
+        self.ui.previewWidget.vbl.setContentsMargins(0, 0, 0, 0)
+        self.ui.previewWidget.canvas.ax.clear()
+        self.ui.previewWidget.canvas.ax.axis(False)
+        self.ui.previewWidget.canvas.ax.imshow(dataset.data, cmap="gray")
+        self.ui.previewWidget.canvas.draw()
+
+    def preview_processing(self):
+
+        self.s_prev = self.s.inav[0:3, 0:3]
+        self.options = self.getOptions()
+
+        if self.ui.staticBackgroundBox.isChecked():
+            self.remove_static(dataset=self.s_prev)
+        if self.ui.dynamicBackgroundBox.isChecked():
+            self.remove_dynamic(dataset=self.s_prev)
+        if self.ui.averageBox.isChecked():
+            self.average_neighbour(dataset=self.s_prev)
+
+        self.showImage(self.s_prev.inav[1, 1])
+
+        del self.s_prev
+
     def run_processing(self):
         # Pass the function to execute
         worker = Worker(self.apply_processing)
@@ -77,17 +125,23 @@ class PatternProcessingDialog(QDialog):
         self.accept()
 
     def apply_processing(self):
+
         print("Applying processing ...")
         self.options = self.getOptions()
-        for optionName, optionInfo in self.options.items():
-            optionEnabled, optionExecute = optionInfo
-            print(f"{optionName}: {optionEnabled}")
-            if optionEnabled:
-                optionExecute
+
+        if self.options["static"]:
+            print(f"static : {self.options['static']}")
+            self.remove_static(dataset=self.s)
+        if self.options["dynamic"]:
+            print(f"dynamic : {self.options['dynamic']}")
+            self.remove_dynamic(dataset=self.s)
+        if self.options["average"]:
+            print(f"average : {self.options['average']}")
+            self.average_neighbour(dataset=self.s)
+
         try:
-            filepath = self.ui.pathLineEdit.text()
             self.s.save(
-                filename=filepath,
+                self.save_path,
                 overwrite=True,
             )
             print("Processing complete")

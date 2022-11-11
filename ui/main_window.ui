@@ -26,7 +26,7 @@
       <item>
        <layout class="QHBoxLayout" name="topLayout" stretch="1,0,2">
         <item>
-         <layout class="QVBoxLayout" name="systemViewerLayout" stretch="0,1,0,0">
+         <layout class="QVBoxLayout" name="systemViewerLayout" stretch="0,0,0,0">
           <item>
            <widget class="QLabel" name="folderLabel">
             <property name="sizePolicy">
@@ -54,8 +54,29 @@
               <height>320</height>
              </size>
             </property>
+            <property name="mouseTracking">
+             <bool>false</bool>
+            </property>
+            <property name="tabletTracking">
+             <bool>true</bool>
+            </property>
             <property name="styleSheet">
              <string notr="true"/>
+            </property>
+            <property name="editTriggers">
+             <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::CurrentChanged|QAbstractItemView::DoubleClicked|QAbstractItemView::SelectedClicked</set>
+            </property>
+            <property name="tabKeyNavigation">
+             <bool>true</bool>
+            </property>
+            <property name="dragEnabled">
+             <bool>false</bool>
+            </property>
+            <property name="dragDropOverwriteMode">
+             <bool>false</bool>
+            </property>
+            <property name="alternatingRowColors">
+             <bool>false</bool>
             </property>
             <property name="animated">
              <bool>true</bool>
@@ -89,7 +110,7 @@
          </layout>
         </item>
         <item>
-         <widget class="Line" name="line">
+         <widget class="Line" name="line_2">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
@@ -109,6 +130,9 @@
             <height>320</height>
            </size>
           </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: transparent</string>
+          </property>
          </widget>
         </item>
        </layout>
@@ -123,7 +147,7 @@
      <x>0</x>
      <y>0</y>
      <width>695</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
