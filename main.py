@@ -20,6 +20,7 @@ from scripts.console import Console, Redirect
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
 
+from kikuchipy import load
 
 SYSTEM_VIEWER_FILTER = ["*.h5", "*.dat", "*.ang", "*.jpg", "*.png", "*.gif", "*.txt"] #, "*.bmp"
 
@@ -111,7 +112,6 @@ class AppWindow(QMainWindow):
             self.ROIDialog.exec()
         except Exception as e:
             self.console.errorwrite(f"Could not initialize ROI dialog:\n{str(e)}\n")
-
 
     def onSystemViewClicked(self, index):
         self.file_selected = self.systemModel.filePath(index)
