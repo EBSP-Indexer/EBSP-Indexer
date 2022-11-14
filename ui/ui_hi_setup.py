@@ -106,8 +106,9 @@ class Ui_HISetupDialog(object):
 
         self.listWidgetPhase = QListWidget(self.frame)
         self.listWidgetPhase.setObjectName(u"listWidgetPhase")
+        self.listWidgetPhase.setEditTriggers(QAbstractItemView.EditKeyPressed)
         self.listWidgetPhase.setAlternatingRowColors(False)
-        self.listWidgetPhase.setSelectionMode(QAbstractItemView.MultiSelection)
+        self.listWidgetPhase.setSelectionMode(QAbstractItemView.SingleSelection)
 
         self.verticalLayout_2.addWidget(self.listWidgetPhase)
 
@@ -222,6 +223,16 @@ class Ui_HISetupDialog(object):
 
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
 
+        QWidget.setTabOrder(self.checkBoxLazy, self.checkBoxPre)
+        QWidget.setTabOrder(self.checkBoxPre, self.checkBoxPhase)
+        QWidget.setTabOrder(self.checkBoxPhase, self.checkBoxOrientation)
+        QWidget.setTabOrder(self.checkBoxOrientation, self.checkBoxQuality)
+        QWidget.setTabOrder(self.checkBoxQuality, self.listWidgetPhase)
+        QWidget.setTabOrder(self.listWidgetPhase, self.pushButtonAddPhase)
+        QWidget.setTabOrder(self.pushButtonAddPhase, self.pushButtonRemovePhase)
+        QWidget.setTabOrder(self.pushButtonRemovePhase, self.patternCenterX)
+        QWidget.setTabOrder(self.patternCenterX, self.patternCenterY)
+        QWidget.setTabOrder(self.patternCenterY, self.patternCenterZ)
 
         self.retranslateUi(HISetupDialog)
         self.buttonBox.rejected.connect(HISetupDialog.reject)

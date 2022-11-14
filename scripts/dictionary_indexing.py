@@ -9,6 +9,7 @@ import numpy as np
 from orix import io, plot, sampling
 from orix.quaternion import Rotation
 from PySide6.QtWidgets import QDialog
+from PySide6.QtCore import QThreadPool
 
 from ui.ui_di_setup import Ui_DiSetupDialog
 from utils.filebrowser import FileBrowser
@@ -26,7 +27,7 @@ class DiSetupDialog(QDialog):
     def __init__(self, parent=None, pattern_path=None):
         super().__init__(parent)
         # initate threadpool
-        self.threadPool = parent.threadPool
+        self.threadPool = QThreadPool.globalInstance()
 
         # pattern path
         self.pattern_path = pattern_path
