@@ -8,6 +8,7 @@ from ui.ui_roi_dialog import Ui_ROIDialog
 from matplotlib.widgets import RectangleSelector
 import numpy as np
 import matplotlib.pyplot as plt
+from skimage import exposure, img_as_ubyte
 
 #TODO: show image shape in dialog window
 #TODO: let user change rectangle shape with spinBox
@@ -45,12 +46,15 @@ class RegionOfInteresDialog(QDialog):
             raise e
 
         self.x_len, self.y_len = self.s.axes_manager.navigation_shape
-
+        
+        self.ui.imageShapeLabel.setText(f"({self.x_len}, {self.y_len})")
+                
         self.ui.spinBoxXstart.setMaximum(self.x_len)
         self.ui.spinBoxXend.setMaximum(self.x_len)
         self.ui.spinBoxYstart.setMaximum(self.y_len)
         self.ui.spinBoxYend.setMaximum(self.y_len)
 
+        self.generate_mean_intensity_map()
 
         self.fileBrowser = FileBrowser(
             mode=FileBrowser.SaveFile,
@@ -58,7 +62,6 @@ class RegionOfInteresDialog(QDialog):
             filter_name="Hierarchical Data Format (*.h5);;NordifUF Pattern Files (*.dat)",
         )
 
-        self.plot()
 
     def setSavePath(self):
         if self.fileBrowser.getFile():
@@ -95,6 +98,11 @@ class RegionOfInteresDialog(QDialog):
         self.ui.spinBoxYstart.textChanged.connect(lambda: self.updateSavePath())
         self.ui.spinBoxYend.textChanged.connect(lambda: self.updateSavePath())
 
+        # choose navigator
+
+        self.ui.pushButtonMIM.clicked.connect(lambda: self.generate_mean_intensity_map())
+        self.ui.pushButtonVBSE.clicked.connect(lambda: self.generate_rgb_vbse())
+
     def getOptions(self) -> dict:
         return {
             "x-start": self.ui.spinBoxXstart.value(),
@@ -103,18 +111,31 @@ class RegionOfInteresDialog(QDialog):
             "y-end": self.ui.spinBoxYend.value(),
         }
 
-    def plot(self):
+    def generate_mean_intensity_map(self):
 
-        #generate VBSE image
-        self.vbse_gen = generators.VirtualBSEGenerator(self.s)
-        self.vbse_rgb = self.vbse_gen.get_rgb_image(r=(3, 1), b=(3, 2), g=(3, 3))
-        self.vbse_rgb.change_dtype("uint8")
+        mean_intensity = self.s.mean(axis=(2, 3))
+        mean_image = mean_intensity
+        #mean_intensity_image = np.uint8(mean_intensity.data/mean_intensity.data.max()*255)
+        #mean_image = mean_intensity_image
+        #mean_image = exposure.equalize_adapthist(img_as_ubyte(mean_intensity_image))
+
+        self.plot(mean_image)
+
+    def generate_rgb_vbse(self):
+        
+        vbse_gen = generators.VirtualBSEGenerator(self.s)
+        vbse_rgb = vbse_gen.get_rgb_image(r=(3, 1), b=(3, 2), g=(3, 3))
+        vbse_rgb.change_dtype("uint8")
+
+        self.plot(vbse_rgb)
+    
+    def plot(self, image):
 
         #image = mpimg.imread()
         self.ui.mplWidget.vbl.setContentsMargins(0, 0, 0, 0)
         self.ui.mplWidget.canvas.ax.clear()
         self.ui.mplWidget.canvas.ax.axis(False)
-        self.ui.mplWidget.canvas.ax.imshow(self.vbse_rgb)
+        self.ui.mplWidget.canvas.ax.imshow(image, cmap="gray")
         self.ui.mplWidget.canvas.draw()
 
         self.rs = RectangleSelector(self.ui.mplWidget.canvas.ax, self.line_select_callback,
