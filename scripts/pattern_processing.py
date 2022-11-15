@@ -39,8 +39,6 @@ class PatternProcessingDialog(QDialog):
 
         self.gaussian_window = filters.Window("gaussian", std=1)
 
-        self.options = self.getOptions()
-
         self.fileBrowser = FileBrowser(
             mode=FileBrowser.SaveFile,
             dirpath=self.working_dir,
@@ -103,7 +101,6 @@ class PatternProcessingDialog(QDialog):
     def preview_processing(self):
 
         self.s_prev = self.s.inav[0:3, 0:3]
-        self.options = self.getOptions()
 
         if self.ui.staticBackgroundBox.isChecked():
             self.remove_static(dataset=self.s_prev)
@@ -126,17 +123,16 @@ class PatternProcessingDialog(QDialog):
     def apply_processing(self):
 
         print("Applying processing ...")
-        self.options = self.getOptions()
 
         if self.ui.staticBackgroundBox.isChecked():
-            self.remove_static(dataset=self.s_prev)
-            print("Static removed")
+            self.remove_static(dataset=self.s)
+            print("Static background removed")
         if self.ui.dynamicBackgroundBox.isChecked():
-            self.remove_dynamic(dataset=self.s_prev)
-            print("Dynamic removed")
+            self.remove_dynamic(dataset=self.s)
+            print("Dynamic background removed")
         if self.ui.averageBox.isChecked():
-            self.average_neighbour(dataset=self.s_prev)
-            print("Average neighbour")
+            self.average_neighbour(dataset=self.s)
+            print("Averaging neighbouring patterns")
 
         # Get current save path
 
