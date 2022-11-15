@@ -20,6 +20,7 @@ from scripts.console import Console, Redirect
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
 
+from kikuchipy import load
 
 SYSTEM_VIEWER_FILTER = ["*.h5", "*.dat", "*.ang", "*.jpg", "*.png", "*.gif", "*.txt"] #, "*.bmp"
 
@@ -39,7 +40,7 @@ class AppWindow(QMainWindow):
         self.showMaximized()
         self.setupConnections()
         self.showImage()
-        self.threadPool = QThreadPool()
+        self.threadPool = QThreadPool.globalInstance()
 
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         self.systemModel = QFileSystemModel()
@@ -112,7 +113,6 @@ class AppWindow(QMainWindow):
         except Exception as e:
             self.console.errorwrite(f"Could not initialize ROI dialog:\n{str(e)}\n")
 
-
     def onSystemViewClicked(self, index):
         self.file_selected = self.systemModel.filePath(index)
         if splitext(self.file_selected)[1] in [".jpg", ".png", ".gif", ".bmp"]:
@@ -172,7 +172,7 @@ if __name__ == "__main__":
 
     # Redirect stdout to console.write and stderr to console.errorwrite
     redirect = Redirect(APP.console.errorwrite)
-    debug = True
+    debug = False
     if debug:
         APP.show()
         print(

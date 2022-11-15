@@ -4,6 +4,8 @@ from PySide6.QtWidgets import QDialog
 
 from utils.filebrowser import FileBrowser
 from utils.worker import Worker
+from utils.setting_file import SettingFile
+
 from ui.ui_pattern_processing_dialog import Ui_PatternProcessingWindow
 
 
@@ -65,21 +67,21 @@ class PatternProcessingDialog(QDialog):
     def setSavePath(self):
         if self.fileBrowser.getFile():
             self.save_path = self.fileBrowser.getPaths()[0]
-            self.ui.folderEdit.setText(path.dirname(self.save_path))
+            self.working_dir = path.dirname(self.save_path)
+            self.ui.folderEdit.setText(self.working_dir)
             self.ui.filenameEdit.setText(path.basename(self.save_path))
 
-    def getOptions(self) -> dict:
-        return {
-            "static": {
-                self.ui.staticBackgroundBox.isChecked(),
-            },
-            "dynamic": {
-                self.ui.dynamicBackgroundBox.isChecked(),
-            },
-            "average": {
-                self.ui.averageBox.isChecked(),
-            },
-        }
+    def setupInitialSettings(self):
+        self.sf = SettingFile(path.join(self.working_dir, "project_settings.txt"))
+
+        try:
+            self.rsb = self.sf.read("Remove static bacground")
+            self.rdb = self.sf.read("Remove dynamic bacground")
+            self.anp = self.sf.read("Average neighbour patterns")
+        except:
+            self.rsb = False
+            self.rdb = False
+            self.anp = False
 
     def remove_static(self, dataset):
         dataset.remove_static_background(show_progressbar=True)
@@ -126,16 +128,19 @@ class PatternProcessingDialog(QDialog):
         print("Applying processing ...")
         self.options = self.getOptions()
 
-        if self.options["static"]:
-            print(f"static : {self.options['static']}")
-            self.remove_static(dataset=self.s)
-        if self.options["dynamic"]:
-            print(f"dynamic : {self.options['dynamic']}")
-            self.remove_dynamic(dataset=self.s)
-        if self.options["average"]:
-            print(f"average : {self.options['average']}")
-            self.average_neighbour(dataset=self.s)
+        if self.ui.staticBackgroundBox.isChecked():
+            self.remove_static(dataset=self.s_prev)
+            print("Static removed")
+        if self.ui.dynamicBackgroundBox.isChecked():
+            self.remove_dynamic(dataset=self.s_prev)
+            print("Dynamic removed")
+        if self.ui.averageBox.isChecked():
+            self.average_neighbour(dataset=self.s_prev)
+            print("Average neighbour")
 
+        # Get current save path
+
+        self.save_path = path.join(self.working_dir, self.ui.filenameEdit.text())
         try:
             self.s.save(
                 self.save_path,

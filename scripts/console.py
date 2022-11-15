@@ -152,22 +152,23 @@ class Console(QtWidgets.QWidget):
         self.prompt = text
     
     def flush(self):
-        try: 
-            content_text = self.outdisplay.toPlainText()
-            content = content_text.split("\n")
-            found = 0
-            if len(content) == 0:
-                return
-            for i in range(len(content)-1, -1, -1):
-                if content[i] != "" and content[i][0] == '[':
-                    found += 1  
-                if found == 2:
-                    content.append("Found two progress_bars!!")
-                    del content[i]
-                    self.outdisplay.setPlainText("\n".join(content))
-                    break
-        except Exception as e:
-            pass
+        pass
+        # try: 
+        #     content_text = self.outdisplay.toPlainText()
+        #     content = content_text.split("\n")
+        #     found = 0
+        #     if len(content) == 0:
+        #         return
+        #     for i in range(len(content)-1, -1, -1):
+        #         if content[i] != "" and content[i][0] == '[':
+        #             found += 1  
+        #         if found == 2:
+        #             del content[i]
+        #             self.outdisplay.setPlainText("\n".join(content))
+        #             self.outdisplay.scroll(-1,-1)
+        #             break
+        # except Exception as e:
+        #     raise e
         #self.outdisplay.appendPlainText(str(len(content)).rstrip())
  
     def push(self, line: str) -> None:

@@ -1,6 +1,7 @@
 from kikuchipy import load
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+from os import path
 
 class SignalNavigation():
 

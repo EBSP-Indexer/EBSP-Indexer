@@ -44,10 +44,24 @@ class Ui_ROIDialog(object):
 
         self.verticalLayout_3.addItem(self.verticalSpacer)
 
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.label_6 = QLabel(self.centralwidget)
         self.label_6.setObjectName(u"label_6")
 
-        self.verticalLayout_3.addWidget(self.label_6)
+        self.horizontalLayout_4.addWidget(self.label_6)
+
+        self.imageShapeLabel = QLabel(self.centralwidget)
+        self.imageShapeLabel.setObjectName(u"imageShapeLabel")
+
+        self.horizontalLayout_4.addWidget(self.imageShapeLabel)
+
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_4)
+
+
+        self.verticalLayout_3.addLayout(self.horizontalLayout_4)
 
         self.line_2 = QFrame(self.centralwidget)
         self.line_2.setObjectName(u"line_2")
@@ -120,18 +134,12 @@ class Ui_ROIDialog(object):
 
         self.gridLayout_5.addLayout(self.verticalLayout_3, 2, 0, 1, 1)
 
-        self.mplWidget = MplWidget(self.centralwidget)
-        self.mplWidget.setObjectName(u"mplWidget")
-        self.mplWidget.setStyleSheet(u"background-color: transparent")
-
-        self.gridLayout_5.addWidget(self.mplWidget, 2, 1, 1, 1)
-
         self.buttonBox = QDialogButtonBox(self.centralwidget)
         self.buttonBox.setObjectName(u"buttonBox")
         self.buttonBox.setLayoutDirection(Qt.LeftToRight)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
 
-        self.gridLayout_5.addWidget(self.buttonBox, 4, 1, 1, 1)
+        self.gridLayout_5.addWidget(self.buttonBox, 4, 2, 1, 1)
 
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -188,6 +196,56 @@ class Ui_ROIDialog(object):
 
         self.gridLayout_5.addLayout(self.verticalLayout, 3, 0, 1, 1)
 
+        self.verticalLayout_2 = QVBoxLayout()
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalLayout_2.setSizeConstraint(QLayout.SetMinimumSize)
+        self.label_5 = QLabel(self.centralwidget)
+        self.label_5.setObjectName(u"label_5")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.label_5.sizePolicy().hasHeightForWidth())
+        self.label_5.setSizePolicy(sizePolicy1)
+
+        self.horizontalLayout_2.addWidget(self.label_5)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
+
+        self.pushButtonVBSE = QPushButton(self.centralwidget)
+        self.pushButtonVBSE.setObjectName(u"pushButtonVBSE")
+
+        self.horizontalLayout_2.addWidget(self.pushButtonVBSE)
+
+        self.pushButtonMIM = QPushButton(self.centralwidget)
+        self.pushButtonMIM.setObjectName(u"pushButtonMIM")
+
+        self.horizontalLayout_2.addWidget(self.pushButtonMIM)
+
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_3)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_2)
+
+        self.mplWidget = MplWidget(self.centralwidget)
+        self.mplWidget.setObjectName(u"mplWidget")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.mplWidget.sizePolicy().hasHeightForWidth())
+        self.mplWidget.setSizePolicy(sizePolicy2)
+        self.mplWidget.setStyleSheet(u"background-color: transparent")
+
+        self.verticalLayout_2.addWidget(self.mplWidget)
+
+
+        self.gridLayout_5.addLayout(self.verticalLayout_2, 2, 2, 1, 1)
+
 
         self.gridLayout.addLayout(self.gridLayout_5, 3, 0, 1, 1)
 
@@ -203,6 +261,7 @@ class Ui_ROIDialog(object):
     def retranslateUi(self, ROIDialog):
         ROIDialog.setWindowTitle(QCoreApplication.translate("ROIDialog", u"Region of interest", None))
         self.label_6.setText(QCoreApplication.translate("ROIDialog", u"Image shape:", None))
+        self.imageShapeLabel.setText(QCoreApplication.translate("ROIDialog", u"(x,x)", None))
         self.label_4.setText(QCoreApplication.translate("ROIDialog", u"y-end [px]", None))
         self.label_3.setText(QCoreApplication.translate("ROIDialog", u"y-start [px]", None))
         self.label_2.setText(QCoreApplication.translate("ROIDialog", u"x-end [px]", None))
@@ -211,5 +270,8 @@ class Ui_ROIDialog(object):
         self.folderEdit.setText(QCoreApplication.translate("ROIDialog", u"TextLabel", None))
         self.filenameLabel.setText(QCoreApplication.translate("ROIDialog", u"Filename:", None))
         self.browseButton.setText(QCoreApplication.translate("ROIDialog", u"Browse", None))
+        self.label_5.setText(QCoreApplication.translate("ROIDialog", u"Choose navigator:", None))
+        self.pushButtonVBSE.setText(QCoreApplication.translate("ROIDialog", u"VBSE Image", None))
+        self.pushButtonMIM.setText(QCoreApplication.translate("ROIDialog", u"Mean intensity map", None))
     # retranslateUi
 
