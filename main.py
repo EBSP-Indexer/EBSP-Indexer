@@ -1,5 +1,6 @@
 import sys
 from os.path import basename, splitext
+from os import startfile
 from contextlib import redirect_stdout, redirect_stderr
 from PySide6.QtCore import QDir, QThreadPool, Qt, Signal
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
@@ -7,6 +8,7 @@ from PySide6.QtGui import QFont, QKeyEvent
 from scripts.hough_indexing import HiSetupDialog
 from ui.ui_main_window import Ui_MainWindow
 import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
 
 from utils.filebrowser import FileBrowser
 from utils.setting_file import SettingFile
@@ -14,6 +16,7 @@ from utils.setting_file import SettingFile
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.signal_navigation import SignalNavigation
 from scripts.dictionary_indexing import DiSetupDialog
+from scripts.pre_indexing_maps import PreIndexingMapsDialog
 
 # from scripts.interpreter import ConsoleWidget
 from scripts.console import Console, Redirect
@@ -59,6 +62,8 @@ class AppWindow(QMainWindow):
         )
         self.ui.systemViewer.keyReleaseEvent = self.onKeyReleaseEvent
 
+        self.ui.systemViewer.doubleClicked.connect(lambda: self.openTextFile())
+
         self.ui.actionSignalNavigation.triggered.connect(
             lambda: self.selectSignalNavigation()
         )
@@ -70,6 +75,9 @@ class AppWindow(QMainWindow):
         )
         self.ui.actionPattern_Center.triggered.connect(
             lambda: self.selectPatternCenter()
+        )
+        self.ui.actionPre_indexing_maps.triggered.connect(
+            lambda: self.selectPreIndexingMaps()
         )
 
     def onKeyReleaseEvent(self, event):
@@ -107,11 +115,25 @@ class AppWindow(QMainWindow):
 
     def selectROI(self):
         try:
+            plt.close("all")
+        except Exception as e:
+            print(e)
+            pass
+        try:
             self.ROIDialog = RegionOfInteresDialog(parent=self, pattern_path=self.file_selected)
             self.ROIDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.ROIDialog.exec()
         except Exception as e:
             self.console.errorwrite(f"Could not initialize ROI dialog:\n{str(e)}\n")
+
+    def selectPreIndexingMaps(self):
+        try:
+            self.PreInMapDialog = PreIndexingMapsDialog(parent=self, pattern_path=self.file_selected)
+            self.PreInMapDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+            self.PreInMapDialog.exec()
+        except Exception as e:
+            self.console.errorwrite(f"Could not initialize pre-indexing maps generation dialog:\n{str(e)}\n")
+
 
     def onSystemViewClicked(self, index):
         self.file_selected = self.systemModel.filePath(index)
@@ -119,6 +141,12 @@ class AppWindow(QMainWindow):
             self.showImage(self.file_selected)
         else:
             self.showImage()
+
+    def openTextFile(self):
+        index = self.ui.systemViewer.currentIndex()
+        self.file_selected = self.systemModel.filePath(index)
+        if splitext(self.file_selected)[1] in [".txt"]:
+            startfile(self.file_selected)
 
     def selectSignalNavigation(self):
         try:
@@ -164,6 +192,8 @@ class AppWindow(QMainWindow):
         self.ui.MplWidget.canvas.ax.axis(False)
         self.ui.MplWidget.canvas.ax.imshow(image)
         self.ui.MplWidget.canvas.draw()
+
+
         
 
 if __name__ == "__main__":
