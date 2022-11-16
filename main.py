@@ -1,6 +1,6 @@
 import sys
 from os.path import basename, splitext
-from os import startfile
+# from os import startfile #Does not work on mac...
 from contextlib import redirect_stdout, redirect_stderr
 from PySide6.QtCore import QDir, QThreadPool, Qt, Signal
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
@@ -17,6 +17,7 @@ from scripts.pattern_processing import PatternProcessingDialog
 from scripts.signal_navigation import SignalNavigation
 from scripts.dictionary_indexing import DiSetupDialog
 from scripts.pre_indexing_maps import PreIndexingMapsDialog
+from scripts.advanced_settings import AdvancedSettingsDialog
 
 # from scripts.interpreter import ConsoleWidget
 from scripts.console import Console, Redirect
@@ -54,6 +55,9 @@ class AppWindow(QMainWindow):
     def setupConnections(self):
         self.ui.actionOpen_Workfolder.triggered.connect(
             lambda: self.selectWorkingDirectory()
+        )
+        self.ui.actionSettings.triggered.connect(
+            lambda: self.openSettings()
         )
         self.ui.actionProcessingMenu.triggered.connect(lambda: self.selectProcessing())
         self.ui.actionROI.triggered.connect(lambda: self.selectROI())
@@ -101,6 +105,15 @@ class AppWindow(QMainWindow):
 
             self.ui.folderLabel.setText(basename(self.working_dir))
             self.setWindowTitle(f"EBSD-GUI - {self.working_dir}")
+        
+    def openSettings(self):
+        try:
+            self.settingsDialog = AdvancedSettingsDialog(parent=self)
+            self.settingsDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+            self.settingsDialog.exec()
+        except Exception as e:
+            self.console.errorwrite(f"Could not initialize settings dialog:\n{str(e)}\n")
+
 
     def selectProcessing(self):
         try:
@@ -144,8 +157,10 @@ class AppWindow(QMainWindow):
     def openTextFile(self):
         index = self.ui.systemViewer.currentIndex()
         self.file_selected = self.systemModel.filePath(index)
+        """
         if splitext(self.file_selected)[1] in [".txt"]:
             startfile(self.file_selected)
+        """
 
     def selectSignalNavigation(self):
         try:

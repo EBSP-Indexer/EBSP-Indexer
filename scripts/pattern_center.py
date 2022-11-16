@@ -16,7 +16,7 @@ from orix.crystal_map import Phase
 
 from utils.filebrowser import FileBrowser
 from utils.setting_file import SettingFile
-from ui.ui_pattern_center import Ui_PatternCenterDialog
+from ui.ui_pattern_center import Ui_PatternCenter
 
 from mplwidget import MplWidget
 
@@ -33,13 +33,12 @@ def find_hkl(phase):
     #    return [[1, 1, 0], [2, 0, 0], [1, 0, 1], [2, 1, 0], [1, 1, 1], [2, 2, 0], [2, 1, 1]]
 
 
-#TODO: Better way to load file from file browser widget.
 class PatterCenterDialog(QDialog):
     def __init__(self, parent=None, file_selected=None):
         super().__init__(parent)
         self.file_selected = file_selected
         self.setting_path = self.findSettingsFile()
-        self.ui = Ui_PatternCenterDialog()
+        self.ui = Ui_PatternCenter()
         self.ui.setupUi(self)
         self.setupConnections()
         self.setupCalibrationPatterns()
