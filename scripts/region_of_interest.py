@@ -7,8 +7,8 @@ from ui.ui_roi_dialog import Ui_ROIDialog
 
 from matplotlib.widgets import RectangleSelector
 import numpy as np
-import matplotlib.pyplot as plt
-from skimage import exposure, img_as_ubyte
+#import matplotlib.pyplot as plt
+#from skimage import exposure, img_as_ubyte
 
 #TODO: show image shape in dialog window
 #TODO: let user change rectangle shape with spinBox
