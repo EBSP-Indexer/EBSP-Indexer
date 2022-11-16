@@ -155,6 +155,8 @@
      <string>File</string>
     </property>
     <addaction name="actionOpen_Workfolder"/>
+    <addaction name="separator"/>
+    <addaction name="actionSettings"/>
    </widget>
    <widget class="QMenu" name="menuProcessing">
     <property name="title">
@@ -166,9 +168,10 @@
    </widget>
    <widget class="QMenu" name="menuPlot">
     <property name="title">
-     <string>Plotting</string>
+     <string>Pattern inspection</string>
     </property>
     <addaction name="actionSignalNavigation"/>
+    <addaction name="actionPre_indexing_maps"/>
    </widget>
    <widget class="QMenu" name="menuDictionary_indexing">
     <property name="title">
@@ -193,7 +196,7 @@
   </action>
   <action name="actionProcessingMenu">
    <property name="text">
-    <string>N/S improvement</string>
+    <string>Noise-to-signal improvement</string>
    </property>
    <property name="statusTip">
     <string>Perform processing on a pattern</string>
@@ -211,17 +214,27 @@
   </action>
   <action name="actionPattern_Center">
    <property name="text">
-    <string>Pattern center</string>
+    <string>Refine pattern center</string>
    </property>
   </action>
   <action name="actionROI">
    <property name="text">
-    <string>ROI</string>
+    <string>Choose region of interest</string>
    </property>
   </action>
   <action name="actionHough_indexing">
    <property name="text">
     <string>Hough indexing</string>
+   </property>
+  </action>
+  <action name="actionPre_indexing_maps">
+   <property name="text">
+    <string>Generate pre-indexing maps</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
    </property>
   </action>
  </widget>
