@@ -61,7 +61,6 @@ class AppWindow(QMainWindow):
             lambda index: self.onSystemViewClicked(index)
         )
         self.ui.systemViewer.keyReleaseEvent = self.onKeyReleaseEvent
-
         self.ui.systemViewer.doubleClicked.connect(lambda: self.openTextFile())
 
         self.ui.actionSignalNavigation.triggered.connect(
