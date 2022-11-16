@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'pattern_center.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.3.2
+## Created by: Qt User Interface Compiler version 6.4.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -15,11 +15,11 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QDialog,
-    QDialogButtonBox, QDoubleSpinBox, QFrame, QGridLayout,
-    QHBoxLayout, QLabel, QListWidget, QListWidgetItem,
-    QPushButton, QSizePolicy, QSpacerItem, QToolButton,
-    QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QComboBox,
+    QDialog, QDialogButtonBox, QDoubleSpinBox, QFrame,
+    QGridLayout, QHBoxLayout, QLabel, QListWidget,
+    QListWidgetItem, QPushButton, QSizePolicy, QSpacerItem,
+    QToolButton, QVBoxLayout, QWidget)
 
 from mplwidget import MplWidget
 
@@ -27,7 +27,7 @@ class Ui_PatternCenterDialog(object):
     def setupUi(self, PatternCenterDialog):
         if not PatternCenterDialog.objectName():
             PatternCenterDialog.setObjectName(u"PatternCenterDialog")
-        PatternCenterDialog.resize(706, 544)
+        PatternCenterDialog.resize(683, 482)
         self.horizontalLayout_2 = QHBoxLayout(PatternCenterDialog)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.verticalLayout_3 = QVBoxLayout()
@@ -35,6 +35,7 @@ class Ui_PatternCenterDialog(object):
         self.MplWidget = MplWidget(PatternCenterDialog)
         self.MplWidget.setObjectName(u"MplWidget")
         self.MplWidget.setMinimumSize(QSize(400, 400))
+        self.MplWidget.setStyleSheet(u"background-color: transparent")
 
         self.verticalLayout_3.addWidget(self.MplWidget)
 
@@ -185,6 +186,42 @@ class Ui_PatternCenterDialog(object):
 
         self.verticalLayout.addLayout(self.gridLayout_2)
 
+        self.horizontalLayout_8 = QHBoxLayout()
+        self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
+        self.conventionLabel = QLabel(PatternCenterDialog)
+        self.conventionLabel.setObjectName(u"conventionLabel")
+
+        self.horizontalLayout_8.addWidget(self.conventionLabel)
+
+        self.conventionBox = QComboBox(PatternCenterDialog)
+        self.conventionBox.addItem("")
+        self.conventionBox.addItem("")
+        self.conventionBox.setObjectName(u"conventionBox")
+
+        self.horizontalLayout_8.addWidget(self.conventionBox)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_8)
+
+        self.line_3 = QFrame(PatternCenterDialog)
+        self.line_3.setObjectName(u"line_3")
+        self.line_3.setFrameShape(QFrame.HLine)
+        self.line_3.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout.addWidget(self.line_3)
+
+        self.workingDistanceLabel = QLabel(PatternCenterDialog)
+        self.workingDistanceLabel.setObjectName(u"workingDistanceLabel")
+
+        self.verticalLayout.addWidget(self.workingDistanceLabel)
+
+        self.line_2 = QFrame(PatternCenterDialog)
+        self.line_2.setObjectName(u"line_2")
+        self.line_2.setFrameShape(QFrame.HLine)
+        self.line_2.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout.addWidget(self.line_2)
+
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.buttonPlot = QPushButton(PatternCenterDialog)
@@ -238,11 +275,13 @@ class Ui_PatternCenterDialog(object):
         self.buttonBox.setSizePolicy(sizePolicy4)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
 
-        self.verticalLayout.addWidget(self.buttonBox, 0, Qt.AlignRight|Qt.AlignVCenter)
+        self.verticalLayout.addWidget(self.buttonBox, 0, Qt.AlignRight)
 
 
         self.horizontalLayout_2.addLayout(self.verticalLayout)
 
+        self.horizontalLayout_2.setStretch(0, 3)
+        self.horizontalLayout_2.setStretch(1, 1)
 
         self.retranslateUi(PatternCenterDialog)
 
@@ -257,9 +296,14 @@ class Ui_PatternCenterDialog(object):
         self.bandButton.setText(QCoreApplication.translate("PatternCenterDialog", u"Show bands", None))
         self.buttonAddPhase.setText(QCoreApplication.translate("PatternCenterDialog", u"Add Phase", None))
         self.buttonRemovePhase.setText(QCoreApplication.translate("PatternCenterDialog", u"Remove Phase", None))
-        self.labelXStar.setText(QCoreApplication.translate("PatternCenterDialog", u"X-Star", None))
-        self.labelYStar.setText(QCoreApplication.translate("PatternCenterDialog", u"Y-Star", None))
-        self.labelZStar.setText(QCoreApplication.translate("PatternCenterDialog", u"Z-Star", None))
+        self.labelXStar.setText(QCoreApplication.translate("PatternCenterDialog", u"X (%):", None))
+        self.labelYStar.setText(QCoreApplication.translate("PatternCenterDialog", u"Y (%):", None))
+        self.labelZStar.setText(QCoreApplication.translate("PatternCenterDialog", u"Z (%):", None))
+        self.conventionLabel.setText(QCoreApplication.translate("PatternCenterDialog", u"PC Convention", None))
+        self.conventionBox.setItemText(0, QCoreApplication.translate("PatternCenterDialog", u"BRUKER", None))
+        self.conventionBox.setItemText(1, QCoreApplication.translate("PatternCenterDialog", u"TSL", None))
+
+        self.workingDistanceLabel.setText(QCoreApplication.translate("PatternCenterDialog", u"Working Distance (mm): 0.0", None))
         self.buttonPlot.setText(QCoreApplication.translate("PatternCenterDialog", u"Plot", None))
         self.buttonTune.setText(QCoreApplication.translate("PatternCenterDialog", u"Tune", None))
         self.labelMisfit.setText(QCoreApplication.translate("PatternCenterDialog", u"Misfit (\u00b0): 0.0000", None))

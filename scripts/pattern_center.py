@@ -61,42 +61,38 @@ class PatterCenterDialog(QDialog):
             return setting_path
 
     def setupInitialSettings(self):
-        self.setting_file = SettingFile(path.join(path.dirname(self.setting_path),"project_settings.txt"))
+        self.project_settings_file = SettingFile(path.join(path.dirname(self.setting_path),"project_settings.txt"))
         
         try:
-            self.convention = self.sf.read["Convention"]
-
+            self.convention = self.project_settings_file.read("Convention")
         except:
             self.convention = "TSL"
-
-        print(self.convention)
         
         try:
             self.pc = [
-                    float(self.setting_file.read("X star")),
-                    float(self.setting_file.read("Y star")),
-                    float(self.setting_file.read("Z star")),
+                    float(self.project_settings_file.read("X star")),
+                    float(self.project_settings_file.read("Y star")),
+                    float(self.project_settings_file.read("Z star")),
             ]
-
         except:
             self.pc = np.array([0.5000, 0.7000, 0.5000])
         
         if self.convention == "TSL":
             #Store TSL convention in BRUKER convention
             self.pc[1] = 1 - self.pc[1]
-
+            self.ui.conventionBox.setCurrentIndex(1)
         self.updatePCSpinBox()
         
         self.mp_paths = {}
         i = 1
-
         while True:
             try:
-                mp_path = self.setting_file.read("Master pattern " + str(i))
+                mp_path = self.project_settings_file.read("Master pattern " + str(i))
                 phase = mp_path.split("/").pop()
                 self.mp_paths[phase] = mp_path
                 self.ui.listPhases.addItem(phase)
                 i += 1
+                self.phase = phase
             except:
                 break
 
@@ -112,6 +108,9 @@ class PatterCenterDialog(QDialog):
 
         self.s_cal.remove_static_background()
         self.s_cal.remove_dynamic_background()
+
+        working_distance = self.s_cal.metadata.Acquisition_instrument.SEM.working_distance
+        self.ui.workingDistanceLabel.setText("Working Distance (mm): "+str(working_distance))
 
         self.indexer = ebsd_index.EBSDIndexer(
             phaselist=["FCC", "BCC"],
@@ -139,10 +138,11 @@ class PatterCenterDialog(QDialog):
         self.ui.toolButtonRight.clicked.connect(lambda: self.nextPattern())
         self.ui.buttonTune.clicked.connect(lambda: self.refinePatternCenter())
         self.ui.buttonPlot.clicked.connect(lambda: self.plotClicked())
-        self.ui.buttonBox.accepted.connect(lambda: self.saveAndExit())
-        self.ui.buttonBox.rejected.connect(lambda: self.reject())
+        self.ui.buttonBox.clicked.connect(lambda: self.saveAndExit())
+        self.ui.buttonBox.clicked.connect(lambda: self.reject())
         self.ui.bandButton.clicked.connect(lambda: self.bandButtonClicked())
         self.ui.ignoreCheckBox.clicked.connect(lambda: self.ignoreButtonClicked())
+        self.ui.conventionBox.currentTextChanged.connect(lambda: self.updatePCConvention())
 
     def previousPattern(self):
         if self.pattern_index > 0:
@@ -193,11 +193,11 @@ class PatterCenterDialog(QDialog):
             mp_path = self.fileBrowserOD.getPaths()[0]
             phase = mp_path.split("/").pop()
             self.fileBrowserOD.setDefaultDir(path.dirname(mp_path))
-
             if phase not in self.mp_paths.keys():
                 self.mp_paths[phase] = mp_path
                 self.ui.listPhases.addItem(phase)
                 self.is_mp_paths_updated = True
+            self.phase = phase
 
     def removePhase(self):
         self.mp_paths.pop(str(self.ui.listPhases.currentItem().text()))
@@ -219,7 +219,11 @@ class PatterCenterDialog(QDialog):
             self.pc[1] = self.ui.spinBoxY.value()
         elif self.convention == "TSL":
             self.pc[1] = 1 - self.ui.spinBoxY.value()
-        
+    
+    def updatePCConvention(self):
+        self.convention = self.ui.conventionBox.currentText()
+        self.updatePCSpinBox()
+            
 
     def updatePCDict(self, pattern_index, phase, pc, pattern_ignored):
         self.pcs[pattern_index] = [phase, pc, pattern_ignored]
@@ -345,11 +349,11 @@ class PatterCenterDialog(QDialog):
         self.pattern_ignored = self.ui.ignoreCheckBox.checkState()
 
     def saveAndExit(self):
-        self.setting_file.delete_all_entries()  # clean up initial dictionary
+        self.project_settings_file.delete_all_entries()  # clean up initial dictionary
 
         ### Sample parameters
         for i, path in enumerate(self.mp_paths.values(), 1):
-            self.setting_file.write(f"Master pattern {i}", path)
+            self.project_settings_file.write(f"Master pattern {i}", path)
 
         x_average, y_average, z_average = 0, 0, 0
         n = 0
@@ -365,15 +369,15 @@ class PatterCenterDialog(QDialog):
         y_average = round(y_average/n, 4)
         z_average = round(z_average/n, 4)
 
-        self.setting_file.write("Convention", self.convention)
-        self.setting_file.write("X star", f"{x_average}")
+        self.project_settings_file.write("Convention", self.convention)
+        self.project_settings_file.write("X star", f"{x_average}")
         
         if self.convention == "BRUKER":
-            self.setting_file.write("Y star", f"{y_average}")
+            self.project_settings_file.write("Y star", f"{y_average}")
         elif self.convention == "TSL":
-            self.setting_file.write("Y star", f"{1-y_average}")
+            self.project_settings_file.write("Y star", f"{1-y_average}")
 
-        self.setting_file.write("Z star", f"{z_average}")
+        self.project_settings_file.write("Z star", f"{z_average}")
         
-        self.setting_file.save()
+        self.project_settings_file.save()
         self.close()
