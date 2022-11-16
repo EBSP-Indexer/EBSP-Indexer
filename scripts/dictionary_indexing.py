@@ -82,7 +82,7 @@ class DiSetupDialog(QDialog):
         # PC convention, default is TSL
 
         try:
-            self.convention = self.setting_file.read["Convention"]
+            self.convention = self.setting_file.read("Convention")
 
         except:
             self.convention = "TSL"
@@ -119,13 +119,9 @@ class DiSetupDialog(QDialog):
                 break
 
     def update_pc_convention(self):
-
         self.convention = self.ui.comboBoxConvention.currentText()
-
-        self.ui.patternCenterX.setValue(self.pc[0])
         self.ui.patternCenterY.setValue(1 - self.pc[1])
-        self.ui.patternCenterZ.setValue(self.pc[2])
-
+        
         self.updatePCArrayFrompatternCenter()
 
     def setupConnections(self):
