@@ -26,7 +26,7 @@ class SettingFile:
     
     def read(self, key):
         try:
-            return self.dict[key].strip()
+            return self.dict.get(key).strip()
         except:
             pass
             # warnings.warn(f"Could not read '{key}' from settings file.")

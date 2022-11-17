@@ -64,19 +64,24 @@ class DiSetupDialog(QDialog):
         # standard dictionary indexing kwargs
         self.di_kwargs = dict(metric="ncc", keep_n=20)
 
-        # read current setting from project_settings.txt
+        # read current setting from project_settings.txt, advanced_settings.txt
         self.setting_file = SettingFile(
             path.join(self.working_dir, "project_settings.txt")
         )
+        self.program_settings = SettingFile("advanced_settings.txt")
 
         # PC convention, default is TSL
         try:
             self.convention = self.setting_file.read("Convention")
-
         except:
+            self.convention = self.program_settings.read("Convetion")
+        else:
             self.convention = "TSL"
 
         self.ui.comboBoxConvention.setCurrentText(self.convention)
+
+        if self.program_settings.read("Lazy Loading") == "False":
+            self.ui.checkBoxLazy.setChecked(False)
 
         # Update pattern center to be displayed in UI
         try:
@@ -88,7 +93,7 @@ class DiSetupDialog(QDialog):
                 ]
             )
         except:
-            self.pc = np.array([0.400, 0.800, 0.400])
+            self.pc = np.array([0.400, 0.400, 0.400])
 
         self.updatePCpatternCenter()
 

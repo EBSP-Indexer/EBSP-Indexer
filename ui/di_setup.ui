@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>792</width>
-    <height>531</height>
+    <height>536</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -291,6 +291,9 @@
           </item>
           <item row="1" column="0">
            <widget class="QCheckBox" name="checkBoxLazy">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="text">
              <string>Lazy loading of patterns</string>
             </property>

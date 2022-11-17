@@ -68,27 +68,42 @@ class HiSetupDialog(QDialog):
         self.savefig_kwds = dict(pad_inches=0, bbox_inches="tight", dpi=150)
 
     def setupInitialSettings(self):
-        self.sf = SettingFile(path.join(self.working_dir, "project_settings.txt"))
+        self.setting_file = SettingFile(path.join(self.working_dir, "project_settings.txt"))
+        self.program_settings = SettingFile("advanced_settings.txt")
+
+        # PC convention, default is TSL
+        try:
+            self.convention = self.setting_file.read("Convention")
+        except:
+            self.convention = self.program_settings.read("Convetion")
+        else:
+            self.convention = "TSL"
 
         try:
             self.pc = np.array(
                 [
-                    float(self.sf.read("X star:")),
-                    float(self.sf.read("Y star:")),
-                    float(self.sf.read("Z star:")),
+                    float(self.setting_file.read("X star")),
+                    float(self.setting_file.read("Y star")),
+                    float(self.setting_file.read("Z star")),
                 ]
             )
+
+            if self.convention == "TSL":
+                self.pc[1] = 1 - self.pc[1]
         except:
             self.pc = np.array([0.000, 0.000, 0.000])
+    
 
         self.updatePCpatternCenter()
 
-        self.mpPaths = {}
+        if self.program_settings.read("Lazy Loading") == "False":
+            self.ui.checkBoxLazy.setChecked(False)
 
+        self.mpPaths = {}
         i = 1
         while True:
             try:
-                mpPath = self.sf.read("Master pattern " + str(i) + ":")
+                mpPath = self.setting_file.read("Master pattern " + str(i))
                 phase = mpPath.split("/").pop()
                 self.mpPaths[phase] = mpPath
                 self.ui.listWidgetPhase.addItem(phase)
@@ -98,14 +113,20 @@ class HiSetupDialog(QDialog):
 
     def updatePCpatternCenter(self):
         self.ui.patternCenterX.setValue(self.pc[0])
-        self.ui.patternCenterY.setValue(self.pc[1])
         self.ui.patternCenterZ.setValue(self.pc[2])
+        if self.convention == "BRUKER":
+            self.ui.patternCenterY.setValue(self.pc[1])
+        elif self.convention == "TSL":
+            self.ui.patternCenterY.setValue(1-self.pc[1])
 
     def updatePCArrayFrompatternCenter(self):
         self.pc[0] = self.ui.patternCenterX.value()
-        self.pc[1] = self.ui.patternCenterY.value()
         self.pc[2] = self.ui.patternCenterZ.value()
-
+        if self.convention == "BRUKER":
+            self.pc[1] = self.ui.patternCenterY.value()
+        elif self.covention == "TSL":
+            self.pc[1] = 1 - self.ui.patternCenterY.value()
+            
     def addPhase(self):
         if self.fileBrowserOD.getFile():
             mpPath = self.fileBrowserOD.getPaths()[0]
