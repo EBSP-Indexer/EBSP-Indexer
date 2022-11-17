@@ -350,7 +350,7 @@ class Ui_DiSetupDialog(object):
     # setupUi
 
     def retranslateUi(self, DiSetupDialog):
-        DiSetupDialog.setWindowTitle(QCoreApplication.translate("DiSetupDialog", u"Pattern Processing", None))
+        DiSetupDialog.setWindowTitle(QCoreApplication.translate("DiSetupDialog", u"Dictionary Indexing", None))
         self.label_9.setText(QCoreApplication.translate("DiSetupDialog", u"Phases:", None))
         self.pushButtonAddPhase.setText(QCoreApplication.translate("DiSetupDialog", u"Add Phase", None))
         self.pushButtonRemovePhase.setText(QCoreApplication.translate("DiSetupDialog", u"Remove Phase", None))

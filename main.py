@@ -20,7 +20,6 @@ from scripts.console import Console, Redirect
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
 
-from kikuchipy import load
 
 SYSTEM_VIEWER_FILTER = ["*.h5", "*.dat", "*.ang", "*.jpg", "*.png", "*.gif", "*.txt"] #, "*.bmp"
 
@@ -113,6 +112,7 @@ class AppWindow(QMainWindow):
         except Exception as e:
             self.console.errorwrite(f"Could not initialize ROI dialog:\n{str(e)}\n")
 
+
     def onSystemViewClicked(self, index):
         self.file_selected = self.systemModel.filePath(index)
         if splitext(self.file_selected)[1] in [".jpg", ".png", ".gif", ".bmp"]:
@@ -171,27 +171,14 @@ if __name__ == "__main__":
     APP = AppWindow()
 
     # Redirect stdout to console.write and stderr to console.errorwrite
-    redirect = Redirect(APP.console.errorwrite)
-    debug = False
-    if debug:
+    with redirect_stdout(APP.console), redirect_stderr(Redirect(APP.console.errorwrite)):
         APP.show()
         print(
             f"Multithreading with maximum {APP.threadPool.maxThreadCount()} threads"
         )
+        print("""Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'""")
         try:
             sys.exit(app.exec())
         except Exception as e:
             print(e)
             print("A clean exit was not performed")
-    else:
-        with redirect_stdout(APP.console), redirect_stderr(redirect):
-            APP.show()
-            print(
-                f"Multithreading with maximum {APP.threadPool.maxThreadCount()} threads"
-            )
-            print("""Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'""")
-            try:
-                sys.exit(app.exec())
-            except Exception as e:
-                print(e)
-                print("A clean exit was not performed")
