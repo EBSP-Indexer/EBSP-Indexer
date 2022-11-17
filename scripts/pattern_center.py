@@ -60,18 +60,20 @@ class PatterCenterDialog(QDialog):
             return setting_path
 
     def setupInitialSettings(self):
-        self.project_settings_file = SettingFile(path.join(path.dirname(self.setting_path),"project_settings.txt"))
-        
+        self.setting_file = SettingFile(path.join(path.dirname(self.setting_path),"project_settings.txt"))
+        self.program_settings = SettingFile("advanced_settings.txt")
         try:
-            self.convention = self.project_settings_file.read("Convention")
+            self.convention = self.setting_file.read("Convention")
         except:
+            self.convention = self.program_settings.read("Convention")
+        else:
             self.convention = "TSL"
         
         try:
             self.pc = [
-                    float(self.project_settings_file.read("X star")),
-                    float(self.project_settings_file.read("Y star")),
-                    float(self.project_settings_file.read("Z star")),
+                    float(self.setting_file.read("X star")),
+                    float(self.setting_file.read("Y star")),
+                    float(self.setting_file.read("Z star")),
             ]
         except:
             self.pc = np.array([0.5000, 0.7000, 0.5000])
@@ -86,7 +88,7 @@ class PatterCenterDialog(QDialog):
         i = 1
         while True:
             try:
-                mp_path = self.project_settings_file.read("Master pattern " + str(i))
+                mp_path = self.setting_file.read("Master pattern " + str(i))
                 phase = mp_path.split("/").pop()
                 self.mp_paths[phase] = mp_path
                 self.ui.listPhases.addItem(phase)
@@ -148,7 +150,7 @@ class PatterCenterDialog(QDialog):
             #Saves current phase in pcs dictionary
             self.pcs[self.pattern_index][0] = self.phase
             self.pcs[self.pattern_index][1] = self.pc
-            self.pcs[self.pattern_index][2] = self.ui.ignoreCheckBox.isChecked()
+            self.pcs[self.pattern_index][2] = self.pattern_ignored
 
             #Gets values for previous phase
             self.pattern_index -= 1
@@ -345,38 +347,44 @@ class PatterCenterDialog(QDialog):
             self.bands_enabled = False
     
     def ignoreButtonClicked(self):
-        self.pattern_ignored = self.ui.ignoreCheckBox.checkState()
+        if self.ui.ignoreCheckBox.isChecked():
+            self.pattern_ignored = True
+        else:
+            self.pattern_ignored = False
 
     def saveAndExit(self):
-        self.project_settings_file.delete_all_entries()  # clean up initial dictionary
+        self.setting_file.delete_all_entries()  # clean up initial dictionary
 
         ### Sample parameters
         for i, path in enumerate(self.mp_paths.values(), 1):
-            self.project_settings_file.write(f"Master pattern {i}", path)
+            self.setting_file.write(f"Master pattern {i}", path)
 
-        x_average, y_average, z_average = 0, 0, 0
+        x_sum, y_sum, z_sum = 0, 0, 0
         n = 0
         for i in range(self.nav_size):
             pattern_included = not self.pcs.get(i)[2]
             if self.pcs.get(i)[1][0] > 0 and pattern_included:
-                x_average += self.pcs.get(i)[1][0]
-                y_average += self.pcs.get(i)[1][1]
-                z_average += self.pcs.get(i)[1][2]
+                x, y, z = self.pcs.get(i)[1][0], self.pcs.get(i)[1][1], self.pcs.get(i)[1][2]
+                x_sum += x
+                y_sum += y
+                z_sum += z
                 n += 1
+                if self.program_settings.read("Individual PC data") == "True":
+                    self.setting_file.write("Calibration PC"+str(i), str([round(x, 4),round(y, 4), round(z, 4)]))
 
-        x_average = round(x_average/n, 4)
-        y_average = round(y_average/n, 4)
-        z_average = round(z_average/n, 4)
+        x_average = round(x_sum/n, 4)
+        y_average = round(y_sum/n, 4)
+        z_average = round(z_sum/n, 4)
 
-        self.project_settings_file.write("Convention", self.convention)
-        self.project_settings_file.write("X star", f"{x_average}")
+        self.setting_file.write("Convention", self.convention)
+        self.setting_file.write("X star", f"{x_average}")
         
         if self.convention == "BRUKER":
-            self.project_settings_file.write("Y star", f"{y_average}")
+            self.setting_file.write("Y star", f"{y_average}")
         elif self.convention == "TSL":
-            self.project_settings_file.write("Y star", f"{1-y_average}")
+            self.setting_file.write("Y star", f"{1-y_average}")
 
-        self.project_settings_file.write("Z star", f"{z_average}")
+        self.setting_file.write("Z star", f"{z_average}")
         
-        self.project_settings_file.save()
+        self.setting_file.save()
         self.close()

@@ -37,8 +37,8 @@ class AdvancedSettingsDialog(QDialog):
 
     def removeFileType(self):
         try:
-            self.ui.fileTypeList.takeItem(self.ui.fileTypeList.currentRow())
             self.file_types.remove(self.ui.fileTypeList.currentItem().text())
+            self.ui.fileTypeList.takeItem(self.ui.fileTypeList.currentRow())
         except:
             pass
 
@@ -109,7 +109,6 @@ class AdvancedSettingsDialog(QDialog):
         else: self.individual_PC_data = False
             
         if self.setting_file.read("Lazy Loading") == "True":
-            print("lazy True")
             self.ui.lazyLoadingBox.setChecked(True)
             self.lazy = True
         else: self.lazy = False
@@ -124,9 +123,10 @@ class AdvancedSettingsDialog(QDialog):
             self.ui.browseDirectoryButton.setDisabled(True)
         
     def saveSettings(self):
-        if exists(self.ui.directoryEdit.text()):
+        if exists(self.ui.directoryEdit.text()) and self.directory:
             self.directory = self.ui.directoryEdit.text()
-        else: self.directory = False
+        else:
+            self.directory = False
 
         self.setting_file.write("File Types", json.dumps(self.file_types))
         self.setting_file.write("Individual PC data", str(self.individual_PC_data))

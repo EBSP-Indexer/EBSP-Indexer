@@ -1,5 +1,6 @@
 import sys
-from os.path import basename, splitext
+import json
+from os.path import basename, splitext, exists
 # from os import startfile #Does not work on mac...
 from contextlib import redirect_stdout, redirect_stderr
 from PySide6.QtCore import QDir, QThreadPool, Qt, Signal
@@ -26,9 +27,6 @@ from scripts.region_of_interest import RegionOfInteresDialog
 
 from kikuchipy import load
 
-SYSTEM_VIEWER_FILTER = ["*.h5", "*.dat", "*.ang", "*.jpg", "*.png", "*.gif", "*.txt"] #, "*.bmp"
-
-
 class AppWindow(QMainWindow):
     """
     The main app window that is present at all times
@@ -43,7 +41,7 @@ class AppWindow(QMainWindow):
         self.ui.setupUi(self)
         self.showMaximized()
         self.setupConnections()
-        self.showImage()
+
         self.threadPool = QThreadPool.globalInstance()
 
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
@@ -51,6 +49,9 @@ class AppWindow(QMainWindow):
 
         self.console = Console(parent=self, context=globals())
         self.console.setfont(QFont("Lucida Sans Typewriter", 10))
+
+        self.showImage()
+        self.importSettings()
 
     def setupConnections(self):
         self.ui.actionOpen_Workfolder.triggered.connect(
@@ -93,19 +94,35 @@ class AppWindow(QMainWindow):
             self.working_dir = self.fileBrowserOD.getPaths()[0]
             self.file_selected = None
             self.fileBrowserOD.setDefaultDir(self.working_dir)
+            self.setSystemViewer(self.working_dir)
 
-            # Setting the system viewer
-            self.systemModel.setRootPath(self.working_dir)
-            self.systemModel.setNameFilters(SYSTEM_VIEWER_FILTER)
+    def setSystemViewer(self, working_dir):
+            self.systemModel.setRootPath(working_dir)
+            self.systemModel.setNameFilters(self.system_view_filter)
             self.systemModel.setNameFilterDisables(0)
             self.ui.systemViewer.setModel(self.systemModel)
-            self.ui.systemViewer.setRootIndex(self.systemModel.index(self.working_dir))
+            self.ui.systemViewer.setRootIndex(self.systemModel.index(working_dir))
             self.ui.systemViewer.setColumnWidth(0, 250)
             self.ui.systemViewer.hideColumn(2)
 
-            self.ui.folderLabel.setText(basename(self.working_dir))
-            self.setWindowTitle(f"EBSD-GUI - {self.working_dir}")
-        
+            self.ui.folderLabel.setText(basename(working_dir))
+            self.setWindowTitle(f"EBSD-GUI - {working_dir}")
+
+    def importSettings(self):
+        if exists("advanced_settings.txt"):
+            setting_file = SettingFile("advanced_settings.txt")
+            try:
+                file_types = json.loads(setting_file.read("File Types"))
+                self.system_view_filter = ["*" + x for x in file_types]
+            except:
+                self.system_view_filter = ["*.h5", "*.dat", "*.ang", "*.jpg", "*.png", "*.txt"]
+
+            if exists(setting_file.read("Default Directory")):
+                self.working_dir = setting_file.read("Default Directory")
+                self.setSystemViewer(self.working_dir)
+        else:
+            AdvancedSettingsDialog(parent=self).createSettingsFile()
+
     def openSettings(self):
         try:
             self.settingsDialog = AdvancedSettingsDialog(parent=self)
@@ -114,6 +131,16 @@ class AppWindow(QMainWindow):
         except Exception as e:
             self.console.errorwrite(f"Could not initialize settings dialog:\n{str(e)}\n")
 
+        #updates file browser to changes:
+        setting_file = SettingFile("advanced_settings.txt")
+        file_types = json.loads(setting_file.read("File Types"))
+        self.system_view_filter = ["*" + x for x in file_types]
+        if setting_file.read("Default Directory") not in ["False", ""]:
+            if self.working_dir == QDir.currentPath():
+                self.working_dir = setting_file.read("Default Directory")
+            self.setSystemViewer(self.working_dir)
+
+        self.systemModel.setNameFilters(self.system_view_filter)
 
     def selectProcessing(self):
         try:

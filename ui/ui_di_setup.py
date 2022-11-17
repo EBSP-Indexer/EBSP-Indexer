@@ -26,7 +26,7 @@ class Ui_DiSetupDialog(object):
     def setupUi(self, DiSetupDialog):
         if not DiSetupDialog.objectName():
             DiSetupDialog.setObjectName(u"DiSetupDialog")
-        DiSetupDialog.resize(792, 531)
+        DiSetupDialog.resize(792, 536)
         self.gridLayout_2 = QGridLayout(DiSetupDialog)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.centralwidget = QFrame(DiSetupDialog)
@@ -207,6 +207,7 @@ class Ui_DiSetupDialog(object):
 
         self.checkBoxLazy = QCheckBox(self.centralwidget)
         self.checkBoxLazy.setObjectName(u"checkBoxLazy")
+        self.checkBoxLazy.setEnabled(True)
         self.checkBoxLazy.setChecked(True)
 
         self.gridLayout_3.addWidget(self.checkBoxLazy, 1, 0, 1, 1)
