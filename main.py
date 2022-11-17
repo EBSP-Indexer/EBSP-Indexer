@@ -25,8 +25,6 @@ from scripts.console import Console, Redirect
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
 
-from kikuchipy import load
-
 class AppWindow(QMainWindow):
     """
     The main app window that is present at all times
@@ -57,9 +55,7 @@ class AppWindow(QMainWindow):
         self.ui.actionOpen_Workfolder.triggered.connect(
             lambda: self.selectWorkingDirectory()
         )
-        self.ui.actionSettings.triggered.connect(
-            lambda: self.openSettings()
-        )
+        self.ui.actionSettings.triggered.connect(lambda: self.openSettings())
         self.ui.actionProcessingMenu.triggered.connect(lambda: self.selectProcessing())
         self.ui.actionROI.triggered.connect(lambda: self.selectROI())
         self.ui.systemViewer.clicked.connect(
@@ -150,7 +146,9 @@ class AppWindow(QMainWindow):
             self.processingDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.processingDialog.exec()
         except Exception as e:
-            self.console.errorwrite(f"Could not initialize processing dialog:\n{str(e)}\n")
+            self.console.errorwrite(
+                f"Could not initialize processing dialog:\n{str(e)}\n"
+            )
 
     def selectROI(self):
         try:
@@ -159,7 +157,9 @@ class AppWindow(QMainWindow):
             print(e)
             pass
         try:
-            self.ROIDialog = RegionOfInteresDialog(parent=self, pattern_path=self.file_selected)
+            self.ROIDialog = RegionOfInteresDialog(
+                parent=self, pattern_path=self.file_selected
+            )
             self.ROIDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.ROIDialog.exec()
         except Exception as e:
@@ -167,12 +167,15 @@ class AppWindow(QMainWindow):
 
     def selectPreIndexingMaps(self):
         try:
-            self.PreInMapDialog = PreIndexingMapsDialog(parent=self, pattern_path=self.file_selected)
+            self.PreInMapDialog = PreIndexingMapsDialog(
+                parent=self, pattern_path=self.file_selected
+            )
             self.PreInMapDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.PreInMapDialog.exec()
         except Exception as e:
-            self.console.errorwrite(f"Could not initialize pre-indexing maps generation dialog:\n{str(e)}\n")
-
+            self.console.errorwrite(
+                f"Could not initialize pre-indexing maps generation dialog:\n{str(e)}\n"
+            )
 
     def onSystemViewClicked(self, index):
         self.file_selected = self.systemModel.filePath(index)
@@ -200,7 +203,9 @@ class AppWindow(QMainWindow):
                 dlg.setStandardButtons(QMessageBox.Ok)
                 dlg.setIcon(QMessageBox.Warning)
                 dlg.exec()
-            self.console.errorwrite(f"Could not initialize signal navigation:\n{str(e)}\n")
+            self.console.errorwrite(
+                f"Could not initialize signal navigation:\n{str(e)}\n"
+            )
 
     def selectDictionaryIndexingSetup(self):
         try:
@@ -208,7 +213,9 @@ class AppWindow(QMainWindow):
             self.diSetup.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.diSetup.show()
         except Exception as e:
-            self.console.errorwrite(f"Could not initialize dictionary indexing:\n{str(e)}\n")
+            self.console.errorwrite(
+                f"Could not initialize dictionary indexing:\n{str(e)}\n"
+            )
 
     def selectHoughIndexingSetup(self):
         try:
@@ -220,11 +227,15 @@ class AppWindow(QMainWindow):
 
     def selectPatternCenter(self):
         try:
-            self.patternCenter = PatterCenterDialog(parent=self, file_selected=self.file_selected)
+            self.patternCenter = PatterCenterDialog(
+                parent=self, file_selected=self.file_selected
+            )
             self.patternCenter.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.patternCenter.show()
         except Exception as e:
-            self.console.errorwrite(f"Could not initialize pattern center refinement:\n{str(e)}\n")
+            self.console.errorwrite(
+                f"Could not initialize pattern center refinement:\n{str(e)}\n"
+            )
 
     def showImage(self, imagePath="resources/kikuchipy_banner.png"):
         image = mpimg.imread(imagePath)
@@ -235,34 +246,21 @@ class AppWindow(QMainWindow):
         self.ui.MplWidget.canvas.draw()
 
 
-        
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     APP = AppWindow()
 
     # Redirect stdout to console.write and stderr to console.errorwrite
-    redirect = Redirect(APP.console.errorwrite)
-    debug = False
-    if debug:
+    with redirect_stdout(APP.console), redirect_stderr(
+        Redirect(APP.console.errorwrite)
+    ):
         APP.show()
+        print(f"Multithreading with maximum {APP.threadPool.maxThreadCount()} threads")
         print(
-            f"Multithreading with maximum {APP.threadPool.maxThreadCount()} threads"
+            """Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'"""
         )
         try:
             sys.exit(app.exec())
         except Exception as e:
             print(e)
             print("A clean exit was not performed")
-    else:
-        with redirect_stdout(APP.console), redirect_stderr(redirect):
-            APP.show()
-            print(
-                f"Multithreading with maximum {APP.threadPool.maxThreadCount()} threads"
-            )
-            print("""Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'""")
-            try:
-                sys.exit(app.exec())
-            except Exception as e:
-                print(e)
-                print("A clean exit was not performed")

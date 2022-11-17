@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Pattern Processing</string>
+   <string>Dictionary Indexing</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
@@ -338,9 +338,9 @@
         <item>
          <layout class="QGridLayout" name="gridLayout_5">
           <item row="1" column="0">
-           <widget class="QLabel" name="label_10">
+           <widget class="QLabel" name="nIterLabel">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="text">
              <string>Matching per iteration</string>
@@ -350,7 +350,7 @@
           <item row="0" column="1">
            <widget class="QDoubleSpinBox" name="doubleSpinBoxStepSize">
             <property name="minimum">
-             <double>0.010000000000000</double>
+             <double>1.000000000000000</double>
             </property>
             <property name="maximum">
              <double>3.000000000000000</double>
@@ -359,7 +359,7 @@
              <double>0.100000000000000</double>
             </property>
             <property name="value">
-             <double>2.000000000000000</double>
+             <double>1.600000000000000</double>
             </property>
            </widget>
           </item>
@@ -373,7 +373,7 @@
           <item row="1" column="1">
            <widget class="QSpinBox" name="spinBoxNumIter">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="maximum">
              <number>99</number>
@@ -428,42 +428,45 @@
            </widget>
           </item>
           <item row="3" column="0">
-           <widget class="QCheckBox" name="checkBoxVBSE">
+           <widget class="QCheckBox" name="checkBoxIPF">
             <property name="toolTip">
-             <string>Virtual backscatter image </string>
+             <string>Inverse pole figure</string>
             </property>
             <property name="toolTipDuration">
              <number>-1</number>
             </property>
             <property name="text">
-             <string>VBSE image</string>
+             <string>IPF</string>
             </property>
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QCheckBox" name="checkBoxADP">
+           <widget class="QCheckBox" name="checkBoxOSM">
             <property name="toolTip">
-             <string>Average dot product map</string>
+             <string>Orientation simmilairty map</string>
             </property>
             <property name="text">
-             <string>ADP map</string>
+             <string>OSM</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QCheckBox" name="checkBoxIQ">
+           <widget class="QCheckBox" name="checkBoxNCC">
             <property name="toolTip">
-             <string>Image quality map</string>
+             <string>Nomralized cross correlation</string>
             </property>
             <property name="text">
-             <string>IQ map</string>
+             <string>NCC</string>
             </property>
            </widget>
           </item>
           <item row="4" column="0">
-           <widget class="QCheckBox" name="checkBoxMI">
+           <widget class="QCheckBox" name="checkBoxPM">
+            <property name="toolTip">
+             <string>Phase map</string>
+            </property>
             <property name="text">
-             <string>Mean intensity image</string>
+             <string>Phase map</string>
             </property>
            </widget>
           </item>
