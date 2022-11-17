@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'di_setup.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.4.0
+## Created by: Qt User Interface Compiler version 6.3.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -350,7 +350,7 @@ class Ui_DiSetupDialog(object):
     # setupUi
 
     def retranslateUi(self, DiSetupDialog):
-        DiSetupDialog.setWindowTitle(QCoreApplication.translate("DiSetupDialog", u"Pattern Processing", None))
+        DiSetupDialog.setWindowTitle(QCoreApplication.translate("DiSetupDialog", u"Dictionary Indexing", None))
         self.label_9.setText(QCoreApplication.translate("DiSetupDialog", u"Phases:", None))
         self.pushButtonAddPhase.setText(QCoreApplication.translate("DiSetupDialog", u"Add Phase", None))
         self.pushButtonRemovePhase.setText(QCoreApplication.translate("DiSetupDialog", u"Remove Phase", None))

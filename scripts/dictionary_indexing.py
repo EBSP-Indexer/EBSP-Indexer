@@ -26,8 +26,9 @@ class DiSetupDialog(QDialog):
 
     def __init__(self, parent=None, pattern_path=None):
         super().__init__(parent)
-        # initate threadpool
+        # initate threadpool and output
         self.threadPool = QThreadPool.globalInstance()
+        self.console = parent.console
 
         # pattern path
         self.pattern_path = pattern_path
@@ -209,7 +210,7 @@ class DiSetupDialog(QDialog):
     # Call worker to start DI in separate thread
     def run_dictionary_indexing(self):
         # Pass the function to execute
-        di_worker = Worker(self.dictionary_indexing)
+        di_worker = Worker(fn = self.dictionary_indexing, output=self.console)
         # Execute
         self.threadPool.start(di_worker)
         self.accept()

@@ -1,3 +1,4 @@
+from contextlib import redirect_stderr, redirect_stdout
 from os import path, mkdir
 from PySide6.QtCore import QThreadPool
 from PySide6.QtWidgets import QDialog, QDialogButtonBox
@@ -5,10 +6,12 @@ from utils.setting_file import SettingFile
 
 from utils.filebrowser import FileBrowser
 from utils.worker import Worker
+from scripts.console import ThreadedStdout, Redirect
 from ui.ui_hi_setup import Ui_HISetupDialog
 
 import kikuchipy as kp
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
 import warnings
 from h5py import File
@@ -20,6 +23,7 @@ from pyebsdindex import ebsd_index
 
 # Ignore warnings to avoid crash with integrated console
 warnings.filterwarnings("ignore")
+
 
 class HiSetupDialog(QDialog):
 
@@ -35,6 +39,7 @@ class HiSetupDialog(QDialog):
     def __init__(self, parent, pattern_path=None):
         super().__init__(parent)
         self.threadPool = QThreadPool.globalInstance()
+        self.console = parent.console
         self.pattern_path = pattern_path
         self.pattern_name = path.splitext(path.basename(pattern_path))[0]
         self.working_dir = path.dirname(pattern_path)
@@ -44,7 +49,9 @@ class HiSetupDialog(QDialog):
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
 
+        self.load_pattern()
         self.setupInitialSettings()
+        self.setupBinningShapes()
 
         self.setupConnections()
         self.checkPhaseList()
@@ -122,8 +129,17 @@ class HiSetupDialog(QDialog):
         self.ui.pushButtonAddPhase.clicked.connect(lambda: self.addPhase())
         self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.removePhase())
 
+        self.ui.comboBoxConvention.currentTextChanged.connect(
+            lambda: self.update_pc_convention()
+        )
+
+        self.ui.horizontalSliderRho.valueChanged.connect(lambda: self.updateRho())
+
     def getOptions(self) -> dict:
         return {
+            "binning": self.ui.comboBoxBinning.currentText(),
+            "bands": self.ui.spinBoxBands.value(),
+            "rho": self.ui.horizontalSliderRho.value(),
             "phase_list": self.ui.listWidgetPhase.selectedItems(),
             "lazy": self.ui.checkBoxLazy.isChecked(),
             "pre": [self.ui.checkBoxPre.isChecked(), self.generate_pre_maps],
@@ -138,13 +154,93 @@ class HiSetupDialog(QDialog):
             ],
         }
 
+    def updateRho(self):
+        self.ui.labelRho.setText(f"{self.ui.horizontalSliderRho.value()}%")
+
     def checkPhaseList(self):
         flag = False
         if self.ui.listWidgetPhase.count() != 0:
             flag = True
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(flag)
-        print()  
-        print(self.mpPaths)
+
+    def setupInitialSettings(self):
+
+        # matplotlib settings
+        mpl.use("agg")
+        self.savefig_kwargs = dict(bbox_inches="tight", pad_inches=0, dpi=150)
+
+        # standard dictionary indexing kwargs
+        self.di_kwargs = dict(metric="ncc", keep_n=20)
+
+        # read current setting from project_settings.txt
+        self.setting_file = SettingFile(
+            path.join(self.working_dir, "project_settings.txt")
+        )
+
+        # PC convention, default is TSL
+
+        try:
+            self.convention = self.setting_file.read["Convention"]
+
+        except:
+            self.convention = "TSL"
+
+        # TODO: add convention read from settings file
+        self.ui.comboBoxConvention.setCurrentText(self.convention)
+
+        # Update pattern center to be displayed in UI
+        try:
+            self.pc = np.array(
+                [
+                    float(self.setting_file.read("X star")),
+                    float(self.setting_file.read("Y star")),
+                    float(self.setting_file.read("Z star")),
+                ]
+            )
+        except:
+            self.pc = np.array([0.400, 0.400, 0.400])
+
+        self.updatePCpatternCenter()
+
+        # Paths for master patterns
+        self.mpPaths = {}
+
+        i = 1
+        while True:
+            try:
+                mpPath = self.setting_file.read(f"Master pattern {i}")
+                phase = mpPath.split("/").pop()
+                self.mpPaths[phase] = mpPath
+                self.ui.listWidgetPhase.addItem(phase)
+                i += 1
+            except:
+                break
+
+    def update_pc_convention(self):
+
+        self.convention = self.ui.comboBoxConvention.currentText()
+
+        self.ui.patternCenterX.setValue(self.pc[0])
+        self.ui.patternCenterY.setValue(1 - self.pc[1])
+        self.ui.patternCenterZ.setValue(self.pc[2])
+
+        self.updatePCArrayFrompatternCenter()
+
+    def setupBinningShapes(self):
+        self.sig_shape = self.s.axes_manager.signal_shape[::-1]
+        self.bin_shapes = np.array([])
+        for num in range(10, self.sig_shape[0] + 1):
+            if self.sig_shape[0] % num == 0:
+                self.bin_shapes = np.append(self.bin_shapes, f"({num}, {num})")
+
+        self.ui.comboBoxBinning.addItems(self.bin_shapes[::-1])
+
+    def load_pattern(self):
+        # Load pattern-file to get acquisition resolution
+        try:
+            self.s = kp.load(self.pattern_path, lazy=True)
+        except Exception as e:
+            raise e
 
     def hough_indexing(self):
         for i in range(1, 100):
@@ -156,35 +252,43 @@ class HiSetupDialog(QDialog):
                 print(
                     f"Directory '{self.dir_out}' exists, will try to create directory '{self.dir_out[:-1] + str(i + 1)}'"
                 )
-
         self.updatePCArrayFrompatternCenter()
         options = self.getOptions()
         self.phases = [phase for phase, _ in self.mpPaths.items()]
         self.set_phases_properties()
-        try:
-            self.s = kp.load(filename=self.pattern_path, lazy=options["lazy"])
-        except Exception as e:
-            raise e
+        self.rho_mask = (100.0 - options["rho"]) / 100.0
+        self.number_bands = options["bands"]
         optionEnabled, optionExecute = options["pre"]
         if optionEnabled:
             optionExecute()
         self.sig_shape = self.s.axes_manager.signal_shape[::-1]
-        self.s.save(
+        self.nav_shape = self.s.axes_manager.navigation_shape
+        self.new_signal_shape = eval(options["binning"])
+        self.s2 = self.s.rebin(new_shape=self.nav_shape + self.new_signal_shape)
+        self.s2.rescale_intensity(dtype_out=np.uint8)
+        self.s2.save(
             path.join(self.dir_out, "pattern.h5")
         )  # Not sure if the file must be converted to H5
         file_h5 = File(path.join(self.dir_out, "pattern.h5"), mode="r")
         dset_h5 = file_h5["Scan 1/EBSD/Data/patterns"]
-        print(f"Dataset has shape: {dset_h5.shape}")  # Navigation dimension is flattened
+        print(
+            f"Dataset has shape: {dset_h5.shape}"
+        )  # Navigation dimension is flattened
 
-        sample_tilt = self.s.detector.sample_tilt
-        camera_tilt = self.s.detector.tilt
+        sample_tilt = self.s2.detector.sample_tilt
+        camera_tilt = self.s2.detector.tilt
+
+        if self.convention == "TSL":
+            self.convention = "EDAX"
 
         indexer = ebsd_index.EBSDIndexer(
             phaselist=self.phase_proxys,
-            vendor="EDAX",
+            vendor=self.convention,
             PC=self.pc,
             sampleTilt=sample_tilt,
             camElev=camera_tilt,
+            rhoMaskFrac=self.rho_mask,
+            nBands=self.number_bands,
             patDim=self.sig_shape,
         )
 
@@ -194,9 +298,9 @@ class HiSetupDialog(QDialog):
 
         # Generate CrystalMap from best match
         xy, _ = create_coordinate_arrays(
-            shape=self.s.axes_manager.navigation_shape[::-1],
+            shape=self.s2.axes_manager.navigation_shape[::-1],
             step_sizes=tuple(
-                i.scale for i in self.s.axes_manager.navigation_axes[::-1]
+                i.scale for i in self.s2.axes_manager.navigation_axes[::-1]
             ),
         )
 
@@ -235,10 +339,7 @@ class HiSetupDialog(QDialog):
         print(f"Finished indexing {self.pattern_name}")
 
     def run_hough_indexing(self):
-        #self.hough_indexing()
-        # Pass the function to execute
-        hi_worker = Worker(lambda: self.hough_indexing())
-        # # Execute
+        hi_worker = Worker(fn=self.hough_indexing, output=self.console)
         self.threadPool.start(hi_worker)
 
     def set_phases_properties(self):
@@ -300,9 +401,7 @@ class HiSetupDialog(QDialog):
         print("Generating phase map ...")
         try:
             fig = self.xmap.plot(return_figure=True, remove_padding=True)
-            fig.savefig(
-                path.join(self.dir_out, "maps_phase.png"), **self.savefig_kwds
-            )
+            fig.savefig(path.join(self.dir_out, "maps_phase.png"), **self.savefig_kwds)
         except Exception as e:
             raise e
 
@@ -333,5 +432,3 @@ class HiSetupDialog(QDialog):
                 )
         except Exception as e:
             raise e
-
-

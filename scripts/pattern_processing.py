@@ -1,6 +1,7 @@
 from os import path
 from kikuchipy import load, filters, generators
 from PySide6.QtWidgets import QDialog
+from PySide6.QtCore import QThreadPool
 
 from utils.filebrowser import FileBrowser
 from utils.worker import Worker
@@ -13,7 +14,8 @@ class PatternProcessingDialog(QDialog):
     def __init__(self, parent=None, pattern_path=None):
         super().__init__(parent)
 
-        self.threadPool = parent.threadPool
+        self.threadPool = QThreadPool.globalInstance()
+        self.console = parent.console
         self.working_dir = path.dirname(pattern_path)
 
         self.pattern_path = pattern_path
@@ -60,7 +62,6 @@ class PatternProcessingDialog(QDialog):
             lambda: self.preview_processing()
         )
         self.ui.averageBox.stateChanged.connect(lambda: self.preview_processing())
-        
 
     def setSavePath(self):
         if self.fileBrowser.getFile():
@@ -114,9 +115,7 @@ class PatternProcessingDialog(QDialog):
         del self.s_prev
 
     def run_processing(self):
-        # Pass the function to execute
-        worker = Worker(self.apply_processing)
-        # Execute
+        worker = Worker(fn=self.apply_processing, output=self.console)
         self.threadPool.start(worker)
         self.accept()
 
