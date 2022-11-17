@@ -1,5 +1,0 @@
-File Types:	[".h5", ".dat", ".ang", ".jpg", ".png", ".txt", ".bmp"]
-Individual PC data:	True
-Convention:	TSL
-Lazy Loading:	True
-Default Directory:	/Users/olavletholsen/EBSD-data/DI-dataset
