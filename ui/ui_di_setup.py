@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'di_setup.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.3.2
+## Created by: Qt User Interface Compiler version 6.4.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -245,18 +245,18 @@ class Ui_DiSetupDialog(object):
 
         self.gridLayout_5 = QGridLayout()
         self.gridLayout_5.setObjectName(u"gridLayout_5")
-        self.label_10 = QLabel(self.centralwidget)
-        self.label_10.setObjectName(u"label_10")
-        self.label_10.setEnabled(True)
+        self.nIterLabel = QLabel(self.centralwidget)
+        self.nIterLabel.setObjectName(u"nIterLabel")
+        self.nIterLabel.setEnabled(False)
 
-        self.gridLayout_5.addWidget(self.label_10, 1, 0, 1, 1)
+        self.gridLayout_5.addWidget(self.nIterLabel, 1, 0, 1, 1)
 
         self.doubleSpinBoxStepSize = QDoubleSpinBox(self.centralwidget)
         self.doubleSpinBoxStepSize.setObjectName(u"doubleSpinBoxStepSize")
-        self.doubleSpinBoxStepSize.setMinimum(0.010000000000000)
+        self.doubleSpinBoxStepSize.setMinimum(1.000000000000000)
         self.doubleSpinBoxStepSize.setMaximum(3.000000000000000)
         self.doubleSpinBoxStepSize.setSingleStep(0.100000000000000)
-        self.doubleSpinBoxStepSize.setValue(2.000000000000000)
+        self.doubleSpinBoxStepSize.setValue(1.600000000000000)
 
         self.gridLayout_5.addWidget(self.doubleSpinBoxStepSize, 0, 1, 1, 1)
 
@@ -267,7 +267,7 @@ class Ui_DiSetupDialog(object):
 
         self.spinBoxNumIter = QSpinBox(self.centralwidget)
         self.spinBoxNumIter.setObjectName(u"spinBoxNumIter")
-        self.spinBoxNumIter.setEnabled(True)
+        self.spinBoxNumIter.setEnabled(False)
         self.spinBoxNumIter.setMaximum(99)
 
         self.gridLayout_5.addWidget(self.spinBoxNumIter, 1, 1, 1, 1)
@@ -305,26 +305,26 @@ class Ui_DiSetupDialog(object):
 
         self.gridLayout_6.addWidget(self.line_4, 0, 0, 1, 1)
 
-        self.checkBoxVBSE = QCheckBox(self.centralwidget)
-        self.checkBoxVBSE.setObjectName(u"checkBoxVBSE")
-        self.checkBoxVBSE.setToolTipDuration(-1)
+        self.checkBoxIPF = QCheckBox(self.centralwidget)
+        self.checkBoxIPF.setObjectName(u"checkBoxIPF")
+        self.checkBoxIPF.setToolTipDuration(-1)
 
-        self.gridLayout_6.addWidget(self.checkBoxVBSE, 3, 0, 1, 1)
+        self.gridLayout_6.addWidget(self.checkBoxIPF, 3, 0, 1, 1)
 
-        self.checkBoxADP = QCheckBox(self.centralwidget)
-        self.checkBoxADP.setObjectName(u"checkBoxADP")
+        self.checkBoxOSM = QCheckBox(self.centralwidget)
+        self.checkBoxOSM.setObjectName(u"checkBoxOSM")
 
-        self.gridLayout_6.addWidget(self.checkBoxADP, 2, 0, 1, 1)
+        self.gridLayout_6.addWidget(self.checkBoxOSM, 2, 0, 1, 1)
 
-        self.checkBoxIQ = QCheckBox(self.centralwidget)
-        self.checkBoxIQ.setObjectName(u"checkBoxIQ")
+        self.checkBoxNCC = QCheckBox(self.centralwidget)
+        self.checkBoxNCC.setObjectName(u"checkBoxNCC")
 
-        self.gridLayout_6.addWidget(self.checkBoxIQ, 1, 0, 1, 1)
+        self.gridLayout_6.addWidget(self.checkBoxNCC, 1, 0, 1, 1)
 
-        self.checkBoxMI = QCheckBox(self.centralwidget)
-        self.checkBoxMI.setObjectName(u"checkBoxMI")
+        self.checkBoxPM = QCheckBox(self.centralwidget)
+        self.checkBoxPM.setObjectName(u"checkBoxPM")
 
-        self.gridLayout_6.addWidget(self.checkBoxMI, 4, 0, 1, 1)
+        self.gridLayout_6.addWidget(self.checkBoxPM, 4, 0, 1, 1)
 
         self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -367,22 +367,25 @@ class Ui_DiSetupDialog(object):
         self.checkBoxLazy.setText(QCoreApplication.translate("DiSetupDialog", u"Lazy loading of patterns", None))
         self.checkBoxMask.setText(QCoreApplication.translate("DiSetupDialog", u"Apply circular mask to pattern", None))
         self.label_6.setText(QCoreApplication.translate("DiSetupDialog", u"Dictionary indexing parameters:", None))
-        self.label_10.setText(QCoreApplication.translate("DiSetupDialog", u"Matching per iteration", None))
+        self.nIterLabel.setText(QCoreApplication.translate("DiSetupDialog", u"Matching per iteration", None))
         self.label_8.setText(QCoreApplication.translate("DiSetupDialog", u"Angular step size (\u00b0)", None))
         self.checkBoxRefine.setText(QCoreApplication.translate("DiSetupDialog", u"Refine orientations", None))
         self.label_11.setText(QCoreApplication.translate("DiSetupDialog", u"Figures to be saved:", None))
 #if QT_CONFIG(tooltip)
-        self.checkBoxVBSE.setToolTip(QCoreApplication.translate("DiSetupDialog", u"Virtual backscatter image ", None))
+        self.checkBoxIPF.setToolTip(QCoreApplication.translate("DiSetupDialog", u"Inverse pole figure", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBoxVBSE.setText(QCoreApplication.translate("DiSetupDialog", u"VBSE image", None))
+        self.checkBoxIPF.setText(QCoreApplication.translate("DiSetupDialog", u"IPF", None))
 #if QT_CONFIG(tooltip)
-        self.checkBoxADP.setToolTip(QCoreApplication.translate("DiSetupDialog", u"Average dot product map", None))
+        self.checkBoxOSM.setToolTip(QCoreApplication.translate("DiSetupDialog", u"Orientation simmilairty map", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBoxADP.setText(QCoreApplication.translate("DiSetupDialog", u"ADP map", None))
+        self.checkBoxOSM.setText(QCoreApplication.translate("DiSetupDialog", u"OSM", None))
 #if QT_CONFIG(tooltip)
-        self.checkBoxIQ.setToolTip(QCoreApplication.translate("DiSetupDialog", u"Image quality map", None))
+        self.checkBoxNCC.setToolTip(QCoreApplication.translate("DiSetupDialog", u"Nomralized cross correlation", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBoxIQ.setText(QCoreApplication.translate("DiSetupDialog", u"IQ map", None))
-        self.checkBoxMI.setText(QCoreApplication.translate("DiSetupDialog", u"Mean intensity image", None))
+        self.checkBoxNCC.setText(QCoreApplication.translate("DiSetupDialog", u"NCC", None))
+#if QT_CONFIG(tooltip)
+        self.checkBoxPM.setToolTip(QCoreApplication.translate("DiSetupDialog", u"Phase map", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBoxPM.setText(QCoreApplication.translate("DiSetupDialog", u"Phase map", None))
     # retranslateUi
 
