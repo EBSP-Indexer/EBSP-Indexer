@@ -558,7 +558,7 @@ class DiSetupDialog(QDialog):
             shape=self.sig_shape,
             sample_tilt=self.sample_tilt,  # Degrees
             pc=self.pc,
-            convention=self.convention,  # Default is Bruker, TODO: let user choose convention
+            convention="BRUKER",  # Default is Bruker, TODO: let user choose convention
         )
 
         # Define refinement kwargs

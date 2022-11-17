@@ -68,6 +68,14 @@ class HiSetupDialog(QDialog):
         self.savefig_kwds = dict(pad_inches=0, bbox_inches="tight", dpi=150)
 
     def setupInitialSettings(self):
+        # matplotlib settings
+        mpl.use("agg")
+        self.savefig_kwargs = dict(bbox_inches="tight", pad_inches=0, dpi=150)
+
+        # standard dictionary indexing kwargs
+        self.di_kwargs = dict(metric="ncc", keep_n=20)
+
+        # read current setting from project_settings.txt, advanced_settings.txt
         self.setting_file = SettingFile(path.join(self.working_dir, "project_settings.txt"))
         self.program_settings = SettingFile("advanced_settings.txt")
 
@@ -95,6 +103,7 @@ class HiSetupDialog(QDialog):
     
 
         self.updatePCpatternCenter()
+        self.ui.comboBoxConvention.setCurrentText(self.convention)
 
         if self.program_settings.read("Lazy Loading") == "False":
             self.ui.checkBoxLazy.setChecked(False)
@@ -126,6 +135,10 @@ class HiSetupDialog(QDialog):
             self.pc[1] = self.ui.patternCenterY.value()
         elif self.convention == "TSL":
             self.pc[1] = 1 - self.ui.patternCenterY.value()
+    
+    def updatePCConvention(self):
+        self.convention = self.ui.comboBoxConvention.currentText()
+        self.updatePCpatternCenter()
             
     def addPhase(self):
         if self.fileBrowserOD.getFile():
@@ -151,7 +164,7 @@ class HiSetupDialog(QDialog):
         self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.removePhase())
 
         self.ui.comboBoxConvention.currentTextChanged.connect(
-            lambda: self.update_pc_convention()
+            lambda: self.updatePCConvention()
         )
 
         self.ui.horizontalSliderRho.valueChanged.connect(lambda: self.updateRho())
@@ -183,69 +196,6 @@ class HiSetupDialog(QDialog):
         if self.ui.listWidgetPhase.count() != 0:
             flag = True
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(flag)
-
-    def setupInitialSettings(self):
-
-        # matplotlib settings
-        mpl.use("agg")
-        self.savefig_kwargs = dict(bbox_inches="tight", pad_inches=0, dpi=150)
-
-        # standard dictionary indexing kwargs
-        self.di_kwargs = dict(metric="ncc", keep_n=20)
-
-        # read current setting from project_settings.txt
-        self.setting_file = SettingFile(
-            path.join(self.working_dir, "project_settings.txt")
-        )
-
-        # PC convention, default is TSL
-
-        try:
-            self.convention = self.setting_file.read["Convention"]
-
-        except:
-            self.convention = "TSL"
-
-        # TODO: add convention read from settings file
-        self.ui.comboBoxConvention.setCurrentText(self.convention)
-
-        # Update pattern center to be displayed in UI
-        try:
-            self.pc = np.array(
-                [
-                    float(self.setting_file.read("X star")),
-                    float(self.setting_file.read("Y star")),
-                    float(self.setting_file.read("Z star")),
-                ]
-            )
-        except:
-            self.pc = np.array([0.400, 0.400, 0.400])
-
-        self.updatePCpatternCenter()
-
-        # Paths for master patterns
-        self.mpPaths = {}
-
-        i = 1
-        while True:
-            try:
-                mpPath = self.setting_file.read(f"Master pattern {i}")
-                phase = mpPath.split("/").pop()
-                self.mpPaths[phase] = mpPath
-                self.ui.listWidgetPhase.addItem(phase)
-                i += 1
-            except:
-                break
-
-    def update_pc_convention(self):
-
-        self.convention = self.ui.comboBoxConvention.currentText()
-
-        self.ui.patternCenterX.setValue(self.pc[0])
-        self.ui.patternCenterY.setValue(1 - self.pc[1])
-        self.ui.patternCenterZ.setValue(self.pc[2])
-
-        self.updatePCArrayFrompatternCenter()
 
     def setupBinningShapes(self):
         self.sig_shape = self.s.axes_manager.signal_shape[::-1]
@@ -304,7 +254,7 @@ class HiSetupDialog(QDialog):
 
         indexer = ebsd_index.EBSDIndexer(
             phaselist=self.phase_proxys,
-            vendor=self.convention,
+            vendor="BRUKER",
             PC=self.pc,
             sampleTilt=sample_tilt,
             camElev=camera_tilt,
