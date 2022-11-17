@@ -162,8 +162,6 @@ class HiSetupDialog(QDialog):
         if self.ui.listWidgetPhase.count() != 0:
             flag = True
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(flag)
-        print()
-        print(self.mpPaths)
 
     def setupInitialSettings(self):
 
@@ -260,8 +258,6 @@ class HiSetupDialog(QDialog):
         self.set_phases_properties()
         self.rho_mask = (100.0 - options["rho"]) / 100.0
         self.number_bands = options["bands"]
-        print(self.rho_mask)
-        print(self.number_bands)
         optionEnabled, optionExecute = options["pre"]
         if optionEnabled:
             optionExecute()
