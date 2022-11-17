@@ -75,7 +75,7 @@ class HiSetupDialog(QDialog):
         try:
             self.convention = self.setting_file.read("Convention")
         except:
-            self.convention = self.program_settings.read("Convetion")
+            self.convention = self.program_settings.read("Convention")
         else:
             self.convention = "TSL"
 
@@ -124,7 +124,7 @@ class HiSetupDialog(QDialog):
         self.pc[2] = self.ui.patternCenterZ.value()
         if self.convention == "BRUKER":
             self.pc[1] = self.ui.patternCenterY.value()
-        elif self.covention == "TSL":
+        elif self.convention == "TSL":
             self.pc[1] = 1 - self.ui.patternCenterY.value()
             
     def addPhase(self):

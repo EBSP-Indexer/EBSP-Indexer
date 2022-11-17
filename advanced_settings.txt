@@ -1,4 +1,4 @@
-File Types:	[".h5", ".dat", ".ang", ".jpg", ".png", ".txt"]
+File Types:	[".h5", ".dat", ".ang", ".jpg", ".png", ".txt", ".bmp"]
 Individual PC data:	True
 Convention:	TSL
 Lazy Loading:	True
