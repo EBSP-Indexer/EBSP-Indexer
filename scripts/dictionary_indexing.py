@@ -125,6 +125,12 @@ class DiSetupDialog(QDialog):
         self.ui.comboBoxBinning.addItems(self.bin_shapes[::-1])
 
         del self.s
+        
+    def update_pc_convention(self):
+        self.convention = self.ui.comboBoxConvention.currentText()
+        self.ui.patternCenterY.setValue(1 - self.pc[1])
+        
+        self.updatePCArrayFrompatternCenter()
 
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_dictionary_indexing())

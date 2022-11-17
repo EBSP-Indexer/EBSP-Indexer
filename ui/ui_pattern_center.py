@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'pattern_center.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.3.2
+## Created by: Qt User Interface Compiler version 6.4.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -15,32 +15,33 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QDialog,
-    QDialogButtonBox, QDoubleSpinBox, QFrame, QGridLayout,
-    QHBoxLayout, QLabel, QListWidget, QListWidgetItem,
-    QPushButton, QSizePolicy, QSpacerItem, QToolButton,
-    QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QComboBox,
+    QDialog, QDialogButtonBox, QDoubleSpinBox, QFrame,
+    QGridLayout, QHBoxLayout, QLabel, QListWidget,
+    QListWidgetItem, QPushButton, QSizePolicy, QSpacerItem,
+    QToolButton, QVBoxLayout, QWidget)
 
 from mplwidget import MplWidget
 
-class Ui_PatternCenterDialog(object):
-    def setupUi(self, PatternCenterDialog):
-        if not PatternCenterDialog.objectName():
-            PatternCenterDialog.setObjectName(u"PatternCenterDialog")
-        PatternCenterDialog.resize(706, 544)
-        self.horizontalLayout_2 = QHBoxLayout(PatternCenterDialog)
+class Ui_PatternCenter(object):
+    def setupUi(self, PatternCenter):
+        if not PatternCenter.objectName():
+            PatternCenter.setObjectName(u"PatternCenter")
+        PatternCenter.resize(683, 482)
+        self.horizontalLayout_2 = QHBoxLayout(PatternCenter)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.verticalLayout_3 = QVBoxLayout()
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.MplWidget = MplWidget(PatternCenterDialog)
+        self.MplWidget = MplWidget(PatternCenter)
         self.MplWidget.setObjectName(u"MplWidget")
         self.MplWidget.setMinimumSize(QSize(400, 400))
+        self.MplWidget.setStyleSheet(u"background-color: transparent")
 
         self.verticalLayout_3.addWidget(self.MplWidget)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.counterLabel = QLabel(PatternCenterDialog)
+        self.counterLabel = QLabel(PatternCenter)
         self.counterLabel.setObjectName(u"counterLabel")
         self.counterLabel.setMinimumSize(QSize(140, 0))
         self.counterLabel.setSizeIncrement(QSize(0, 0))
@@ -51,7 +52,7 @@ class Ui_PatternCenterDialog(object):
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
 
-        self.toolButtonLeft = QToolButton(PatternCenterDialog)
+        self.toolButtonLeft = QToolButton(PatternCenter)
         self.toolButtonLeft.setObjectName(u"toolButtonLeft")
         sizePolicy = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -66,7 +67,7 @@ class Ui_PatternCenterDialog(object):
 
         self.horizontalLayout.addWidget(self.toolButtonLeft)
 
-        self.toolButtonRight = QToolButton(PatternCenterDialog)
+        self.toolButtonRight = QToolButton(PatternCenter)
         self.toolButtonRight.setObjectName(u"toolButtonRight")
         sizePolicy.setHeightForWidth(self.toolButtonRight.sizePolicy().hasHeightForWidth())
         self.toolButtonRight.setSizePolicy(sizePolicy)
@@ -79,7 +80,7 @@ class Ui_PatternCenterDialog(object):
 
         self.horizontalLayout.addItem(self.horizontalSpacer_2)
 
-        self.bandButton = QPushButton(PatternCenterDialog)
+        self.bandButton = QPushButton(PatternCenter)
         self.bandButton.setObjectName(u"bandButton")
         self.bandButton.setMinimumSize(QSize(140, 0))
         self.bandButton.setSizeIncrement(QSize(0, 0))
@@ -99,19 +100,19 @@ class Ui_PatternCenterDialog(object):
 
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.listPhases = QListWidget(PatternCenterDialog)
+        self.listPhases = QListWidget(PatternCenter)
         self.listPhases.setObjectName(u"listPhases")
 
         self.verticalLayout.addWidget(self.listPhases)
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.buttonAddPhase = QPushButton(PatternCenterDialog)
+        self.buttonAddPhase = QPushButton(PatternCenter)
         self.buttonAddPhase.setObjectName(u"buttonAddPhase")
 
         self.horizontalLayout_3.addWidget(self.buttonAddPhase)
 
-        self.buttonRemovePhase = QPushButton(PatternCenterDialog)
+        self.buttonRemovePhase = QPushButton(PatternCenter)
         self.buttonRemovePhase.setObjectName(u"buttonRemovePhase")
 
         self.horizontalLayout_3.addWidget(self.buttonRemovePhase)
@@ -119,7 +120,7 @@ class Ui_PatternCenterDialog(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout_3)
 
-        self.line = QFrame(PatternCenterDialog)
+        self.line = QFrame(PatternCenter)
         self.line.setObjectName(u"line")
         self.line.setFrameShape(QFrame.HLine)
         self.line.setFrameShadow(QFrame.Sunken)
@@ -132,7 +133,7 @@ class Ui_PatternCenterDialog(object):
 
         self.gridLayout_2 = QGridLayout()
         self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.labelXStar = QLabel(PatternCenterDialog)
+        self.labelXStar = QLabel(PatternCenter)
         self.labelXStar.setObjectName(u"labelXStar")
         sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
         sizePolicy1.setHorizontalStretch(0)
@@ -143,7 +144,7 @@ class Ui_PatternCenterDialog(object):
 
         self.gridLayout_2.addWidget(self.labelXStar, 0, 0, 1, 1)
 
-        self.spinBoxX = QDoubleSpinBox(PatternCenterDialog)
+        self.spinBoxX = QDoubleSpinBox(PatternCenter)
         self.spinBoxX.setObjectName(u"spinBoxX")
         sizePolicy2 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         sizePolicy2.setHorizontalStretch(0)
@@ -156,7 +157,7 @@ class Ui_PatternCenterDialog(object):
 
         self.gridLayout_2.addWidget(self.spinBoxX, 0, 1, 1, 1)
 
-        self.spinBoxY = QDoubleSpinBox(PatternCenterDialog)
+        self.spinBoxY = QDoubleSpinBox(PatternCenter)
         self.spinBoxY.setObjectName(u"spinBoxY")
         self.spinBoxY.setDecimals(4)
         self.spinBoxY.setMaximum(1.000000000000000)
@@ -164,17 +165,17 @@ class Ui_PatternCenterDialog(object):
 
         self.gridLayout_2.addWidget(self.spinBoxY, 1, 1, 1, 1)
 
-        self.labelYStar = QLabel(PatternCenterDialog)
+        self.labelYStar = QLabel(PatternCenter)
         self.labelYStar.setObjectName(u"labelYStar")
 
         self.gridLayout_2.addWidget(self.labelYStar, 1, 0, 1, 1)
 
-        self.labelZStar = QLabel(PatternCenterDialog)
+        self.labelZStar = QLabel(PatternCenter)
         self.labelZStar.setObjectName(u"labelZStar")
 
         self.gridLayout_2.addWidget(self.labelZStar, 2, 0, 1, 1)
 
-        self.spinBoxZ = QDoubleSpinBox(PatternCenterDialog)
+        self.spinBoxZ = QDoubleSpinBox(PatternCenter)
         self.spinBoxZ.setObjectName(u"spinBoxZ")
         self.spinBoxZ.setDecimals(4)
         self.spinBoxZ.setMaximum(3.000000000000000)
@@ -185,14 +186,50 @@ class Ui_PatternCenterDialog(object):
 
         self.verticalLayout.addLayout(self.gridLayout_2)
 
+        self.horizontalLayout_8 = QHBoxLayout()
+        self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
+        self.conventionLabel = QLabel(PatternCenter)
+        self.conventionLabel.setObjectName(u"conventionLabel")
+
+        self.horizontalLayout_8.addWidget(self.conventionLabel)
+
+        self.conventionBox = QComboBox(PatternCenter)
+        self.conventionBox.addItem("")
+        self.conventionBox.addItem("")
+        self.conventionBox.setObjectName(u"conventionBox")
+
+        self.horizontalLayout_8.addWidget(self.conventionBox)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_8)
+
+        self.line_3 = QFrame(PatternCenter)
+        self.line_3.setObjectName(u"line_3")
+        self.line_3.setFrameShape(QFrame.HLine)
+        self.line_3.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout.addWidget(self.line_3)
+
+        self.workingDistanceLabel = QLabel(PatternCenter)
+        self.workingDistanceLabel.setObjectName(u"workingDistanceLabel")
+
+        self.verticalLayout.addWidget(self.workingDistanceLabel)
+
+        self.line_2 = QFrame(PatternCenter)
+        self.line_2.setObjectName(u"line_2")
+        self.line_2.setFrameShape(QFrame.HLine)
+        self.line_2.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout.addWidget(self.line_2)
+
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.buttonPlot = QPushButton(PatternCenterDialog)
+        self.buttonPlot = QPushButton(PatternCenter)
         self.buttonPlot.setObjectName(u"buttonPlot")
 
         self.horizontalLayout_4.addWidget(self.buttonPlot)
 
-        self.buttonTune = QPushButton(PatternCenterDialog)
+        self.buttonTune = QPushButton(PatternCenter)
         self.buttonTune.setObjectName(u"buttonTune")
         sizePolicy2.setHeightForWidth(self.buttonTune.sizePolicy().hasHeightForWidth())
         self.buttonTune.setSizePolicy(sizePolicy2)
@@ -207,12 +244,12 @@ class Ui_PatternCenterDialog(object):
         self.horizontalLayout_5.setSpacing(-1)
 #endif
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.labelMisfit = QLabel(PatternCenterDialog)
+        self.labelMisfit = QLabel(PatternCenter)
         self.labelMisfit.setObjectName(u"labelMisfit")
 
         self.horizontalLayout_5.addWidget(self.labelMisfit)
 
-        self.ignoreCheckBox = QCheckBox(PatternCenterDialog)
+        self.ignoreCheckBox = QCheckBox(PatternCenter)
         self.ignoreCheckBox.setObjectName(u"ignoreCheckBox")
         sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         sizePolicy3.setHorizontalStretch(0)
@@ -229,7 +266,7 @@ class Ui_PatternCenterDialog(object):
 
         self.verticalLayout.addItem(self.verticalSpacer_2)
 
-        self.buttonBox = QDialogButtonBox(PatternCenterDialog)
+        self.buttonBox = QDialogButtonBox(PatternCenter)
         self.buttonBox.setObjectName(u"buttonBox")
         sizePolicy4 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy4.setHorizontalStretch(0)
@@ -238,31 +275,38 @@ class Ui_PatternCenterDialog(object):
         self.buttonBox.setSizePolicy(sizePolicy4)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
 
-        self.verticalLayout.addWidget(self.buttonBox, 0, Qt.AlignRight|Qt.AlignVCenter)
+        self.verticalLayout.addWidget(self.buttonBox, 0, Qt.AlignRight)
 
 
         self.horizontalLayout_2.addLayout(self.verticalLayout)
 
+        self.horizontalLayout_2.setStretch(0, 3)
+        self.horizontalLayout_2.setStretch(1, 1)
 
-        self.retranslateUi(PatternCenterDialog)
+        self.retranslateUi(PatternCenter)
 
-        QMetaObject.connectSlotsByName(PatternCenterDialog)
+        QMetaObject.connectSlotsByName(PatternCenter)
     # setupUi
 
-    def retranslateUi(self, PatternCenterDialog):
-        PatternCenterDialog.setWindowTitle(QCoreApplication.translate("PatternCenterDialog", u"Pattern Center Refinement", None))
-        self.counterLabel.setText(QCoreApplication.translate("PatternCenterDialog", u"Calibration Pattern: 0/0", None))
-        self.toolButtonLeft.setText(QCoreApplication.translate("PatternCenterDialog", u"...", None))
-        self.toolButtonRight.setText(QCoreApplication.translate("PatternCenterDialog", u"...", None))
-        self.bandButton.setText(QCoreApplication.translate("PatternCenterDialog", u"Show bands", None))
-        self.buttonAddPhase.setText(QCoreApplication.translate("PatternCenterDialog", u"Add Phase", None))
-        self.buttonRemovePhase.setText(QCoreApplication.translate("PatternCenterDialog", u"Remove Phase", None))
-        self.labelXStar.setText(QCoreApplication.translate("PatternCenterDialog", u"X-Star", None))
-        self.labelYStar.setText(QCoreApplication.translate("PatternCenterDialog", u"Y-Star", None))
-        self.labelZStar.setText(QCoreApplication.translate("PatternCenterDialog", u"Z-Star", None))
-        self.buttonPlot.setText(QCoreApplication.translate("PatternCenterDialog", u"Plot", None))
-        self.buttonTune.setText(QCoreApplication.translate("PatternCenterDialog", u"Tune", None))
-        self.labelMisfit.setText(QCoreApplication.translate("PatternCenterDialog", u"Misfit (\u00b0): 0.0000", None))
-        self.ignoreCheckBox.setText(QCoreApplication.translate("PatternCenterDialog", u"Ignore pattern", None))
+    def retranslateUi(self, PatternCenter):
+        PatternCenter.setWindowTitle(QCoreApplication.translate("PatternCenter", u"Pattern Center Refinement", None))
+        self.counterLabel.setText(QCoreApplication.translate("PatternCenter", u"Calibration Pattern: 0/0", None))
+        self.toolButtonLeft.setText(QCoreApplication.translate("PatternCenter", u"...", None))
+        self.toolButtonRight.setText(QCoreApplication.translate("PatternCenter", u"...", None))
+        self.bandButton.setText(QCoreApplication.translate("PatternCenter", u"Show bands", None))
+        self.buttonAddPhase.setText(QCoreApplication.translate("PatternCenter", u"Add Phase", None))
+        self.buttonRemovePhase.setText(QCoreApplication.translate("PatternCenter", u"Remove Phase", None))
+        self.labelXStar.setText(QCoreApplication.translate("PatternCenter", u"X (%):", None))
+        self.labelYStar.setText(QCoreApplication.translate("PatternCenter", u"Y (%):", None))
+        self.labelZStar.setText(QCoreApplication.translate("PatternCenter", u"Z (%):", None))
+        self.conventionLabel.setText(QCoreApplication.translate("PatternCenter", u"PC Convention", None))
+        self.conventionBox.setItemText(0, QCoreApplication.translate("PatternCenter", u"BRUKER", None))
+        self.conventionBox.setItemText(1, QCoreApplication.translate("PatternCenter", u"TSL", None))
+
+        self.workingDistanceLabel.setText(QCoreApplication.translate("PatternCenter", u"Working Distance (mm): 0.0", None))
+        self.buttonPlot.setText(QCoreApplication.translate("PatternCenter", u"Plot", None))
+        self.buttonTune.setText(QCoreApplication.translate("PatternCenter", u"Tune", None))
+        self.labelMisfit.setText(QCoreApplication.translate("PatternCenter", u"Misfit (\u00b0): 0.0000", None))
+        self.ignoreCheckBox.setText(QCoreApplication.translate("PatternCenter", u"Ignore pattern", None))
     # retranslateUi
 
