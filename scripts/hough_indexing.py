@@ -249,9 +249,6 @@ class HiSetupDialog(QDialog):
         sample_tilt = self.s2.detector.sample_tilt
         camera_tilt = self.s2.detector.tilt
 
-        if self.convention == "TSL":
-            self.convention = "EDAX"
-
         indexer = ebsd_index.EBSDIndexer(
             phaselist=self.phase_proxys,
             vendor="BRUKER",
