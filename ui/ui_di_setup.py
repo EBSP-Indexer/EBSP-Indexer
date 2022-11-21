@@ -26,7 +26,7 @@ class Ui_DiSetupDialog(object):
     def setupUi(self, DiSetupDialog):
         if not DiSetupDialog.objectName():
             DiSetupDialog.setObjectName(u"DiSetupDialog")
-        DiSetupDialog.resize(792, 536)
+        DiSetupDialog.resize(931, 597)
         self.gridLayout_2 = QGridLayout(DiSetupDialog)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.centralwidget = QFrame(DiSetupDialog)
@@ -39,6 +39,7 @@ class Ui_DiSetupDialog(object):
         self.gridLayout.setContentsMargins(20, 20, 20, 20)
         self.buttonBox = QDialogButtonBox(self.centralwidget)
         self.buttonBox.setObjectName(u"buttonBox")
+        self.buttonBox.setEnabled(True)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
         self.buttonBox.setCenterButtons(False)
 
@@ -53,7 +54,7 @@ class Ui_DiSetupDialog(object):
 
         self.listWidgetPhase = QListWidget(self.centralwidget)
         self.listWidgetPhase.setObjectName(u"listWidgetPhase")
-        self.listWidgetPhase.setMinimumSize(QSize(0, 50))
+        self.listWidgetPhase.setMinimumSize(QSize(300, 50))
         self.listWidgetPhase.setMaximumSize(QSize(16000000, 1699999))
         self.listWidgetPhase.setAcceptDrops(False)
         self.listWidgetPhase.setSelectionMode(QAbstractItemView.MultiSelection)
@@ -166,12 +167,16 @@ class Ui_DiSetupDialog(object):
 
         self.verticalLayout_3.addLayout(self.horizontalLayout_3)
 
-        self.verticalSpacer = QSpacerItem(20, 50, QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.verticalLayout_3.addItem(self.verticalSpacer)
+        self.verticalLayout_3.addItem(self.verticalSpacer_4)
 
 
         self.gridLayout.addLayout(self.verticalLayout_3, 1, 2, 1, 1)
+
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.gridLayout.addItem(self.horizontalSpacer, 1, 1, 1, 1)
 
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -212,15 +217,15 @@ class Ui_DiSetupDialog(object):
 
         self.gridLayout_3.addWidget(self.checkBoxLazy, 1, 0, 1, 1)
 
-        self.comboBoxBinning = QComboBox(self.centralwidget)
-        self.comboBoxBinning.setObjectName(u"comboBoxBinning")
-
-        self.gridLayout_3.addWidget(self.comboBoxBinning, 0, 1, 1, 1)
-
         self.checkBoxMask = QCheckBox(self.centralwidget)
         self.checkBoxMask.setObjectName(u"checkBoxMask")
 
         self.gridLayout_3.addWidget(self.checkBoxMask, 2, 0, 1, 1)
+
+        self.comboBoxBinning = QComboBox(self.centralwidget)
+        self.comboBoxBinning.setObjectName(u"comboBoxBinning")
+
+        self.gridLayout_3.addWidget(self.comboBoxBinning, 0, 1, 1, 1)
 
 
         self.verticalLayout.addLayout(self.gridLayout_3)
@@ -246,14 +251,10 @@ class Ui_DiSetupDialog(object):
 
         self.gridLayout_5 = QGridLayout()
         self.gridLayout_5.setObjectName(u"gridLayout_5")
-        self.nIterLabel = QLabel(self.centralwidget)
-        self.nIterLabel.setObjectName(u"nIterLabel")
-        self.nIterLabel.setEnabled(False)
-
-        self.gridLayout_5.addWidget(self.nIterLabel, 1, 0, 1, 1)
-
         self.doubleSpinBoxStepSize = QDoubleSpinBox(self.centralwidget)
         self.doubleSpinBoxStepSize.setObjectName(u"doubleSpinBoxStepSize")
+        self.doubleSpinBoxStepSize.setMinimumSize(QSize(80, 0))
+        self.doubleSpinBoxStepSize.setMaximumSize(QSize(80, 16777215))
         self.doubleSpinBoxStepSize.setMinimum(1.000000000000000)
         self.doubleSpinBoxStepSize.setMaximum(3.000000000000000)
         self.doubleSpinBoxStepSize.setSingleStep(0.100000000000000)
@@ -266,12 +267,11 @@ class Ui_DiSetupDialog(object):
 
         self.gridLayout_5.addWidget(self.label_8, 0, 0, 1, 1)
 
-        self.spinBoxNumIter = QSpinBox(self.centralwidget)
-        self.spinBoxNumIter.setObjectName(u"spinBoxNumIter")
-        self.spinBoxNumIter.setEnabled(False)
-        self.spinBoxNumIter.setMaximum(99)
+        self.nIterLabel = QLabel(self.centralwidget)
+        self.nIterLabel.setObjectName(u"nIterLabel")
+        self.nIterLabel.setEnabled(False)
 
-        self.gridLayout_5.addWidget(self.spinBoxNumIter, 1, 1, 1, 1)
+        self.gridLayout_5.addWidget(self.nIterLabel, 2, 0, 1, 1)
 
         self.checkBoxRefine = QCheckBox(self.centralwidget)
         self.checkBoxRefine.setObjectName(u"checkBoxRefine")
@@ -280,7 +280,25 @@ class Ui_DiSetupDialog(object):
         self.checkBoxRefine.setChecked(True)
         self.checkBoxRefine.setTristate(False)
 
-        self.gridLayout_5.addWidget(self.checkBoxRefine, 2, 0, 1, 1)
+        self.gridLayout_5.addWidget(self.checkBoxRefine, 3, 0, 1, 1)
+
+        self.spinBoxNumIter = QSpinBox(self.centralwidget)
+        self.spinBoxNumIter.setObjectName(u"spinBoxNumIter")
+        self.spinBoxNumIter.setEnabled(False)
+        self.spinBoxNumIter.setMaximum(99)
+
+        self.gridLayout_5.addWidget(self.spinBoxNumIter, 2, 1, 1, 1)
+
+        self.label_10 = QLabel(self.centralwidget)
+        self.label_10.setObjectName(u"label_10")
+
+        self.gridLayout_5.addWidget(self.label_10, 1, 0, 1, 1)
+
+        self.numSimPatterns = QLabel(self.centralwidget)
+        self.numSimPatterns.setObjectName(u"numSimPatterns")
+        self.numSimPatterns.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.gridLayout_5.addWidget(self.numSimPatterns, 1, 1, 1, 1)
 
 
         self.verticalLayout.addLayout(self.gridLayout_5)
@@ -306,6 +324,16 @@ class Ui_DiSetupDialog(object):
 
         self.gridLayout_6.addWidget(self.line_4, 0, 0, 1, 1)
 
+        self.checkBoxPM = QCheckBox(self.centralwidget)
+        self.checkBoxPM.setObjectName(u"checkBoxPM")
+
+        self.gridLayout_6.addWidget(self.checkBoxPM, 4, 0, 1, 1)
+
+        self.checkBoxNCC = QCheckBox(self.centralwidget)
+        self.checkBoxNCC.setObjectName(u"checkBoxNCC")
+
+        self.gridLayout_6.addWidget(self.checkBoxNCC, 1, 0, 1, 1)
+
         self.checkBoxIPF = QCheckBox(self.centralwidget)
         self.checkBoxIPF.setObjectName(u"checkBoxIPF")
         self.checkBoxIPF.setToolTipDuration(-1)
@@ -317,29 +345,42 @@ class Ui_DiSetupDialog(object):
 
         self.gridLayout_6.addWidget(self.checkBoxOSM, 2, 0, 1, 1)
 
-        self.checkBoxNCC = QCheckBox(self.centralwidget)
-        self.checkBoxNCC.setObjectName(u"checkBoxNCC")
+        self.line_10 = QFrame(self.centralwidget)
+        self.line_10.setObjectName(u"line_10")
+        self.line_10.setFrameShape(QFrame.HLine)
+        self.line_10.setFrameShadow(QFrame.Sunken)
 
-        self.gridLayout_6.addWidget(self.checkBoxNCC, 1, 0, 1, 1)
+        self.gridLayout_6.addWidget(self.line_10, 5, 0, 1, 1)
 
-        self.checkBoxPM = QCheckBox(self.centralwidget)
-        self.checkBoxPM.setObjectName(u"checkBoxPM")
+        self.line_11 = QFrame(self.centralwidget)
+        self.line_11.setObjectName(u"line_11")
+        self.line_11.setFrameShape(QFrame.HLine)
+        self.line_11.setFrameShadow(QFrame.Sunken)
 
-        self.gridLayout_6.addWidget(self.checkBoxPM, 4, 0, 1, 1)
+        self.gridLayout_6.addWidget(self.line_11, 7, 0, 1, 1)
+
+        self.label_13 = QLabel(self.centralwidget)
+        self.label_13.setObjectName(u"label_13")
+
+        self.gridLayout_6.addWidget(self.label_13, 6, 0, 1, 1)
 
         self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.gridLayout_6.addItem(self.verticalSpacer_3, 5, 0, 1, 1)
+        self.gridLayout_6.addItem(self.verticalSpacer_3, 9, 0, 1, 1)
+
+        self.comboBoxFiletype = QComboBox(self.centralwidget)
+        self.comboBoxFiletype.addItem("")
+        self.comboBoxFiletype.addItem("")
+        self.comboBoxFiletype.addItem("")
+        self.comboBoxFiletype.setObjectName(u"comboBoxFiletype")
+
+        self.gridLayout_6.addWidget(self.comboBoxFiletype, 8, 0, 1, 1)
 
 
         self.verticalLayout.addLayout(self.gridLayout_6)
 
 
         self.gridLayout.addLayout(self.verticalLayout, 1, 0, 1, 1)
-
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.gridLayout.addItem(self.horizontalSpacer, 1, 1, 1, 1)
 
 
         self.gridLayout_2.addWidget(self.centralwidget, 0, 0, 1, 1)
@@ -368,10 +409,20 @@ class Ui_DiSetupDialog(object):
         self.checkBoxLazy.setText(QCoreApplication.translate("DiSetupDialog", u"Lazy loading of patterns", None))
         self.checkBoxMask.setText(QCoreApplication.translate("DiSetupDialog", u"Apply circular mask to pattern", None))
         self.label_6.setText(QCoreApplication.translate("DiSetupDialog", u"Dictionary indexing parameters:", None))
-        self.nIterLabel.setText(QCoreApplication.translate("DiSetupDialog", u"Matching per iteration", None))
         self.label_8.setText(QCoreApplication.translate("DiSetupDialog", u"Angular step size (\u00b0)", None))
+        self.nIterLabel.setText(QCoreApplication.translate("DiSetupDialog", u"Matching per iteration", None))
         self.checkBoxRefine.setText(QCoreApplication.translate("DiSetupDialog", u"Refine orientations", None))
+        self.label_10.setText(QCoreApplication.translate("DiSetupDialog", u"Expected number of simulated patterns", None))
+        self.numSimPatterns.setText(QCoreApplication.translate("DiSetupDialog", u"N/A", None))
         self.label_11.setText(QCoreApplication.translate("DiSetupDialog", u"Figures to be saved:", None))
+#if QT_CONFIG(tooltip)
+        self.checkBoxPM.setToolTip(QCoreApplication.translate("DiSetupDialog", u"Phase map", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBoxPM.setText(QCoreApplication.translate("DiSetupDialog", u"Phase map", None))
+#if QT_CONFIG(tooltip)
+        self.checkBoxNCC.setToolTip(QCoreApplication.translate("DiSetupDialog", u"Nomralized cross correlation", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBoxNCC.setText(QCoreApplication.translate("DiSetupDialog", u"NCC", None))
 #if QT_CONFIG(tooltip)
         self.checkBoxIPF.setToolTip(QCoreApplication.translate("DiSetupDialog", u"Inverse pole figure", None))
 #endif // QT_CONFIG(tooltip)
@@ -381,12 +432,15 @@ class Ui_DiSetupDialog(object):
 #endif // QT_CONFIG(tooltip)
         self.checkBoxOSM.setText(QCoreApplication.translate("DiSetupDialog", u"OSM", None))
 #if QT_CONFIG(tooltip)
-        self.checkBoxNCC.setToolTip(QCoreApplication.translate("DiSetupDialog", u"Nomralized cross correlation", None))
+        self.label_13.setToolTip(QCoreApplication.translate("DiSetupDialog", u"<html><head/><body><p>ATEX fileformat: .ang</p><p>Kikuchip format: .h5</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBoxNCC.setText(QCoreApplication.translate("DiSetupDialog", u"NCC", None))
+        self.label_13.setText(QCoreApplication.translate("DiSetupDialog", u"Filetype for saving crystal maps:", None))
+        self.comboBoxFiletype.setItemText(0, QCoreApplication.translate("DiSetupDialog", u".ang, .h5", None))
+        self.comboBoxFiletype.setItemText(1, QCoreApplication.translate("DiSetupDialog", u".ang", None))
+        self.comboBoxFiletype.setItemText(2, QCoreApplication.translate("DiSetupDialog", u".h5", None))
+
 #if QT_CONFIG(tooltip)
-        self.checkBoxPM.setToolTip(QCoreApplication.translate("DiSetupDialog", u"Phase map", None))
+        self.comboBoxFiletype.setToolTip(QCoreApplication.translate("DiSetupDialog", u"<html><head/><body><p><br/></p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBoxPM.setText(QCoreApplication.translate("DiSetupDialog", u"Phase map", None))
     # retranslateUi
 

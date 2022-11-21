@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'main_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.3.2
+## Created by: Qt User Interface Compiler version 6.4.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -16,10 +16,10 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QGridLayout,
-    QHBoxLayout, QHeaderView, QLabel, QMainWindow,
-    QMenu, QMenuBar, QPlainTextEdit, QSizePolicy,
-    QStatusBar, QTreeView, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QGridLayout, QHBoxLayout,
+    QHeaderView, QLabel, QMainWindow, QMenu,
+    QMenuBar, QPlainTextEdit, QSizePolicy, QStatusBar,
+    QTreeView, QVBoxLayout, QWidget)
 
 from mplwidget import MplWidget
 
@@ -27,7 +27,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(695, 662)
+        MainWindow.resize(1024, 662)
         MainWindow.setLayoutDirection(Qt.LeftToRight)
         MainWindow.setAutoFillBackground(False)
         self.actionOpen_Workfolder = QAction(MainWindow)
@@ -52,15 +52,15 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout = QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.verticalLayout = QVBoxLayout()
-        self.verticalLayout.setObjectName(u"verticalLayout")
-        self.topLayout = QHBoxLayout()
-        self.topLayout.setObjectName(u"topLayout")
+        self.verticalLayout_4 = QVBoxLayout()
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.systemViewerLayout = QVBoxLayout()
         self.systemViewerLayout.setObjectName(u"systemViewerLayout")
         self.folderLabel = QLabel(self.centralwidget)
         self.folderLabel.setObjectName(u"folderLabel")
-        sizePolicy = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Preferred)
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.folderLabel.sizePolicy().hasHeightForWidth())
@@ -70,11 +70,8 @@ class Ui_MainWindow(object):
 
         self.systemViewer = QTreeView(self.centralwidget)
         self.systemViewer.setObjectName(u"systemViewer")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.systemViewer.sizePolicy().hasHeightForWidth())
-        self.systemViewer.setSizePolicy(sizePolicy1)
+        sizePolicy.setHeightForWidth(self.systemViewer.sizePolicy().hasHeightForWidth())
+        self.systemViewer.setSizePolicy(sizePolicy)
         self.systemViewer.setMinimumSize(QSize(320, 320))
         self.systemViewer.setMouseTracking(False)
         self.systemViewer.setTabletTracking(True)
@@ -89,15 +86,36 @@ class Ui_MainWindow(object):
 
         self.systemViewerLayout.addWidget(self.systemViewer)
 
+        self.systemViewerLayout.setStretch(1, 1)
+
+        self.horizontalLayout.addLayout(self.systemViewerLayout)
+
+        self.MplWidget = MplWidget(self.centralwidget)
+        self.MplWidget.setObjectName(u"MplWidget")
+        sizePolicy.setHeightForWidth(self.MplWidget.sizePolicy().hasHeightForWidth())
+        self.MplWidget.setSizePolicy(sizePolicy)
+        self.MplWidget.setMinimumSize(QSize(320, 320))
+        self.MplWidget.setAutoFillBackground(False)
+        self.MplWidget.setStyleSheet(u"background-color: transparent")
+
+        self.horizontalLayout.addWidget(self.MplWidget)
+
+        self.horizontalLayout.setStretch(0, 2)
+        self.horizontalLayout.setStretch(1, 3)
+
+        self.verticalLayout_4.addLayout(self.horizontalLayout)
+
+        self.verticalLayout_3 = QVBoxLayout()
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.consoleLog = QPlainTextEdit(self.centralwidget)
         self.consoleLog.setObjectName(u"consoleLog")
-        sizePolicy2 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.consoleLog.sizePolicy().hasHeightForWidth())
-        self.consoleLog.setSizePolicy(sizePolicy2)
+        sizePolicy1 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Preferred)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.consoleLog.sizePolicy().hasHeightForWidth())
+        self.consoleLog.setSizePolicy(sizePolicy1)
 
-        self.systemViewerLayout.addWidget(self.consoleLog)
+        self.verticalLayout_3.addWidget(self.consoleLog)
 
         self.inputLayout = QHBoxLayout()
         self.inputLayout.setObjectName(u"inputLayout")
@@ -107,35 +125,16 @@ class Ui_MainWindow(object):
         self.inputLayout.addWidget(self.consolePrompt)
 
 
-        self.systemViewerLayout.addLayout(self.inputLayout)
+        self.verticalLayout_3.addLayout(self.inputLayout)
 
+        self.verticalLayout_3.setStretch(0, 1)
 
-        self.topLayout.addLayout(self.systemViewerLayout)
+        self.verticalLayout_4.addLayout(self.verticalLayout_3)
 
-        self.line_2 = QFrame(self.centralwidget)
-        self.line_2.setObjectName(u"line_2")
-        self.line_2.setFrameShape(QFrame.VLine)
-        self.line_2.setFrameShadow(QFrame.Sunken)
+        self.verticalLayout_4.setStretch(0, 3)
+        self.verticalLayout_4.setStretch(1, 1)
 
-        self.topLayout.addWidget(self.line_2)
-
-        self.MplWidget = MplWidget(self.centralwidget)
-        self.MplWidget.setObjectName(u"MplWidget")
-        sizePolicy1.setHeightForWidth(self.MplWidget.sizePolicy().hasHeightForWidth())
-        self.MplWidget.setSizePolicy(sizePolicy1)
-        self.MplWidget.setMinimumSize(QSize(320, 320))
-        self.MplWidget.setStyleSheet(u"background-color: transparent")
-
-        self.topLayout.addWidget(self.MplWidget)
-
-        self.topLayout.setStretch(0, 1)
-        self.topLayout.setStretch(2, 2)
-
-        self.verticalLayout.addLayout(self.topLayout)
-
-        self.verticalLayout.setStretch(0, 2)
-
-        self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
+        self.gridLayout.addLayout(self.verticalLayout_4, 0, 1, 1, 1)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QStatusBar(MainWindow)
@@ -143,7 +142,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 695, 24))
+        self.menubar.setGeometry(QRect(0, 0, 1024, 21))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuProcessing = QMenu(self.menubar)

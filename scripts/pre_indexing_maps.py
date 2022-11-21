@@ -19,8 +19,9 @@ class PreIndexingMapsDialog(QDialog):
     ):
         super().__init__(parent)
 
-        # initate threadpool
+        # initate threadpool and text output
         self.threadPool = QThreadPool.globalInstance()
+        self.console = parent.console
 
         self.working_dir = path.dirname(pattern_path)
 
@@ -102,7 +103,7 @@ class PreIndexingMapsDialog(QDialog):
 
     def run_pre_indexing_maps(self):
         # Pass the function to execute
-        save_worker = Worker(self.save_pre_indexing_maps)
+        save_worker = Worker(fn = self.save_pre_indexing_maps, output=self.console)
         # Execute
         self.threadPool.start(save_worker)
         self.accept()
