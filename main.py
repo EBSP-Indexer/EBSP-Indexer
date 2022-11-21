@@ -1,9 +1,10 @@
 import sys
 import json
 from os.path import basename, splitext, exists
+
 # from os import startfile #Does not work on mac...
 from contextlib import redirect_stdout, redirect_stderr
-from PySide6.QtCore import QDir, QThreadPool, Qt, Signal
+from PySide6.QtCore import QDir, Qt, QEvent
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
 from PySide6.QtGui import QFont, QKeyEvent
 from scripts.hough_indexing import HiSetupDialog
@@ -25,6 +26,7 @@ from scripts.console import Console, Redirect
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
 
+
 class AppWindow(QMainWindow):
     """
     The main app window that is present at all times
@@ -38,12 +40,12 @@ class AppWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.showMaximized()
-        self.setupConnections()
-
-        self.threadPool = QThreadPool.globalInstance()
 
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         self.systemModel = QFileSystemModel()
+
+        self.ui.systemViewer.setModel(self.systemModel)
+        self.setupConnections()
 
         self.console = Console(parent=self, context=globals())
         self.console.setfont(QFont("Lucida Sans Typewriter", 10))
@@ -58,11 +60,11 @@ class AppWindow(QMainWindow):
         self.ui.actionSettings.triggered.connect(lambda: self.openSettings())
         self.ui.actionProcessingMenu.triggered.connect(lambda: self.selectProcessing())
         self.ui.actionROI.triggered.connect(lambda: self.selectROI())
-        self.ui.systemViewer.clicked.connect(
-            lambda index: self.onSystemViewClicked(index)
+        self.ui.systemViewer.selectionModel().selectionChanged.connect(
+            lambda new, old: self.onSystemModelChanged(new, old)
         )
         self.ui.systemViewer.keyReleaseEvent = self.onKeyReleaseEvent
-        self.ui.systemViewer.doubleClicked.connect(lambda: self.openTextFile())
+        # self.ui.systemViewer.doubleClicked.connect(lambda: self.openTextFile())
 
         self.ui.actionSignalNavigation.triggered.connect(
             lambda: self.selectSignalNavigation()
@@ -93,16 +95,16 @@ class AppWindow(QMainWindow):
             self.setSystemViewer(self.working_dir)
 
     def setSystemViewer(self, working_dir):
-            self.systemModel.setRootPath(working_dir)
-            self.systemModel.setNameFilters(self.system_view_filter)
-            self.systemModel.setNameFilterDisables(0)
-            self.ui.systemViewer.setModel(self.systemModel)
-            self.ui.systemViewer.setRootIndex(self.systemModel.index(working_dir))
-            self.ui.systemViewer.setColumnWidth(0, 250)
-            self.ui.systemViewer.hideColumn(2)
+        self.systemModel.setRootPath(working_dir)
+        self.systemModel.setNameFilters(self.system_view_filter)
+        self.systemModel.setNameFilterDisables(0)
+        self.ui.systemViewer.setModel(self.systemModel)
+        self.ui.systemViewer.setRootIndex(self.systemModel.index(working_dir))
+        self.ui.systemViewer.setColumnWidth(0, 250)
+        self.ui.systemViewer.hideColumn(2)
 
-            self.ui.folderLabel.setText(basename(working_dir))
-            self.setWindowTitle(f"EBSD-GUI - {working_dir}")
+        self.ui.folderLabel.setText(basename(working_dir))
+        self.setWindowTitle(f"EBSD-GUI - {working_dir}")
 
     def importSettings(self):
         if exists("advanced_settings.txt"):
@@ -111,7 +113,14 @@ class AppWindow(QMainWindow):
                 file_types = json.loads(setting_file.read("File Types"))
                 self.system_view_filter = ["*" + x for x in file_types]
             except:
-                self.system_view_filter = ["*.h5", "*.dat", "*.ang", "*.jpg", "*.png", "*.txt"]
+                self.system_view_filter = [
+                    "*.h5",
+                    "*.dat",
+                    "*.ang",
+                    "*.jpg",
+                    "*.png",
+                    "*.txt",
+                ]
 
             if exists(setting_file.read("Default Directory")):
                 self.working_dir = setting_file.read("Default Directory")
@@ -125,9 +134,11 @@ class AppWindow(QMainWindow):
             self.settingsDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
             self.settingsDialog.exec()
         except Exception as e:
-            self.console.errorwrite(f"Could not initialize settings dialog:\n{str(e)}\n")
+            self.console.errorwrite(
+                f"Could not initialize settings dialog:\n{str(e)}\n"
+            )
 
-        #updates file browser to changes:
+        # updates file browser to changes:
         setting_file = SettingFile("advanced_settings.txt")
         file_types = json.loads(setting_file.read("File Types"))
         self.system_view_filter = ["*" + x for x in file_types]
@@ -177,12 +188,16 @@ class AppWindow(QMainWindow):
                 f"Could not initialize pre-indexing maps generation dialog:\n{str(e)}\n"
             )
 
-    def onSystemViewClicked(self, index):
-        self.file_selected = self.systemModel.filePath(index)
-        if splitext(self.file_selected)[1] in [".jpg", ".png", ".gif", ".bmp"]:
-            self.showImage(self.file_selected)
-        else:
+    def onSystemModelChanged(self, new_selected, old_selected):
+        if new_selected.empty():
+            self.file_selected = None
             self.showImage()
+        else:
+            self.file_selected = self.systemModel.filePath(
+                self.ui.systemViewer.currentIndex()
+            )
+            if splitext(self.file_selected)[1] in [".jpg", ".png", ".gif", ".bmp"]:
+                self.showImage(self.file_selected)
 
     def openTextFile(self):
         index = self.ui.systemViewer.currentIndex()
@@ -255,7 +270,7 @@ if __name__ == "__main__":
         Redirect(APP.console.errorwrite)
     ):
         APP.show()
-        print(f"Multithreading with maximum {APP.threadPool.maxThreadCount()} threads")
+        # print(f"Multithreading with maximum {APP.threadPool.maxThreadCount()} threads")
         print(
             """Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'"""
         )

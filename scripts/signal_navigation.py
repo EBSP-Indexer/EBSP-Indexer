@@ -3,10 +3,9 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 from os import path
 
-class SignalNavigation():
 
+class SignalNavigation:
     def __init__(self, file_path):
-        super().__init__()
         mpl.use("qt5agg")
         print(mpl.get_backend())
         self.file_path = file_path
