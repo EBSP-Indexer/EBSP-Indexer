@@ -62,12 +62,11 @@ class PatterCenterDialog(QDialog):
     def setupInitialSettings(self):
         self.setting_file = SettingFile(path.join(path.dirname(self.setting_path),"project_settings.txt"))
         self.program_settings = SettingFile("advanced_settings.txt")
+        
         try:
             self.convention = self.setting_file.read("Convention")
         except:
             self.convention = self.program_settings.read("Convention")
-        else:
-            self.convention = "TSL"
         
         try:
             self.pc = [

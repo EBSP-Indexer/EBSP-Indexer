@@ -75,8 +75,6 @@ class DiSetupDialog(QDialog):
             self.convention = self.setting_file.read("Convention")
         except:
             self.convention = self.program_settings.read("Convetion")
-        else:
-            self.convention = "TSL"
 
         self.ui.comboBoxConvention.setCurrentText(self.convention)
 
