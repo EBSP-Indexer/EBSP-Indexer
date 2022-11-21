@@ -209,18 +209,23 @@ class DiSetupDialog(QDialog):
 
     def update_pc_convention(self):
         self.convention = self.ui.comboBoxConvention.currentText()
-        self.ui.patternCenterY.setValue(1 - self.pc[1])
-        self.updatePCArrayFrompatternCenter()
+        self.updatePCpatternCenter()
 
     def updatePCpatternCenter(self):
         self.ui.patternCenterX.setValue(self.pc[0])
-        self.ui.patternCenterY.setValue(self.pc[1])
-        self.ui.patternCenterZ.setValue(self.pc[2])
+        self.ui.patternCenterY.setValue(self.pc[2])
+        if self.convention == "BRUKER":
+            self.ui.patternCenterZ.setValue(self.pc[1])
+        elif self.convention == "TSL":
+            self.ui.patternCenterZ.setValue(1-self.pc[1])
 
     def updatePCArrayFrompatternCenter(self):
         self.pc[0] = self.ui.patternCenterX.value()
-        self.pc[1] = self.ui.patternCenterY.value()
-        self.pc[2] = self.ui.patternCenterZ.value()
+        self.pc[2] = self.ui.patternCenterY.value()
+        if self.convention == "BRUKER":
+            self.pc[1] = self.ui.patternCenterZ.value()
+        elif self.convention == "TSL":
+            self.pc[1] = 1 - self.ui.patternCenterZ.value()
 
     ### Phases
     def addPhase(self):
@@ -469,7 +474,12 @@ class DiSetupDialog(QDialog):
 
         self.updatePCArrayFrompatternCenter()
         self.setting_file.write("X star", f"{self.pc[0]}")
-        self.setting_file.write("Y star", f"{self.pc[1]}")
+        
+        if self.convention == "BRUKER":
+            self.setting_file.write("Y star", f"{self.pc[1]}")
+        elif self.convention == "TSL":
+            self.setting_file.write("Y star", f"{1-self.pc[1]}")
+
         self.setting_file.write("Z star", f"{self.pc[2]}")
 
         self.setting_file.write("Binning", f"({self.new_signal_shape})")
