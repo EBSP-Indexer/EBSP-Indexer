@@ -92,6 +92,8 @@ class DiSetupDialog(QDialog):
                     float(self.setting_file.read("Z star")),
                 ]
             )
+            if self.convention == "TSL":
+                self.pc[1] = 1 - self.pc[1]
         except:
             self.pc = np.array([0.400, 0.400, 0.400])
 
