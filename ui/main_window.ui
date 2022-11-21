@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>834</width>
-    <height>806</height>
+    <width>695</width>
+    <height>662</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,47 +20,134 @@
    <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout" columnstretch="0,1">
-    <item row="0" column="1">
-     <spacer name="horizontalSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
+   <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QTreeView" name="systemViewer">
-      <property name="minimumSize">
-       <size>
-        <width>500</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="animated">
-       <bool>true</bool>
-      </property>
-      <attribute name="headerStretchLastSection">
-       <bool>true</bool>
-      </attribute>
-     </widget>
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="2">
+      <item>
+       <layout class="QHBoxLayout" name="topLayout" stretch="1,0,2">
+        <item>
+         <layout class="QVBoxLayout" name="systemViewerLayout" stretch="0,0,0,0">
+          <item>
+           <widget class="QLabel" name="folderLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>NO FOLDER OPENED</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTreeView" name="systemViewer">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>320</width>
+              <height>320</height>
+             </size>
+            </property>
+            <property name="mouseTracking">
+             <bool>false</bool>
+            </property>
+            <property name="tabletTracking">
+             <bool>true</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="editTriggers">
+             <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::CurrentChanged|QAbstractItemView::DoubleClicked|QAbstractItemView::SelectedClicked</set>
+            </property>
+            <property name="tabKeyNavigation">
+             <bool>true</bool>
+            </property>
+            <property name="dragEnabled">
+             <bool>false</bool>
+            </property>
+            <property name="dragDropOverwriteMode">
+             <bool>false</bool>
+            </property>
+            <property name="alternatingRowColors">
+             <bool>false</bool>
+            </property>
+            <property name="animated">
+             <bool>true</bool>
+            </property>
+            <attribute name="headerStretchLastSection">
+             <bool>true</bool>
+            </attribute>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPlainTextEdit" name="consoleLog">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="inputLayout">
+            <item>
+             <widget class="QLabel" name="consolePrompt">
+              <property name="text">
+               <string>&gt;&gt;&gt;</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="Line" name="line_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="MplWidget" name="MplWidget" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>320</width>
+            <height>320</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: transparent</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>834</width>
+     <width>695</width>
      <height>24</height>
     </rect>
    </property>
@@ -69,32 +156,36 @@
      <string>File</string>
     </property>
     <addaction name="actionOpen_Workfolder"/>
+    <addaction name="separator"/>
+    <addaction name="actionSettings"/>
    </widget>
    <widget class="QMenu" name="menuProcessing">
     <property name="title">
      <string>Processing</string>
     </property>
     <addaction name="actionProcessingMenu"/>
+    <addaction name="actionROI"/>
     <addaction name="actionPattern_Center"/>
    </widget>
    <widget class="QMenu" name="menuPlot">
     <property name="title">
-     <string>Plotting</string>
+     <string>Pattern inspection</string>
     </property>
     <addaction name="actionSignalNavigation"/>
+    <addaction name="actionPre_indexing_maps"/>
    </widget>
    <widget class="QMenu" name="menuDictionary_indexing">
     <property name="title">
-     <string>Dictionary indexing</string>
+     <string>Indexing</string>
     </property>
-    <addaction name="actionDictinary_indexing_setup"/>
+    <addaction name="actionDictionary_indexing"/>
+    <addaction name="actionHough_indexing"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuProcessing"/>
    <addaction name="menuPlot"/>
    <addaction name="menuDictionary_indexing"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen_Workfolder">
    <property name="text">
     <string>Open Workfolder...</string>
@@ -105,7 +196,7 @@
   </action>
   <action name="actionProcessingMenu">
    <property name="text">
-    <string>N/S improvement</string>
+    <string>Noise-to-signal improvement</string>
    </property>
    <property name="statusTip">
     <string>Perform processing on a pattern</string>
@@ -116,15 +207,48 @@
     <string>Signal navigation</string>
    </property>
   </action>
-  <action name="actionDictinary_indexing_setup">
+  <action name="actionDictionary_indexing">
    <property name="text">
-    <string>Dictinary indexing setup</string>
+    <string>Dictionary indexing</string>
+   </property>
+  </action>
   <action name="actionPattern_Center">
    <property name="text">
-    <string>Pattern center</string>
+    <string>Refine pattern center</string>
+   </property>
+  </action>
+  <action name="actionROI">
+   <property name="text">
+    <string>Choose region of interest</string>
+   </property>
+  </action>
+  <action name="actionHough_indexing">
+   <property name="text">
+    <string>Hough indexing</string>
+   </property>
+  </action>
+  <action name="actionPre_indexing_maps">
+   <property name="text">
+    <string>Generate pre-indexing maps</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
+   </property>
+   <property name="statusTip">
+    <string/>
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MplWidget</class>
+   <extends>QWidget</extends>
+   <header>mplwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
