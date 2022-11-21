@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from orix import io, plot, sampling
 from orix.quaternion import Rotation
-from PySide6.QtWidgets import QDialog
+from PySide6.QtWidgets import QDialog, QDialogButtonBox
 from PySide6.QtCore import QThreadPool
 
 from ui.ui_di_setup import Ui_DiSetupDialog
@@ -44,11 +44,13 @@ class DiSetupDialog(QDialog):
 
         self.load_pattern()
         self.setupInitialSettings()
+        self.checkConfirmState()
         self.setupBinningShapes()
+        self.generate_rotation_lookup_dict()
+        self.estimateSimulationSize()
 
         # temporary
         self.keep_unrefined_xmaps = False
-        self.di_result_filetypes = ["ang", "h5"]
 
         # Setup button connections
         self.setupConnections()
@@ -111,26 +113,71 @@ class DiSetupDialog(QDialog):
             except:
                 break
 
+        self.getPhases()
+        self.load_master_pattern()
+
         # Set max for N-iter
         x_len, y_len = self.s.axes_manager.navigation_shape
         self.ui.spinBoxNumIter.setMaximum(x_len*y_len)
 
+    # Lookup table for sample rotations
+    def generate_rotation_lookup_dict(self):
+        self.sample_rotations = {}
+        with open("sample_rotations.txt", "r") as f:
+            for line in f:
+                (key, value) = line.strip().split("\t")
+                self.sample_rotations[f"{float(key):.2}"] = eval(value)
+
+    def estimateSimulationSize(self):
+        angle = float(self.ui.doubleSpinBoxStepSize.value())
+        total_sim = 0
+        if len(self.phases) > 0:
+            for ph in self.phases:
+                file_mp = path.join(self.mpPaths[ph], f"{ph}_mc_mp_20kv.h5")
+                mp = kp.load(
+                    file_mp,
+                    energy=20,  # single energies like 10, 11, 12 etc. or a range like (10, 20)
+                    projection="lambert",  # stereographic, lambert
+                    hemisphere="upper",  # upper, lower
+                )
+                
+                total_sim += self.sample_rotations[f"{round(angle, 1)}"][mp.phase.point_group.name]
+            
+            self.ui.numSimPatterns.setText(f"{total_sim:,}")
+        else:
+            self.ui.numSimPatterns.setText("N/A")
+
     def load_pattern(self, lazy_load=True):
         try:
             self.s = kp.load(self.pattern_path, lazy=lazy_load)
+            # Read metadata from pattern file
+            self.energy = self.s.metadata.Acquisition_instrument.SEM.beam_energy
+            self.sample_tilt = self.s.detector.sample_tilt
         except Exception as e:
             raise e
 
     def setupBinningShapes(self):
-        self.sig_shape = self.s.axes_manager.signal_shape[::-1]
-        self.bin_shapes = np.array([])
-        for num in range(10, self.sig_shape[0] + 1):
-            if self.sig_shape[0] % num == 0:
-                self.bin_shapes = np.append(self.bin_shapes, f"({num}, {num})")
+        try:
+            self.sig_shape = self.s.axes_manager.signal_shape[::-1]
+            self.bin_shapes = np.array([])
+            for num in range(10, self.sig_shape[0] + 1):
+                if self.sig_shape[0] % num == 0:
+                    self.bin_shapes = np.append(self.bin_shapes, f"({num}, {num})")
 
-        self.ui.comboBoxBinning.addItems(self.bin_shapes[::-1])
+            self.ui.comboBoxBinning.addItems(self.bin_shapes[::-1])
+        except Exception as e:
+            raise e
 
-        del self.s
+    def set_save_fileformat(self):
+        self.di_result_filetypes = [el.strip(".") for el in self.ui.comboBoxFiletype.currentText().split(", ")]
+        print(self.di_result_filetypes)
+
+        
+        
+    def update_pc_convention(self):
+        self.convention = self.ui.comboBoxConvention.currentText()
+        self.ui.patternCenterY.setValue(1 - self.pc[1])
+        self.updatePCArrayFrompatternCenter()
 
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_dictionary_indexing())
@@ -143,17 +190,21 @@ class DiSetupDialog(QDialog):
             lambda: self.update_pc_convention()
         )
         self.ui.checkBoxLazy.stateChanged.connect(lambda: self.setNiterState())
-
+        self.ui.doubleSpinBoxStepSize.valueChanged.connect(lambda: self.estimateSimulationSize())
+    
     def setNiterState(self):
-        print("start")
         if self.ui.checkBoxLazy.isChecked():
-            print("ok")
             self.ui.spinBoxNumIter.setEnabled(False)
             self.ui.nIterLabel.setEnabled(False)
         else:
-            print("ok2")
             self.ui.spinBoxNumIter.setEnabled(True)
             self.ui.nIterLabel.setEnabled(True)
+
+    def checkConfirmState(self):
+        if len(self.phases) == 0:
+            self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+        else:
+            self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
     ### Pattern center functions
 
     def update_pc_convention(self):
@@ -187,9 +238,19 @@ class DiSetupDialog(QDialog):
                 self.mpPaths[phase] = mpPath
                 self.ui.listWidgetPhase.addItem(phase)
 
+        self.getPhases()
+        self.load_master_pattern()
+        self.estimateSimulationSize()
+        self.checkConfirmState()
+
     def removePhase(self):
         self.mpPaths.pop(str(self.ui.listWidgetPhase.currentItem().text()))
         self.ui.listWidgetPhase.takeItem(self.ui.listWidgetPhase.currentRow())
+
+        self.getPhases()
+        self.load_master_pattern()
+        self.estimateSimulationSize()
+        self.checkConfirmState()
 
     def getPhases(self):
         lw = self.ui.listWidgetPhase
@@ -218,30 +279,26 @@ class DiSetupDialog(QDialog):
         self.threadPool.start(di_worker)
         self.accept()
 
+    
+    # Master pattern dictionary
+    def load_master_pattern(self):
+        self.mp = {}
+        for ph in self.phases:
+            file_mp = path.join(self.mpPaths[ph], f"{ph}_mc_mp_20kv.h5")
+            self.mp[f"{ph}"] = kp.load(
+                file_mp,
+                energy=self.energy,  # single energies like 10, 11, 12 etc. or a range like (10, 20)
+                projection="lambert",  # stereographic, lambert
+                hemisphere="upper",  # upper, lower
+            )
+
     # Signal mask
     def signal_mask(self):  # Add signal mask
-        self.signal_mask = ~kp.filters.Window("circular", self.sig_shape).astype(bool)
+        if self.options["mask"]:
+            self.signal_mask = ~kp.filters.Window("circular", self.sig_shape).astype(bool)
 
-        # Save figure of signal mask for visualization
-        # try:
-        #    p = self.s_binned.inav[0, 0].data
-        #    fig, ax = plt.subplots(ncols=2, figsize=(10, 5))
-        #    ax[0].imshow(p * self.signal_mask, cmap="gray")
-        #    ax[0].set_title("Not used in matching")
-        #    ax[1].imshow(p * ~self.signal_mask, cmap="gray")
-        #    ax[1].set_title("Used in matching")
-        #    fig.savefig(
-        #        path.join(self.results_dir, "circular_mask_for_di.png"),
-        #        **self.savefig_kwargs,
-        #    )
-        #
-        #    plt.close(fig)
-
-        # except Exception as e:
-        #    raise e
-
-        # Set signal mask for dictionary indexing
-        self.di_kwargs["signal_mask"] = self.signal_mask
+            # Set signal mask for dictionary indexing
+            self.di_kwargs["signal_mask"] = self.signal_mask
 
     # Master pattern sample, TODO: add in dialog
     def master_pattern_sample(self, ph):
@@ -368,6 +425,7 @@ class DiSetupDialog(QDialog):
         # Merge xmaps from indexed phases
 
         merged = kp.indexing.merge_crystal_maps(crystal_maps=cm, scores_prop="scores", **merge_kwargs)
+        
 
         colors = ["lime", "r", "b", "yellow"]
 
@@ -506,48 +564,22 @@ class DiSetupDialog(QDialog):
                 break
             except FileExistsError:
                 pass
-                # print(
-                #    f"Directory {self.results_dir} exists, will try to create directory di_results_{i + 1}"
-                # )
             i += 1
+        print("Initializing dictionary indexing")
 
         # get options from input
         self.options = self.getOptions()
-
         self.load_pattern(self.options["lazy"])
-        # load selected EBSD pattern with current options
-        # try:
-        #    self.s = kp.load(self.pattern_path, lazy=self.options["lazy"])
-        # except Exception as e:
-        #    raise e
-
-        # set pattern center values
         self.updatePCArrayFrompatternCenter()
-
-        # Get phases
-        self.getPhases()
-
-        # Refinement
+        self.set_save_fileformat()
         self.refine = self.options["refine"]
-
-        # New binning shape
         self.new_signal_shape = self.options["binning"]
-
-        # Angular step size for DI
         self.angular_step_size = self.options["angular_step_size"]
-
-        ### Removed for now
-        # If n per iteration is 0
+        
         self.n_per_iteration = None
-
         if self.options["n_iter"] != 0:
             self.n_per_iteration = self.options["n_iter"]
-
         self.di_kwargs["n_per_iteration"] = self.n_per_iteration
-
-        # Read metadata from pattern file
-        self.energy = self.s.metadata.Acquisition_instrument.SEM.beam_energy
-        self.sample_tilt = self.s.detector.sample_tilt
 
         # Rebinning of signal
         self.nav_shape = self.s.axes_manager.navigation_shape
@@ -556,51 +588,23 @@ class DiSetupDialog(QDialog):
 
         # Define detector-sample geometry
         self.sig_shape = self.s_binned.axes_manager.signal_shape[::-1]
-
         self.detector = kp.detectors.EBSDDetector(
             shape=self.sig_shape,
             sample_tilt=self.sample_tilt,  # Degrees
             pc=self.pc,
-            convention="BRUKER",  # Default is Bruker, TODO: let user choose convention
+            convention=self.convention,  # Default is Bruker, TODO: let user choose convention
         )
 
-        # Define refinement kwargs
+        # Apply signal mask
+        self.signal_mask()
 
-        # self.ref_kw = dict(detector=self.detector, energy=self.energy, compute=True)
-
-        ### Set up dictionary indexing parameters
-
-        # self.di_kwargs["n_per_iteration"] = None
-
-        ### additional functions to be performed
-
-        if self.options["mask"]:
-            self.signal_mask()
-
-        # maps_keys = ["ncc", "osm", "ipf"]
-        # for key in maps_keys:
-        #    optionEnabled, optionExecute = self.options[key]
-        #    if optionEnabled:
-        #        optionExecute()
-
-        # Master pattern dictionary
-        self.mp = {}
-        for ph in self.phases:
-            self.file_mp = path.join(self.mpPaths[ph], f"{ph}_mc_mp_20kv.h5")
-            self.mp[f"{ph}"] = kp.load(
-                self.file_mp,
-                energy=self.energy,  # single energies like 10, 11, 12 etc. or a range like (10, 20)
-                projection="lambert",  # stereographic, lambert
-                hemisphere="upper",  # upper, lower
-            )
-
-        # Xmaps dictionary for storing crystalmaps
+        # Define dictionaries for storing crystal maps
         self.xmaps = {}
         self.xmaps["type"] = "unrefined"
-        # Refined xmaps dictionary for storing refined crystalmaps
         self.xmaps_ref = {}
         self.xmaps_ref["type"] = "refined"
 
+        # Save current project settings to project_settings.txt
         self.save_project_settings()
 
         ### Dictionary indexing
@@ -608,15 +612,13 @@ class DiSetupDialog(QDialog):
         for ph in self.phases:
 
             ### Sample orientations
-
             self.rot = sampling.get_sample_fundamental(
                 method="cubochoric",
                 resolution=self.angular_step_size,
                 point_group=self.mp[f"{ph}"].phase.point_group,
             )
-
+            print(f"Generation simulation dictinary from {ph} master pattern")
             ### Generate dictionary
-
             self.sim_dict = self.mp[f"{ph}"].get_patterns(
                 rotations=self.rot,
                 detector=self.detector,
@@ -639,6 +641,7 @@ class DiSetupDialog(QDialog):
                     )
 
         if self.options["osm"]:
+            print("Creating orientation similarity map")
             self.save_orientation_similairty_map(self.xmaps)
 
         if self.refine:
@@ -647,7 +650,7 @@ class DiSetupDialog(QDialog):
         ### Single phase
 
         if len(self.phases) == 1:
-
+            print("Saving figures")
             if self.refine:
 
                 # Save IPF of refined xmap
@@ -671,12 +674,10 @@ class DiSetupDialog(QDialog):
                 #save DI settings to file
                 self.save_di_settings(self.xmaps)
 
-            
-
         ## Multiple phase
 
         if len(self.phases) > 1:
-
+            print("Merging crystal maps")
             if self.refine:
                 type = self.xmaps_ref["type"]
                 self.merged = self.merge_crystal_maps(self.xmaps_ref)
@@ -721,3 +722,4 @@ class DiSetupDialog(QDialog):
                 )
             
             self.save_di_settings(self.merged)
+        print(f"Dictionary indexing complete, results are stored in {path.basename(self.results_dir)}")
