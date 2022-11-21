@@ -162,19 +162,19 @@ class DiSetupDialog(QDialog):
 
     def updatePCpatternCenter(self):
         self.ui.patternCenterX.setValue(self.pc[0])
-        self.ui.patternCenterY.setValue(self.pc[2])
+        self.ui.patternCenterZ.setValue(self.pc[2])
         if self.convention == "BRUKER":
-            self.ui.patternCenterZ.setValue(self.pc[1])
+            self.ui.patternCenterY.setValue(self.pc[1])
         elif self.convention == "TSL":
-            self.ui.patternCenterZ.setValue(1-self.pc[1])
+            self.ui.patternCenterY.setValue(1-self.pc[1])
 
     def updatePCArrayFrompatternCenter(self):
         self.pc[0] = self.ui.patternCenterX.value()
-        self.pc[2] = self.ui.patternCenterY.value()
+        self.pc[2] = self.ui.patternCenterZ.value()
         if self.convention == "BRUKER":
-            self.pc[1] = self.ui.patternCenterZ.value()
+            self.pc[1] = self.ui.patternCenterY.value()
         elif self.convention == "TSL":
-            self.pc[1] = 1 - self.ui.patternCenterZ.value()
+            self.pc[1] = 1 - self.ui.patternCenterY.value()
 
     ### Phases
     def addPhase(self):
