@@ -4,9 +4,9 @@ from os.path import basename, splitext, exists
 
 # from os import startfile #Does not work on mac...
 from contextlib import redirect_stdout, redirect_stderr
-from PySide6.QtCore import QDir, Qt, QEvent
+from PySide6.QtCore import QDir, Qt, QProcess, QThreadPool
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
-from PySide6.QtGui import QFont, QKeyEvent
+from PySide6.QtGui import QFont
 from scripts.hough_indexing import HiSetupDialog
 from ui.ui_main_window import Ui_MainWindow
 import matplotlib.image as mpimg
@@ -16,7 +16,7 @@ from utils.filebrowser import FileBrowser
 from utils.setting_file import SettingFile
 
 from scripts.pattern_processing import PatternProcessingDialog
-from scripts.signal_navigation import SignalNavigation
+from scripts.signal_navigation import signalNavigation
 from scripts.dictionary_indexing import DiSetupDialog
 from scripts.pre_indexing_maps import PreIndexingMapsDialog
 from scripts.advanced_settings import AdvancedSettingsDialog
@@ -25,6 +25,9 @@ from scripts.advanced_settings import AdvancedSettingsDialog
 from scripts.console import Console, Redirect
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
+
+KP_EXTENSIONS = (".h5", ".dat")
+IMAGE_EXTENSIONS = ()
 
 
 class AppWindow(QMainWindow):
@@ -50,22 +53,21 @@ class AppWindow(QMainWindow):
         self.console = Console(parent=self, context=globals())
         self.console.setfont(QFont("Lucida Sans Typewriter", 10))
 
-        self.showImage()
+        self.showImage(self.file_selected)
         self.importSettings()
 
     def setupConnections(self):
+        self.ui.systemViewer.selectionModel().selectionChanged.connect(
+            lambda new, old: self.onSystemModelChanged(new, old)
+        )
+        # self.ui.systemViewer.keyReleaseEvent = self.onKeyReleaseEvent
+        # self.ui.systemViewer.doubleClicked.connect(lambda: self.openTextFile())
         self.ui.actionOpen_Workfolder.triggered.connect(
             lambda: self.selectWorkingDirectory()
         )
         self.ui.actionSettings.triggered.connect(lambda: self.openSettings())
         self.ui.actionProcessingMenu.triggered.connect(lambda: self.selectProcessing())
         self.ui.actionROI.triggered.connect(lambda: self.selectROI())
-        self.ui.systemViewer.selectionModel().selectionChanged.connect(
-            lambda new, old: self.onSystemModelChanged(new, old)
-        )
-        self.ui.systemViewer.keyReleaseEvent = self.onKeyReleaseEvent
-        # self.ui.systemViewer.doubleClicked.connect(lambda: self.openTextFile())
-
         self.ui.actionSignalNavigation.triggered.connect(
             lambda: self.selectSignalNavigation()
         )
@@ -82,10 +84,10 @@ class AppWindow(QMainWindow):
             lambda: self.selectPreIndexingMaps()
         )
 
-    def onKeyReleaseEvent(self, event):
-        if event.key() == Qt.Key_Up or event.key() == Qt.Key_Down:
-            index = self.ui.systemViewer.currentIndex()
-            self.onSystemViewClicked(index)
+    # def onKeyReleaseEvent(self, event):
+    #     if event.key() == Qt.Key_Up or event.key() == Qt.Key_Down:
+    #         index = self.ui.systemViewer.currentIndex()
+    #         self.onSystemViewClicked(index)
 
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
@@ -191,13 +193,12 @@ class AppWindow(QMainWindow):
     def onSystemModelChanged(self, new_selected, old_selected):
         if new_selected.empty():
             self.file_selected = None
-            self.showImage()
         else:
             self.file_selected = self.systemModel.filePath(
                 self.ui.systemViewer.currentIndex()
             )
-            if splitext(self.file_selected)[1] in [".jpg", ".png", ".gif", ".bmp"]:
-                self.showImage(self.file_selected)
+        self.updateMenuButtons(self.file_selected)
+        self.showImage(self.file_selected)
 
     def openTextFile(self):
         index = self.ui.systemViewer.currentIndex()
@@ -209,7 +210,9 @@ class AppWindow(QMainWindow):
 
     def selectSignalNavigation(self):
         try:
-            self.signalNavigation = SignalNavigation(file_path=self.file_selected)
+            #self.p = QProcess()
+            #self.p.start("python", ['scripts/signal_navigation.py', self.file_selected])
+            signalNavigation(file_path=self.file_selected)
         except Exception as e:
             if self.file_selected == "":
                 dlg = QMessageBox(self)
@@ -252,13 +255,48 @@ class AppWindow(QMainWindow):
                 f"Could not initialize pattern center refinement:\n{str(e)}\n"
             )
 
-    def showImage(self, imagePath="resources/kikuchipy_banner.png"):
-        image = mpimg.imread(imagePath)
-
+    def showImage(self, image_path):
+        if image_path == None or not splitext(image_path)[1] in [
+            ".jpg",
+            ".png",
+            ".gif",
+            ".bmp",
+        ]:
+            image = mpimg.imread("resources/kikuchipy_banner.png")
+        else:
+            image = mpimg.imread(image_path)
         self.ui.MplWidget.canvas.ax.clear()
         self.ui.MplWidget.canvas.ax.axis(False)
         self.ui.MplWidget.canvas.ax.imshow(image)
         self.ui.MplWidget.canvas.draw()
+
+    def updateMenuButtons(self, file_path):
+        """
+        Updates the menu buttons based on the extension of file_path
+        """
+
+        def setAllMenu(enabled):
+            self.ui.menuProcessing.setEnabled(enabled)
+            self.ui.menuPlot.setEnabled(enabled)
+            self.ui.menuIndexing.setEnabled(enabled)
+            self.ui.actionPre_indexing_maps.setEnabled(enabled)
+            self.ui.actionSignalNavigation.setEnabled(enabled)
+
+        if file_path == None:
+            return
+        file_extension = splitext(file_path)[1]
+
+        if file_extension in KP_EXTENSIONS:
+            kp_enabled = True
+        else:
+            kp_enabled = False
+        setAllMenu(kp_enabled)
+
+        # Special case for plotting calibration patterns from Settings.txt
+        if basename(file_path) == "Setting.txt":
+            self.ui.menuPlot.setEnabled(True)
+            self.ui.actionSignalNavigation.setEnabled(True)
+            self.ui.actionPre_indexing_maps.setEnabled(False)
 
 
 if __name__ == "__main__":
@@ -270,7 +308,7 @@ if __name__ == "__main__":
         Redirect(APP.console.errorwrite)
     ):
         APP.show()
-        # print(f"Multithreading with maximum {APP.threadPool.maxThreadCount()} threads")
+        print(f"Multithreading with maximum {QThreadPool.globalInstance().maxThreadCount()} threads")
         print(
             """Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'"""
         )

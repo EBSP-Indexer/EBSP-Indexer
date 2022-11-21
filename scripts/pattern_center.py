@@ -92,11 +92,15 @@ class PatterCenterDialog(QDialog):
                 phase = mp_path.split("/").pop()
                 self.mp_paths[phase] = mp_path
                 self.ui.listPhases.addItem(phase)
+                
                 i += 1
                 self.phase = phase
             except:
                 break
-
+        if bool(self.mp_paths):
+            print(self.mp_paths)
+            self.phase = list(self.mp_paths.keys())[0]
+            self.ui.listPhases.setCurrentRow(0)
         self.is_mp_paths_updated = True
         self.enabled = False
         self.ui.bandButton.setDisabled(True)
@@ -139,8 +143,8 @@ class PatterCenterDialog(QDialog):
         self.ui.toolButtonRight.clicked.connect(lambda: self.nextPattern())
         self.ui.buttonTune.clicked.connect(lambda: self.refinePatternCenter())
         self.ui.buttonPlot.clicked.connect(lambda: self.plotClicked())
-        self.ui.buttonBox.clicked.connect(lambda: self.saveAndExit())
-        self.ui.buttonBox.clicked.connect(lambda: self.reject())
+        self.ui.buttonBox.accepted.connect(lambda: self.saveAndExit())
+        self.ui.buttonBox.rejected.connect(lambda: self.reject())
         self.ui.bandButton.clicked.connect(lambda: self.bandButtonClicked())
         self.ui.ignoreCheckBox.clicked.connect(lambda: self.ignoreButtonClicked())
         self.ui.conventionBox.currentTextChanged.connect(lambda: self.updatePCConvention())
