@@ -84,8 +84,7 @@ class HiSetupDialog(QDialog):
             self.convention = self.setting_file.read("Convention")
         except:
             self.convention = self.program_settings.read("Convention")
-        else:
-            self.convention = "TSL"
+
 
         try:
             self.pc = np.array(
