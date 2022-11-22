@@ -1,18 +1,16 @@
+import sys
 from kikuchipy import load
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-from os import path
 
-class SignalNavigation():
+path = sys.argv[1]
 
-    def __init__(self, file_path):
-        super().__init__()
-        mpl.use("qt5agg")
-        print(mpl.get_backend())
-        self.file_path = file_path
-        try:
-            self.s = load(self.file_path, lazy=True)
-        except Exception as e:
-            raise e
-        self.s.plot()
-        plt.show()
+def signalNavigation(file_path):
+    try:
+        s = load(file_path, lazy=True)
+    except Exception as e:
+        raise e
+    s.plot()
+    plt.show()
+
+if __name__ == "__main__":
+    signalNavigation(path)
