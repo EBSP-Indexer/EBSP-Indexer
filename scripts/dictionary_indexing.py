@@ -74,7 +74,7 @@ class DiSetupDialog(QDialog):
         try:
             self.convention = self.setting_file.read("Convention")
         except:
-            self.convention = self.program_settings.read("Convetion")
+            self.convention = self.program_settings.read("Convention")
 
         self.ui.comboBoxConvention.setCurrentText(self.convention)
 
@@ -469,7 +469,10 @@ class DiSetupDialog(QDialog):
         ### DI parameteres
 
         self.di_setting_file.write("kikuchipy version", kp.__version__)
-        self.di_setting_file.write("PC (x*, y*, z*)", f"{self.pc}")
+        if self.convention == "TSL":
+            self.di_setting_file.write("PC (x*, y*, z*)", f"{1-self.pc}")
+        elif self.convention == "BRUKER":
+            self.di_setting_file.write("PC (x*, y*, z*)", f"{self.pc}")
         self.di_setting_file.write("PC convention", f"{self.convention}")
 
         for i, ph in enumerate(self.phases, 1):
