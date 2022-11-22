@@ -175,7 +175,6 @@ class HiSetupDialog(QDialog):
             "rho": self.ui.horizontalSliderRho.value(),
             "phase_list": self.ui.listWidgetPhase.selectedItems(),
             "lazy": self.ui.checkBoxLazy.isChecked(),
-            "pre": [self.ui.checkBoxPre.isChecked(), self.generate_pre_maps],
             "quality": [
                 self.ui.checkBoxQuality.isChecked(),
                 self.generate_combined_map,
@@ -228,9 +227,6 @@ class HiSetupDialog(QDialog):
         self.set_phases_properties()
         self.rho_mask = (100.0 - options["rho"]) / 100.0
         self.number_bands = options["bands"]
-        optionEnabled, optionExecute = options["pre"]
-        if optionEnabled:
-            optionExecute()
         self.sig_shape = self.s.axes_manager.signal_shape[::-1]
         self.nav_shape = self.s.axes_manager.navigation_shape
         self.new_signal_shape = eval(options["binning"])
@@ -315,28 +311,6 @@ class HiSetupDialog(QDialog):
             self.lat_param.append(a)
             self.space_groups.append(space_group)
             self.phase_proxys.append(phase_proxy)
-
-    def generate_pre_maps(self):
-        print("Generating maps of input data ...")
-        mean_intensity = self.s.mean(axis=(2, 3))
-        plt.imsave(
-            path.join(self.dir_out, "mean_intensity.png"),
-            mean_intensity.data,
-            cmap="gray",
-        )
-
-        vbse_gen = kp.generators.VirtualBSEGenerator(self.s)
-        red = (2, 1)
-        green = (2, 2)
-        blue = (2, 3)
-        vbse_rgb_img = vbse_gen.get_rgb_image(r=red, g=green, b=blue)
-        vbse_rgb_img.change_dtype("uint8")
-        plt.imsave(path.join(self.dir_out, "vbse_rgb.png"), vbse_rgb_img.data)
-
-        iq = self.s.get_image_quality()
-        adp = self.s.get_average_neighbour_dot_product_map()
-        plt.imsave(path.join(self.dir_out, "maps_iq.png"), iq, cmap="gray")
-        plt.imsave(path.join(self.dir_out, "maps_adp.png"), adp, cmap="gray")
 
     def generate_combined_map(self):
         """

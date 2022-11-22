@@ -97,7 +97,6 @@ class PatterCenterDialog(QDialog):
             except:
                 break
         if bool(self.mp_paths):
-            print(self.mp_paths)
             self.phase = list(self.mp_paths.keys())[0]
             self.ui.listPhases.setCurrentRow(0)
         self.is_mp_paths_updated = True
@@ -202,11 +201,14 @@ class PatterCenterDialog(QDialog):
                 self.ui.listPhases.addItem(phase)
                 self.is_mp_paths_updated = True
             self.phase = phase
+            if not self.ui.listPhases.selectionModel().hasSelection():
+                self.ui.listPhases.setCurrentRow(0)
 
     def removePhase(self):
         self.mp_paths.pop(str(self.ui.listPhases.currentItem().text()))
         self.ui.listPhases.takeItem(self.ui.listPhases.currentRow())
         self.is_mp_paths_updated = True
+        self.ui.listPhases.clearSelection()
 
     def updatePCSpinBox(self):
         self.ui.spinBoxX.setValue(self.pc[0])

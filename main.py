@@ -47,7 +47,6 @@ class AppWindow(QMainWindow):
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         self.systemModel = QFileSystemModel()
 
-        self.ui.systemViewer.setModel(self.systemModel)
         self.setupConnections()
 
         self.console = Console(parent=self, context=globals())
@@ -57,11 +56,12 @@ class AppWindow(QMainWindow):
         self.importSettings()
 
     def setupConnections(self):
+        self.ui.systemViewer.setModel(self.systemModel)
         self.ui.systemViewer.selectionModel().selectionChanged.connect(
             lambda new, old: self.onSystemModelChanged(new, old)
         )
         # self.ui.systemViewer.keyReleaseEvent = self.onKeyReleaseEvent
-        # self.ui.systemViewer.doubleClicked.connect(lambda: self.openTextFile())
+        self.ui.systemViewer.doubleClicked.connect(lambda: self.openTextFile())
         self.ui.actionOpen_Workfolder.triggered.connect(
             lambda: self.selectWorkingDirectory()
         )
