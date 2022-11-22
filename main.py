@@ -1,8 +1,10 @@
 import sys
 import json
 from os.path import basename, splitext, exists
+from os import startfile
+import subprocess
+import platform
 
-# from os import startfile #Does not work on mac...
 from contextlib import redirect_stdout, redirect_stderr
 from PySide6.QtCore import QDir, Qt, QProcess, QThreadPool
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
@@ -61,7 +63,7 @@ class AppWindow(QMainWindow):
             lambda new, old: self.onSystemModelChanged(new, old)
         )
         # self.ui.systemViewer.keyReleaseEvent = self.onKeyReleaseEvent
-        # self.ui.systemViewer.doubleClicked.connect(lambda: self.openTextFile())
+        self.ui.systemViewer.doubleClicked.connect(lambda: self.openTextFile())
         self.ui.actionOpen_Workfolder.triggered.connect(
             lambda: self.selectWorkingDirectory()
         )
@@ -203,10 +205,12 @@ class AppWindow(QMainWindow):
     def openTextFile(self):
         index = self.ui.systemViewer.currentIndex()
         self.file_selected = self.systemModel.filePath(index)
-        """
+        
         if splitext(self.file_selected)[1] in [".txt"]:
-            startfile(self.file_selected)
-        """
+            if platform.system().lower() == "darwin":
+                subprocess.call(['open', '-a', 'TextEdit', self.file_selected])
+            if platform.system().lower() == "windows":
+                startfile(self.file_selected)
 
     def selectSignalNavigation(self):
         try:

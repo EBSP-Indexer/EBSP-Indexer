@@ -19,17 +19,11 @@ class SettingFile:
         
 
     def write(self, key, value):
-        try:
-            self.dict[f"{key}"] = f"{value}\n"
-        except:
-            warnings.warn(f"Could not write {key}: {value} to settings file.")
+        self.dict[f"{key}"] = f"{value}\n"
     
     def read(self, key):
-        try:
-            return self.dict.get(key).strip()
-        except:
-            pass
-            # warnings.warn(f"Could not read '{key}' from settings file.")
+        return self.dict.get(key).strip()
+            
     
     def remove(self, key):
         try:

@@ -26,7 +26,7 @@ warnings.filterwarnings("ignore")
 
 
 class HiSetupDialog(QDialog):
-
+    """
     PHASE_PARAMETERS = {
         "al": (0.404, 225, "FCC"),
         "austenite": (0.3595, 225, "FCC"),
@@ -35,6 +35,8 @@ class HiSetupDialog(QDialog):
         "si": (0.543070, 227, "FCC"),
         "ti_beta": (0.33065, 229, "BCC"),
     }
+    """
+    SG_NUM_TO_PROXY = {"225": "FCC", "227": "FCC", "229": "BCC"}
 
     def __init__(self, parent, pattern_path=None):
         super().__init__(parent)
@@ -56,8 +58,8 @@ class HiSetupDialog(QDialog):
         self.setupConnections()
         self.checkPhaseList()
 
-        self.phases = []
-        self.lat_param = []
+        # self.phases = []
+        # self.lat_param = []
         self.space_groups = []
         self.phase_proxys = []
         self.xmap = None
@@ -76,7 +78,9 @@ class HiSetupDialog(QDialog):
         self.di_kwargs = dict(metric="ncc", keep_n=20)
 
         # read current setting from project_settings.txt, advanced_settings.txt
-        self.setting_file = SettingFile(path.join(self.working_dir, "project_settings.txt"))
+        self.setting_file = SettingFile(
+            path.join(self.working_dir, "project_settings.txt")
+        )
         self.program_settings = SettingFile("advanced_settings.txt")
 
         # PC convention, default is TSL
@@ -84,7 +88,6 @@ class HiSetupDialog(QDialog):
             self.convention = self.setting_file.read("Convention")
         except:
             self.convention = self.program_settings.read("Convention")
-
 
         try:
             self.pc = np.array(
@@ -98,10 +101,9 @@ class HiSetupDialog(QDialog):
             if self.convention == "TSL":
                 self.pc[1] = 1 - self.pc[1]
         except:
-            self.pc = np.array([0.000, 0.000, 0.000])
-    
+            self.pc = np.array([0.400, 0.200, 0.400])
 
-        self.updatePCpatternCenter()
+        self.update_pc_spinbox()
         self.ui.comboBoxConvention.setCurrentText(self.convention)
 
         if self.program_settings.read("Lazy Loading") == "False":
@@ -119,26 +121,26 @@ class HiSetupDialog(QDialog):
             except:
                 break
 
-    def updatePCpatternCenter(self):
+    def update_pc_spinbox(self):
         self.ui.patternCenterX.setValue(self.pc[0])
         self.ui.patternCenterZ.setValue(self.pc[2])
         if self.convention == "BRUKER":
             self.ui.patternCenterY.setValue(self.pc[1])
         elif self.convention == "TSL":
-            self.ui.patternCenterY.setValue(1-self.pc[1])
+            self.ui.patternCenterY.setValue(1 - self.pc[1])
 
-    def updatePCArrayFrompatternCenter(self):
+    def update_pc_array_from_spinbox(self):
         self.pc[0] = self.ui.patternCenterX.value()
         self.pc[2] = self.ui.patternCenterZ.value()
         if self.convention == "BRUKER":
             self.pc[1] = self.ui.patternCenterY.value()
         elif self.convention == "TSL":
             self.pc[1] = 1 - self.ui.patternCenterY.value()
-    
-    def updatePCConvention(self):
+
+    def update_pc_convention(self):
         self.convention = self.ui.comboBoxConvention.currentText()
-        self.updatePCpatternCenter()
-            
+        self.update_pc_spinbox()
+
     def addPhase(self):
         if self.fileBrowserOD.getFile():
             mpPath = self.fileBrowserOD.getPaths()[0]
@@ -163,7 +165,7 @@ class HiSetupDialog(QDialog):
         self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.removePhase())
 
         self.ui.comboBoxConvention.currentTextChanged.connect(
-            lambda: self.updatePCConvention()
+            lambda: self.update_pc_convention()
         )
 
         self.ui.horizontalSliderRho.valueChanged.connect(lambda: self.updateRho())
@@ -222,9 +224,9 @@ class HiSetupDialog(QDialog):
                 print(
                     f"Directory '{self.dir_out}' exists, will try to create directory '{self.dir_out[:-1] + str(i + 1)}'"
                 )
-        self.updatePCArrayFrompatternCenter()
+        self.update_pc_array_from_spinbox()
         options = self.getOptions()
-        self.phases = [phase for phase, _ in self.mpPaths.items()]
+        self.phases = [phase for phase in self.mpPaths.keys()]
         self.set_phases_properties()
         self.rho_mask = (100.0 - options["rho"]) / 100.0
         self.number_bands = options["bands"]
@@ -310,9 +312,9 @@ class HiSetupDialog(QDialog):
         self.threadPool.start(hi_worker)
 
     def set_phases_properties(self):
-        for phase in self.phases:
-            a, space_group, phase_proxy = self.PHASE_PARAMETERS[phase]
-            self.lat_param.append(a)
+        for ph in self.phases:
+            mp = kp.load(path.join(self.mpPaths[ph], f"{ph}_mc_mp_20kv.h5"))
+            space_group, phase_proxy = mp.phase.space_group.number, self.SG_NUM_TO_PROXY[f"{mp.phase.space_group.number}"]
             self.space_groups.append(space_group)
             self.phase_proxys.append(phase_proxy)
 
