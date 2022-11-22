@@ -52,38 +52,58 @@ class PreIndexingMapsDialog(QDialog):
             self.ui.filenameEdit.setText(path.basename(self.save_path))
 
     def setupConnections(self):
-        #self.ui.browseButton.clicked.connect(lambda: self.setSavePath())
+        # self.ui.browseButton.clicked.connect(lambda: self.setSavePath())
         self.ui.buttonBox.accepted.connect(lambda: self.run_pre_indexing_maps())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
 
         # choose navigator
 
-        #self.ui.pushButtonMIM.clicked.connect(lambda: self.generate_mean_intensity_map())
-        #self.ui.pushButtonVBSE.clicked.connect(lambda: self.generate_rgb_vbse())
+        # self.ui.pushButtonMIM.clicked.connect(lambda: self.generate_mean_intensity_map())
+        # self.ui.pushButtonVBSE.clicked.connect(lambda: self.generate_rgb_vbse())
 
     def getOptions(self) -> dict:
         return {
-            "Average dot product map": [self.ui.checkBoxADP.isChecked(), lambda: self.save_adp_map()],
-            "Image quality map": [self.ui.checkBoxIQM.isChecked(), lambda: self.save_iq_map()],
-            "Virtual backscatter image": [self.ui.checkBoxVBSE.isChecked(), lambda: self.save_rgb_vbse()],
-            "Mean intensity map": [self.ui.checkBoxMIM.isChecked(), lambda: self.save_mean_intensity_map()],
+            "Average dot product map": [
+                self.ui.checkBoxADP.isChecked(),
+                lambda: self.save_adp_map(),
+            ],
+            "Image quality map": [
+                self.ui.checkBoxIQM.isChecked(),
+                lambda: self.save_iq_map(),
+            ],
+            "Virtual backscatter image": [
+                self.ui.checkBoxVBSE.isChecked(),
+                lambda: self.save_rgb_vbse(),
+            ],
+            "Mean intensity map": [
+                self.ui.checkBoxMIM.isChecked(),
+                lambda: self.save_mean_intensity_map(),
+            ],
         }
-    
+
     def save_iq_map(self):
         self.iq_map = self.s.get_image_quality()
-        plt.imsave(path.join(self.working_dir, "average_dot_product_map.png"), self.iq_map, cmap="gray")
+        plt.imsave(
+            path.join(self.working_dir, "average_dot_product_map.png"),
+            self.iq_map,
+            cmap="gray",
+        )
 
     def save_adp_map(self):
         self.adp_map = self.s.get_average_neighbour_dot_product_map()
-        plt.imsave(path.join(self.working_dir, "image_quality_map.png"), self.adp_map, cmap="gray")
+        plt.imsave(
+            path.join(self.working_dir, "image_quality_map.png"),
+            self.adp_map,
+            cmap="gray",
+        )
 
     def save_mean_intensity_map(self):
         self.mim_map = self.s.mean(axis=(2, 3))
 
         plt.imsave(
-            path.join(self.working_dir, "mean_intensity_map.png"), 
-            self.mim_map.data, 
-            cmap="gray", 
+            path.join(self.working_dir, "mean_intensity_map.png"),
+            self.mim_map.data,
+            cmap="gray",
         )
 
     def save_rgb_vbse(self):
@@ -92,7 +112,7 @@ class PreIndexingMapsDialog(QDialog):
         self.vbse_map.change_dtype("uint8")
 
         plt.imsave(path.join(self.working_dir, "vbse_rgb.png"), self.vbse_map.data)
-    
+
     def plot(self, image):
 
         self.ui.mplWidget.vbl.setContentsMargins(0, 0, 0, 0)
@@ -103,15 +123,20 @@ class PreIndexingMapsDialog(QDialog):
 
     def run_pre_indexing_maps(self):
         # Pass the function to execute
-        save_worker = Worker(fn = self.save_pre_indexing_maps, output=self.console)
+        save_worker = Worker(fn=self.save_pre_indexing_maps, output=self.console)
         # Execute
         self.threadPool.start(save_worker)
         self.accept()
 
     def save_pre_indexing_maps(self):
-        pre_processing_keys = ["Average dot product map", "Image quality map", "Virtual backscatter image", "Mean intensity map"]
+        pre_processing_keys = [
+            "Average dot product map",
+            "Image quality map",
+            "Virtual backscatter image",
+            "Mean intensity map",
+        ]
         self.options = self.getOptions()
-        
+
         try:
             for key in pre_processing_keys:
                 optionEnabled, optionExecute = self.options[key]

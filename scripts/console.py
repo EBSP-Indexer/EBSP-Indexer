@@ -200,11 +200,14 @@ class Console(QtWidgets.QWidget):
     def writeoutput(self, line: str, fmt: QtGui.QTextCharFormat = None) -> None:
         """Set text formatting and display line in outdisplay"""
         # TODO: Make more efficient in handling of progress bars
+        if fmt is not None:
+            self.outdisplay.setCurrentCharFormat(fmt)
+        else:
+            self.outdisplay.setCurrentCharFormat(self.outfmt)
         if "\r" not in line:
             self.is_progress_bar = False
         if self.is_progress_bar:
             content = self.outdisplay.toPlainText().split("\n")
-            self.outdisplay.setCurrentCharFormat(self.outfmt)
             self.outdisplay.setPlainText("\n".join(content[:-2]))
         if "\r" in line:
             self.is_progress_bar = True
@@ -212,8 +215,6 @@ class Console(QtWidgets.QWidget):
         if not self.is_progress_bar:
             sb = self.outdisplay.verticalScrollBar()
             sb.setValue(sb.maximum())
-        if fmt is not None:
-            self.outdisplay.setCurrentCharFormat(fmt)
         self.outdisplay.appendPlainText(line.rstrip())
 
 

@@ -148,7 +148,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -160,6 +160,9 @@
     <addaction name="actionSettings"/>
    </widget>
    <widget class="QMenu" name="menuProcessing">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>Processing</string>
     </property>
@@ -168,13 +171,19 @@
     <addaction name="actionPattern_Center"/>
    </widget>
    <widget class="QMenu" name="menuPlot">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>Pattern inspection</string>
     </property>
     <addaction name="actionSignalNavigation"/>
     <addaction name="actionPre_indexing_maps"/>
    </widget>
-   <widget class="QMenu" name="menuDictionary_indexing">
+   <widget class="QMenu" name="menuIndexing">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>Indexing</string>
     </property>
@@ -184,7 +193,7 @@
    <addaction name="menuFile"/>
    <addaction name="menuProcessing"/>
    <addaction name="menuPlot"/>
-   <addaction name="menuDictionary_indexing"/>
+   <addaction name="menuIndexing"/>
   </widget>
   <action name="actionOpen_Workfolder">
    <property name="text">
