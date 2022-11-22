@@ -76,7 +76,7 @@ class DiSetupDialog(QDialog):
         try:
             self.convention = self.setting_file.read("Convention")
         except:
-            self.convention = self.program_settings.read("Convetion")
+            self.convention = self.program_settings.read("Convention")
 
         self.ui.comboBoxConvention.setCurrentText(self.convention)
 
@@ -93,11 +93,12 @@ class DiSetupDialog(QDialog):
                 ]
             )
             if self.convention == "TSL":
+                # Ensure that PC is stored in BRUKER convention
                 self.pc[1] = 1 - self.pc[1]
         except:
-            self.pc = np.array([0.400, 0.400, 0.400])
+            self.pc = np.array([0.400, 0.200, 0.400])
 
-        self.updatePCpatternCenter()
+        self.update_pc_spinbox()
 
         # Paths for master patterns
         self.mpPaths = {}
@@ -170,12 +171,6 @@ class DiSetupDialog(QDialog):
 
     def set_save_fileformat(self):
         self.di_result_filetypes = [el.strip(".") for el in self.ui.comboBoxFiletype.currentText().split(", ")]
-        print(self.di_result_filetypes)
-        
-    def update_pc_convention(self):
-        self.convention = self.ui.comboBoxConvention.currentText()
-        self.ui.patternCenterY.setValue(1 - self.pc[1])
-        self.updatePCArrayFrompatternCenter()
 
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_dictionary_indexing())
@@ -207,9 +202,9 @@ class DiSetupDialog(QDialog):
 
     def update_pc_convention(self):
         self.convention = self.ui.comboBoxConvention.currentText()
-        self.updatePCpatternCenter()
+        self.update_pc_spinbox()
 
-    def updatePCpatternCenter(self):
+    def update_pc_spinbox(self):
         self.ui.patternCenterX.setValue(self.pc[0])
         self.ui.patternCenterZ.setValue(self.pc[2])
         if self.convention == "BRUKER":
@@ -217,7 +212,7 @@ class DiSetupDialog(QDialog):
         elif self.convention == "TSL":
             self.ui.patternCenterY.setValue(1-self.pc[1])
 
-    def updatePCArrayFrompatternCenter(self):
+    def update_pc_array_from_spinbox(self):
         self.pc[0] = self.ui.patternCenterX.value()
         self.pc[2] = self.ui.patternCenterZ.value()
         if self.convention == "BRUKER":
@@ -293,6 +288,7 @@ class DiSetupDialog(QDialog):
     # Signal mask
     def signal_mask(self):  # Add signal mask
         if self.options["mask"]:
+            print("Applying signal mask")
             self.signal_mask = ~kp.filters.Window("circular", self.sig_shape).astype(bool)
 
             # Set signal mask for dictionary indexing
@@ -470,7 +466,7 @@ class DiSetupDialog(QDialog):
 
         self.setting_file.write("Convention", self.convention)
 
-        self.updatePCArrayFrompatternCenter()
+        self.update_pc_array_from_spinbox()
         self.setting_file.write("X star", f"{self.pc[0]}")
         
         if self.convention == "BRUKER":
@@ -568,7 +564,7 @@ class DiSetupDialog(QDialog):
         # get options from input
         self.options = self.getOptions()
         self.load_pattern(self.options["lazy"])
-        self.updatePCArrayFrompatternCenter()
+        self.update_pc_array_from_spinbox()
         self.set_save_fileformat()
         self.refine = self.options["refine"]
         self.new_signal_shape = self.options["binning"]
@@ -580,17 +576,19 @@ class DiSetupDialog(QDialog):
         self.di_kwargs["n_per_iteration"] = self.n_per_iteration
 
         # Rebinning of signal
+        print("Rebinning EBSD signals")
         self.nav_shape = self.s.axes_manager.navigation_shape
         self.s_binned = self.s.rebin(new_shape=self.nav_shape + self.new_signal_shape)
         self.s_binned.rescale_intensity(dtype_out=np.uint8)
 
         # Define detector-sample geometry
+        print("Defining detector")
         self.sig_shape = self.s_binned.axes_manager.signal_shape[::-1]
         self.detector = kp.detectors.EBSDDetector(
             shape=self.sig_shape,
             sample_tilt=self.sample_tilt,  # Degrees
             pc=self.pc,
-            convention=self.convention,  # Default is Bruker, TODO: let user choose convention
+            convention="BRUKER",  # Default is Bruker
         )
 
         # Apply signal mask
@@ -615,7 +613,7 @@ class DiSetupDialog(QDialog):
                 resolution=self.angular_step_size,
                 point_group=self.mp[f"{ph}"].phase.point_group,
             )
-            print(f"Generation simulation dictinary from {ph} master pattern")
+            print(f"Generating simulation dictinary from {ph} master pattern")
             ### Generate dictionary
             self.sim_dict = self.mp[f"{ph}"].get_patterns(
                 rotations=self.rot,
@@ -653,9 +651,11 @@ class DiSetupDialog(QDialog):
 
                 # Save IPF of refined xmap
                 if self.options["ipf"]:
+                    print("Saving inverse pole figure")
                     self.save_inverse_pole_figure(self.xmaps_ref)
 
                 if self.options["ncc"]:
+                    print("Saving normalized cross-correlation map")
                     self.save_ncc_figure(self.xmaps_ref)
 
                 self.save_di_settings(self.xmaps_ref)
@@ -663,10 +663,12 @@ class DiSetupDialog(QDialog):
             else:
                 # If xmaps are not refined, an unrefined IPF is saved
                 if self.options["ipf"]:
+                    print("Saving inverse pole figure")
                     self.save_inverse_pole_figure(self.xmaps)
 
                 # NCC map
                 if self.options["ncc"]:
+                    print("Saving normalized cross-correlation map")
                     self.save_inverse_pole_figure(self.xmaps)
 
                 #save DI settings to file

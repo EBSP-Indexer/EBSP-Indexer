@@ -3,7 +3,7 @@ from pickle import TRUE
 from re import T
 import kikuchipy as kp
 from PySide6.QtCore import QDir
-from PySide6.QtWidgets import QDialog, QApplication
+from PySide6.QtWidgets import QDialog, QApplication, QDialogButtonBox
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -102,6 +102,7 @@ class PatterCenterDialog(QDialog):
         self.is_mp_paths_updated = True
         self.enabled = False
         self.ui.bandButton.setDisabled(True)
+        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
     
     def setupCalibrationPatterns(self):
         self.pattern_index = 0
@@ -333,6 +334,7 @@ class PatterCenterDialog(QDialog):
         self.bands_enabled = False
         self.bandButtonClicked()
         self.ui.bandButton.setEnabled(True)
+        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
 
     def bandButtonClicked(self):
         if not self.bands_enabled:
