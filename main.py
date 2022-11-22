@@ -18,12 +18,10 @@ from utils.filebrowser import FileBrowser
 from utils.setting_file import SettingFile
 
 from scripts.pattern_processing import PatternProcessingDialog
-from scripts.signal_navigation import signalNavigation
 from scripts.dictionary_indexing import DiSetupDialog
 from scripts.pre_indexing_maps import PreIndexingMapsDialog
 from scripts.advanced_settings import AdvancedSettingsDialog
 
-# from scripts.interpreter import ConsoleWidget
 from scripts.console import Console, Redirect
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
@@ -49,6 +47,13 @@ class AppWindow(QMainWindow):
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         self.systemModel = QFileSystemModel()
 
+        #Check platform and set windowStayOnTopHint
+        if platform.system() == "darwin":
+            self.stayOnTopHint = True
+        else:
+            self.stayOnTopHint = False
+
+        self.ui.systemViewer.setModel(self.systemModel)
         self.setupConnections()
 
         self.console = Console(parent=self, context=globals())
@@ -135,7 +140,7 @@ class AppWindow(QMainWindow):
     def openSettings(self):
         try:
             self.settingsDialog = AdvancedSettingsDialog(parent=self)
-            self.settingsDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+            self.settingsDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.settingsDialog.exec()
         except Exception as e:
             self.console.errorwrite(
@@ -158,7 +163,7 @@ class AppWindow(QMainWindow):
             self.processingDialog = PatternProcessingDialog(
                 parent=self, pattern_path=self.file_selected
             )
-            self.processingDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+            self.processingDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.processingDialog.exec()
         except Exception as e:
             self.console.errorwrite(
@@ -175,7 +180,7 @@ class AppWindow(QMainWindow):
             self.ROIDialog = RegionOfInteresDialog(
                 parent=self, pattern_path=self.file_selected
             )
-            self.ROIDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+            self.ROIDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.ROIDialog.exec()
         except Exception as e:
             self.console.errorwrite(f"Could not initialize ROI dialog:\n{str(e)}\n")
@@ -185,7 +190,7 @@ class AppWindow(QMainWindow):
             self.PreInMapDialog = PreIndexingMapsDialog(
                 parent=self, pattern_path=self.file_selected
             )
-            self.PreInMapDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+            self.PreInMapDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.PreInMapDialog.exec()
         except Exception as e:
             self.console.errorwrite(
@@ -212,11 +217,19 @@ class AppWindow(QMainWindow):
             if platform.system().lower() == "windows":
                 startfile(self.file_selected)
 
+    def process_finished(self):
+        print("EBSD pattern closed.")
+        self.p = None
+
     def selectSignalNavigation(self):
         try:
-            #self.p = QProcess()
-            #self.p.start("python", ['scripts/signal_navigation.py', self.file_selected])
-            signalNavigation(file_path=self.file_selected)
+            self.p = QProcess()
+            print("Loading EBSD patterns ...")
+            self.p.start("python", ['scripts/signal_navigation.py', self.file_selected])
+            self.p.finished.connect(self.process_finished)
+            #subprocess.run(["python", "scripts/signal_navigation.py"], text=True, input=self.file_selected)
+    
+        
         except Exception as e:
             if self.file_selected == "":
                 dlg = QMessageBox(self)
@@ -232,7 +245,7 @@ class AppWindow(QMainWindow):
     def selectDictionaryIndexingSetup(self):
         try:
             self.diSetup = DiSetupDialog(parent=self, pattern_path=self.file_selected)
-            self.diSetup.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+            self.diSetup.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.diSetup.show()
         except Exception as e:
             self.console.errorwrite(
@@ -242,7 +255,7 @@ class AppWindow(QMainWindow):
     def selectHoughIndexingSetup(self):
         try:
             self.hiSetup = HiSetupDialog(parent=self, pattern_path=self.file_selected)
-            self.hiSetup.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+            self.hiSetup.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.hiSetup.show()
         except Exception as e:
             self.console.errorwrite(f"Could not initialize hough indexing:\n{str(e)}\n")
@@ -252,7 +265,7 @@ class AppWindow(QMainWindow):
             self.patternCenter = PatterCenterDialog(
                 parent=self, file_selected=self.file_selected
             )
-            self.patternCenter.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+            self.patternCenter.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.patternCenter.show()
         except Exception as e:
             self.console.errorwrite(
@@ -266,7 +279,7 @@ class AppWindow(QMainWindow):
             ".gif",
             ".bmp",
         ]:
-            image = mpimg.imread("resources/kikuchipy_banner.png")
+            image = mpimg.imread("resources/ebsd_gui.png")
         else:
             image = mpimg.imread(image_path)
         self.ui.MplWidget.canvas.ax.clear()

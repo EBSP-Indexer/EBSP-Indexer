@@ -192,10 +192,16 @@ class HiSetupDialog(QDialog):
         self.ui.labelRho.setText(f"{self.ui.horizontalSliderRho.value()}%")
 
     def checkPhaseList(self):
-        flag = False
-        if self.ui.listWidgetPhase.count() != 0:
-            flag = True
-        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(flag)
+        ok_flag = False
+        phase_map_flag = False
+        n_phases = self.ui.listWidgetPhase.count()
+        if n_phases != 0:
+            ok_flag = True
+            if n_phases > 1:
+                phase_map_flag = True
+        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(ok_flag)
+        self.ui.checkBoxPhase.setEnabled(phase_map_flag)
+        self.ui.checkBoxPhase.setChecked(phase_map_flag)
 
     def setupBinningShapes(self):
         self.sig_shape = self.s.axes_manager.signal_shape[::-1]
@@ -242,7 +248,7 @@ class HiSetupDialog(QDialog):
         print(
             f"Dataset has shape: {dset_h5.shape}"
         )  # Navigation dimension is flattened
-
+        self.sig_shape = self.s2.axes_manager.signal_shape[::-1]
         sample_tilt = self.s2.detector.sample_tilt
         camera_tilt = self.s2.detector.tilt
 
