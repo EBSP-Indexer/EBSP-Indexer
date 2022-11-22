@@ -63,6 +63,7 @@ class AppWindow(QMainWindow):
         self.importSettings()
 
     def setupConnections(self):
+        self.ui.systemViewer.setModel(self.systemModel)
         self.ui.systemViewer.selectionModel().selectionChanged.connect(
             lambda new, old: self.onSystemModelChanged(new, old)
         )
