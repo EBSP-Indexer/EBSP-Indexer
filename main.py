@@ -18,12 +18,10 @@ from utils.filebrowser import FileBrowser
 from utils.setting_file import SettingFile
 
 from scripts.pattern_processing import PatternProcessingDialog
-from scripts.signal_navigation import signalNavigation
 from scripts.dictionary_indexing import DiSetupDialog
 from scripts.pre_indexing_maps import PreIndexingMapsDialog
 from scripts.advanced_settings import AdvancedSettingsDialog
 
-# from scripts.interpreter import ConsoleWidget
 from scripts.console import Console, Redirect
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
@@ -212,11 +210,19 @@ class AppWindow(QMainWindow):
             if platform.system().lower() == "windows":
                 startfile(self.file_selected)
 
+    def process_finished(self):
+        print("EBSD pattern closed.")
+        self.p = None
+
     def selectSignalNavigation(self):
         try:
-            #self.p = QProcess()
-            #self.p.start("python", ['scripts/signal_navigation.py', self.file_selected])
-            signalNavigation(file_path=self.file_selected)
+            self.p = QProcess()
+            print("Loading EBSD patterns ...")
+            self.p.start("python", ['scripts/signal_navigation.py', self.file_selected])
+            self.p.finished.connect(self.process_finished)
+            #subprocess.run(["python", "scripts/signal_navigation.py"], text=True, input=self.file_selected)
+    
+        
         except Exception as e:
             if self.file_selected == "":
                 dlg = QMessageBox(self)
@@ -266,7 +272,7 @@ class AppWindow(QMainWindow):
             ".gif",
             ".bmp",
         ]:
-            image = mpimg.imread("resources/kikuchipy_banner.png")
+            image = mpimg.imread("resources/ebsd_gui.png")
         else:
             image = mpimg.imread(image_path)
         self.ui.MplWidget.canvas.ax.clear()
