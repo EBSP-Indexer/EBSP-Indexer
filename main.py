@@ -47,6 +47,12 @@ class AppWindow(QMainWindow):
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         self.systemModel = QFileSystemModel()
 
+        #Check platform and set windowStayOnTopHint
+        if platform.system() == "darwin":
+            self.stayOnTopHint = True
+        else:
+            self.stayOnTopHint = False
+
         self.ui.systemViewer.setModel(self.systemModel)
         self.setupConnections()
 
@@ -133,7 +139,7 @@ class AppWindow(QMainWindow):
     def openSettings(self):
         try:
             self.settingsDialog = AdvancedSettingsDialog(parent=self)
-            self.settingsDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+            self.settingsDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.settingsDialog.exec()
         except Exception as e:
             self.console.errorwrite(
@@ -156,7 +162,7 @@ class AppWindow(QMainWindow):
             self.processingDialog = PatternProcessingDialog(
                 parent=self, pattern_path=self.file_selected
             )
-            self.processingDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+            self.processingDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.processingDialog.exec()
         except Exception as e:
             self.console.errorwrite(
@@ -173,7 +179,7 @@ class AppWindow(QMainWindow):
             self.ROIDialog = RegionOfInteresDialog(
                 parent=self, pattern_path=self.file_selected
             )
-            self.ROIDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+            self.ROIDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.ROIDialog.exec()
         except Exception as e:
             self.console.errorwrite(f"Could not initialize ROI dialog:\n{str(e)}\n")
@@ -183,7 +189,7 @@ class AppWindow(QMainWindow):
             self.PreInMapDialog = PreIndexingMapsDialog(
                 parent=self, pattern_path=self.file_selected
             )
-            self.PreInMapDialog.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+            self.PreInMapDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.PreInMapDialog.exec()
         except Exception as e:
             self.console.errorwrite(
@@ -238,7 +244,7 @@ class AppWindow(QMainWindow):
     def selectDictionaryIndexingSetup(self):
         try:
             self.diSetup = DiSetupDialog(parent=self, pattern_path=self.file_selected)
-            self.diSetup.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+            self.diSetup.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.diSetup.show()
         except Exception as e:
             self.console.errorwrite(
@@ -248,7 +254,7 @@ class AppWindow(QMainWindow):
     def selectHoughIndexingSetup(self):
         try:
             self.hiSetup = HiSetupDialog(parent=self, pattern_path=self.file_selected)
-            self.hiSetup.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+            self.hiSetup.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.hiSetup.show()
         except Exception as e:
             self.console.errorwrite(f"Could not initialize hough indexing:\n{str(e)}\n")
@@ -258,7 +264,7 @@ class AppWindow(QMainWindow):
             self.patternCenter = PatterCenterDialog(
                 parent=self, file_selected=self.file_selected
             )
-            self.patternCenter.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+            self.patternCenter.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.patternCenter.show()
         except Exception as e:
             self.console.errorwrite(
