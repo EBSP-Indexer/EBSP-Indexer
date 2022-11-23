@@ -181,7 +181,7 @@ class Ui_color_picker(object):
     # setupUi
 
     def retranslateUi(self, color_picker):
-        color_picker.setWindowTitle(QCoreApplication.translate("color_picker", u"Dialog", None))
+        color_picker.setWindowTitle("")
         self.pushButton.setText("")
         self.pushButton_2.setText("")
         self.pushButton_3.setText("")

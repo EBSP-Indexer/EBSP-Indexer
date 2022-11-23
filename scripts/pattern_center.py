@@ -1,4 +1,5 @@
-from os import path
+import sys
+from os import path, devnull
 from pickle import TRUE
 from re import T
 import kikuchipy as kp
@@ -329,8 +330,11 @@ class PatterCenterDialog(QDialog):
         rot = Rotation(data["quat"][-1]) * Rotation.from_axes_angles([0, 0, -1], np.pi / 2)
 
         geosim_dict = {}
+
+        sys.stdout = open(devnull, 'w')
         for name in self.mp_paths.keys():
-            geosim_dict[name] = self.simulator_dict[name].on_detector(detector, rot, show_progressbar=progressbar_bool)
+            geosim_dict[name] = self.simulator_dict[name].on_detector(detector, rot)
+        sys.stdout = sys.__stdout__
 
         #Draws pattern in MplWidget 
         self.pattern_image = self.s_cal.data[self.pattern_index]

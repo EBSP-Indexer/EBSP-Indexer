@@ -1,8 +1,10 @@
 import sys
 import json
 from os.path import basename, splitext, exists
-from os import startfile
-import subprocess
+try:
+    from os import startfile
+except:
+    import subprocess
 import platform
 
 from contextlib import redirect_stdout, redirect_stderr
@@ -48,7 +50,7 @@ class AppWindow(QMainWindow):
         self.systemModel = QFileSystemModel()
 
         #Check platform and set windowStayOnTopHint
-        if platform.system() == "darwin":
+        if platform.system() == "Darwin":
             self.stayOnTopHint = True
         else:
             self.stayOnTopHint = False
