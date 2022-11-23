@@ -1,11 +1,7 @@
 from PySide6.QtWidgets import QDialog
-from PySide6.QtGui import QColor, QAction
-import json
 from os.path import exists
 
 from ui.ui_color_picker import Ui_color_picker
-from utils.setting_file import SettingFile
-from utils.filebrowser import FileBrowser
 
 class ColorPicker(QDialog):
     def __init__(self, parent=None):
