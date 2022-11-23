@@ -1,5 +1,6 @@
 from contextlib import redirect_stderr, redirect_stdout
 from os import path, mkdir
+import json
 from PySide6.QtCore import QThreadPool
 from PySide6.QtWidgets import QDialog, QDialogButtonBox
 from utils.setting_file import SettingFile
