@@ -1,9 +1,12 @@
 from PySide6.QtWidgets import QDialog, QApplication, QColorDialog, QTreeWidgetItem, QTreeWidgetItemIterator
 from PySide6.QtGui import QColor
+from PySide6.QtCore import Qt
+import matplotlib.colors as mplcolors
 import json
 from os.path import exists
 
 from ui.ui_advanced_settings import Ui_AdvancedSettings
+from scripts.color_picker import ColorPicker
 from utils.setting_file import SettingFile
 from utils.filebrowser import FileBrowser
 
@@ -15,6 +18,8 @@ class AdvancedSettingsDialog(QDialog):
         self.loadSettings()
         self.setupConnections()
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
+
+        self.ui.colorTreeWidget.setColumnWidth(0, 200)
     
     def setupConnections(self):
         self.ui.addFileTypeButton.clicked.connect(lambda: self.addFileType())
@@ -88,11 +93,17 @@ class AdvancedSettingsDialog(QDialog):
         if self.ui.colorTreeWidget.currentItem().parent() is None:
             return
         phase_index = self.ui.colorTreeWidget.currentIndex().row()
-        color = QColorDialog.getColor()
-        self.ui.colorTreeWidget.currentItem().setForeground(0, color)
-        self.ui.colorTreeWidget.setCurrentItem(None)
-        self.colors[phase_index] = color.name()[1:]
 
+        colorPicker = ColorPicker(parent=self)
+        colorPicker.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+        colorPicker.exec()
+        try:
+            color = colorPicker.color
+            self.ui.colorTreeWidget.currentItem().setForeground(1, QColor(mplcolors.to_hex(color)))
+            self.ui.colorTreeWidget.setCurrentItem(None)
+            self.colors[phase_index] = color
+        except: pass
+            
     def loadSettings(self):
         if exists("advanced_settings.txt"):
             self.setting_file = SettingFile("advanced_settings.txt")
@@ -135,10 +146,8 @@ class AdvancedSettingsDialog(QDialog):
         
         colors_str = self.setting_file.read("Colors")
         self.colors = json.loads(colors_str)
-        #self.ui.colorTreeWidget.setCurrentItem(self.ui.colorTreeWidget.topLevelItem(0))
-        #self.ui.colorTreeWidget.setCurrentItem(self.ui.colorTreeWidget.childAt(self.ui.colorTreeWidget.currentItem()))
         for i, c in enumerate(self.colors):
-            self.ui.colorTreeWidget.itemAt(0,0).child(i).setForeground(0, QColor(str('#'+c)))
+            self.ui.colorTreeWidget.itemAt(0,0).child(i).setForeground(1, QColor(mplcolors.to_hex(c)))
         
     def saveSettings(self):
         if exists(self.ui.directoryEdit.text()) and self.directory:
@@ -164,7 +173,7 @@ class AdvancedSettingsDialog(QDialog):
             "Convention"            : "TSL",
             "Lazy Loading"          : True,
             "Default Directory"     : False,
-            "Colors"                : json.dumps(['00ff00', 'ff0000', '0000ff', 'ffff00'])
+            "Colors"                : json.dumps(['lime', 'r', 'b', 'yellow'])
         }
 
         self.setting_file = SettingFile("advanced_settings.txt")

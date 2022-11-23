@@ -1,4 +1,5 @@
 import warnings
+import json
 from datetime import date
 from os import mkdir, path
 
@@ -6,7 +7,7 @@ import kikuchipy as kp
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-from orix import io, plot, sampling
+from orix import io, plot, sampling, crystal_map
 from orix.quaternion import Rotation
 from PySide6.QtWidgets import QDialog
 from PySide6.QtCore import QThreadPool
@@ -96,6 +97,12 @@ class DiSetupDialog(QDialog):
             self.pc = np.array([0.400, 0.400, 0.400])
 
         self.updatePCpatternCenter()
+
+        #Setup colors from program settings
+        try:
+            self.colors = json.loads(self.program_settings.read("Colors"))
+        except:
+            self.colors = ['lime', 'r', 'b', 'yellow',]
 
         # Paths for master patterns
         self.mpPaths = {}
@@ -369,10 +376,8 @@ class DiSetupDialog(QDialog):
 
         merged = kp.indexing.merge_crystal_maps(crystal_maps=cm, scores_prop="scores", **merge_kwargs)
 
-        colors = ["lime", "r", "b", "yellow"]
-
         for i, ph in enumerate(self.phases):
-            merged.phases[ph].color = colors[i]
+            merged.phases[ph].color = self.colors[i]
 
         for filetype in self.di_result_filetypes:  # [".ang", ".h5"]
             io.save(

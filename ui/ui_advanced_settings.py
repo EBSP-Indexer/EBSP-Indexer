@@ -208,34 +208,35 @@ class Ui_AdvancedSettings(object):
         font.setPointSize(13)
         font.setKerning(False)
         __qtreewidgetitem = QTreeWidgetItem()
+        __qtreewidgetitem.setTextAlignment(0, Qt.AlignLeading|Qt.AlignVCenter);
         __qtreewidgetitem.setFont(0, font);
         self.colorTreeWidget.setHeaderItem(__qtreewidgetitem)
-        brush = QBrush(QColor(0, 0, 0, 255))
-        brush.setStyle(Qt.SolidPattern)
-        brush1 = QBrush(QColor(255, 38, 0, 255))
-        brush1.setStyle(Qt.NoBrush)
+        brush = QBrush(QColor(33, 33, 33, 255))
+        brush.setStyle(Qt.NoBrush)
+        brush1 = QBrush(QColor(0, 0, 0, 255))
+        brush1.setStyle(Qt.SolidPattern)
+        brush2 = QBrush(QColor(255, 38, 0, 255))
+        brush2.setStyle(Qt.NoBrush)
         font1 = QFont()
         font1.setUnderline(False)
         font1.setStrikeOut(False)
-        brush2 = QBrush(QColor(33, 33, 33, 255))
-        brush2.setStyle(Qt.NoBrush)
         __qtreewidgetitem1 = QTreeWidgetItem(self.colorTreeWidget)
         __qtreewidgetitem1.setFlags(Qt.ItemIsEnabled);
         __qtreewidgetitem2 = QTreeWidgetItem(__qtreewidgetitem1)
-        __qtreewidgetitem2.setFlags(Qt.ItemIsSelectable|Qt.ItemIsEnabled);
-        __qtreewidgetitem2.setFont(0, font1);
-        __qtreewidgetitem2.setBackground(0, brush1);
-        __qtreewidgetitem2.setForeground(0, brush);
+        __qtreewidgetitem2.setFlags(Qt.ItemIsSelectable|Qt.ItemIsUserCheckable|Qt.ItemIsEnabled);
+        __qtreewidgetitem2.setBackground(0, brush);
         __qtreewidgetitem3 = QTreeWidgetItem(__qtreewidgetitem1)
         __qtreewidgetitem3.setFlags(Qt.ItemIsSelectable|Qt.ItemIsUserCheckable|Qt.ItemIsEnabled);
         __qtreewidgetitem4 = QTreeWidgetItem(__qtreewidgetitem1)
         __qtreewidgetitem4.setFlags(Qt.ItemIsSelectable|Qt.ItemIsUserCheckable|Qt.ItemIsEnabled);
         __qtreewidgetitem5 = QTreeWidgetItem(__qtreewidgetitem1)
-        __qtreewidgetitem5.setFlags(Qt.ItemIsSelectable|Qt.ItemIsUserCheckable|Qt.ItemIsEnabled);
+        __qtreewidgetitem5.setFlags(Qt.ItemIsSelectable|Qt.ItemIsEnabled);
+        __qtreewidgetitem5.setFont(0, font1);
         __qtreewidgetitem5.setBackground(0, brush2);
+        __qtreewidgetitem5.setForeground(0, brush1);
         self.colorTreeWidget.setObjectName(u"colorTreeWidget")
         self.colorTreeWidget.setEnabled(True)
-        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.colorTreeWidget.sizePolicy().hasHeightForWidth())
@@ -247,15 +248,27 @@ class Ui_AdvancedSettings(object):
         font2.setBold(False)
         self.colorTreeWidget.setFont(font2)
         self.colorTreeWidget.setLayoutDirection(Qt.LeftToRight)
+        self.colorTreeWidget.setAutoFillBackground(False)
         self.colorTreeWidget.setStyleSheet(u"background-color: transparent")
         self.colorTreeWidget.setFrameShape(QFrame.NoFrame)
         self.colorTreeWidget.setFrameShadow(QFrame.Plain)
+        self.colorTreeWidget.setLineWidth(1)
         self.colorTreeWidget.setMidLineWidth(0)
         self.colorTreeWidget.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
         self.colorTreeWidget.setEditTriggers(QAbstractItemView.DoubleClicked|QAbstractItemView.EditKeyPressed)
+        self.colorTreeWidget.setProperty("showDropIndicator", False)
         self.colorTreeWidget.setAlternatingRowColors(False)
+        self.colorTreeWidget.setRootIsDecorated(True)
+        self.colorTreeWidget.setUniformRowHeights(False)
+        self.colorTreeWidget.setItemsExpandable(True)
+        self.colorTreeWidget.setSortingEnabled(False)
+        self.colorTreeWidget.setAnimated(False)
+        self.colorTreeWidget.setAllColumnsShowFocus(False)
+        self.colorTreeWidget.setWordWrap(False)
         self.colorTreeWidget.setExpandsOnDoubleClick(True)
+        self.colorTreeWidget.setColumnCount(2)
         self.colorTreeWidget.header().setVisible(False)
+        self.colorTreeWidget.header().setMinimumSectionSize(19)
 
         self.verticalLayout_4.addWidget(self.colorTreeWidget)
 
@@ -302,19 +315,24 @@ class Ui_AdvancedSettings(object):
         self.lazyLoadingBox.setText(QCoreApplication.translate("AdvancedSettings", u"Lazy Loading (recommended)", None))
         self.label_7.setText(QCoreApplication.translate("AdvancedSettings", u"Colors:", None))
         ___qtreewidgetitem = self.colorTreeWidget.headerItem()
-        ___qtreewidgetitem.setText(0, QCoreApplication.translate("AdvancedSettings", u"Colors:", None));
+        ___qtreewidgetitem.setText(1, QCoreApplication.translate("AdvancedSettings", u"2", None));
+        ___qtreewidgetitem.setText(0, QCoreApplication.translate("AdvancedSettings", u"1", None));
 
         __sortingEnabled = self.colorTreeWidget.isSortingEnabled()
         self.colorTreeWidget.setSortingEnabled(False)
         ___qtreewidgetitem1 = self.colorTreeWidget.topLevelItem(0)
         ___qtreewidgetitem1.setText(0, QCoreApplication.translate("AdvancedSettings", u"Default phase map colors", None));
         ___qtreewidgetitem2 = ___qtreewidgetitem1.child(0)
+        ___qtreewidgetitem2.setText(1, QCoreApplication.translate("AdvancedSettings", u"\u25a0", None));
         ___qtreewidgetitem2.setText(0, QCoreApplication.translate("AdvancedSettings", u"Phase 1", None));
         ___qtreewidgetitem3 = ___qtreewidgetitem1.child(1)
+        ___qtreewidgetitem3.setText(1, QCoreApplication.translate("AdvancedSettings", u"\u25a0", None));
         ___qtreewidgetitem3.setText(0, QCoreApplication.translate("AdvancedSettings", u"Phase 2", None));
         ___qtreewidgetitem4 = ___qtreewidgetitem1.child(2)
+        ___qtreewidgetitem4.setText(1, QCoreApplication.translate("AdvancedSettings", u"\u25a0", None));
         ___qtreewidgetitem4.setText(0, QCoreApplication.translate("AdvancedSettings", u"Phase 3", None));
         ___qtreewidgetitem5 = ___qtreewidgetitem1.child(3)
+        ___qtreewidgetitem5.setText(1, QCoreApplication.translate("AdvancedSettings", u"\u25a0", None));
         ___qtreewidgetitem5.setText(0, QCoreApplication.translate("AdvancedSettings", u"Phase 4", None));
         self.colorTreeWidget.setSortingEnabled(__sortingEnabled)
 
