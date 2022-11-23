@@ -9,6 +9,7 @@ from utils.worker import Worker
 from ui.ui_pre_indexing_maps import Ui_Dialog
 
 import matplotlib.pyplot as plt
+from matplotlib_scalebar.scalebar import ScaleBar
 
 
 class PreIndexingMapsDialog(QDialog):
@@ -39,6 +40,9 @@ class PreIndexingMapsDialog(QDialog):
         except Exception as e:
             raise e
 
+        self.scale = self.s.axes_manager["x"].scale
+        self.save_fig_kwargs = dict(bbox_inches="tight", pad_inches = 0)
+        
         self.fileBrowser = FileBrowser(
             mode=FileBrowser.SaveFile,
             dirpath=self.working_dir,
@@ -83,35 +87,42 @@ class PreIndexingMapsDialog(QDialog):
 
     def save_iq_map(self):
         self.iq_map = self.s.get_image_quality()
-        plt.imsave(
-            path.join(self.working_dir, "average_dot_product_map.png"),
-            self.iq_map,
-            cmap="gray",
-        )
+        fig, ax = plt.subplots()
+        ax.axis("off")
+        ax.imshow(self.iq_map, cmap="gray")
+        scalebar = ScaleBar(self.scale, "um", location="lower left", box_alpha=0.5, border_pad=0.4)
+        ax.add_artist(scalebar)
+        plt.savefig(path.join(self.working_dir, "image_quality_map.png"), **self.save_fig_kwargs)
 
     def save_adp_map(self):
         self.adp_map = self.s.get_average_neighbour_dot_product_map()
-        plt.imsave(
-            path.join(self.working_dir, "image_quality_map.png"),
-            self.adp_map,
-            cmap="gray",
-        )
+        fig, ax = plt.subplots()
+        ax.axis("off")
+        ax.imshow(self.adp_map, cmap="gray")
+        scalebar = ScaleBar(self.scale, "um", location="lower left", box_alpha=0.5, border_pad=0.4)
+        ax.add_artist(scalebar)
+        plt.savefig(path.join(self.working_dir, "average_dot_product_map.png"), **self.save_fig_kwargs)
 
     def save_mean_intensity_map(self):
         self.mim_map = self.s.mean(axis=(2, 3))
-
-        plt.imsave(
-            path.join(self.working_dir, "mean_intensity_map.png"),
-            self.mim_map.data,
-            cmap="gray",
-        )
+        fig, ax = plt.subplots()
+        ax.axis("off")
+        ax.imshow(self.mim_map, cmap="gray")
+        scalebar = ScaleBar(self.scale, "um", location="lower left", box_alpha=0.5, border_pad=0.4)
+        ax.add_artist(scalebar)
+        plt.savefig(path.join(self.working_dir, "mean_intensity_map.png"), **self.save_fig_kwargs)
 
     def save_rgb_vbse(self):
         vbse_gen = generators.VirtualBSEGenerator(self.s)
         self.vbse_map = vbse_gen.get_rgb_image(r=(3, 1), b=(3, 2), g=(3, 3))
         self.vbse_map.change_dtype("uint8")
 
-        plt.imsave(path.join(self.working_dir, "vbse_rgb.png"), self.vbse_map.data)
+        fig, ax = plt.subplots()
+        ax.axis("off")
+        ax.imshow(self.vbse_map.data)
+        scalebar = ScaleBar(self.scale, "um", location="lower left", box_alpha=0.5, border_pad=0.4)
+        ax.add_artist(scalebar)
+        plt.savefig(path.join(self.working_dir, "vbse_rgb.png"), **self.save_fig_kwargs)
 
     def plot(self, image):
 
@@ -130,19 +141,19 @@ class PreIndexingMapsDialog(QDialog):
 
     def save_pre_indexing_maps(self):
         pre_processing_keys = [
-            "Average dot product map",
-            "Image quality map",
-            "Virtual backscatter image",
             "Mean intensity map",
+            "Average dot product map",
+            "Image quality map",           
+            "Virtual backscatter image",
         ]
         self.options = self.getOptions()
 
         try:
             for key in pre_processing_keys:
                 optionEnabled, optionExecute = self.options[key]
-                print(f"{key}: {optionEnabled}")
                 if optionEnabled:
                     optionExecute()
+                    print(f"{key}: OK")
             print(f"Pre-indexing maps generated successfully!")
         except Exception as e:
             print(f"Could not generate pre-indexing maps: {e}")
