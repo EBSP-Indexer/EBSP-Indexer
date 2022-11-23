@@ -93,7 +93,7 @@ class Ui_HISetupDialog(object):
         self.horizontalSliderRho.setObjectName(u"horizontalSliderRho")
         self.horizontalSliderRho.setMinimum(40)
         self.horizontalSliderRho.setMaximum(100)
-        self.horizontalSliderRho.setValue(90)
+        self.horizontalSliderRho.setValue(85)
         self.horizontalSliderRho.setOrientation(Qt.Horizontal)
 
         self.horizontalLayout_5.addWidget(self.horizontalSliderRho)
@@ -124,20 +124,16 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout.addWidget(self.checkBoxLazy)
 
-        self.checkBoxPre = QCheckBox(self.frame)
-        self.checkBoxPre.setObjectName(u"checkBoxPre")
+        self.checkBoxOrientation = QCheckBox(self.frame)
+        self.checkBoxOrientation.setObjectName(u"checkBoxOrientation")
+        self.checkBoxOrientation.setChecked(True)
 
-        self.verticalLayout.addWidget(self.checkBoxPre)
+        self.verticalLayout.addWidget(self.checkBoxOrientation)
 
         self.checkBoxPhase = QCheckBox(self.frame)
         self.checkBoxPhase.setObjectName(u"checkBoxPhase")
 
         self.verticalLayout.addWidget(self.checkBoxPhase)
-
-        self.checkBoxOrientation = QCheckBox(self.frame)
-        self.checkBoxOrientation.setObjectName(u"checkBoxOrientation")
-
-        self.verticalLayout.addWidget(self.checkBoxOrientation)
 
         self.checkBoxQuality = QCheckBox(self.frame)
         self.checkBoxQuality.setObjectName(u"checkBoxQuality")
@@ -304,10 +300,8 @@ class Ui_HISetupDialog(object):
 
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
 
-        QWidget.setTabOrder(self.checkBoxLazy, self.checkBoxPre)
-        QWidget.setTabOrder(self.checkBoxPre, self.checkBoxPhase)
-        QWidget.setTabOrder(self.checkBoxPhase, self.checkBoxOrientation)
-        QWidget.setTabOrder(self.checkBoxOrientation, self.checkBoxQuality)
+        QWidget.setTabOrder(self.checkBoxLazy, self.checkBoxPhase)
+        QWidget.setTabOrder(self.checkBoxPhase, self.checkBoxQuality)
         QWidget.setTabOrder(self.checkBoxQuality, self.listWidgetPhase)
         QWidget.setTabOrder(self.listWidgetPhase, self.pushButtonAddPhase)
         QWidget.setTabOrder(self.pushButtonAddPhase, self.pushButtonRemovePhase)
@@ -327,11 +321,10 @@ class Ui_HISetupDialog(object):
         self.label_7.setText(QCoreApplication.translate("HISetupDialog", u"Binning shape", None))
         self.label_9.setText(QCoreApplication.translate("HISetupDialog", u"Number of bands", None))
         self.label_8.setText(QCoreApplication.translate("HISetupDialog", u"Rho fraction (\u03c1) ", None))
-        self.labelRho.setText(QCoreApplication.translate("HISetupDialog", u"90%", None))
+        self.labelRho.setText(QCoreApplication.translate("HISetupDialog", u"85%", None))
         self.checkBoxLazy.setText(QCoreApplication.translate("HISetupDialog", u"Lazy loading of patterns", None))
-        self.checkBoxPre.setText(QCoreApplication.translate("HISetupDialog", u"Generate pre-indexing maps", None))
-        self.checkBoxPhase.setText(QCoreApplication.translate("HISetupDialog", u"Generate phase maps", None))
         self.checkBoxOrientation.setText(QCoreApplication.translate("HISetupDialog", u"Generate orientation maps", None))
+        self.checkBoxPhase.setText(QCoreApplication.translate("HISetupDialog", u"Generate phase maps", None))
         self.checkBoxQuality.setText(QCoreApplication.translate("HISetupDialog", u"Generate quality metrics for combined maps", None))
         self.label.setText(QCoreApplication.translate("HISetupDialog", u"Phases", None))
         self.pushButtonAddPhase.setText(QCoreApplication.translate("HISetupDialog", u"Add Phase", None))
