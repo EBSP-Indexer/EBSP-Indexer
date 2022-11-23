@@ -2,6 +2,7 @@ from os import path
 from pickle import TRUE
 from re import T
 import kikuchipy as kp
+import hyperspy as hs
 from PySide6.QtCore import QDir
 from PySide6.QtWidgets import QDialog, QApplication, QDialogButtonBox
 import matplotlib.pyplot as plt
@@ -19,6 +20,8 @@ from utils.setting_file import SettingFile
 from ui.ui_pattern_center import Ui_PatternCenter
 
 from mplwidget import MplWidget
+
+progressbar_bool = False
 
 def find_hkl(phase):
     FCC = ["ni", "al", "austenite", "cu", "si"]
@@ -96,23 +99,34 @@ class PatterCenterDialog(QDialog):
                 self.phase = phase
             except:
                 break
-        if bool(self.mp_paths):
-            print(self.mp_paths)
-            self.phase = list(self.mp_paths.keys())[0]
+        if len(list(self.mp_paths.keys())) != 0:
             self.ui.listPhases.setCurrentRow(0)
+            self.phase = self.ui.listPhases.currentItem().text()
+        else:
+            self.changeStateOfButtons()
+
         self.is_mp_paths_updated = True
         self.enabled = False
         self.ui.bandButton.setDisabled(True)
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
     
+    def changeStateOfButtons(self):
+        enable = bool(len(list(self.mp_paths.keys())))
+        
+        self.ui.buttonPlot.setEnabled(enable)
+        self.ui.buttonTune.setEnabled(enable)
+        self.ui.toolButtonLeft.setEnabled(enable)
+        self.ui.toolButtonRight.setEnabled(enable)
+        self.ui.buttonRemovePhase.setEnabled(enable)
+
     def setupCalibrationPatterns(self):
         self.pattern_index = 0
         self.s_cal = kp.load(self.setting_path)
         sig_shape = self.s_cal.axes_manager.signal_shape[::-1]
         self.nav_size = self.s_cal.axes_manager.navigation_size
 
-        self.s_cal.remove_static_background()
-        self.s_cal.remove_dynamic_background()
+        self.s_cal.remove_static_background(show_progressbar=progressbar_bool)
+        self.s_cal.remove_dynamic_background(show_progressbar=progressbar_bool)
 
         working_distance = self.s_cal.metadata.Acquisition_instrument.SEM.working_distance
         self.ui.workingDistanceLabel.setText("Working Distance (mm): "+str(working_distance))
@@ -203,11 +217,17 @@ class PatterCenterDialog(QDialog):
                 self.ui.listPhases.addItem(phase)
                 self.is_mp_paths_updated = True
             self.phase = phase
+            self.ui.listPhases.setCurrentRow(len(self.mp_paths.keys())-1)
+        self.changeStateOfButtons()
 
     def removePhase(self):
+        #if str(self.ui.listPhases.currentItem().text()) is None:
+        #    self.ui.listPhases.setCurrentRow(-1)
         self.mp_paths.pop(str(self.ui.listPhases.currentItem().text()))
         self.ui.listPhases.takeItem(self.ui.listPhases.currentRow())
         self.is_mp_paths_updated = True
+
+        self.changeStateOfButtons()
 
     def updatePCSpinBox(self):
         self.ui.spinBoxX.setValue(self.pc[0])
@@ -227,8 +247,7 @@ class PatterCenterDialog(QDialog):
     
     def updatePCConvention(self):
         self.convention = self.ui.conventionBox.currentText()
-        self.updatePCSpinBox()
-            
+        self.updatePCSpinBox()      
 
     def updatePCDict(self, pattern_index, phase, pc, pattern_ignored):
         self.pcs[pattern_index] = [phase, pc, pattern_ignored]
@@ -240,7 +259,8 @@ class PatterCenterDialog(QDialog):
         try:
             self.phase = self.ui.listPhases.currentItem().text()
         except:
-            self.phase = self.mp_paths.keys()[0]
+            self.ui.listPhases.setCurrentRow(0)
+            self.phase = self.ui.listPhases.currentItem().text()
         
         self.plotData()
 
@@ -251,7 +271,8 @@ class PatterCenterDialog(QDialog):
         try:
             self.phase = self.ui.listPhases.currentItem().text()
         except:
-            self.phase = self.mp_paths.keys()[0]
+            self.ui.listPhases.setCurrentRow(0)
+            self.phase = self.ui.listPhases.currentItem().text()
 
         pattern = self.s_cal.data[self.pattern_index]
         self.pc = pcopt.optimize(pattern, self.indexer, self.pc)
@@ -307,7 +328,7 @@ class PatterCenterDialog(QDialog):
 
         geosim_dict = {}
         for name in self.mp_paths.keys():
-            geosim_dict[name] = self.simulator_dict[name].on_detector(detector, rot)
+            geosim_dict[name] = self.simulator_dict[name].on_detector(detector, rot, show_progressbar=progressbar_bool)
 
         #Draws pattern in MplWidget 
         self.pattern_image = self.s_cal.data[self.pattern_index]
