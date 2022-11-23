@@ -99,6 +99,7 @@ class PatterCenterDialog(QDialog):
                 self.phase = phase
             except:
                 break
+
         if len(list(self.mp_paths.keys())) != 0:
             self.ui.listPhases.setCurrentRow(0)
             self.phase = self.ui.listPhases.currentItem().text()
@@ -226,6 +227,7 @@ class PatterCenterDialog(QDialog):
         self.mp_paths.pop(str(self.ui.listPhases.currentItem().text()))
         self.ui.listPhases.takeItem(self.ui.listPhases.currentRow())
         self.is_mp_paths_updated = True
+        self.ui.listPhases.clearSelection()
 
         self.changeStateOfButtons()
 

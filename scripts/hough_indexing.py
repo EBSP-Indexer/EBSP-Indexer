@@ -177,7 +177,6 @@ class HiSetupDialog(QDialog):
             "rho": self.ui.horizontalSliderRho.value(),
             "phase_list": self.ui.listWidgetPhase.selectedItems(),
             "lazy": self.ui.checkBoxLazy.isChecked(),
-            "pre": [self.ui.checkBoxPre.isChecked(), self.generate_pre_maps],
             "quality": [
                 self.ui.checkBoxQuality.isChecked(),
                 self.generate_combined_map,
@@ -193,10 +192,16 @@ class HiSetupDialog(QDialog):
         self.ui.labelRho.setText(f"{self.ui.horizontalSliderRho.value()}%")
 
     def checkPhaseList(self):
-        flag = False
-        if self.ui.listWidgetPhase.count() != 0:
-            flag = True
-        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(flag)
+        ok_flag = False
+        phase_map_flag = False
+        n_phases = self.ui.listWidgetPhase.count()
+        if n_phases != 0:
+            ok_flag = True
+            if n_phases > 1:
+                phase_map_flag = True
+        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(ok_flag)
+        self.ui.checkBoxPhase.setEnabled(phase_map_flag)
+        self.ui.checkBoxPhase.setChecked(phase_map_flag)
 
     def setupBinningShapes(self):
         self.sig_shape = self.s.axes_manager.signal_shape[::-1]
@@ -230,9 +235,6 @@ class HiSetupDialog(QDialog):
         self.set_phases_properties()
         self.rho_mask = (100.0 - options["rho"]) / 100.0
         self.number_bands = options["bands"]
-        optionEnabled, optionExecute = options["pre"]
-        if optionEnabled:
-            optionExecute()
         self.sig_shape = self.s.axes_manager.signal_shape[::-1]
         self.nav_shape = self.s.axes_manager.navigation_shape
         self.new_signal_shape = eval(options["binning"])
@@ -246,7 +248,7 @@ class HiSetupDialog(QDialog):
         print(
             f"Dataset has shape: {dset_h5.shape}"
         )  # Navigation dimension is flattened
-
+        self.sig_shape = self.s2.axes_manager.signal_shape[::-1]
         sample_tilt = self.s2.detector.sample_tilt
         camera_tilt = self.s2.detector.tilt
 
@@ -317,28 +319,6 @@ class HiSetupDialog(QDialog):
             space_group, phase_proxy = mp.phase.space_group.number, self.SG_NUM_TO_PROXY[f"{mp.phase.space_group.number}"]
             self.space_groups.append(space_group)
             self.phase_proxys.append(phase_proxy)
-
-    def generate_pre_maps(self):
-        print("Generating maps of input data ...")
-        mean_intensity = self.s.mean(axis=(2, 3))
-        plt.imsave(
-            path.join(self.dir_out, "mean_intensity.png"),
-            mean_intensity.data,
-            cmap="gray",
-        )
-
-        vbse_gen = kp.generators.VirtualBSEGenerator(self.s)
-        red = (2, 1)
-        green = (2, 2)
-        blue = (2, 3)
-        vbse_rgb_img = vbse_gen.get_rgb_image(r=red, g=green, b=blue)
-        vbse_rgb_img.change_dtype("uint8")
-        plt.imsave(path.join(self.dir_out, "vbse_rgb.png"), vbse_rgb_img.data)
-
-        iq = self.s.get_image_quality()
-        adp = self.s.get_average_neighbour_dot_product_map()
-        plt.imsave(path.join(self.dir_out, "maps_iq.png"), iq, cmap="gray")
-        plt.imsave(path.join(self.dir_out, "maps_adp.png"), adp, cmap="gray")
 
     def generate_combined_map(self):
         """
