@@ -38,7 +38,9 @@ class HiSetupDialog(QDialog):
         self.ui = Ui_HISetupDialog()
         self.ui.setupUi(self)
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
-        self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
+        self.fileBrowserOF = FileBrowser(
+            mode=FileBrowser.OpenFile, filter_name="Hierarchical Data Format (*.h5);"
+        )
 
         self.load_pattern()
         self.setupInitialSettings()
@@ -98,7 +100,12 @@ class HiSetupDialog(QDialog):
         try:
             self.colors = json.loads(self.program_settings.read("Colors"))
         except:
-            self.colors = ['lime', 'r', 'b', 'yellow',]
+            self.colors = [
+                "lime",
+                "r",
+                "b",
+                "yellow",
+            ]
 
         try:
             self.colors = json.loads(self.program_settings.read("Colors"))
@@ -117,8 +124,8 @@ class HiSetupDialog(QDialog):
         i = 1
         while True:
             try:
-                mpPath = self.setting_file.read("Master pattern " + str(i))
-                phase = mpPath.split("/").pop()
+                mpPath = self.setting_file.read(f"Master pattern {i}")
+                phase = path.dirname(mpPath).split("/").pop()
                 self.mpPaths[phase] = mpPath
                 self.ui.listWidgetPhase.addItem(phase)
                 i += 1
@@ -146,10 +153,10 @@ class HiSetupDialog(QDialog):
         self.update_pc_spinbox()
 
     def addPhase(self):
-        if self.fileBrowserOD.getFile():
-            mpPath = self.fileBrowserOD.getPaths()[0]
-            phase = mpPath.split("/").pop()
-            self.fileBrowserOD.setDefaultDir(mpPath[0 : -len(phase) - 1])
+        if self.fileBrowserOF.getFile():
+            mpPath = self.fileBrowserOF.getPaths()[0]
+            phase = path.dirname(mpPath).split("/").pop()
+            self.fileBrowserOF.setDefaultDir(mpPath[0 : -len(phase) - 1])
 
             if phase not in self.mpPaths.keys():
                 self.mpPaths[phase] = mpPath
@@ -322,7 +329,7 @@ class HiSetupDialog(QDialog):
 
     def set_phases_properties(self):
         for ph in self.phases:
-            mp = kp.load(path.join(self.mpPaths[ph], f"{ph}_mc_mp_20kv.h5"))
+            mp = kp.load(self.mpPaths[ph])
             try:
                 space_group, phase_proxy = (
                     mp.phase.space_group.number,

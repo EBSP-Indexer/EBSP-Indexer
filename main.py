@@ -11,14 +11,56 @@ from contextlib import redirect_stdout, redirect_stderr
 from PySide6.QtCore import QDir, Qt, QProcess, QThreadPool
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
 from PySide6.QtGui import QFont
-from scripts.hough_indexing import HiSetupDialog
+try: 
+    import pyi_splash
+except:
+    pass
+# Hidden modules for pyinstaller to detect 
 import kikuchipy.io._io
+import kikuchipy.detectors.ebsd_detector
+import kikuchipy.signals.ebsd
+import kikuchipy.signals.ebsd_master_pattern
+import kikuchipy.signals.ecp_master_pattern
+import kikuchipy.signals.virtual_bse_image
+import hyperspy._components.eels_arctan
+import hyperspy._components.bleasdale
+import hyperspy._components.doniach
+import hyperspy._components.eels_double_power_law
+import hyperspy._components.eels_arctan
+import hyperspy._components.eels_cl_edge
+import hyperspy._components.error_function
+import hyperspy._components.exponential
+import hyperspy._components.expression
+import hyperspy._components.gaussian
+import hyperspy._components.gaussianhf
+import hyperspy._components.heaviside
+import hyperspy._components.logistic
+import hyperspy._components.lorentzian
+import hyperspy._components.offset
+import hyperspy._components.pes_core_line_shape
+import hyperspy._components.pes_voigt
+import hyperspy._components.polynomial_deprecated
+import hyperspy._components.polynomial
+import hyperspy._components.power_law
+import hyperspy._components.rc
+import hyperspy._components.pes_see
+import hyperspy._components.scalable_fixed_pattern
+import hyperspy._components.skew_normal
+import hyperspy._components.split_voigt
+import hyperspy._components.eels_vignetting
+import hyperspy._components.pes_voigt
+import hyperspy._components.volume_plasmon_drude
+
+import hyperspy._components.expression
+import hyperspy._components.gaussian2d
+
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 
 from ui.ui_main_window import Ui_MainWindow
 from utils.filebrowser import FileBrowser
 from utils.setting_file import SettingFile
+from scripts.hough_indexing import HiSetupDialog
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.dictionary_indexing import DiSetupDialog
 from scripts.pre_indexing_maps import *
@@ -62,6 +104,10 @@ class AppWindow(QMainWindow):
 
         self.showImage(self.file_selected)
         self.importSettings()
+        try:
+            pyi_splash.close()
+        except Exception as e:
+            print(e)
 
     def setupConnections(self):
         self.ui.systemViewer.setModel(self.systemModel)
