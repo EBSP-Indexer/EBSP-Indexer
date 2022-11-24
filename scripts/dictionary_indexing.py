@@ -1,4 +1,5 @@
 import warnings
+import json
 from datetime import date
 from os import mkdir, path
 
@@ -9,7 +10,7 @@ from matplotlib_scalebar.scalebar import ScaleBar
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import numpy as np
-from orix import io, plot, sampling
+from orix import io, plot, sampling, crystal_map
 from orix.quaternion import Rotation
 from PySide6.QtWidgets import QDialog, QDialogButtonBox
 from PySide6.QtCore import QThreadPool
@@ -107,6 +108,12 @@ class DiSetupDialog(QDialog):
             self.pc = np.array([0.400, 0.200, 0.400])
 
         self.update_pc_spinbox()
+
+        #Setup colors from program settings
+        try:
+            self.colors = json.loads(self.program_settings.read("Colors"))
+        except:
+            self.colors = ['lime', 'r', 'b', 'yellow',]
 
         # Paths for master patterns
         self.mpPaths = {}
@@ -463,9 +470,11 @@ class DiSetupDialog(QDialog):
             crystal_maps=cm, scores_prop="scores", **merge_kwargs
         )
 
-        colors = ["lime", "r", "b", "yellow"]
         for i in range(len(self.phases)):
-            merged.phases[i].color = colors[i]
+            merged.phases[i].color = self.colors[i]
+
+#        for i, ph in enumerate(self.phases):
+#            merged.phases[ph].color = self.colors[i]
 
         for filetype in self.di_result_filetypes:  # [".ang", ".h5"]
             io.save(
@@ -562,9 +571,16 @@ class DiSetupDialog(QDialog):
         ### DI parameteres
 
         self.di_setting_file.write("kikuchipy version", kp.__version__)
+
         pc_copy = self.pc.copy()
         if self.convention == "TSL":
             pc_copy[1] = 1-pc_copy[1]
+
+        if self.convention == "TSL":
+            self.di_setting_file.write("PC (x*, y*, z*)", f"{1-pc_copy}")
+        elif self.convention == "BRUKER":
+            self.di_setting_file.write("PC (x*, y*, z*)", f"{pc_copy}")
+
         self.di_setting_file.write("PC convention", f"{self.convention}")
         self.di_setting_file.write("Pattern center (x*, y*, z*)", f"{pc_copy}")
         

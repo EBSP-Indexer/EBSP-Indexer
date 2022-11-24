@@ -1,8 +1,12 @@
-from PySide6.QtWidgets import QDialog, QApplication
+from PySide6.QtWidgets import QDialog, QApplication, QColorDialog, QTreeWidgetItem, QTreeWidgetItemIterator
+from PySide6.QtGui import QColor
+from PySide6.QtCore import Qt
+import matplotlib.colors as mplcolors
 import json
 from os.path import exists
 
 from ui.ui_advanced_settings import Ui_AdvancedSettings
+from scripts.color_picker import ColorPicker
 from utils.setting_file import SettingFile
 from utils.filebrowser import FileBrowser
 
@@ -14,6 +18,8 @@ class AdvancedSettingsDialog(QDialog):
         self.loadSettings()
         self.setupConnections()
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
+
+        self.ui.colorTreeWidget.setColumnWidth(0, 200)
     
     def setupConnections(self):
         self.ui.addFileTypeButton.clicked.connect(lambda: self.addFileType())
@@ -26,6 +32,7 @@ class AdvancedSettingsDialog(QDialog):
         self.ui.buttonBox.accepted.connect(lambda: self.saveSettings())
         self.ui.directoryBox.clicked.connect(lambda: self.toggleDefaultDirectory())
         self.ui.browseDirectoryButton.clicked.connect(lambda: self.browseDirectory())
+        self.ui.colorTreeWidget.doubleClicked.connect(lambda: self.colorPicker())
         
     def addFileType(self):
         if self.ui.fileTypeLineEdit.text():
@@ -81,7 +88,22 @@ class AdvancedSettingsDialog(QDialog):
             self.lazy = True
         else:
             self.lazy = False
+    
+    def colorPicker(self):
+        if self.ui.colorTreeWidget.currentItem().parent() is None:
+            return
+        phase_index = self.ui.colorTreeWidget.currentIndex().row()
 
+        colorPicker = ColorPicker(parent=self)
+        colorPicker.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+        colorPicker.exec()
+        try:
+            color = colorPicker.color
+            self.ui.colorTreeWidget.currentItem().setForeground(1, QColor(mplcolors.to_hex(color)))
+            self.ui.colorTreeWidget.setCurrentItem(None)
+            self.colors[phase_index] = color
+        except: pass
+            
     def loadSettings(self):
         if exists("advanced_settings.txt"):
             self.setting_file = SettingFile("advanced_settings.txt")
@@ -122,6 +144,11 @@ class AdvancedSettingsDialog(QDialog):
             self.ui.directoryEdit.setDisabled(True)
             self.ui.browseDirectoryButton.setDisabled(True)
         
+        colors_str = self.setting_file.read("Colors")
+        self.colors = json.loads(colors_str)
+        for i, c in enumerate(self.colors):
+            self.ui.colorTreeWidget.itemAt(0,0).child(i).setForeground(1, QColor(mplcolors.to_hex(c)))
+        
     def saveSettings(self):
         if exists(self.ui.directoryEdit.text()) and self.directory:
             self.directory = self.ui.directoryEdit.text()
@@ -133,6 +160,7 @@ class AdvancedSettingsDialog(QDialog):
         self.setting_file.write("Convention", str(self.convention))
         self.setting_file.write("Lazy Loading", str(self.lazy))
         self.setting_file.write("Default Directory", str(self.directory))
+        self.setting_file.write("Colors", json.dumps(self.colors))
         self.setting_file.save()
     
     def createSettingsFile(self):
@@ -140,11 +168,12 @@ class AdvancedSettingsDialog(QDialog):
         f.close()
 
         setting_dict = {
-            "File Types" : json.dumps(['.h5', '.dat', '.ang', '.jpg', '.png', '.txt']),
-            "Individual PC data" : False,
-            "Convention" : "TSL",
-            "Lazy Loading" : True,
-            "Default Directory" : False
+            "File Types"            : json.dumps(['.h5', '.dat', '.ang', '.jpg', '.png', '.txt']),
+            "Individual PC data"    : False,
+            "Convention"            : "TSL",
+            "Lazy Loading"          : True,
+            "Default Directory"     : False,
+            "Colors"                : json.dumps(['lime', 'r', 'b', 'yellow'])
         }
 
         self.setting_file = SettingFile("advanced_settings.txt")

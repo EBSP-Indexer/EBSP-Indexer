@@ -1,8 +1,10 @@
 import sys
 import json
 from os.path import basename, splitext, exists
-from os import startfile
-import subprocess
+try:
+    from os import startfile
+except:
+    import subprocess
 import platform
 
 from contextlib import redirect_stdout, redirect_stderr
@@ -19,7 +21,7 @@ from utils.setting_file import SettingFile
 
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.dictionary_indexing import DiSetupDialog
-from scripts.pre_indexing_maps import PreIndexingMapsDialog
+from scripts.pre_indexing_maps import *
 from scripts.advanced_settings import AdvancedSettingsDialog
 
 from scripts.console import Console, Redirect
@@ -48,7 +50,7 @@ class AppWindow(QMainWindow):
         self.systemModel = QFileSystemModel()
 
         #Check platform and set windowStayOnTopHint
-        if platform.system() == "darwin":
+        if platform.system() == "Darwin":
             self.stayOnTopHint = True
         else:
             self.stayOnTopHint = False
@@ -87,9 +89,10 @@ class AppWindow(QMainWindow):
         self.ui.actionPattern_Center.triggered.connect(
             lambda: self.selectPatternCenter()
         )
-        self.ui.actionPre_indexing_maps.triggered.connect(
-            lambda: self.selectPreIndexingMaps()
-        )
+        self.ui.actionAverage_dot_product.triggered.connect(lambda: save_adp_map(self.file_selected))
+        self.ui.actionImage_quality.triggered.connect(lambda: save_iq_map(self.file_selected))
+        self.ui.actionMean_intensity.triggered.connect(lambda: save_mean_intensity_map(self.file_selected))
+        self.ui.actionVirtual_backscatter_electron.triggered.connect(lambda: save_rgb_vbse(self.file_selected))
 
     # def onKeyReleaseEvent(self, event):
     #     if event.key() == Qt.Key_Up or event.key() == Qt.Key_Down:
@@ -184,18 +187,6 @@ class AppWindow(QMainWindow):
             self.ROIDialog.exec()
         except Exception as e:
             self.console.errorwrite(f"Could not initialize ROI dialog:\n{str(e)}\n")
-
-    def selectPreIndexingMaps(self):
-        try:
-            self.PreInMapDialog = PreIndexingMapsDialog(
-                parent=self, pattern_path=self.file_selected
-            )
-            self.PreInMapDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
-            self.PreInMapDialog.exec()
-        except Exception as e:
-            self.console.errorwrite(
-                f"Could not initialize pre-indexing maps generation dialog:\n{str(e)}\n"
-            )
 
     def onSystemModelChanged(self, new_selected, old_selected):
         if new_selected.empty():
@@ -296,7 +287,7 @@ class AppWindow(QMainWindow):
             self.ui.menuProcessing.setEnabled(enabled)
             self.ui.menuPlot.setEnabled(enabled)
             self.ui.menuIndexing.setEnabled(enabled)
-            self.ui.actionPre_indexing_maps.setEnabled(enabled)
+            self.ui.menuPre_indexing_maps.setEnabled(enabled)
             self.ui.actionSignalNavigation.setEnabled(enabled)
 
         if file_path == None:
@@ -313,7 +304,7 @@ class AppWindow(QMainWindow):
         if basename(file_path) == "Setting.txt":
             self.ui.menuPlot.setEnabled(True)
             self.ui.actionSignalNavigation.setEnabled(True)
-            self.ui.actionPre_indexing_maps.setEnabled(False)
+            self.ui.menuPre_indexing_maps.setEnabled(False)
 
 
 if __name__ == "__main__":
