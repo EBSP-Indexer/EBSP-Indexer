@@ -1,24 +1,18 @@
-from os import path
-from pickle import TRUE
-from re import T
+import sys
+from os import path, devnull
 import kikuchipy as kp
-from PySide6.QtCore import QDir
-from PySide6.QtWidgets import QDialog, QApplication
-import matplotlib.pyplot as plt
+from PySide6.QtWidgets import QDialog, QDialogButtonBox
 import numpy as np
 
 from diffsims.crystallography import ReciprocalLatticeVector
-from diffpy.structure import Atom, Lattice, Structure
 from pyebsdindex import ebsd_index, pcopt
-from orix.crystal_map.phase_list import Structure
 from orix.quaternion import Rotation
-from orix.crystal_map import Phase
 
 from utils.filebrowser import FileBrowser
 from utils.setting_file import SettingFile
 from ui.ui_pattern_center import Ui_PatternCenter
 
-from mplwidget import MplWidget
+progressbar_bool = False
 
 def find_hkl(phase):
     FCC = ["ni", "al", "austenite", "cu", "si"]
@@ -44,7 +38,10 @@ class PatterCenterDialog(QDialog):
         self.setupCalibrationPatterns()
         self.setupInitialSettings()
         
-        self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
+        #self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
+        self.fileBrowserOD = FileBrowser(
+            mode=FileBrowser.OpenFile,
+        )
 
     def findSettingsFile(self):
         if self.file_selected[-11:] == "Setting.txt":
@@ -84,6 +81,19 @@ class PatterCenterDialog(QDialog):
         self.updatePCSpinBox()
         
         self.mp_paths = {}
+
+        i = 1
+        while True:
+            try:
+                mp_path = self.setting_file.read(f"Master pattern {i}")
+                phase = path.dirname(mp_path).split("/").pop()
+                self.mp_paths[phase] = mp_path
+                self.ui.listPhases.addItem(phase)
+                i += 1
+            except:
+                break
+
+        """
         i = 1
         while True:
             try:
@@ -91,23 +101,41 @@ class PatterCenterDialog(QDialog):
                 phase = mp_path.split("/").pop()
                 self.mp_paths[phase] = mp_path
                 self.ui.listPhases.addItem(phase)
+                
                 i += 1
                 self.phase = phase
             except:
                 break
+        """
+
+        if len(list(self.mp_paths.keys())) != 0:
+            self.ui.listPhases.setCurrentRow(0)
+            self.phase = self.ui.listPhases.currentItem().text()
+        else:
+            self.changeStateOfButtons()
 
         self.is_mp_paths_updated = True
         self.enabled = False
         self.ui.bandButton.setDisabled(True)
+        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
     
+    def changeStateOfButtons(self):
+        enable = bool(len(list(self.mp_paths.keys())))
+        
+        self.ui.buttonPlot.setEnabled(enable)
+        self.ui.buttonTune.setEnabled(enable)
+        self.ui.toolButtonLeft.setEnabled(enable)
+        self.ui.toolButtonRight.setEnabled(enable)
+        self.ui.buttonRemovePhase.setEnabled(enable)
+
     def setupCalibrationPatterns(self):
         self.pattern_index = 0
         self.s_cal = kp.load(self.setting_path)
         sig_shape = self.s_cal.axes_manager.signal_shape[::-1]
         self.nav_size = self.s_cal.axes_manager.navigation_size
 
-        self.s_cal.remove_static_background()
-        self.s_cal.remove_dynamic_background()
+        self.s_cal.remove_static_background(show_progressbar=progressbar_bool)
+        self.s_cal.remove_dynamic_background(show_progressbar=progressbar_bool)
 
         working_distance = self.s_cal.metadata.Acquisition_instrument.SEM.working_distance
         self.ui.workingDistanceLabel.setText("Working Distance (mm): "+str(working_distance))
@@ -138,8 +166,8 @@ class PatterCenterDialog(QDialog):
         self.ui.toolButtonRight.clicked.connect(lambda: self.nextPattern())
         self.ui.buttonTune.clicked.connect(lambda: self.refinePatternCenter())
         self.ui.buttonPlot.clicked.connect(lambda: self.plotClicked())
-        self.ui.buttonBox.clicked.connect(lambda: self.saveAndExit())
-        self.ui.buttonBox.clicked.connect(lambda: self.reject())
+        self.ui.buttonBox.accepted.connect(lambda: self.saveAndExit())
+        self.ui.buttonBox.rejected.connect(lambda: self.reject())
         self.ui.bandButton.clicked.connect(lambda: self.bandButtonClicked())
         self.ui.ignoreCheckBox.clicked.connect(lambda: self.ignoreButtonClicked())
         self.ui.conventionBox.currentTextChanged.connect(lambda: self.updatePCConvention())
@@ -191,18 +219,25 @@ class PatterCenterDialog(QDialog):
     def addPhase(self):
         if self.fileBrowserOD.getFile():
             mp_path = self.fileBrowserOD.getPaths()[0]
-            phase = mp_path.split("/").pop()
+            phase = path.basename(path.dirname(mp_path)) #.split("/").pop()
             self.fileBrowserOD.setDefaultDir(path.dirname(mp_path))
             if phase not in self.mp_paths.keys():
                 self.mp_paths[phase] = mp_path
                 self.ui.listPhases.addItem(phase)
                 self.is_mp_paths_updated = True
             self.phase = phase
+            self.ui.listPhases.setCurrentRow(len(self.mp_paths.keys())-1)
+        self.changeStateOfButtons()
 
     def removePhase(self):
+        #if str(self.ui.listPhases.currentItem().text()) is None:
+        #    self.ui.listPhases.setCurrentRow(-1)
         self.mp_paths.pop(str(self.ui.listPhases.currentItem().text()))
         self.ui.listPhases.takeItem(self.ui.listPhases.currentRow())
         self.is_mp_paths_updated = True
+        self.ui.listPhases.clearSelection()
+
+        self.changeStateOfButtons()
 
     def updatePCSpinBox(self):
         self.ui.spinBoxX.setValue(self.pc[0])
@@ -222,8 +257,7 @@ class PatterCenterDialog(QDialog):
     
     def updatePCConvention(self):
         self.convention = self.ui.conventionBox.currentText()
-        self.updatePCSpinBox()
-            
+        self.updatePCSpinBox()      
 
     def updatePCDict(self, pattern_index, phase, pc, pattern_ignored):
         self.pcs[pattern_index] = [phase, pc, pattern_ignored]
@@ -235,7 +269,8 @@ class PatterCenterDialog(QDialog):
         try:
             self.phase = self.ui.listPhases.currentItem().text()
         except:
-            self.phase = self.mp_paths.keys()[0]
+            self.ui.listPhases.setCurrentRow(0)
+            self.phase = self.ui.listPhases.currentItem().text()
         
         self.plotData()
 
@@ -246,7 +281,8 @@ class PatterCenterDialog(QDialog):
         try:
             self.phase = self.ui.listPhases.currentItem().text()
         except:
-            self.phase = self.mp_paths.keys()[0]
+            self.ui.listPhases.setCurrentRow(0)
+            self.phase = self.ui.listPhases.currentItem().text()
 
         pattern = self.s_cal.data[self.pattern_index]
         self.pc = pcopt.optimize(pattern, self.indexer, self.pc)
@@ -257,7 +293,7 @@ class PatterCenterDialog(QDialog):
         mp_dict = {}
         for name, h5path in self.mp_paths.items():
             mp_i = kp.load(
-                path.join(h5path, str(f"{name}_mc_mp_20kv.h5")),
+                path.join(h5path),
                 projection="lambert",
                 energy=self.s_cal.metadata.Acquisition_instrument.SEM.beam_energy,
                 hemisphere="upper",
@@ -301,8 +337,13 @@ class PatterCenterDialog(QDialog):
         rot = Rotation(data["quat"][-1]) * Rotation.from_axes_angles([0, 0, -1], np.pi / 2)
 
         geosim_dict = {}
+
+        sys.stdout = open(devnull, 'w')
         for name in self.mp_paths.keys():
             geosim_dict[name] = self.simulator_dict[name].on_detector(detector, rot)
+
+        sys.stdout = sys.__stdout__
+
 
         #Draws pattern in MplWidget 
         self.pattern_image = self.s_cal.data[self.pattern_index]
@@ -327,6 +368,7 @@ class PatterCenterDialog(QDialog):
         self.bands_enabled = False
         self.bandButtonClicked()
         self.ui.bandButton.setEnabled(True)
+        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
 
     def bandButtonClicked(self):
         if not self.bands_enabled:
