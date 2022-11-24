@@ -2,11 +2,14 @@ from os import path
 from kikuchipy import load, generators
 from matplotlib_scalebar.scalebar import ScaleBar
 import matplotlib.pyplot as plt
-from matplotlib_scalebar.scalebar import ScaleBar
+
+from utils.worker import Worker
+from PySide6.QtCore import QThreadPool
 
 save_fig_kwargs = dict(bbox_inches="tight", pad_inches = 0)
 
 def generate_figure(image, pattern):
+    print("Generating image...")
     scale = pattern.axes_manager["x"].scale
     fig, ax = plt.subplots()
     ax.axis("off")
@@ -14,7 +17,7 @@ def generate_figure(image, pattern):
     scalebar = ScaleBar(scale, "um", location="lower left", box_alpha=0.5, border_pad=0.4)
     ax.add_artist(scalebar)
     return fig
-
+    
 def save_iq_map(pattern_path):
     s = load(pattern_path, lazy=True)
     iq_map = s.get_image_quality()
