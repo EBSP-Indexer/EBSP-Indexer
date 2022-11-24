@@ -21,7 +21,7 @@ from utils.setting_file import SettingFile
 
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.dictionary_indexing import DiSetupDialog
-from scripts.pre_indexing_maps import PreIndexingMapsDialog, save_adp_map, save_iq_map, save_mean_intensity_map, save_rgb_vbse
+from scripts.pre_indexing_maps import *
 from scripts.advanced_settings import AdvancedSettingsDialog
 
 from scripts.console import Console, Redirect
@@ -187,18 +187,6 @@ class AppWindow(QMainWindow):
             self.ROIDialog.exec()
         except Exception as e:
             self.console.errorwrite(f"Could not initialize ROI dialog:\n{str(e)}\n")
-
-    def selectPreIndexingMaps(self):
-        try:
-            self.PreInMapDialog = PreIndexingMapsDialog(
-                parent=self, pattern_path=self.file_selected
-            )
-            self.PreInMapDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
-            self.PreInMapDialog.exec()
-        except Exception as e:
-            self.console.errorwrite(
-                f"Could not initialize pre-indexing maps generation dialog:\n{str(e)}\n"
-            )
 
     def onSystemModelChanged(self, new_selected, old_selected):
         if new_selected.empty():
