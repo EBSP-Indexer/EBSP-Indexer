@@ -8,3 +8,6 @@ report.log
 work_in_progress
 advanced_settings.txt
 test.py
+build
+dist
+output
