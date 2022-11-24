@@ -69,7 +69,6 @@ class AppWindow(QMainWindow):
         self.ui.systemViewer.selectionModel().selectionChanged.connect(
             lambda new, old: self.onSystemModelChanged(new, old)
         )
-        # self.ui.systemViewer.keyReleaseEvent = self.onKeyReleaseEvent
         self.ui.systemViewer.doubleClicked.connect(lambda: self.openTextFile())
         self.ui.actionOpen_Workfolder.triggered.connect(
             lambda: self.selectWorkingDirectory()
@@ -93,12 +92,7 @@ class AppWindow(QMainWindow):
         self.ui.actionImage_quality.triggered.connect(lambda: save_iq_map(self.file_selected))
         self.ui.actionMean_intensity.triggered.connect(lambda: save_mean_intensity_map(self.file_selected))
         self.ui.actionVirtual_backscatter_electron.triggered.connect(lambda: save_rgb_vbse(self.file_selected))
-
-    # def onKeyReleaseEvent(self, event):
-    #     if event.key() == Qt.Key_Up or event.key() == Qt.Key_Down:
-    #         index = self.ui.systemViewer.currentIndex()
-    #         self.onSystemViewClicked(index)
-
+    
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
             self.working_dir = self.fileBrowserOD.getPaths()[0]

@@ -1,26 +1,16 @@
 import sys
 from os import path, devnull
-from pickle import TRUE
-from re import T
 import kikuchipy as kp
-import hyperspy as hs
-from PySide6.QtCore import QDir
-from PySide6.QtWidgets import QDialog, QApplication, QDialogButtonBox
-import matplotlib.pyplot as plt
+from PySide6.QtWidgets import QDialog, QDialogButtonBox
 import numpy as np
 
 from diffsims.crystallography import ReciprocalLatticeVector
-from diffpy.structure import Atom, Lattice, Structure
 from pyebsdindex import ebsd_index, pcopt
-from orix.crystal_map.phase_list import Structure
 from orix.quaternion import Rotation
-from orix.crystal_map import Phase
 
 from utils.filebrowser import FileBrowser
 from utils.setting_file import SettingFile
 from ui.ui_pattern_center import Ui_PatternCenter
-
-from mplwidget import MplWidget
 
 progressbar_bool = False
 
@@ -98,7 +88,7 @@ class PatterCenterDialog(QDialog):
                 mp_path = self.setting_file.read(f"Master pattern {i}")
                 phase = path.dirname(mp_path).split("/").pop()
                 self.mp_paths[phase] = mp_path
-                self.ui.listWidgetPhase.addItem(phase)
+                self.ui.listPhases.addItem(phase)
                 i += 1
             except:
                 break
