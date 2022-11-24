@@ -1,9 +1,6 @@
 import sys
 from os import path, devnull
-from pickle import TRUE
-from re import T
 import kikuchipy as kp
-import hyperspy as hs
 from PySide6.QtCore import QDir
 from PySide6.QtWidgets import QDialog, QApplication, QDialogButtonBox
 import matplotlib.pyplot as plt

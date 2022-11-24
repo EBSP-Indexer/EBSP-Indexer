@@ -12,18 +12,17 @@ from PySide6.QtCore import QDir, Qt, QProcess, QThreadPool
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
 from PySide6.QtGui import QFont
 from scripts.hough_indexing import HiSetupDialog
-from ui.ui_main_window import Ui_MainWindow
+import kikuchipy.io._io
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 
+from ui.ui_main_window import Ui_MainWindow
 from utils.filebrowser import FileBrowser
 from utils.setting_file import SettingFile
-
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.dictionary_indexing import DiSetupDialog
 from scripts.pre_indexing_maps import PreIndexingMapsDialog
 from scripts.advanced_settings import AdvancedSettingsDialog
-
 from scripts.console import Console, Redirect
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
