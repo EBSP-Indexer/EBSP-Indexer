@@ -2,6 +2,7 @@ from os import path
 from kikuchipy import load, generators
 from matplotlib_scalebar.scalebar import ScaleBar
 import matplotlib.pyplot as plt
+from matplotlib_scalebar.scalebar import ScaleBar
 
 save_fig_kwargs = dict(bbox_inches="tight", pad_inches = 0)
 

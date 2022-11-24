@@ -48,7 +48,10 @@ class PatterCenterDialog(QDialog):
         self.setupCalibrationPatterns()
         self.setupInitialSettings()
         
-        self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
+        #self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
+        self.fileBrowserOD = FileBrowser(
+            mode=FileBrowser.OpenFile,
+        )
 
     def findSettingsFile(self):
         if self.file_selected[-11:] == "Setting.txt":
@@ -88,6 +91,19 @@ class PatterCenterDialog(QDialog):
         self.updatePCSpinBox()
         
         self.mp_paths = {}
+
+        i = 1
+        while True:
+            try:
+                mp_path = self.setting_file.read(f"Master pattern {i}")
+                phase = path.dirname(mp_path).split("/").pop()
+                self.mp_paths[phase] = mp_path
+                self.ui.listWidgetPhase.addItem(phase)
+                i += 1
+            except:
+                break
+
+        """
         i = 1
         while True:
             try:
@@ -100,6 +116,7 @@ class PatterCenterDialog(QDialog):
                 self.phase = phase
             except:
                 break
+        """
 
         if len(list(self.mp_paths.keys())) != 0:
             self.ui.listPhases.setCurrentRow(0)
@@ -212,7 +229,7 @@ class PatterCenterDialog(QDialog):
     def addPhase(self):
         if self.fileBrowserOD.getFile():
             mp_path = self.fileBrowserOD.getPaths()[0]
-            phase = mp_path.split("/").pop()
+            phase = path.basename(path.dirname(mp_path)) #.split("/").pop()
             self.fileBrowserOD.setDefaultDir(path.dirname(mp_path))
             if phase not in self.mp_paths.keys():
                 self.mp_paths[phase] = mp_path
@@ -286,7 +303,7 @@ class PatterCenterDialog(QDialog):
         mp_dict = {}
         for name, h5path in self.mp_paths.items():
             mp_i = kp.load(
-                path.join(h5path, str(f"{name}_mc_mp_20kv.h5")),
+                path.join(h5path),
                 projection="lambert",
                 energy=self.s_cal.metadata.Acquisition_instrument.SEM.beam_energy,
                 hemisphere="upper",
@@ -334,7 +351,9 @@ class PatterCenterDialog(QDialog):
         sys.stdout = open(devnull, 'w')
         for name in self.mp_paths.keys():
             geosim_dict[name] = self.simulator_dict[name].on_detector(detector, rot)
+
         sys.stdout = sys.__stdout__
+
 
         #Draws pattern in MplWidget 
         self.pattern_image = self.s_cal.data[self.pattern_index]
