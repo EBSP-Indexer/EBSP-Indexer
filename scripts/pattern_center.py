@@ -1,23 +1,16 @@
 import sys
 from os import path, devnull
 import kikuchipy as kp
-from PySide6.QtCore import QDir
-from PySide6.QtWidgets import QDialog, QApplication, QDialogButtonBox
-import matplotlib.pyplot as plt
+from PySide6.QtWidgets import QDialog, QDialogButtonBox
 import numpy as np
 
 from diffsims.crystallography import ReciprocalLatticeVector
-from diffpy.structure import Atom, Lattice, Structure
 from pyebsdindex import ebsd_index, pcopt
-from orix.crystal_map.phase_list import Structure
 from orix.quaternion import Rotation
-from orix.crystal_map import Phase
 
 from utils.filebrowser import FileBrowser
 from utils.setting_file import SettingFile
 from ui.ui_pattern_center import Ui_PatternCenter
-
-from mplwidget import MplWidget
 
 progressbar_bool = False
 
@@ -95,7 +88,7 @@ class PatterCenterDialog(QDialog):
                 mp_path = self.setting_file.read(f"Master pattern {i}")
                 phase = path.dirname(mp_path).split("/").pop()
                 self.mp_paths[phase] = mp_path
-                self.ui.listWidgetPhase.addItem(phase)
+                self.ui.listPhases.addItem(phase)
                 i += 1
             except:
                 break
@@ -420,19 +413,19 @@ class PatterCenterDialog(QDialog):
                 if self.program_settings.read("Individual PC data") == "True":
                     self.setting_file.write("Calibration PC"+str(i), str([round(x, 4),round(y, 4), round(z, 4)]))
 
-        x_average = round(x_sum/n, 4)
-        y_average = round(y_sum/n, 4)
-        z_average = round(z_sum/n, 4)
+        x_average = x_sum/n
+        y_average = y_sum/n
+        z_average = z_sum/n
 
         self.setting_file.write("Convention", self.convention)
-        self.setting_file.write("X star", f"{x_average}")
+        self.setting_file.write("X star", f"{x_average:.4}")
         
         if self.convention == "BRUKER":
-            self.setting_file.write("Y star", f"{y_average}")
+            self.setting_file.write("Y star", f"{y_average:.4}")
         elif self.convention == "TSL":
-            self.setting_file.write("Y star", f"{1-y_average}")
+            self.setting_file.write("Y star", f"{1-y_average:.4}")
 
-        self.setting_file.write("Z star", f"{z_average}")
+        self.setting_file.write("Z star", f"{z_average:.4}")
         
         self.setting_file.save()
         self.close()
