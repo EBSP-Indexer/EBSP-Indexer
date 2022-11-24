@@ -711,8 +711,6 @@ class DiSetupDialog(QDialog):
         if self.refine:
             self.refine_orientations()
 
-        ### Single phase - NOE GALT HER
-
         if len(self.phases) == 1:
             print("Saving figures")
             if self.refine:
