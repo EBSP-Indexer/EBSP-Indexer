@@ -107,7 +107,7 @@ class AppWindow(QMainWindow):
         try:
             pyi_splash.close()
         except Exception as e:
-            print(e)
+            pass
 
     def setupConnections(self):
         self.ui.systemViewer.setModel(self.systemModel)
