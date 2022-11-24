@@ -6,6 +6,7 @@ import kikuchipy as kp
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib_scalebar.scalebar import ScaleBar
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import numpy as np
 from orix import io, plot, sampling
@@ -175,8 +176,12 @@ class DiSetupDialog(QDialog):
                     self.bin_shapes = np.append(self.bin_shapes, f"({num}, {num})")
 
             self.ui.comboBoxBinning.addItems(self.bin_shapes[::-1])
+
+            # Define pixel-scale globally
+            self.scale = self.s.axes_manager["x"].scale
         except Exception as e:
             raise e
+        
 
     def set_save_fileformat(self):
         self.di_result_filetypes = [
@@ -296,6 +301,7 @@ class DiSetupDialog(QDialog):
         self.mp = {}
         for ph in self.phases:
             file_mp = path.join(self.mpPaths[ph])  # , f"{ph}_mc_mp_20kv.h5")
+            
             self.mp[f"{ph}"] = kp.load(
                 file_mp,
                 energy=self.energy,  # single energies like 10, 11, 12 etc. or a range like (10, 20)
@@ -339,7 +345,6 @@ class DiSetupDialog(QDialog):
 
     # Normal cross correlation
     def save_ncc_figure(self, xmap_dict):
-        scale = self.s.axes_manager["x"].scale
         for ph in self.phases:
             if xmap_dict["type"] == "refined":
                 ncc_map = xmap_dict[f"{ph}"].get_map_data("scores")
@@ -351,9 +356,12 @@ class DiSetupDialog(QDialog):
             ### Inspect dictionary indexing results for phase
             fig, ax = plt.subplots()
             ax.axis("off")
-            ax.imshow(ncc_map, cmap="gray")
+            ncc = ax.imshow(ncc_map, cmap="gray")
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes("right", size="5%", pad=0.05)
+            plt.colorbar(ncc, cax=cax, label="NCC")
             scalebar = ScaleBar(
-                scale, "um", location="lower left", box_alpha=0.5, border_pad=0.4
+                self.scale, "um", location="lower left", box_alpha=0.5, border_pad=0.4
             )
             ax.add_artist(scalebar)
             fig.savefig(
@@ -369,16 +377,18 @@ class DiSetupDialog(QDialog):
             ### Calculate and save orientation similairty map
 
             osm = kp.indexing.orientation_similarity_map(xmap_dict[f"{ph}"])
-
-            fig = xmap_dict[f"{ph}"].plot(
-                value=osm.ravel(),
-                colorbar=True,
-                colorbar_label="Orientation similarity",
-                return_figure=True,
-                cmap="gray",
-                remove_padding=True,
+            ### Inspect dictionary indexing results for phase
+            
+            fig, ax = plt.subplots()
+            ax.axis("off")
+            osm_map = ax.imshow(osm, cmap="gray")
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes("right", size="5%", pad=0.05)
+            plt.colorbar(osm_map, cax=cax, label="Orientation similarity")
+            scalebar = ScaleBar(
+                self.scale, "um", location="lower left", box_alpha=0.5, border_pad=0.4
             )
-
+            ax.add_artist(scalebar)
             fig.savefig(
                 path.join(self.results_dir, f"osm_{ph}.png"), **self.savefig_kwargs
             )
@@ -390,6 +400,12 @@ class DiSetupDialog(QDialog):
         for ph in self.phases:
 
             self.ckey = plot.IPFColorKeyTSL(self.mp[f"{ph}"].phase.point_group)
+
+            fig = self.ckey.plot(return_figure=True)
+            fig.savefig(
+                path.join(self.results_dir, "orientation_color_key.png"),
+                **self.savefig_kwargs,
+            )
 
             fig = xmap_dict[f"{ph}"].plot(
                 self.ckey.orientation2color(xmap_dict[f"{ph}"].orientations),
@@ -448,9 +464,8 @@ class DiSetupDialog(QDialog):
         )
 
         colors = ["lime", "r", "b", "yellow"]
-
-        for i, ph in enumerate(self.phases):
-            merged.phases[ph].color = colors[i]
+        for i in range(len(self.phases)):
+            merged.phases[i].color = colors[i]
 
         for filetype in self.di_result_filetypes:  # [".ang", ".h5"]
             io.save(
@@ -469,7 +484,7 @@ class DiSetupDialog(QDialog):
 
             fig = merged.plot(
                 colorbar=True,
-                colorbar_label="NCC score",
+                colorbar_label="NCC",
                 return_figure=True,
                 cmap="gray",
                 remove_padding=True,
@@ -641,7 +656,7 @@ class DiSetupDialog(QDialog):
         ### Dictionary indexing
 
         for ph in self.phases:
-
+            self.mp[f"{ph}"].phase.name = ph
             ### Sample orientations
             rot = sampling.get_sample_fundamental(
                 method="cubochoric",
@@ -661,6 +676,8 @@ class DiSetupDialog(QDialog):
                 dictionary=sim_dict, **self.di_kwargs
             )
             self.xmaps[f"{ph}"].scan_unit = "um"
+            print(ph)
+            self.xmaps[f"{ph}"].phases[0].name = ph
 
             del sim_dict
 
