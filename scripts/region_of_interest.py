@@ -168,6 +168,10 @@ class RegionOfInteresDialog(QDialog):
         self.y1 = self.options["y-end"]
 
         self.s2 = self.s.inav[self.x0:self.x1, self.y0:self.y1]
+        self.save_path = path.join(
+            self.working_dir, self.ui.filenameEdit.text()
+        )
+
         try:
             self.s2.save(
                 self.save_path,
