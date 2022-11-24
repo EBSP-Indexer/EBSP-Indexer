@@ -576,11 +576,6 @@ class DiSetupDialog(QDialog):
         if self.convention == "TSL":
             pc_copy[1] = 1-pc_copy[1]
 
-        if self.convention == "TSL":
-            self.di_setting_file.write("PC (x*, y*, z*)", f"{1-pc_copy}")
-        elif self.convention == "BRUKER":
-            self.di_setting_file.write("PC (x*, y*, z*)", f"{pc_copy}")
-
         self.di_setting_file.write("PC convention", f"{self.convention}")
         self.di_setting_file.write("Pattern center (x*, y*, z*)", f"{pc_copy}")
         
