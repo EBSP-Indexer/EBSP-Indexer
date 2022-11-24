@@ -148,7 +148,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>26</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -161,7 +161,7 @@
    </widget>
    <widget class="QMenu" name="menuProcessing">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="title">
      <string>Processing</string>
@@ -172,13 +172,22 @@
    </widget>
    <widget class="QMenu" name="menuPlot">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="title">
      <string>Pattern inspection</string>
     </property>
+    <widget class="QMenu" name="menuPre_indexing_maps">
+     <property name="title">
+      <string>Pre-indexing maps</string>
+     </property>
+     <addaction name="actionAverage_dot_product"/>
+     <addaction name="actionImage_quality"/>
+     <addaction name="actionMean_intensity"/>
+     <addaction name="actionVirtual_backscatter_electron"/>
+    </widget>
     <addaction name="actionSignalNavigation"/>
-    <addaction name="actionPre_indexing_maps"/>
+    <addaction name="menuPre_indexing_maps"/>
    </widget>
    <widget class="QMenu" name="menuIndexing">
     <property name="enabled">
@@ -204,6 +213,9 @@
    </property>
   </action>
   <action name="actionProcessingMenu">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Noise-to-signal improvement</string>
    </property>
@@ -212,6 +224,9 @@
    </property>
   </action>
   <action name="actionSignalNavigation">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Signal navigation</string>
    </property>
@@ -236,17 +251,49 @@
     <string>Hough indexing</string>
    </property>
   </action>
-  <action name="actionPre_indexing_maps">
-   <property name="text">
-    <string>Generate pre-indexing maps</string>
-   </property>
-  </action>
   <action name="actionSettings">
    <property name="text">
     <string>Settings</string>
    </property>
    <property name="statusTip">
     <string/>
+   </property>
+  </action>
+  <action name="actionImage_quality">
+   <property name="text">
+    <string>Image quality map</string>
+   </property>
+  </action>
+  <action name="actionMean_intensity">
+   <property name="text">
+    <string>Mean intensity map</string>
+   </property>
+  </action>
+  <action name="actionVirtual_backscatter_electron">
+   <property name="text">
+    <string>Virtual backscatter electron</string>
+   </property>
+  </action>
+  <action name="actionAverage_dot_product">
+   <property name="text">
+    <string>Average dot product</string>
+   </property>
+  </action>
+  <action name="actionGenerate_images">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Generate images...</string>
+   </property>
+   <property name="font">
+    <font>
+     <stylestrategy>NoAntialias</stylestrategy>
+     <kerning>false</kerning>
+    </font>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
    </property>
   </action>
  </widget>

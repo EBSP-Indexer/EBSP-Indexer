@@ -21,7 +21,7 @@ from utils.setting_file import SettingFile
 
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.dictionary_indexing import DiSetupDialog
-from scripts.pre_indexing_maps import PreIndexingMapsDialog
+from scripts.pre_indexing_maps import PreIndexingMapsDialog, save_adp_map, save_iq_map, save_mean_intensity_map, save_rgb_vbse
 from scripts.advanced_settings import AdvancedSettingsDialog
 
 from scripts.console import Console, Redirect
@@ -89,9 +89,10 @@ class AppWindow(QMainWindow):
         self.ui.actionPattern_Center.triggered.connect(
             lambda: self.selectPatternCenter()
         )
-        self.ui.actionPre_indexing_maps.triggered.connect(
-            lambda: self.selectPreIndexingMaps()
-        )
+        self.ui.actionAverage_dot_product.triggered.connect(lambda: save_adp_map(self.file_selected))
+        self.ui.actionImage_quality.triggered.connect(lambda: save_iq_map(self.file_selected))
+        self.ui.actionMean_intensity.triggered.connect(lambda: save_mean_intensity_map(self.file_selected))
+        self.ui.actionVirtual_backscatter_electron.triggered.connect(lambda: save_rgb_vbse(self.file_selected))
 
     # def onKeyReleaseEvent(self, event):
     #     if event.key() == Qt.Key_Up or event.key() == Qt.Key_Down:
@@ -298,7 +299,7 @@ class AppWindow(QMainWindow):
             self.ui.menuProcessing.setEnabled(enabled)
             self.ui.menuPlot.setEnabled(enabled)
             self.ui.menuIndexing.setEnabled(enabled)
-            self.ui.actionPre_indexing_maps.setEnabled(enabled)
+            self.ui.menuPre_indexing_maps.setEnabled(enabled)
             self.ui.actionSignalNavigation.setEnabled(enabled)
 
         if file_path == None:
@@ -315,7 +316,7 @@ class AppWindow(QMainWindow):
         if basename(file_path) == "Setting.txt":
             self.ui.menuPlot.setEnabled(True)
             self.ui.actionSignalNavigation.setEnabled(True)
-            self.ui.actionPre_indexing_maps.setEnabled(False)
+            self.ui.menuPre_indexing_maps.setEnabled(False)
 
 
 if __name__ == "__main__":
