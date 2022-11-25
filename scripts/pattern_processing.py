@@ -1,5 +1,5 @@
 from os import path
-from kikuchipy import load, filters, generators
+import kikuchipy as kp
 from PySide6.QtWidgets import QDialog
 from PySide6.QtCore import QThreadPool
 
@@ -33,13 +33,13 @@ class PatternProcessingDialog(QDialog):
         self.setupConnections()
 
         try:
-            self.s = load(self.pattern_path, lazy=True)
+            self.s = kp.load(self.pattern_path, lazy=False)
         except Exception as e:
             raise e
 
         self.showImage(self.s.inav[1, 1])
 
-        self.gaussian_window = filters.Window("gaussian", std=1)
+        self.gaussian_window = kp.filters.Window("gaussian", std=1)
 
         self.fileBrowser = FileBrowser(
             mode=FileBrowser.SaveFile,
