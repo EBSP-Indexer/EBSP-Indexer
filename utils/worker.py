@@ -1,6 +1,5 @@
 import sys
 from contextlib import redirect_stderr, redirect_stdout
-import PySide6.QtCore as QtCore
 from PySide6.QtCore import QRunnable, Slot
 
 from scripts.console import ThreadedStdout, Redirect
