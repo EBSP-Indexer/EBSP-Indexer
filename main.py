@@ -196,6 +196,9 @@ class AppWindow(QMainWindow):
                 self.setSystemViewer(self.working_dir)
         else:
             AdvancedSettingsDialog(parent=self).createSettingsFile()
+            setting_file = SettingFile("advanced_settings.txt")
+            file_types = json.loads(setting_file.read("File Types"))
+            self.system_view_filter = ["*" + x for x in file_types]
 
     def openSettings(self):
         try:
@@ -373,10 +376,10 @@ if __name__ == "__main__":
         Redirect(APP.console.errorwrite)
     ):
         APP.show()
-        print(f"Multithreading with maximum {QThreadPool.globalInstance().maxThreadCount()} threads")
-        print(
-            """Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'"""
-        )
+        #print(f"Multithreading with maximum {QThreadPool.globalInstance().maxThreadCount()} threads")
+        #print(
+        #    """Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'"""
+        #)
         try:
             sys.exit(app.exec())
         except Exception as e:

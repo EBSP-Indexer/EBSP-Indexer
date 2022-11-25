@@ -92,7 +92,7 @@ class HiSetupDialog(QDialog):
             if self.convention == "TSL":
                 self.pc[1] = 1 - self.pc[1]
         except:
-            self.pc = np.array([0.400, 0.200, 0.400])
+            self.pc = np.array([0.500, 0.200, 0.500])
 
         self.update_pc_spinbox()
         self.ui.comboBoxConvention.setCurrentText(self.convention)
@@ -131,6 +131,8 @@ class HiSetupDialog(QDialog):
                 i += 1
             except:
                 break
+        
+        self.getPhases()
 
     def update_pc_spinbox(self):
         self.ui.patternCenterX.setValue(self.pc[0])
@@ -161,12 +163,18 @@ class HiSetupDialog(QDialog):
             if phase not in self.mpPaths.keys():
                 self.mpPaths[phase] = mpPath
                 self.ui.listWidgetPhase.addItem(phase)
+        self.getPhases()
         self.checkPhaseList()
 
     def removePhase(self):
         self.mpPaths.pop(str(self.ui.listWidgetPhase.currentItem().text()))
         self.ui.listWidgetPhase.takeItem(self.ui.listWidgetPhase.currentRow())
+        self.getPhases()
         self.checkPhaseList()
+    
+    def getPhases(self):
+        lw = self.ui.listWidgetPhase
+        self.phases = [lw.item(x).text() for x in range(lw.count())]
 
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_hough_indexing())

@@ -105,7 +105,7 @@ class DiSetupDialog(QDialog):
                 # Ensure that PC is stored in BRUKER convention
                 self.pc[1] = 1 - self.pc[1]
         except:
-            self.pc = np.array([0.400, 0.200, 0.400])
+            self.pc = np.array([0.500, 0.200, 0.500])
 
         self.update_pc_spinbox()
 
@@ -576,11 +576,6 @@ class DiSetupDialog(QDialog):
         if self.convention == "TSL":
             pc_copy[1] = 1-pc_copy[1]
 
-        if self.convention == "TSL":
-            self.di_setting_file.write("PC (x*, y*, z*)", f"{1-pc_copy}")
-        elif self.convention == "BRUKER":
-            self.di_setting_file.write("PC (x*, y*, z*)", f"{pc_copy}")
-
         self.di_setting_file.write("PC convention", f"{self.convention}")
         self.di_setting_file.write("Pattern center (x*, y*, z*)", f"{pc_copy}")
         
@@ -710,8 +705,6 @@ class DiSetupDialog(QDialog):
 
         if self.refine:
             self.refine_orientations()
-
-        ### Single phase - NOE GALT HER
 
         if len(self.phases) == 1:
             print("Saving figures")
