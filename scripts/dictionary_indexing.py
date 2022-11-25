@@ -105,7 +105,7 @@ class DiSetupDialog(QDialog):
                 # Ensure that PC is stored in BRUKER convention
                 self.pc[1] = 1 - self.pc[1]
         except:
-            self.pc = np.array([0.400, 0.200, 0.400])
+            self.pc = np.array([0.500, 0.200, 0.500])
 
         self.update_pc_spinbox()
 
