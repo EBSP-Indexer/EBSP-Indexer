@@ -3,14 +3,7 @@ from kikuchipy import load, generators
 from matplotlib_scalebar.scalebar import ScaleBar
 import matplotlib.pyplot as plt
 
-from utils.worker import Worker
-from PySide6.QtCore import QThreadPool
-
 save_fig_kwargs = dict(bbox_inches="tight", pad_inches = 0)
-
-def toWorker(function, console, *args, **kwargs):
-    worker = Worker(function, console, *args, **kwargs)
-    QThreadPool.globalInstance().start(worker)
 
 def generate_figure(image, pattern):
     print("Generating image...")

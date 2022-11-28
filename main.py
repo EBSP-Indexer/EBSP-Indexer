@@ -78,6 +78,7 @@ import matplotlib.pyplot as plt
 from ui.ui_main_window import Ui_MainWindow
 from utils.filebrowser import FileBrowser
 from utils.setting_file import SettingFile
+from utils.worker import toWorker
 from scripts.hough_indexing import HiSetupDialog
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.dictionary_indexing import DiSetupDialog
@@ -376,7 +377,7 @@ if __name__ == "__main__":
         Redirect(APP.console.errorwrite)
     ):
         APP.show()
-        #print(f"Multithreading with maximum {QThreadPool.globalInstance().maxThreadCount()} threads")
+        print(f"Multithreading with maximum {QThreadPool.globalInstance().maxThreadCount()} threads")
         #print(
         #    """Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'"""
         #)

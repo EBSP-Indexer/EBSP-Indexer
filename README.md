@@ -8,8 +8,15 @@ Developing an EBSD GUI based on the kikuchipy package
 - Functions/ variables containing PyQt logic and pure Qt elements uses camelCase
 - Functions/ variables that contain python code and other libraries uses snake_case
 
+## Download the repository 
+
+## Update Modules 
+
+## Bundle with pyinstaller
+auto-py-to-exe -c pyinstaller_config.json
+
 ## Working with Qt Designer and python tutorial
-The following describes a workflow for designing GUI elements and then add Python code to the element
+The following describes a workflow for designing GUI elements and then add Python code to the elements
 
 ### Qt Designer
 Design the gui component using Qt designer and save the file with an .ui extension. 

@@ -134,6 +134,29 @@ class HiSetupDialog(QDialog):
         
         self.getPhases()
 
+    def save_project_settings(self):
+        self.setting_file.delete_all_entries()  # clean up initial dictionary
+
+        ### Sample parameters
+        for i, mppath in enumerate(self.mpPaths.values(), 1):
+            self.setting_file.write(f"Master pattern {i}", mppath)
+
+        self.setting_file.write("Convention", self.convention)
+
+        self.update_pc_array_from_spinbox()
+        self.setting_file.write("X star", f"{self.pc[0]}")
+
+        if self.convention == "BRUKER":
+            self.setting_file.write("Y star", f"{self.pc[1]}")
+        elif self.convention == "TSL":
+            self.setting_file.write("Y star", f"{1-self.pc[1]}")
+
+        self.setting_file.write("Z star", f"{self.pc[2]}")
+
+        self.setting_file.write("Binning", f"({self.new_signal_shape})")
+
+        self.setting_file.save()
+
     def update_pc_spinbox(self):
         self.ui.patternCenterX.setValue(self.pc[0])
         self.ui.patternCenterZ.setValue(self.pc[2])
@@ -251,6 +274,7 @@ class HiSetupDialog(QDialog):
                 print(
                     f"Directory '{self.dir_out}' exists, will try to create directory '{self.dir_out[:-1] + str(i + 1)}'"
                 )
+        print(f"Initializing hough indexing of {self.pattern_name} ...")
         self.update_pc_array_from_spinbox()
         options = self.getOptions()
         self.phases = [phase for phase in self.mpPaths.keys()]
@@ -329,6 +353,8 @@ class HiSetupDialog(QDialog):
             optionEnabled, optionExecute = options[key]
             if optionEnabled:
                 optionExecute()
+        print("Saving project settings ...")
+        self.save_project_settings()
         print(f"Finished indexing {self.pattern_name}")
 
     def run_hough_indexing(self):
