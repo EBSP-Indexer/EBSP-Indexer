@@ -1,4 +1,6 @@
 from os import path
+import copy
+
 import kikuchipy as kp
 from PySide6.QtWidgets import QDialog
 from PySide6.QtCore import QThreadPool
@@ -82,14 +84,14 @@ class PatternProcessingDialog(QDialog):
             self.rdb = False
             self.anp = False
 
-    def remove_static(self, dataset):
-        dataset.remove_static_background(show_progressbar=True)
+    def remove_static(self, dataset, show_progressbar=True):
+        dataset.remove_static_background(show_progressbar=show_progressbar)
 
-    def remove_dynamic(self, dataset):
-        dataset.remove_dynamic_background(show_progressbar=True)
+    def remove_dynamic(self, dataset, show_progressbar=True):
+        dataset.remove_dynamic_background(show_progressbar=show_progressbar)
 
-    def average_neighbour(self, dataset):
-        dataset.average_neighbour_patterns(self.gaussian_window, show_progressbar=True)
+    def average_neighbour(self, dataset, show_progressbar=True):
+        dataset.average_neighbour_patterns(self.gaussian_window, show_progressbar=show_progressbar)
 
     def showImage(self, dataset):
 
@@ -100,15 +102,13 @@ class PatternProcessingDialog(QDialog):
         self.ui.previewWidget.canvas.draw()
 
     def preview_processing(self):
-
-        self.s_prev = self.s.inav[0:3, 0:3]
-
+        self.s_prev = self.s.deepcopy().inav[0:3, 0:3]
         if self.ui.staticBackgroundBox.isChecked():
-            self.remove_static(dataset=self.s_prev)
+            self.remove_static(dataset=self.s_prev, show_progressbar=False)
         if self.ui.dynamicBackgroundBox.isChecked():
-            self.remove_dynamic(dataset=self.s_prev)
+            self.remove_dynamic(dataset=self.s_prev, show_progressbar=False)
         if self.ui.averageBox.isChecked():
-            self.average_neighbour(dataset=self.s_prev)
+            self.average_neighbour(dataset=self.s_prev, show_progressbar=False)
 
         self.showImage(self.s_prev.inav[1, 1])
 

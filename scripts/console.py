@@ -2,7 +2,7 @@
 Interactive console widget.  Use to add an interactive python interpreter
 in a GUI application.
 
-created by deanhystad, sourcecode from https://python-forum.io/thread-25117.html
+Original code created by deanhystad, sourcecode from https://python-forum.io/thread-25117.html
 """
 import code
 import re
@@ -108,17 +108,12 @@ class Console(QtWidgets.QWidget):
         self.parent = parent
         self.setcontext(context)
         self.buffer = []
-        self.is_progress_bar = False
-
-        # self.content = QtWidgets.QGridLayout(self)
-        # self.content.setContentsMargins(0,0,0,0)
-        # self.content.setSpacing(0)
+        self.progress_bar_mode = False
 
         # Display for output and stderr
         self.outdisplay: QtWidgets.QPlainTextEdit = self.parent.ui.consoleLog
         self.outdisplay.setMaximumBlockCount(blockcount)
         self.outdisplay.setReadOnly(True)
-        # self.content.addWidget(self.outdisplay, 0, 0, 1, 2)
 
         # Use color to differentiate input, output and stderr
         self.inpfmt = self.outdisplay.currentCharFormat()
@@ -126,13 +121,6 @@ class Console(QtWidgets.QWidget):
         self.outfmt.setForeground(QtGui.QBrush(QtGui.QColor(0, 0, 255)))
         self.errfmt = QtGui.QTextCharFormat(self.inpfmt)
         self.errfmt.setForeground(QtGui.QBrush(QtGui.QColor(255, 0, 0)))
-
-        # Display input prompt left of input edit
-        # self.promptdisp = QtWidgets.QLineEdit(self)
-        # self.promptdisp.setReadOnly(True)
-        # self.promptdisp.setFixedWidth(15)
-        # self.promptdisp.setFrame(False)
-        # self.content.addWidget(self.promptdisp, 1, 0)
         self.setprompt(">>>")
 
         # Enter commands here
@@ -143,7 +131,6 @@ class Console(QtWidgets.QWidget):
         self.inpedit = self.parent.ui.consoleInput
         self.inpedit.newline.connect(self.push)
         self.inpedit.setFrame(False)
-        # self.content.addWidget(self.inpedit, 1, 1)
 
     def setcontext(self, context):
         """Set context for interpreter"""
@@ -205,14 +192,14 @@ class Console(QtWidgets.QWidget):
         else:
             self.outdisplay.setCurrentCharFormat(self.outfmt)
         if "\r" not in line:
-            self.is_progress_bar = False
-        if self.is_progress_bar:
+            self.progress_bar_mode = False
+        if self.progress_bar_mode:
             content = self.outdisplay.toPlainText().split("\n")
             self.outdisplay.setPlainText("\n".join(content[:-2]))
         if "\r" in line:
-            self.is_progress_bar = True
+            self.progress_bar_mode = True
             self.setscrollbarmax()
-        if not self.is_progress_bar:
+        if not self.progress_bar_mode:
             sb = self.outdisplay.verticalScrollBar()
             sb.setValue(sb.maximum())
         self.outdisplay.appendPlainText(line.rstrip())
