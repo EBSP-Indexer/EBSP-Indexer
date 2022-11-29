@@ -178,6 +178,9 @@ class AppWindow(QMainWindow):
                 self.setSystemViewer(self.working_dir)
         else:
             AdvancedSettingsDialog(parent=self).createSettingsFile()
+            setting_file = SettingFile("advanced_settings.txt")
+            file_types = json.loads(setting_file.read("File Types"))
+            self.system_view_filter = ["*" + x for x in file_types]
 
     def openSettings(self):
         try:

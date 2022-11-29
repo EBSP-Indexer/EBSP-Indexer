@@ -72,7 +72,7 @@ class PatterCenterDialog(QDialog):
                     float(self.setting_file.read("Z star")),
             ]
         except:
-            self.pc = np.array([0.5000, 0.7000, 0.5000])
+            self.pc = np.array([0.5000, 0.8000, 0.5000])
         
         if self.convention == "TSL":
             #Store TSL convention in BRUKER convention
