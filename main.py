@@ -15,13 +15,8 @@ try:
     import pyi_splash
 except:
     pass
-# Hidden modules for pyinstaller to detect 
-import kikuchipy.io._io
-import kikuchipy.detectors.ebsd_detector
-import kikuchipy.signals.ebsd
-import kikuchipy.signals.ebsd_master_pattern
-import kikuchipy.signals.ecp_master_pattern
-import kikuchipy.signals.virtual_bse_image
+# Hidden modules for pyinstaller to detect
+import hyperspy
 import hyperspy._components.eels_arctan
 import hyperspy._components.bleasdale
 import hyperspy._components.doniach
@@ -50,9 +45,32 @@ import hyperspy._components.split_voigt
 import hyperspy._components.eels_vignetting
 import hyperspy._components.pes_voigt
 import hyperspy._components.volume_plasmon_drude
-
 import hyperspy._components.expression
 import hyperspy._components.gaussian2d
+#import hyperspy._signals.signal2d
+#import hyperspy._lazy_signals
+
+import kikuchipy 
+import kikuchipy.generators.virtual_bse_generator
+import kikuchipy.generators._transfer_axes
+import kikuchipy.io._io
+import kikuchipy._util
+import kikuchipy.io._util
+import kikuchipy.data._data
+import kikuchipy.indexing._dictionary_indexing
+import kikuchipy.indexing._merge_crystal_maps
+import kikuchipy.indexing._orientation_similarity_map
+import kikuchipy.indexing._refinement
+import kikuchipy.pattern._pattern
+import kikuchipy.simulations._kikuchi_pattern_features
+import kikuchipy.simulations._kikuchi_pattern_simulation
+import kikuchipy.detectors.ebsd_detector
+import kikuchipy.signals._kikuchipy_signal
+import kikuchipy.signals._kikuchi_master_pattern
+import kikuchipy.signals.ebsd
+import kikuchipy.signals.ebsd_master_pattern
+import kikuchipy.signals.ecp_master_pattern
+import kikuchipy.signals.virtual_bse_image
 
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
@@ -60,6 +78,7 @@ import matplotlib.pyplot as plt
 from ui.ui_main_window import Ui_MainWindow
 from utils.filebrowser import FileBrowser
 from utils.setting_file import SettingFile
+from utils.worker import toWorker
 from scripts.hough_indexing import HiSetupDialog
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.dictionary_indexing import DiSetupDialog
@@ -133,10 +152,10 @@ class AppWindow(QMainWindow):
         self.ui.actionPattern_Center.triggered.connect(
             lambda: self.selectPatternCenter()
         )
-        self.ui.actionAverage_dot_product.triggered.connect(lambda: save_adp_map(self.file_selected))
-        self.ui.actionImage_quality.triggered.connect(lambda: save_iq_map(self.file_selected))
-        self.ui.actionMean_intensity.triggered.connect(lambda: save_mean_intensity_map(self.file_selected))
-        self.ui.actionVirtual_backscatter_electron.triggered.connect(lambda: save_rgb_vbse(self.file_selected))
+        self.ui.actionAverage_dot_product.triggered.connect(lambda: toWorker(save_adp_map, self.console, self.file_selected))
+        self.ui.actionImage_quality.triggered.connect(lambda: toWorker(save_iq_map, self.console, self.file_selected))
+        self.ui.actionMean_intensity.triggered.connect(lambda: toWorker(save_mean_intensity_map, self.console, self.file_selected))
+        self.ui.actionVirtual_backscatter_electron.triggered.connect(lambda: toWorker(save_rgb_vbse, self.console, self.file_selected))
     
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
@@ -359,9 +378,9 @@ if __name__ == "__main__":
     ):
         APP.show()
         print(f"Multithreading with maximum {QThreadPool.globalInstance().maxThreadCount()} threads")
-        print(
-            """Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'"""
-        )
+        #print(
+        #    """Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'"""
+        #)
         try:
             sys.exit(app.exec())
         except Exception as e:

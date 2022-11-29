@@ -1,7 +1,6 @@
 import sys
 from contextlib import redirect_stderr, redirect_stdout
-import PySide6.QtCore as QtCore
-from PySide6.QtCore import QRunnable, Slot
+from PySide6.QtCore import QRunnable, Slot, QThreadPool
 
 from scripts.console import ThreadedStdout, Redirect
 
@@ -39,3 +38,11 @@ class Worker(QRunnable):
         """
         with redirect_stdout(self.threadedStdout), redirect_stderr(self.errorRedirect):
             self.fn(*self.args, **self.kwargs)
+
+def toWorker(function, console, *args, **kwargs):
+    """
+    Sends a function to a worker-thread that will output the result to
+    """
+    worker = Worker(function, console, *args, **kwargs)
+    QThreadPool.globalInstance().start(worker)
+    
