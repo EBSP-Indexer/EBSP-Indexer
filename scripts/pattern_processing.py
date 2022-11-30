@@ -1,4 +1,5 @@
 from os import path
+import gc
 import copy
 
 import kikuchipy as kp
@@ -35,7 +36,7 @@ class PatternProcessingDialog(QDialog):
         self.setupConnections()
 
         try:
-            self.s = kp.load(self.pattern_path, lazy=False)
+            self.s = kp.load(self.pattern_path, lazy=True)
         except Exception as e:
             raise e
 
@@ -65,6 +66,11 @@ class PatternProcessingDialog(QDialog):
         )
         self.ui.averageBox.stateChanged.connect(lambda: self.preview_processing())
 
+    def close_dialog(self):
+        del self.s
+        gc.collect()
+        self.reject()
+    
     def setSavePath(self):
         if self.fileBrowser.getFile():
             self.save_path = self.fileBrowser.getPaths()[0]
