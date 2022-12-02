@@ -674,7 +674,7 @@ class DiSetupDialog(QDialog):
                 resolution=self.angular_step_size,
                 point_group=self.mp[f"{ph}"].phase.point_group,
             )
-            print(f"Generating simulation dictinary from {ph} master pattern")
+            print(f"Generating simulation dictionary from {ph} master pattern")
             ### Generate dictionary
             sim_dict = self.mp[f"{ph}"].get_patterns(
                 rotations=rot,

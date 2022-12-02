@@ -6,7 +6,7 @@ Original code created by deanhystad, sourcecode from https://python-forum.io/thr
 """
 import code
 import re
-from typing import Dict, Callable
+from typing import Callable
 import PySide6.QtWidgets as QtWidgets
 import PySide6.QtCore as QtCore
 import PySide6.QtGui as QtGui
@@ -14,7 +14,7 @@ import PySide6.QtGui as QtGui
 
 class LineEdit(QtWidgets.QLineEdit):
     """QLIneEdit with a history buffer for recalling previous lines.
-    I also accept tab as input (4 spaces).
+    Also accepts tab as input (4 spaces).
     """
 
     newline = QtCore.Signal(str)  # Signal when return key pressed

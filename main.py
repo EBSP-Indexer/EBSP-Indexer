@@ -47,8 +47,6 @@ import hyperspy._components.pes_voigt
 import hyperspy._components.volume_plasmon_drude
 import hyperspy._components.expression
 import hyperspy._components.gaussian2d
-#import hyperspy._signals.signal2d
-#import hyperspy._lazy_signals
 
 import kikuchipy 
 import kikuchipy.generators.virtual_bse_generator
@@ -66,6 +64,7 @@ import kikuchipy.simulations._kikuchi_pattern_features
 import kikuchipy.simulations._kikuchi_pattern_simulation
 import kikuchipy.detectors.ebsd_detector
 import kikuchipy.signals._kikuchipy_signal
+from kikuchipy.signals._kikuchipy_signal import KikuchipySignal2D, LazyKikuchipySignal2D
 import kikuchipy.signals._kikuchi_master_pattern
 import kikuchipy.signals.ebsd
 import kikuchipy.signals.ebsd_master_pattern
@@ -378,9 +377,9 @@ if __name__ == "__main__":
     ):
         APP.show()
         print(f"Multithreading with maximum {QThreadPool.globalInstance().maxThreadCount()} threads")
-        #print(
-        #    """Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'"""
-        #)
+        print(
+            """Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'"""
+        )
         try:
             sys.exit(app.exec())
         except Exception as e:
