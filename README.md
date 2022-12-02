@@ -27,7 +27,7 @@ Requirements:
 
 1. Clone or fork the repository to your local computer using git. It is recommended to put the repository just under your local disk, so that the root directory is C:/EBSD-GUI. If you don't have much experience with git, we recommend [Visual Studio Code's solution for git.](https://learn.microsoft.com/en-us/azure/developer/javascript/how-to/with-visual-studio-code/clone-github-repository?tabs=create-repo-command-palette%2Cinitialize-repo-activity-bar%2Ccreate-branch-command-palette%2Ccommit-changes-command-palette%2Cpush-command-palette)
 Alternativly you could download the repo as a zip and upack it manually.
-![Alt text](https://github.com/htrellin/EBSD-GUI/blob/main/resources\tutorial\tutorial_clone_repo.png?raw=true "Figure for cloning the git repository, copy the link to get started")
+![Alt text](https://github.com/htrellin/EBSD-GUI/blob/dev/resources/tutorial/tutorial_clone_repo.png"Figure for cloning the git repository, copy the link to get started")
 2. Open the repository in any terminal. The next step is to create a virtual evironment for the repository. This can be done by executing the following command in the root directory (same directory that includes requirements.txt):
     ```
     python3 -m venv env
@@ -82,7 +82,7 @@ When you are finished, create the bundle by clicking the bottom button CONVERT .
 
 ## Working with Qt Designer and python tutorial
 The following describes a workflow for designing GUI elements and then add Python code to the elements.
-![Alt text](https://github.com/htrellin/EBSD-GUI/blob/main/resources\tutorial\tutorial_workflow.png?raw=true "Figure for cloning the git repository, copy the link to get started")
+![Alt text](https://github.com/htrellin/EBSD-GUI/blob/dev/resources\tutorial\tutorial_workflow.png?raw=true "Figure for cloning the git repository, copy the link to get started")
 
 ### Qt Designer
 Design the gui component using Qt designer and save the file with an .ui extension. 
