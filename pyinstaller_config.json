@@ -92,18 +92,6 @@
   {
    "optionDest": "datas",
    "value": "C:/EBSD-GUI-erlenmos/env/Lib/site-packages/kikuchipy/hyperspy_extension.yaml;kikuchipy/"
-  },
-  {
-   "optionDest": "hiddenimports",
-   "value": "hyperspy"
-  },
-  {
-   "optionDest": "hiddenimports",
-   "value": "kikuchipy"
-  },
-  {
-   "optionDest": "datas",
-   "value": "C:/EBSD-GUI-erlenmos/env/Lib/site-packages/distributed/distributed.yaml;distributed/"
   }
  ],
  "nonPyinstallerOptions": {
