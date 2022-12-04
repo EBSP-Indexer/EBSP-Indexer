@@ -28,6 +28,7 @@ from utils.setting_file import SettingFile
 from utils.worker import toWorker
 from scripts.hough_indexing import HiSetupDialog
 from scripts.pattern_processing import PatternProcessingDialog
+from scripts.signal_navigation import signalNavigation
 from scripts.dictionary_indexing import DiSetupDialog
 from scripts.pre_indexing_maps import save_adp_map, save_mean_intensity_map, save_rgb_vbse, save_iq_map
 from scripts.advanced_settings import AdvancedSettingsDialog
@@ -222,10 +223,11 @@ class AppWindow(QMainWindow):
 
     def selectSignalNavigation(self):
         try:
-            self.p = QProcess()
-            print("Loading EBSD patterns ...")
-            self.p.start("python", ['scripts/signal_navigation.py', self.file_selected])
-            self.p.finished.connect(self.process_finished)
+            signalNavigation(self.file_selected)
+            #self.p = QProcess()
+            #print("Loading EBSD patterns ...")
+            #self.p.start("python", ['scripts/signal_navigation.py', self.file_selected])
+            #self.p.finished.connect(self.process_finished)
             #subprocess.run(["python", "scripts/signal_navigation.py"], text=True, input=self.file_selected)
     
         
