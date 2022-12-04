@@ -19,7 +19,7 @@
   },
   {
    "optionDest": "icon_file",
-   "value": "C:/EBSD-GUI-erlenmos/resources/ebsd_gui.ico"
+   "value": "C:/EBSD-GUI/resources/ebsd_gui.ico"
   },
   {
    "optionDest": "name",
@@ -35,7 +35,7 @@
   },
   {
    "optionDest": "splash",
-   "value": "C:/EBSD-GUI-erlenmos/resources/ebsd_gui.png"
+   "value": "C:/EBSD-GUI/resources/ebsd_gui.png"
   },
   {
    "optionDest": "strip",
@@ -79,31 +79,23 @@
   },
   {
    "optionDest": "datas",
-   "value": "C:/EBSD-GUI-erlenmos/sample_rotations.txt;."
+   "value": "C:/EBSD-GUI/sample_rotations.txt;."
   },
   {
    "optionDest": "datas",
-   "value": "C:/EBSD-GUI-erlenmos/resources;resources/"
+   "value": "C:/EBSD-GUI/resources;resources/"
   },
   {
-   "optionDest": "datas",
-   "value": "C:/EBSD-GUI-erlenmos/env/Lib/site-packages/hyperspy/hyperspy_extension.yaml;hyperspy/"
-  },
-  {
-   "optionDest": "datas",
-   "value": "C:/EBSD-GUI-erlenmos/env/Lib/site-packages/kikuchipy/hyperspy_extension.yaml;kikuchipy/"
-  },
-  {
-   "optionDest": "hiddenimports",
-   "value": "hyperspy"
+   "optionDest": "hookspath",
+   "value": "C:/EBSD-GUI/hooks"
   },
   {
    "optionDest": "hiddenimports",
    "value": "kikuchipy"
   },
   {
-   "optionDest": "datas",
-   "value": "C:/EBSD-GUI-erlenmos/env/Lib/site-packages/distributed/distributed.yaml;distributed/"
+   "optionDest": "hiddenimports",
+   "value": "hyperspy"
   }
  ],
  "nonPyinstallerOptions": {
