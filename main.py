@@ -17,7 +17,10 @@ except:
     pass
 # Modules available from start in the console
 import kikuchipy as kp
-import hyperspy as hp
+import hyperspy.api as hs
+
+# Import something from kikutchipy to avoid load times during dialog initalizations
+from kikuchipy import load
 
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
@@ -35,6 +38,8 @@ from scripts.advanced_settings import AdvancedSettingsDialog
 from scripts.console import Console, Redirect
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
+
+hs.set_log_level('CRITICAL')
 
 KP_EXTENSIONS = (".h5", ".dat")
 IMAGE_EXTENSIONS = ()
