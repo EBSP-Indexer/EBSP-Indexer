@@ -22,12 +22,16 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QGridLayout, QHB
     QTreeView, QVBoxLayout, QWidget)
 
 from mplwidget import MplWidget
+import resources_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1024, 662)
+        icon = QIcon()
+        icon.addFile(u":/resources/ebsd_gui.ico", QSize(), QIcon.Normal, QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         MainWindow.setLayoutDirection(Qt.LeftToRight)
         MainWindow.setAutoFillBackground(False)
         self.actionOpen_Workfolder = QAction(MainWindow)

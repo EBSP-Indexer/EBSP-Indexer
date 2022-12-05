@@ -1,5 +1,5 @@
 from os import path
-from kikuchipy import load, generators
+import kikuchipy as kp
 from matplotlib_scalebar.scalebar import ScaleBar
 import matplotlib.pyplot as plt
 
@@ -16,7 +16,7 @@ def generate_figure(image, pattern):
     return fig
     
 def save_iq_map(pattern_path):
-    s = load(pattern_path, lazy=True)
+    s = kp.load(pattern_path, lazy=True)
     iq_map = s.get_image_quality()
     fig = generate_figure(iq_map, s)
     plt.savefig(
@@ -26,7 +26,7 @@ def save_iq_map(pattern_path):
     print("Image quality map saved")
 
 def save_adp_map(pattern_path):
-    s = load(pattern_path, lazy=True)
+    s = kp.load(pattern_path, lazy=True)
     adp_map = s.get_average_neighbour_dot_product_map()
     fig = generate_figure(adp_map, s)
     plt.savefig(
@@ -36,7 +36,7 @@ def save_adp_map(pattern_path):
     print("Average dot product map saved")
 
 def save_mean_intensity_map(pattern_path):
-    s = load(pattern_path, lazy=True)
+    s = kp.load(pattern_path, lazy=True)
     mim_map = s.mean(axis=(2, 3))
     fig=generate_figure(mim_map, s)
     plt.savefig(
@@ -46,8 +46,8 @@ def save_mean_intensity_map(pattern_path):
     print("Mean intensity map saved")
 
 def save_rgb_vbse(pattern_path):
-    s = load(pattern_path, lazy=True)
-    vbse_gen = generators.VirtualBSEGenerator(s)
+    s = kp.load(pattern_path, lazy=True)
+    vbse_gen = kp.generators.VirtualBSEGenerator(s)
     vbse_map = vbse_gen.get_rgb_image(r=(3, 1), b=(3, 2), g=(3, 3))
     vbse_map.change_dtype("uint8")
     vbse_map = vbse_map.data

@@ -15,62 +15,12 @@ try:
     import pyi_splash
 except:
     pass
-# Hidden modules for pyinstaller to detect
-import hyperspy
-import hyperspy._components.eels_arctan
-import hyperspy._components.bleasdale
-import hyperspy._components.doniach
-import hyperspy._components.eels_double_power_law
-import hyperspy._components.eels_arctan
-import hyperspy._components.eels_cl_edge
-import hyperspy._components.error_function
-import hyperspy._components.exponential
-import hyperspy._components.expression
-import hyperspy._components.gaussian
-import hyperspy._components.gaussianhf
-import hyperspy._components.heaviside
-import hyperspy._components.logistic
-import hyperspy._components.lorentzian
-import hyperspy._components.offset
-import hyperspy._components.pes_core_line_shape
-import hyperspy._components.pes_voigt
-import hyperspy._components.polynomial_deprecated
-import hyperspy._components.polynomial
-import hyperspy._components.power_law
-import hyperspy._components.rc
-import hyperspy._components.pes_see
-import hyperspy._components.scalable_fixed_pattern
-import hyperspy._components.skew_normal
-import hyperspy._components.split_voigt
-import hyperspy._components.eels_vignetting
-import hyperspy._components.pes_voigt
-import hyperspy._components.volume_plasmon_drude
-import hyperspy._components.expression
-import hyperspy._components.gaussian2d
-#import hyperspy._signals.signal2d
-#import hyperspy._lazy_signals
+# Modules available from start in the console
+import kikuchipy as kp
+import hyperspy.api as hs
 
-import kikuchipy 
-import kikuchipy.generators.virtual_bse_generator
-import kikuchipy.generators._transfer_axes
-import kikuchipy.io._io
-import kikuchipy._util
-import kikuchipy.io._util
-import kikuchipy.data._data
-import kikuchipy.indexing._dictionary_indexing
-import kikuchipy.indexing._merge_crystal_maps
-import kikuchipy.indexing._orientation_similarity_map
-import kikuchipy.indexing._refinement
-import kikuchipy.pattern._pattern
-import kikuchipy.simulations._kikuchi_pattern_features
-import kikuchipy.simulations._kikuchi_pattern_simulation
-import kikuchipy.detectors.ebsd_detector
-import kikuchipy.signals._kikuchipy_signal
-import kikuchipy.signals._kikuchi_master_pattern
-import kikuchipy.signals.ebsd
-import kikuchipy.signals.ebsd_master_pattern
-import kikuchipy.signals.ecp_master_pattern
-import kikuchipy.signals.virtual_bse_image
+# Import something from kikutchipy to avoid load times during dialog initalizations
+from kikuchipy import load
 
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
@@ -81,12 +31,15 @@ from utils.setting_file import SettingFile
 from utils.worker import toWorker
 from scripts.hough_indexing import HiSetupDialog
 from scripts.pattern_processing import PatternProcessingDialog
+from scripts.signal_navigation import signalNavigation
 from scripts.dictionary_indexing import DiSetupDialog
-from scripts.pre_indexing_maps import *
+from scripts.pre_indexing_maps import save_adp_map, save_mean_intensity_map, save_rgb_vbse, save_iq_map
 from scripts.advanced_settings import AdvancedSettingsDialog
 from scripts.console import Console, Redirect
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
+
+hs.set_log_level('CRITICAL')
 
 KP_EXTENSIONS = (".h5", ".dat")
 IMAGE_EXTENSIONS = ()
@@ -275,10 +228,11 @@ class AppWindow(QMainWindow):
 
     def selectSignalNavigation(self):
         try:
-            self.p = QProcess()
-            print("Loading EBSD patterns ...")
-            self.p.start("python", ['scripts/signal_navigation.py', self.file_selected])
-            self.p.finished.connect(self.process_finished)
+            signalNavigation(self.file_selected)
+            #self.p = QProcess()
+            #print("Loading EBSD patterns ...")
+            #self.p.start("python", ['scripts/signal_navigation.py', self.file_selected])
+            #self.p.finished.connect(self.process_finished)
             #subprocess.run(["python", "scripts/signal_navigation.py"], text=True, input=self.file_selected)
     
         
@@ -378,9 +332,9 @@ if __name__ == "__main__":
     ):
         APP.show()
         print(f"Multithreading with maximum {QThreadPool.globalInstance().maxThreadCount()} threads")
-        #print(
-        #    """Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'"""
-        #)
+        print(
+            """Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'"""
+        )
         try:
             sys.exit(app.exec())
         except Exception as e:

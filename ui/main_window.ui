@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>EBSD-GUI</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../resources.qrc">
+    <normaloff>:/resources/ebsd_gui.ico</normaloff>:/resources/ebsd_gui.ico</iconset>
+  </property>
   <property name="layoutDirection">
    <enum>Qt::LeftToRight</enum>
   </property>
@@ -308,6 +312,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
