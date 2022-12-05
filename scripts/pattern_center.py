@@ -191,7 +191,6 @@ class PatterCenterDialog(QDialog):
             self.updatePCSpinBox()
             self.plotData()
 
-    #TODO: Make the program remeber the last phase and pc when moving between calibration patterns
     def nextPattern(self):
         if self.pattern_index < self.nav_size-1:
             self.pcs[self.pattern_index][0] = self.phase
@@ -355,7 +354,7 @@ class PatterCenterDialog(QDialog):
             zone_axes=True,
             zone_axes_labels=True,
             zone_axes_labels_kwargs=dict(fontsize=12),
-        ) #TODO: How does this even work?
+        )
 
         pc_x, pc_y = len(self.pattern_image)*self.pc[0], len(self.pattern_image[0])*self.pc[1]
         self.ui.MplWidget.canvas.ax.plot(pc_x, pc_y, marker="*", markersize=12, color="gold")
