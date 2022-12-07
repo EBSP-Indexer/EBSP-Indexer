@@ -744,8 +744,6 @@ class DiSetupDialog(QDialog):
             if self.refine:
                 type = "refined"
                 merged = self.merge_crystal_maps(xmaps_ref, type)
-                print("merge ok")
-
             else:
                 type = "unrefined"
                 merged = self.merge_crystal_maps(xmaps, type)
