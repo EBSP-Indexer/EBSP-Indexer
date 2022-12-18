@@ -72,7 +72,7 @@ class PatterCenterDialog(QDialog):
                     float(self.setting_file.read("Z star")),
             ]
         except:
-            self.pc = np.array([0.5000, 0.7000, 0.5000])
+            self.pc = np.array([0.5000, 0.8000, 0.5000])
         
         if self.convention == "TSL":
             #Store TSL convention in BRUKER convention
@@ -413,19 +413,19 @@ class PatterCenterDialog(QDialog):
                 if self.program_settings.read("Individual PC data") == "True":
                     self.setting_file.write("Calibration PC"+str(i), str([round(x, 4),round(y, 4), round(z, 4)]))
 
-        x_average = round(x_sum/n, 4)
-        y_average = round(y_sum/n, 4)
-        z_average = round(z_sum/n, 4)
+        x_average = x_sum/n
+        y_average = y_sum/n
+        z_average = z_sum/n
 
         self.setting_file.write("Convention", self.convention)
-        self.setting_file.write("X star", f"{x_average}")
+        self.setting_file.write("X star", f"{x_average:.4}")
         
         if self.convention == "BRUKER":
-            self.setting_file.write("Y star", f"{y_average}")
+            self.setting_file.write("Y star", f"{y_average:.4}")
         elif self.convention == "TSL":
-            self.setting_file.write("Y star", f"{1-y_average}")
+            self.setting_file.write("Y star", f"{1-y_average:.4}")
 
-        self.setting_file.write("Z star", f"{z_average}")
+        self.setting_file.write("Z star", f"{z_average:.4}")
         
         self.setting_file.save()
         self.close()

@@ -1,4 +1,3 @@
-from contextlib import redirect_stderr, redirect_stdout
 from os import path, mkdir
 import json
 from PySide6.QtCore import QThreadPool
@@ -7,7 +6,6 @@ from utils.setting_file import SettingFile
 
 from utils.filebrowser import FileBrowser
 from utils.worker import Worker
-from scripts.console import ThreadedStdout, Redirect
 from ui.ui_hi_setup import Ui_HISetupDialog
 
 import kikuchipy as kp
@@ -27,16 +25,6 @@ warnings.filterwarnings("ignore")
 
 
 class HiSetupDialog(QDialog):
-    """
-    PHASE_PARAMETERS = {
-        "al": (0.404, 225, "FCC"),
-        "austenite": (0.3595, 225, "FCC"),
-        "ferrite": (0.28684, 229, "BCC"),
-        "ni": (0.35236, 225, "FCC"),
-        "si": (0.543070, 227, "FCC"),
-        "ti_beta": (0.33065, 229, "BCC"),
-    }
-    """
     SG_NUM_TO_PROXY = {"225": "FCC", "227": "FCC", "229": "BCC"}
 
     def __init__(self, parent, pattern_path=None):
@@ -50,7 +38,9 @@ class HiSetupDialog(QDialog):
         self.ui = Ui_HISetupDialog()
         self.ui.setupUi(self)
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
-        self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
+        self.fileBrowserOF = FileBrowser(
+            mode=FileBrowser.OpenFile, filter_name="Hierarchical Data Format (*.h5);"
+        )
 
         self.load_pattern()
         self.setupInitialSettings()
@@ -102,10 +92,30 @@ class HiSetupDialog(QDialog):
             if self.convention == "TSL":
                 self.pc[1] = 1 - self.pc[1]
         except:
-            self.pc = np.array([0.400, 0.200, 0.400])
+            self.pc = np.array([0.500, 0.200, 0.500])
 
         self.update_pc_spinbox()
         self.ui.comboBoxConvention.setCurrentText(self.convention)
+
+        try:
+            self.colors = json.loads(self.program_settings.read("Colors"))
+        except:
+            self.colors = [
+                "lime",
+                "r",
+                "b",
+                "yellow",
+            ]
+
+        try:
+            self.colors = json.loads(self.program_settings.read("Colors"))
+        except:
+            self.colors = [
+                "lime",
+                "r",
+                "b",
+                "yellow",
+            ]
 
         if self.program_settings.read("Lazy Loading") == "False":
             self.ui.checkBoxLazy.setChecked(False)
@@ -114,13 +124,38 @@ class HiSetupDialog(QDialog):
         i = 1
         while True:
             try:
-                mpPath = self.setting_file.read("Master pattern " + str(i))
-                phase = mpPath.split("/").pop()
+                mpPath = self.setting_file.read(f"Master pattern {i}")
+                phase = path.dirname(mpPath).split("/").pop()
                 self.mpPaths[phase] = mpPath
                 self.ui.listWidgetPhase.addItem(phase)
                 i += 1
             except:
                 break
+        
+        self.getPhases()
+
+    def save_project_settings(self):
+        self.setting_file.delete_all_entries()  # clean up initial dictionary
+
+        ### Sample parameters
+        for i, mppath in enumerate(self.mpPaths.values(), 1):
+            self.setting_file.write(f"Master pattern {i}", mppath)
+
+        self.setting_file.write("Convention", self.convention)
+
+        self.update_pc_array_from_spinbox()
+        self.setting_file.write("X star", f"{self.pc[0]}")
+
+        if self.convention == "BRUKER":
+            self.setting_file.write("Y star", f"{self.pc[1]}")
+        elif self.convention == "TSL":
+            self.setting_file.write("Y star", f"{1-self.pc[1]}")
+
+        self.setting_file.write("Z star", f"{self.pc[2]}")
+
+        self.setting_file.write("Binning", f"({self.new_signal_shape})")
+
+        self.setting_file.save()
 
     def update_pc_spinbox(self):
         self.ui.patternCenterX.setValue(self.pc[0])
@@ -143,20 +178,26 @@ class HiSetupDialog(QDialog):
         self.update_pc_spinbox()
 
     def addPhase(self):
-        if self.fileBrowserOD.getFile():
-            mpPath = self.fileBrowserOD.getPaths()[0]
-            phase = mpPath.split("/").pop()
-            self.fileBrowserOD.setDefaultDir(mpPath[0 : -len(phase) - 1])
+        if self.fileBrowserOF.getFile():
+            mpPath = self.fileBrowserOF.getPaths()[0]
+            phase = path.dirname(mpPath).split("/").pop()
+            self.fileBrowserOF.setDefaultDir(mpPath[0 : -len(phase) - 1])
 
             if phase not in self.mpPaths.keys():
                 self.mpPaths[phase] = mpPath
                 self.ui.listWidgetPhase.addItem(phase)
+        self.getPhases()
         self.checkPhaseList()
 
     def removePhase(self):
         self.mpPaths.pop(str(self.ui.listWidgetPhase.currentItem().text()))
         self.ui.listWidgetPhase.takeItem(self.ui.listWidgetPhase.currentRow())
+        self.getPhases()
         self.checkPhaseList()
+    
+    def getPhases(self):
+        lw = self.ui.listWidgetPhase
+        self.phases = [lw.item(x).text() for x in range(lw.count())]
 
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_hough_indexing())
@@ -195,14 +236,17 @@ class HiSetupDialog(QDialog):
     def checkPhaseList(self):
         ok_flag = False
         phase_map_flag = False
+        add_phase_flag = True
         n_phases = self.ui.listWidgetPhase.count()
         if n_phases != 0:
             ok_flag = True
-            if n_phases > 1:
+            if n_phases == 2:
                 phase_map_flag = True
+                add_phase_flag = False
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(ok_flag)
         self.ui.checkBoxPhase.setEnabled(phase_map_flag)
         self.ui.checkBoxPhase.setChecked(phase_map_flag)
+        self.ui.pushButtonAddPhase.setEnabled(add_phase_flag)
 
     def setupBinningShapes(self):
         self.sig_shape = self.s.axes_manager.signal_shape[::-1]
@@ -230,6 +274,7 @@ class HiSetupDialog(QDialog):
                 print(
                     f"Directory '{self.dir_out}' exists, will try to create directory '{self.dir_out[:-1] + str(i + 1)}'"
                 )
+        print(f"Initializing hough indexing of {self.pattern_name} ...")
         self.update_pc_array_from_spinbox()
         options = self.getOptions()
         self.phases = [phase for phase in self.mpPaths.keys()]
@@ -308,6 +353,8 @@ class HiSetupDialog(QDialog):
             optionEnabled, optionExecute = options[key]
             if optionEnabled:
                 optionExecute()
+        print("Saving project settings ...")
+        self.save_project_settings()
         print(f"Finished indexing {self.pattern_name}")
 
     def run_hough_indexing(self):
@@ -316,8 +363,15 @@ class HiSetupDialog(QDialog):
 
     def set_phases_properties(self):
         for ph in self.phases:
-            mp = kp.load(path.join(self.mpPaths[ph], f"{ph}_mc_mp_20kv.h5"))
-            space_group, phase_proxy = mp.phase.space_group.number, self.SG_NUM_TO_PROXY[f"{mp.phase.space_group.number}"]
+            mp = kp.load(self.mpPaths[ph])
+            try:
+                space_group, phase_proxy = (
+                    mp.phase.space_group.number,
+                    self.SG_NUM_TO_PROXY[f"{mp.phase.space_group.number}"],
+                )
+            except Exception as e:
+                print("Space group is not supported, only 225, 227, 229 is supported")
+                raise e
             self.space_groups.append(space_group)
             self.phase_proxys.append(phase_proxy)
 
@@ -349,6 +403,8 @@ class HiSetupDialog(QDialog):
         Plot phase map
         """
         print("Generating phase map ...")
+        for i, ph in enumerate(self.phases):
+            self.xmap.phases[ph].color = self.colors[i]
         try:
             fig = self.xmap.plot(return_figure=True, remove_padding=True)
             fig.savefig(path.join(self.dir_out, "maps_phase.png"), **self.savefig_kwds)

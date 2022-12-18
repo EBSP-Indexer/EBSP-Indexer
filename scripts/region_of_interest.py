@@ -1,5 +1,5 @@
 from os import path
-from kikuchipy import load, generators
+import kikuchipy as kp
 from PySide6.QtWidgets import QDialog
 
 from utils.filebrowser import FileBrowser
@@ -41,7 +41,7 @@ class RegionOfInteresDialog(QDialog):
         self.setupConnections()
 
         try:
-            self.s = load(self.pattern_path, lazy=True)
+            self.s = kp.load(self.pattern_path, lazy=True)
         except Exception as e:
             raise e
 
@@ -123,7 +123,7 @@ class RegionOfInteresDialog(QDialog):
 
     def generate_rgb_vbse(self):
         
-        vbse_gen = generators.VirtualBSEGenerator(self.s)
+        vbse_gen = kp.generators.VirtualBSEGenerator(self.s)
         vbse_rgb = vbse_gen.get_rgb_image(r=(3, 1), b=(3, 2), g=(3, 3))
         vbse_rgb.change_dtype("uint8")
 

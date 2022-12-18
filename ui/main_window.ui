@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>EBSD-GUI</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../resources.qrc">
+    <normaloff>:/resources/ebsd_gui.ico</normaloff>:/resources/ebsd_gui.ico</iconset>
+  </property>
   <property name="layoutDirection">
    <enum>Qt::LeftToRight</enum>
   </property>
@@ -148,7 +152,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>24</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -172,12 +176,15 @@
    </widget>
    <widget class="QMenu" name="menuPlot">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="title">
      <string>Pattern inspection</string>
     </property>
     <widget class="QMenu" name="menuPre_indexing_maps">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Pre-indexing maps</string>
      </property>
@@ -225,7 +232,7 @@
   </action>
   <action name="actionSignalNavigation">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Signal navigation</string>
@@ -305,6 +312,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

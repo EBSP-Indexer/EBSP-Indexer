@@ -22,12 +22,16 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QGridLayout, QHB
     QTreeView, QVBoxLayout, QWidget)
 
 from mplwidget import MplWidget
+import resources_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1024, 662)
+        icon = QIcon()
+        icon.addFile(u":/resources/ebsd_gui.ico", QSize(), QIcon.Normal, QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         MainWindow.setLayoutDirection(Qt.LeftToRight)
         MainWindow.setAutoFillBackground(False)
         self.actionOpen_Workfolder = QAction(MainWindow)
@@ -37,7 +41,7 @@ class Ui_MainWindow(object):
         self.actionProcessingMenu.setEnabled(True)
         self.actionSignalNavigation = QAction(MainWindow)
         self.actionSignalNavigation.setObjectName(u"actionSignalNavigation")
-        self.actionSignalNavigation.setEnabled(False)
+        self.actionSignalNavigation.setEnabled(True)
         self.actionDictionary_indexing = QAction(MainWindow)
         self.actionDictionary_indexing.setObjectName(u"actionDictionary_indexing")
         self.actionPattern_Center = QAction(MainWindow)
@@ -158,7 +162,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1024, 24))
+        self.menubar.setGeometry(QRect(0, 0, 1024, 26))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuProcessing = QMenu(self.menubar)
@@ -166,9 +170,10 @@ class Ui_MainWindow(object):
         self.menuProcessing.setEnabled(False)
         self.menuPlot = QMenu(self.menubar)
         self.menuPlot.setObjectName(u"menuPlot")
-        self.menuPlot.setEnabled(True)
+        self.menuPlot.setEnabled(False)
         self.menuPre_indexing_maps = QMenu(self.menuPlot)
         self.menuPre_indexing_maps.setObjectName(u"menuPre_indexing_maps")
+        self.menuPre_indexing_maps.setEnabled(False)
         self.menuIndexing = QMenu(self.menubar)
         self.menuIndexing.setObjectName(u"menuIndexing")
         self.menuIndexing.setEnabled(False)

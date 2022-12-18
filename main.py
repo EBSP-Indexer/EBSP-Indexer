@@ -11,22 +11,35 @@ from contextlib import redirect_stdout, redirect_stderr
 from PySide6.QtCore import QDir, Qt, QProcess, QThreadPool
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
 from PySide6.QtGui import QFont
-from scripts.hough_indexing import HiSetupDialog
-from ui.ui_main_window import Ui_MainWindow
+try: 
+    import pyi_splash
+except:
+    pass
+# Modules available from start in the console
+import kikuchipy as kp
+import hyperspy.api as hs
+
+# Import something from kikutchipy to avoid load times during dialog initalizations
+from kikuchipy import load
+
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 
+from ui.ui_main_window import Ui_MainWindow
 from utils.filebrowser import FileBrowser
 from utils.setting_file import SettingFile
-
+from utils.worker import toWorker
+from scripts.hough_indexing import HiSetupDialog
 from scripts.pattern_processing import PatternProcessingDialog
+from scripts.signal_navigation import signalNavigation
 from scripts.dictionary_indexing import DiSetupDialog
-from scripts.pre_indexing_maps import *
+from scripts.pre_indexing_maps import save_adp_map, save_mean_intensity_map, save_rgb_vbse, save_iq_map
 from scripts.advanced_settings import AdvancedSettingsDialog
-
 from scripts.console import Console, Redirect
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
+
+hs.set_log_level('CRITICAL')
 
 KP_EXTENSIONS = (".h5", ".dat")
 IMAGE_EXTENSIONS = ()
@@ -63,6 +76,10 @@ class AppWindow(QMainWindow):
 
         self.showImage(self.file_selected)
         self.importSettings()
+        try:
+            pyi_splash.close()
+        except Exception as e:
+            pass
 
     def setupConnections(self):
         self.ui.systemViewer.setModel(self.systemModel)
@@ -88,10 +105,10 @@ class AppWindow(QMainWindow):
         self.ui.actionPattern_Center.triggered.connect(
             lambda: self.selectPatternCenter()
         )
-        self.ui.actionAverage_dot_product.triggered.connect(lambda: save_adp_map(self.file_selected))
-        self.ui.actionImage_quality.triggered.connect(lambda: save_iq_map(self.file_selected))
-        self.ui.actionMean_intensity.triggered.connect(lambda: save_mean_intensity_map(self.file_selected))
-        self.ui.actionVirtual_backscatter_electron.triggered.connect(lambda: save_rgb_vbse(self.file_selected))
+        self.ui.actionAverage_dot_product.triggered.connect(lambda: toWorker(save_adp_map, self.console, self.file_selected))
+        self.ui.actionImage_quality.triggered.connect(lambda: toWorker(save_iq_map, self.console, self.file_selected))
+        self.ui.actionMean_intensity.triggered.connect(lambda: toWorker(save_mean_intensity_map, self.console, self.file_selected))
+        self.ui.actionVirtual_backscatter_electron.triggered.connect(lambda: toWorker(save_rgb_vbse, self.console, self.file_selected))
     
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
@@ -133,6 +150,9 @@ class AppWindow(QMainWindow):
                 self.setSystemViewer(self.working_dir)
         else:
             AdvancedSettingsDialog(parent=self).createSettingsFile()
+            setting_file = SettingFile("advanced_settings.txt")
+            file_types = json.loads(setting_file.read("File Types"))
+            self.system_view_filter = ["*" + x for x in file_types]
 
     def openSettings(self):
         try:
@@ -208,10 +228,11 @@ class AppWindow(QMainWindow):
 
     def selectSignalNavigation(self):
         try:
-            self.p = QProcess()
-            print("Loading EBSD patterns ...")
-            self.p.start("python", ['scripts/signal_navigation.py', self.file_selected])
-            self.p.finished.connect(self.process_finished)
+            signalNavigation(self.file_selected)
+            #self.p = QProcess()
+            #print("Loading EBSD patterns ...")
+            #self.p.start("python", ['scripts/signal_navigation.py', self.file_selected])
+            #self.p.finished.connect(self.process_finished)
             #subprocess.run(["python", "scripts/signal_navigation.py"], text=True, input=self.file_selected)
     
         
