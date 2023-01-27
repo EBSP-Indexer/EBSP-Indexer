@@ -3,7 +3,7 @@ import gc
 import copy
 
 import kikuchipy as kp
-from PySide6.QtWidgets import QDialog
+from PySide6.QtWidgets import QDialog, QDialogButtonBox
 from PySide6.QtCore import QThreadPool
 
 from utils.filebrowser import FileBrowser
@@ -27,7 +27,7 @@ class PatternProcessingDialog(QDialog):
 
         # Standard filename of processed pattern
         self.save_path = path.join(
-            self.working_dir, f"{self.filenamebase}_processed.h5"
+            self.working_dir, f"{self.filenamebase}.h5"
         )
 
         self.ui = Ui_PatternProcessingWindow()
@@ -50,10 +50,12 @@ class PatternProcessingDialog(QDialog):
             filter_name="Hierarchical Data Format (*.h5);;NordifUF Pattern Files (*.dat)",
         )
 
+        self.setupInitialSettings()
+
     def setupConnections(self):
         self.ui.browseButton.clicked.connect(lambda: self.setSavePath())
         self.ui.buttonBox.accepted.connect(lambda: self.run_processing())
-        self.ui.buttonBox.rejected.connect(lambda: self.reject())
+        self.ui.buttonBox.rejected.connect(lambda: self.close_dialog())
         self.ui.folderEdit.setText(self.working_dir)
         self.ui.filenameEdit.setText(path.basename(self.save_path))
 
@@ -70,7 +72,7 @@ class PatternProcessingDialog(QDialog):
         del self.s
         gc.collect()
         self.reject()
-    
+
     def setSavePath(self):
         if self.fileBrowser.getFile():
             self.save_path = self.fileBrowser.getPaths()[0]
@@ -79,6 +81,18 @@ class PatternProcessingDialog(QDialog):
             self.ui.filenameEdit.setText(path.basename(self.save_path))
 
     def setupInitialSettings(self):
+        processing_steps = self.filenamebase.split("_")[1:]
+        
+        for step in processing_steps:
+            if step == "sb":
+                self.ui.staticBackgroundBox.setEnabled(False)
+            if step == "db":
+                self.ui.dynamicBackgroundBox.setEnabled(False)
+            if step == "adp":
+                self.ui.averageBox.setEnabled(False)
+        
+        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+        """        
         self.sf = SettingFile(path.join(self.working_dir, "project_settings.txt"))
 
         try:
@@ -90,6 +104,8 @@ class PatternProcessingDialog(QDialog):
             self.rdb = False
             self.anp = False
 
+        """
+
     def remove_static(self, dataset, show_progressbar=True):
         dataset.remove_static_background(show_progressbar=show_progressbar)
 
@@ -97,7 +113,9 @@ class PatternProcessingDialog(QDialog):
         dataset.remove_dynamic_background(show_progressbar=show_progressbar)
 
     def average_neighbour(self, dataset, show_progressbar=True):
-        dataset.average_neighbour_patterns(self.gaussian_window, show_progressbar=show_progressbar)
+        dataset.average_neighbour_patterns(
+            self.gaussian_window, show_progressbar=show_progressbar
+        )
 
     def showImage(self, dataset):
 
@@ -109,12 +127,25 @@ class PatternProcessingDialog(QDialog):
 
     def preview_processing(self):
         self.s_prev = self.s.deepcopy().inav[0:3, 0:3]
+        extensions = ""
+        box_checked = False
         if self.ui.staticBackgroundBox.isChecked():
             self.remove_static(dataset=self.s_prev, show_progressbar=False)
+            extensions += "_sb"
+            box_checked = True
         if self.ui.dynamicBackgroundBox.isChecked():
             self.remove_dynamic(dataset=self.s_prev, show_progressbar=False)
+            extensions += "_db"
+            box_checked = True
         if self.ui.averageBox.isChecked():
             self.average_neighbour(dataset=self.s_prev, show_progressbar=False)
+            extensions += "_adp"
+            box_checked = True
+        
+        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(box_checked)
+
+        self.ui.filenameEdit.setText(f"{self.filenamebase}{extensions}.h5")
+        
 
         self.showImage(self.s_prev.inav[1, 1])
 
@@ -148,6 +179,12 @@ class PatternProcessingDialog(QDialog):
                 overwrite=True,
             )
             print("Processing complete")
+            del self.s
+            gc.collect()
+        
         except Exception as e:
             print(f"Could not save processed pattern: {e}")
+            
+            del self.s
+            gc.collect()
             self.reject()
