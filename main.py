@@ -5,10 +5,15 @@ try:
     from os import startfile
 except:
     import subprocess
+try:
+    import pyopencl
+    from pyopencl.tools import get_test_platforms_and_devices
+except:
+    print("PyOpenCL could not be imported")
 import platform
 
 from contextlib import redirect_stdout, redirect_stderr
-from PySide6.QtCore import QDir, Qt, QProcess, QThreadPool
+from PySide6.QtCore import QDir, Qt, QThreadPool
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
 from PySide6.QtGui import QFont
 try: 
@@ -286,8 +291,10 @@ class AppWindow(QMainWindow):
             ".bmp",
         ]:
             image = mpimg.imread("resources/ebsd_gui.png")
+            self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer")
         else:
             image = mpimg.imread(image_path)
+            self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer - {image_path}")
         self.ui.MplWidget.canvas.ax.clear()
         self.ui.MplWidget.canvas.ax.axis(False)
         self.ui.MplWidget.canvas.ax.imshow(image)
@@ -325,16 +332,17 @@ class AppWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     APP = AppWindow()
-
     # Redirect stdout to console.write and stderr to console.errorwrite
     with redirect_stdout(APP.console), redirect_stderr(
         Redirect(APP.console.errorwrite)
     ):
+        APP.setCentralWidget(None)  #NB! Only set to none if there are nothing inside the central widget
         APP.show()
         print(f"Multithreading with maximum {QThreadPool.globalInstance().maxThreadCount()} threads")
         print(
             """Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'"""
         )
+        print(get_test_platforms_and_devices())
         try:
             sys.exit(app.exec())
         except Exception as e:
