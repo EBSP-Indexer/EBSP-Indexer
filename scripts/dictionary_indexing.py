@@ -52,6 +52,7 @@ class DiSetupDialog(QDialog):
         )
 
         self.load_pattern()
+        self.ui.sliderBinning.setInvertedAppearance(True)
         self.setupInitialSettings()
         self.checkConfirmState()
         self.setupBinningShapes()
@@ -175,19 +176,27 @@ class DiSetupDialog(QDialog):
             raise e
 
     def setupBinningShapes(self):
+        self.ui.comboBoxBinning.clear()
         try:
-            self.sig_shape = self.s.axes_manager.signal_shape[::-1]
-            self.bin_shapes = np.array([])
-            for num in range(10, self.sig_shape[0] + 1):
-                if self.sig_shape[0] % num == 0:
-                    self.bin_shapes = np.append(self.bin_shapes, f"({num}, {num})")
+            sig_shape = self.s.axes_manager.signal_shape[::-1]
+            bin_shapes = np.array([])
+            for num in range(10, sig_shape[0] + 1):
+                if self.ui.checkBoxLazy.isChecked():
+                    if sig_shape[0] % num == 0:
+                        bin_shapes = np.append(bin_shapes, f"({num}, {num})")
+                else:
+                    bin_shapes = np.append(bin_shapes, f"({num}, {num})")
 
-            self.ui.comboBoxBinning.addItems(self.bin_shapes[::-1])
+            self.ui.comboBoxBinning.addItems(bin_shapes[::-1])
+            self.ui.sliderBinning.setMaximum(len(bin_shapes)-1)
 
             # Define pixel-scale globally
             self.scale = self.s.axes_manager["x"].scale
         except Exception as e:
             raise e
+
+    def updateBinningShape(self):
+        self.ui.comboBoxBinning.setCurrentIndex(self.ui.sliderBinning.value())
         
 
     def set_save_fileformat(self):
@@ -206,9 +215,14 @@ class DiSetupDialog(QDialog):
             lambda: self.update_pc_convention()
         )
         self.ui.checkBoxLazy.stateChanged.connect(lambda: self.setNiterState())
+        self.ui.checkBoxLazy.stateChanged.connect(lambda: self.setupBinningShapes())
         self.ui.doubleSpinBoxStepSize.valueChanged.connect(
             lambda: self.estimateSimulationSize()
         )
+
+        self.ui.sliderBinning.valueChanged.connect(lambda: self.ui.comboBoxBinning.setCurrentIndex(self.ui.sliderBinning.value()))
+        self.ui.comboBoxBinning.currentIndexChanged.connect(lambda: self.ui.sliderBinning.setValue(self.ui.comboBoxBinning.currentIndex()))
+
 
     def setNiterState(self):
         if self.ui.checkBoxLazy.isChecked():
@@ -221,8 +235,10 @@ class DiSetupDialog(QDialog):
     def checkConfirmState(self):
         if len(self.phases) == 0:
             self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+            self.ui.pushButtonRemovePhase.setEnabled(False)
         else:
             self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
+            self.ui.pushButtonRemovePhase.setEnabled(True)
 
         if len(self.phases) == 1:
             self.ui.checkBoxPM.setEnabled(False)
