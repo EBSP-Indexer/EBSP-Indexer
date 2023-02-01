@@ -42,7 +42,7 @@ def generate_figure(image, pattern, col_label, pattern_path, image_type):
 def save_iq_map(pattern_path):
     s_iq = kp.load(pattern_path, lazy=True)
     iq_map = s_iq.get_image_quality()
-    generate_figure(iq_map, s_iq, "IQ", pattern_path, "image_qualit_map")
+    generate_figure(iq_map, s_iq, "IQ", pattern_path, "image_quality_map")
     print("Image quality map saved")
     del s_iq
     gc.collect()
