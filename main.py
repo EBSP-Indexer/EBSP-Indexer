@@ -13,7 +13,7 @@ except:
 import platform
 
 from contextlib import redirect_stdout, redirect_stderr
-from PySide6.QtCore import QDir, Qt, QThreadPool
+from PySide6.QtCore import QDir, Qt, QThreadPool, Slot
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
 from PySide6.QtGui import QFont
 try: 
@@ -328,6 +328,17 @@ class AppWindow(QMainWindow):
             self.ui.actionSignalNavigation.setEnabled(True)
             self.ui.menuPre_indexing_maps.setEnabled(False)
 
+    @Slot(int)
+    def removeWorker(self, worker_id: int):
+        jobList = self.ui.jobList
+        for i in range(jobList.count()):
+            item = jobList.item(i)
+            if(jobList.itemWidget(item).id == worker_id):
+                jobList.takeItem(jobList.row(item))
+                break
+
+    def countWorkers(self) -> int:
+        return self.ui.jobList.count()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

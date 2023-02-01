@@ -17,10 +17,10 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QDockWidget, QGridLayout,
-    QHBoxLayout, QHeaderView, QLabel, QMainWindow,
-    QMenu, QMenuBar, QPlainTextEdit, QSizePolicy,
-    QStatusBar, QTabWidget, QTreeView, QVBoxLayout,
-    QWidget)
+    QHBoxLayout, QHeaderView, QLabel, QListWidget,
+    QListWidgetItem, QMainWindow, QMenu, QMenuBar,
+    QPlainTextEdit, QSizePolicy, QStatusBar, QTabWidget,
+    QTreeView, QVBoxLayout, QWidget)
 
 from mplwidget import MplWidget
 import resources_rc
@@ -30,14 +30,14 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.setWindowModality(Qt.NonModal)
-        MainWindow.resize(1187, 737)
+        MainWindow.resize(1058, 737)
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
         icon = QIcon()
-        icon.addFile(u":/resources/ebsd_gui.ico", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u":/icons/app_icon.ico", QSize(), QIcon.Normal, QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setLayoutDirection(Qt.LeftToRight)
         MainWindow.setAutoFillBackground(False)
@@ -47,6 +47,9 @@ class Ui_MainWindow(object):
         MainWindow.setDockOptions(QMainWindow.AllowTabbedDocks|QMainWindow.AnimatedDocks)
         self.actionOpen_Workfolder = QAction(MainWindow)
         self.actionOpen_Workfolder.setObjectName(u"actionOpen_Workfolder")
+        icon1 = QIcon()
+        icon1.addFile(u":/linea icons/resources/linea basic icons/basic_folder.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.actionOpen_Workfolder.setIcon(icon1)
         self.actionProcessingMenu = QAction(MainWindow)
         self.actionProcessingMenu.setObjectName(u"actionProcessingMenu")
         self.actionProcessingMenu.setEnabled(True)
@@ -63,6 +66,9 @@ class Ui_MainWindow(object):
         self.actionHough_indexing.setObjectName(u"actionHough_indexing")
         self.actionSettings = QAction(MainWindow)
         self.actionSettings.setObjectName(u"actionSettings")
+        icon2 = QIcon()
+        icon2.addFile(u":/linea icons/resources/linea basic icons/basic_gear.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.actionSettings.setIcon(icon2)
         self.actionImage_quality = QAction(MainWindow)
         self.actionImage_quality.setObjectName(u"actionImage_quality")
         self.actionMean_intensity = QAction(MainWindow)
@@ -91,6 +97,10 @@ class Ui_MainWindow(object):
         self.actionToggleImage_Viewer.setObjectName(u"actionToggleImage_Viewer")
         self.actionToggleImage_Viewer.setCheckable(True)
         self.actionToggleImage_Viewer.setChecked(True)
+        self.actionToggleJob_Manager = QAction(MainWindow)
+        self.actionToggleJob_Manager.setObjectName(u"actionToggleJob_Manager")
+        self.actionToggleJob_Manager.setCheckable(True)
+        self.actionToggleJob_Manager.setChecked(True)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         sizePolicy.setHeightForWidth(self.centralwidget.sizePolicy().hasHeightForWidth())
@@ -101,7 +111,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1187, 26))
+        self.menubar.setGeometry(QRect(0, 0, 1058, 26))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuProcessing = QMenu(self.menubar)
@@ -227,9 +237,24 @@ class Ui_MainWindow(object):
 
         self.dockWidgetImageViewer.setWidget(self.dockWidgetContentsImageViewer)
         MainWindow.addDockWidget(Qt.TopDockWidgetArea, self.dockWidgetImageViewer)
+        self.dockWidgetJobManager = QDockWidget(MainWindow)
+        self.dockWidgetJobManager.setObjectName(u"dockWidgetJobManager")
+        self.dockWidgetContents = QWidget()
+        self.dockWidgetContents.setObjectName(u"dockWidgetContents")
+        self.gridLayout_3 = QGridLayout(self.dockWidgetContents)
+        self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.jobList = QListWidget(self.dockWidgetContents)
+        self.jobList.setObjectName(u"jobList")
+        self.jobList.setSelectionMode(QAbstractItemView.NoSelection)
+
+        self.gridLayout_3.addWidget(self.jobList, 0, 0, 1, 1)
+
+        self.dockWidgetJobManager.setWidget(self.dockWidgetContents)
+        MainWindow.addDockWidget(Qt.TopDockWidgetArea, self.dockWidgetJobManager)
         self.dockWidgetTerminal.raise_()
         self.dockWidgetSystemExplorer.raise_()
         self.dockWidgetImageViewer.raise_()
+        self.dockWidgetJobManager.raise_()
         QWidget.setTabOrder(self.systemViewer, self.consoleLog)
 
         self.menubar.addAction(self.menuFile.menuAction())
@@ -254,6 +279,7 @@ class Ui_MainWindow(object):
         self.menuView.addAction(self.actionToggleSystem_Explorer)
         self.menuView.addAction(self.actionToggleTerminal)
         self.menuView.addAction(self.actionToggleImage_Viewer)
+        self.menuView.addAction(self.actionToggleJob_Manager)
 
         self.retranslateUi(MainWindow)
         self.dockWidgetTerminal.visibilityChanged.connect(self.actionToggleTerminal.setChecked)
@@ -262,6 +288,8 @@ class Ui_MainWindow(object):
         self.actionToggleTerminal.triggered["bool"].connect(self.dockWidgetTerminal.setVisible)
         self.actionToggleImage_Viewer.triggered["bool"].connect(self.dockWidgetImageViewer.setVisible)
         self.dockWidgetImageViewer.visibilityChanged.connect(self.actionToggleImage_Viewer.setChecked)
+        self.dockWidgetJobManager.visibilityChanged.connect(self.actionToggleJob_Manager.setChecked)
+        self.actionToggleJob_Manager.triggered["bool"].connect(self.dockWidgetJobManager.setVisible)
 
         QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
@@ -293,6 +321,7 @@ class Ui_MainWindow(object):
         self.actionToggleSystem_Explorer.setText(QCoreApplication.translate("MainWindow", u"System Explorer", None))
         self.actionToggleTerminal.setText(QCoreApplication.translate("MainWindow", u"Terminal", None))
         self.actionToggleImage_Viewer.setText(QCoreApplication.translate("MainWindow", u"Image Viewer", None))
+        self.actionToggleJob_Manager.setText(QCoreApplication.translate("MainWindow", u"Job Manager", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuProcessing.setTitle(QCoreApplication.translate("MainWindow", u"Processing", None))
         self.menuPlot.setTitle(QCoreApplication.translate("MainWindow", u"Pattern inspection", None))
@@ -304,5 +333,6 @@ class Ui_MainWindow(object):
         self.dockWidgetSystemExplorer.setWindowTitle(QCoreApplication.translate("MainWindow", u"System Viewer", None))
         self.folderLabel.setText(QCoreApplication.translate("MainWindow", u"NO FOLDER OPENED", None))
         self.dockWidgetImageViewer.setWindowTitle(QCoreApplication.translate("MainWindow", u"Image Viewer", None))
+        self.dockWidgetJobManager.setWindowTitle(QCoreApplication.translate("MainWindow", u"Job Manager", None))
     # retranslateUi
 

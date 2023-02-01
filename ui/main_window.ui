@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1187</width>
+    <width>1058</width>
     <height>737</height>
    </rect>
   </property>
@@ -24,7 +24,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="../resources.qrc">
-    <normaloff>:/resources/ebsd_gui.ico</normaloff>:/resources/ebsd_gui.ico</iconset>
+    <normaloff>:/icons/app_icon.ico</normaloff>:/icons/app_icon.ico</iconset>
   </property>
   <property name="layoutDirection">
    <enum>Qt::LeftToRight</enum>
@@ -58,7 +58,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1187</width>
+     <width>1058</width>
      <height>26</height>
     </rect>
    </property>
@@ -120,6 +120,7 @@
     <addaction name="actionToggleSystem_Explorer"/>
     <addaction name="actionToggleTerminal"/>
     <addaction name="actionToggleImage_Viewer"/>
+    <addaction name="actionToggleJob_Manager"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuProcessing"/>
@@ -291,7 +292,30 @@
     </layout>
    </widget>
   </widget>
+  <widget class="QDockWidget" name="dockWidgetJobManager">
+   <property name="windowTitle">
+    <string>Job Manager</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>4</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QGridLayout" name="gridLayout_3">
+     <item row="0" column="0">
+      <widget class="QListWidget" name="jobList">
+       <property name="selectionMode">
+        <enum>QAbstractItemView::NoSelection</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
   <action name="actionOpen_Workfolder">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/linea icons/resources/linea basic icons/basic_folder.svg</normaloff>:/linea icons/resources/linea basic icons/basic_folder.svg</iconset>
+   </property>
    <property name="text">
     <string>Open Workfolder...</string>
    </property>
@@ -339,6 +363,10 @@
    </property>
   </action>
   <action name="actionSettings">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/linea icons/resources/linea basic icons/basic_gear.svg</normaloff>:/linea icons/resources/linea basic icons/basic_gear.svg</iconset>
+   </property>
    <property name="text">
     <string>Settings</string>
    </property>
@@ -416,9 +444,21 @@
     <string>Image Viewer</string>
    </property>
   </action>
+  <action name="actionToggleJob_Manager">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Job Manager</string>
+   </property>
+  </action>
   <zorder>dockWidgetTerminal</zorder>
   <zorder>dockWidgetSystemExplorer</zorder>
   <zorder>dockWidgetImageViewer</zorder>
+  <zorder>dockWidgetJobManager</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -529,6 +569,38 @@
     <hint type="destinationlabel">
      <x>-1</x>
      <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dockWidgetJobManager</sender>
+   <signal>visibilityChanged(bool)</signal>
+   <receiver>actionToggleJob_Manager</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>899</x>
+     <y>222</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionToggleJob_Manager</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>dockWidgetJobManager</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>899</x>
+     <y>222</y>
     </hint>
    </hints>
   </connection>

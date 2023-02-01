@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QDialog, QDialogButtonBox
 from utils.setting_file import SettingFile
 
 from utils.filebrowser import FileBrowser
-from utils.worker import Worker
+from utils.worker import Worker, sendToJobManager
 from ui.ui_hi_setup import Ui_HISetupDialog
 
 import kikuchipy as kp
@@ -15,12 +15,11 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
 import warnings
-from h5py import File
 from orix import io, plot
 from orix.crystal_map import CrystalMap, create_coordinate_arrays, PhaseList
 from orix.quaternion import Rotation
 from orix.vector import Vector3d
-from pyebsdindex.ebsd_index import EBSDIndexer 
+from pyebsdindex.ebsd_index import EBSDIndexer
 
 # Ignore warnings to avoid crash with integrated console
 warnings.filterwarnings("ignore")
@@ -32,9 +31,9 @@ class HiSetupDialog(QDialog):
     def __init__(self, parent, pattern_path=None):
         super().__init__(parent)
         self.threadPool = QThreadPool.globalInstance()
-        self.console = parent.console
+        self.console = self.parentWidget().console
         self.pattern_path = pattern_path
-        self.pattern_name = path.splitext(path.basename(pattern_path))[0]
+        self.pattern_name = path.basename(pattern_path)
         self.working_dir = path.dirname(pattern_path)
 
         self.ui = Ui_HISetupDialog()
@@ -200,7 +199,15 @@ class HiSetupDialog(QDialog):
         self.phases = [lw.item(x).text() for x in range(lw.count())]
 
     def setupConnections(self):
-        self.ui.buttonBox.accepted.connect(lambda: self.run_hough_indexing())
+        self.ui.buttonBox.accepted.connect(
+            lambda: sendToJobManager(
+                job_title=f"Hough indexing of {self.pattern_name}",
+                output_directory=f"{self.working_dir}",
+                listview=self.parentWidget().ui.jobList,
+                stdout=self.console,
+                fn=self.hough_indexing,
+            )
+        )
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
 
         self.ui.pushButtonAddPhase.clicked.connect(lambda: self.addPhase())
@@ -210,7 +217,9 @@ class HiSetupDialog(QDialog):
             lambda: self.update_pc_convention()
         )
 
-        self.ui.horizontalSliderRho.valueChanged.connect(lambda: self.ui.labelRho.setText(f"{self.ui.horizontalSliderRho.value()}%"))
+        self.ui.horizontalSliderRho.valueChanged.connect(
+            lambda: self.ui.labelRho.setText(f"{self.ui.horizontalSliderRho.value()}%")
+        )
 
     def getOptions(self) -> dict:
         return {
@@ -254,7 +263,7 @@ class HiSetupDialog(QDialog):
                 bin_shapes = np.append(bin_shapes, f"({num}, {num})")
         self.ui.comboBoxBinning.addItems(bin_shapes[::-1])
 
-    #TODO Remove extra print statements
+    # TODO Remove extra print statements
     def hough_indexing(self):
         # Load pattern-file
         options = self.getOptions()
@@ -296,7 +305,7 @@ class HiSetupDialog(QDialog):
             s = s.rebin(new_shape=nav_shape + binning_shape)
             s.rescale_intensity(dtype_out=np.uint8)
             sig_shape = s.axes_manager.signal_shape[::-1]
-        
+
         indexer = EBSDIndexer(
             phaselist=self.phase_proxys,  # FCC, BCC or both
             vendor="BRUKER",
@@ -331,7 +340,7 @@ class HiSetupDialog(QDialog):
             ),
             scan_unit="um",
         )
-        #io.save(path.join(self.dir_out, "xmap_hi.h5"), self.xmap)
+        # io.save(path.join(self.dir_out, "xmap_hi.h5"), self.xmap)
         io.save(
             path.join(self.dir_out, "xmap_hi.ang"),
             self.xmap,
@@ -340,19 +349,30 @@ class HiSetupDialog(QDialog):
             pattern_fit_prop="fit",
             extra_prop=["nmatch", "matchattempts", "totvotes"],
         )
-        print("Result was saved as xmap_hi.ang") #and xmap_hi.h5
+        print("Result was saved as xmap_hi.ang")  # and xmap_hi.h5
         for key in ["quality", "phase", "orientation"]:
             optionEnabled, optionExecute = options.get(key)
             if optionEnabled:
                 optionExecute()
         print("Logging results ...")
-        create_log(self.dir_out, s, self.xmap, self.mp_paths, convention=options["convention"], original_signal_shape=original_sig_shape)
+        create_log(
+            self.dir_out,
+            s,
+            self.xmap,
+            self.mp_paths,
+            convention=options["convention"],
+            original_signal_shape=original_sig_shape,
+        )
         print(f"Finished indexing {self.pattern_name}")
 
-
     def run_hough_indexing(self):
-        hi_worker = Worker(fn=self.hough_indexing, output=self.console)
-        self.threadPool.start(hi_worker)
+        sendToJobManager(
+            job_title=f"Hough indexing of {self.pattern_name}",
+            output_directory=f"{self.working_dir}",
+            listview=self.parentWidget().ui.jobList,
+            stdout=self.console,
+            fn=self.hough_indexing,
+        )
 
     def set_phases_properties(self):
         for ph in self.phases:
@@ -434,7 +454,8 @@ class HiSetupDialog(QDialog):
         except Exception as e:
             raise e
 
-#TODO Add more Hough related properties, better way to sort?
+
+# TODO Add more Hough related properties, better way to sort?
 def create_log(
     dir_out: str,
     signal: EBSD | LazyEBSD = None,
@@ -465,19 +486,15 @@ def create_log(
         "Working distance",
         signal.metadata.Acquisition_instrument.SEM.working_distance,
     )
-    log.write(
-        "Magnification", signal.metadata.Acquisition_instrument.SEM.magnification
-    )
+    log.write("Magnification", signal.metadata.Acquisition_instrument.SEM.magnification)
     log.write(
         "Navigation shape (rows, columns)",
         signal.axes_manager.navigation_shape[::-1],
     )
-    log.write(
-        "Signal shape (rows, columns)", signal.axes_manager.signal_shape[::-1]
-    )
+    log.write("Signal shape (rows, columns)", signal.axes_manager.signal_shape[::-1])
     if original_signal_shape is not None:
         log.write("Original signal shape (rows, columns)", original_signal_shape)
-    
+
     log.write("Step size", f"{signal.axes_manager[0].scale} um\n")
 
     ### HI parameteres
@@ -487,7 +504,7 @@ def create_log(
     if mp_paths is not None:
         for i, mp_path in enumerate(mp_paths.values(), 1):
             log.write(f"Master pattern path {i}", mp_path)
-    
+
     if pattern_center != None:
         displayed_pc = pattern_center
     else:
