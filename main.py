@@ -8,8 +8,8 @@ except:
 import platform
 
 from contextlib import redirect_stdout, redirect_stderr
-from PySide6.QtCore import QDir, Qt, QProcess, QThreadPool
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
+from PySide6.QtCore import QDir, Qt, QThreadPool #QProcess
+from PySide6.QtWidgets import QMainWindow, QFileSystemModel, QMessageBox, QApplication
 from PySide6.QtGui import QFont
 try: 
     import pyi_splash

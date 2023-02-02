@@ -631,7 +631,7 @@ class DiSetupDialog(QDialog):
         self.set_save_fileformat()
         self.refine = self.options["refine"]
         self.new_signal_shape = self.options["binning"]
-        self.angular_step_size = self.options["angular_step_size"]
+        self.   angular_step_size = self.options["angular_step_size"]
 
         self.n_per_iteration = None
         if self.options["n_iter"] != 0:
