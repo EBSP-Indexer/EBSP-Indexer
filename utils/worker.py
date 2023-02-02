@@ -60,14 +60,14 @@ class Worker(QRunnable):
 
 class WorkerWidget(QWidget):
     """
-    Widget displaying information about the worker
+    Widget displaying information about the worker to be shown in the job manager
     """
     ui = Ui_WorkerWidget()
     time = QElapsedTimer()
     timer = QTimer()
     removeMeSignal = Signal(int)
 
-    # TODO: mainWindow should be replaced by a workerManagerList
+    # TODO: mainWindow should be replaced by a jobManagerList
     def __init__(
         self, job_title: str, output_directory: str, mainWindow: QWidget, worker: Worker
     ) -> None:
