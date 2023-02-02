@@ -1,6 +1,12 @@
-<!DOCTYPE RCC>
-<RCC version="1.0">
-  <qresource>
-    <file>resources/ebsd_gui.ico</file>
+<RCC>
+  <qresource prefix="icons">
+    <file alias="app_icon.ico">resources/ebsd_gui.ico</file>
+  </qresource>
+  <qresource prefix="linea icons">
+    <file>resources/linea_basic_icons/basic_picture.svg</file>
+    <file>resources/linea_basic_icons/basic_gear.svg</file>
+    <file>resources/linea_basic_icons/basic_folder.svg</file>
+    <file>resources/linea_basic_icons/basic_trashcan.svg</file>
+    <file>resources/linea_basic_icons/basic_clock.svg</file>
   </qresource>
 </RCC>

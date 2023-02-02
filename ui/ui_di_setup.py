@@ -19,8 +19,8 @@ from PySide6.QtWidgets import (QAbstractButton, QAbstractItemView, QApplication,
     QComboBox, QDialog, QDialogButtonBox, QDoubleSpinBox,
     QFrame, QGridLayout, QHBoxLayout, QLabel,
     QLayout, QListWidget, QListWidgetItem, QPushButton,
-    QSizePolicy, QSpacerItem, QSpinBox, QVBoxLayout,
-    QWidget)
+    QSizePolicy, QSlider, QSpacerItem, QSpinBox,
+    QVBoxLayout, QWidget)
 
 class Ui_DiSetupDialog(object):
     def setupUi(self, DiSetupDialog):
@@ -174,10 +174,6 @@ class Ui_DiSetupDialog(object):
 
         self.gridLayout.addLayout(self.verticalLayout_3, 1, 2, 1, 1)
 
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.gridLayout.addItem(self.horizontalSpacer, 1, 1, 1, 1)
-
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -205,30 +201,44 @@ class Ui_DiSetupDialog(object):
 
         self.gridLayout_3 = QGridLayout()
         self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.comboBoxBinning = QComboBox(self.centralwidget)
+        self.comboBoxBinning.setObjectName(u"comboBoxBinning")
+
+        self.gridLayout_3.addWidget(self.comboBoxBinning, 1, 1, 1, 1)
+
+        self.sliderBinning = QSlider(self.centralwidget)
+        self.sliderBinning.setObjectName(u"sliderBinning")
+        self.sliderBinning.setSliderPosition(0)
+        self.sliderBinning.setOrientation(Qt.Horizontal)
+
+        self.gridLayout_3.addWidget(self.sliderBinning, 1, 0, 1, 1)
+
         self.label_7 = QLabel(self.centralwidget)
         self.label_7.setObjectName(u"label_7")
 
         self.gridLayout_3.addWidget(self.label_7, 0, 0, 1, 1)
+
+        self.gridLayout_3.setColumnStretch(0, 2)
+        self.gridLayout_3.setColumnStretch(1, 1)
+
+        self.verticalLayout.addLayout(self.gridLayout_3)
+
+        self.gridLayout_10 = QGridLayout()
+        self.gridLayout_10.setObjectName(u"gridLayout_10")
+        self.checkBoxMask = QCheckBox(self.centralwidget)
+        self.checkBoxMask.setObjectName(u"checkBoxMask")
+
+        self.gridLayout_10.addWidget(self.checkBoxMask, 1, 0, 1, 1)
 
         self.checkBoxLazy = QCheckBox(self.centralwidget)
         self.checkBoxLazy.setObjectName(u"checkBoxLazy")
         self.checkBoxLazy.setEnabled(True)
         self.checkBoxLazy.setChecked(True)
 
-        self.gridLayout_3.addWidget(self.checkBoxLazy, 1, 0, 1, 1)
-
-        self.checkBoxMask = QCheckBox(self.centralwidget)
-        self.checkBoxMask.setObjectName(u"checkBoxMask")
-
-        self.gridLayout_3.addWidget(self.checkBoxMask, 2, 0, 1, 1)
-
-        self.comboBoxBinning = QComboBox(self.centralwidget)
-        self.comboBoxBinning.setObjectName(u"comboBoxBinning")
-
-        self.gridLayout_3.addWidget(self.comboBoxBinning, 0, 1, 1, 1)
+        self.gridLayout_10.addWidget(self.checkBoxLazy, 0, 0, 1, 1)
 
 
-        self.verticalLayout.addLayout(self.gridLayout_3)
+        self.verticalLayout.addLayout(self.gridLayout_10)
 
         self.line = QFrame(self.centralwidget)
         self.line.setObjectName(u"line")
@@ -253,6 +263,11 @@ class Ui_DiSetupDialog(object):
         self.gridLayout_5.setObjectName(u"gridLayout_5")
         self.doubleSpinBoxStepSize = QDoubleSpinBox(self.centralwidget)
         self.doubleSpinBoxStepSize.setObjectName(u"doubleSpinBoxStepSize")
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.doubleSpinBoxStepSize.sizePolicy().hasHeightForWidth())
+        self.doubleSpinBoxStepSize.setSizePolicy(sizePolicy)
         self.doubleSpinBoxStepSize.setMinimumSize(QSize(80, 0))
         self.doubleSpinBoxStepSize.setMaximumSize(QSize(80, 16777215))
         self.doubleSpinBoxStepSize.setMinimum(1.000000000000000)
@@ -300,6 +315,8 @@ class Ui_DiSetupDialog(object):
 
         self.gridLayout_5.addWidget(self.numSimPatterns, 1, 1, 1, 1)
 
+        self.gridLayout_5.setColumnStretch(0, 2)
+        self.gridLayout_5.setColumnStretch(1, 1)
 
         self.verticalLayout.addLayout(self.gridLayout_5)
 
@@ -382,6 +399,10 @@ class Ui_DiSetupDialog(object):
 
         self.gridLayout.addLayout(self.verticalLayout, 1, 0, 1, 1)
 
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.gridLayout.addItem(self.horizontalSpacer, 1, 1, 1, 1)
+
 
         self.gridLayout_2.addWidget(self.centralwidget, 0, 0, 1, 1)
 
@@ -406,8 +427,8 @@ class Ui_DiSetupDialog(object):
 
         self.label.setText(QCoreApplication.translate("DiSetupDialog", u"Pre-processing parameters:", None))
         self.label_7.setText(QCoreApplication.translate("DiSetupDialog", u"Binning shape", None))
-        self.checkBoxLazy.setText(QCoreApplication.translate("DiSetupDialog", u"Lazy loading of patterns", None))
         self.checkBoxMask.setText(QCoreApplication.translate("DiSetupDialog", u"Apply circular mask to pattern", None))
+        self.checkBoxLazy.setText(QCoreApplication.translate("DiSetupDialog", u"Lazy loading of patterns", None))
         self.label_6.setText(QCoreApplication.translate("DiSetupDialog", u"Dictionary indexing parameters:", None))
         self.label_8.setText(QCoreApplication.translate("DiSetupDialog", u"Angular step size (\u00b0)", None))
         self.nIterLabel.setText(QCoreApplication.translate("DiSetupDialog", u"Matching per iteration", None))

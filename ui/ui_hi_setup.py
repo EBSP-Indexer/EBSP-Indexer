@@ -118,7 +118,9 @@ class Ui_HISetupDialog(object):
 
         self.checkBoxLazy = QCheckBox(self.frame)
         self.checkBoxLazy.setObjectName(u"checkBoxLazy")
+        self.checkBoxLazy.setEnabled(True)
         self.checkBoxLazy.setLayoutDirection(Qt.LeftToRight)
+        self.checkBoxLazy.setCheckable(True)
         self.checkBoxLazy.setChecked(True)
         self.checkBoxLazy.setTristate(False)
 

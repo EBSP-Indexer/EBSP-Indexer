@@ -26,7 +26,7 @@ class Ui_ROIDialog(object):
     def setupUi(self, ROIDialog):
         if not ROIDialog.objectName():
             ROIDialog.setObjectName(u"ROIDialog")
-        ROIDialog.resize(871, 528)
+        ROIDialog.resize(871, 401)
         self.gridLayout_2 = QGridLayout(ROIDialog)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.centralwidget = QFrame(ROIDialog)
@@ -40,10 +40,6 @@ class Ui_ROIDialog(object):
         self.gridLayout_5.setObjectName(u"gridLayout_5")
         self.verticalLayout_3 = QVBoxLayout()
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        self.verticalLayout_3.addItem(self.verticalSpacer)
-
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.label_6 = QLabel(self.centralwidget)
@@ -127,20 +123,6 @@ class Ui_ROIDialog(object):
 
         self.verticalLayout_3.addWidget(self.line)
 
-        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        self.verticalLayout_3.addItem(self.verticalSpacer_2)
-
-
-        self.gridLayout_5.addLayout(self.verticalLayout_3, 2, 0, 1, 1)
-
-        self.buttonBox = QDialogButtonBox(self.centralwidget)
-        self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setLayoutDirection(Qt.LeftToRight)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
-
-        self.gridLayout_5.addWidget(self.buttonBox, 4, 2, 1, 1)
-
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout_3 = QHBoxLayout()
@@ -194,10 +176,21 @@ class Ui_ROIDialog(object):
         self.verticalLayout.addLayout(self.horizontalLayout)
 
 
-        self.gridLayout_5.addLayout(self.verticalLayout, 3, 0, 1, 1)
+        self.verticalLayout_3.addLayout(self.verticalLayout)
+
+
+        self.gridLayout_5.addLayout(self.verticalLayout_3, 2, 0, 1, 1)
+
+        self.buttonBox = QDialogButtonBox(self.centralwidget)
+        self.buttonBox.setObjectName(u"buttonBox")
+        self.buttonBox.setLayoutDirection(Qt.LeftToRight)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+
+        self.gridLayout_5.addWidget(self.buttonBox, 4, 2, 1, 1)
 
         self.verticalLayout_2 = QVBoxLayout()
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout_2.setSizeConstraint(QLayout.SetMaximumSize)
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.horizontalLayout_2.setSizeConstraint(QLayout.SetMinimumSize)
@@ -232,6 +225,13 @@ class Ui_ROIDialog(object):
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
 
+        self.line_3 = QFrame(self.centralwidget)
+        self.line_3.setObjectName(u"line_3")
+        self.line_3.setFrameShape(QFrame.HLine)
+        self.line_3.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout_2.addWidget(self.line_3)
+
         self.mplWidget = MplWidget(self.centralwidget)
         self.mplWidget.setObjectName(u"mplWidget")
         sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
@@ -243,6 +243,14 @@ class Ui_ROIDialog(object):
 
         self.verticalLayout_2.addWidget(self.mplWidget)
 
+        self.line_4 = QFrame(self.centralwidget)
+        self.line_4.setObjectName(u"line_4")
+        self.line_4.setFrameShape(QFrame.HLine)
+        self.line_4.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout_2.addWidget(self.line_4)
+
+        self.verticalLayout_2.setStretch(2, 2)
 
         self.gridLayout_5.addLayout(self.verticalLayout_2, 2, 2, 1, 1)
 

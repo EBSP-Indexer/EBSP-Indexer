@@ -244,19 +244,6 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="1">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
       <item row="1" column="0">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
@@ -294,7 +281,20 @@
          </widget>
         </item>
         <item>
-         <layout class="QGridLayout" name="gridLayout_3">
+         <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0" columnstretch="2,1" rowminimumheight="0,0" columnminimumwidth="0,0">
+          <item row="1" column="1">
+           <widget class="QComboBox" name="comboBoxBinning"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QSlider" name="sliderBinning">
+            <property name="sliderPosition">
+             <number>0</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_7">
             <property name="text">
@@ -302,7 +302,18 @@
             </property>
            </widget>
           </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="gridLayout_10">
           <item row="1" column="0">
+           <widget class="QCheckBox" name="checkBoxMask">
+            <property name="text">
+             <string>Apply circular mask to pattern</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
            <widget class="QCheckBox" name="checkBoxLazy">
             <property name="enabled">
              <bool>true</bool>
@@ -314,16 +325,6 @@
              <bool>true</bool>
             </property>
            </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QCheckBox" name="checkBoxMask">
-            <property name="text">
-             <string>Apply circular mask to pattern</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="comboBoxBinning"/>
           </item>
          </layout>
         </item>
@@ -349,9 +350,15 @@
          </widget>
         </item>
         <item>
-         <layout class="QGridLayout" name="gridLayout_5">
+         <layout class="QGridLayout" name="gridLayout_5" columnstretch="2,1">
           <item row="0" column="1">
            <widget class="QDoubleSpinBox" name="doubleSpinBoxStepSize">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="minimumSize">
              <size>
               <width>80</width>
@@ -574,6 +581,19 @@
          </layout>
         </item>
        </layout>
+      </item>
+      <item row="1" column="1">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>
