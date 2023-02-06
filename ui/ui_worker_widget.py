@@ -105,7 +105,7 @@ class Ui_WorkerWidget(object):
     def retranslateUi(self, WorkerWidget):
         WorkerWidget.setWindowTitle(QCoreApplication.translate("WorkerWidget", u"Form", None))
         self.labelJobNumber.setText(QCoreApplication.translate("WorkerWidget", u"job number", None))
-        self.labelTime.setText(QCoreApplication.translate("WorkerWidget", u"time_placeholder", None))
+        self.labelTime.setText(QCoreApplication.translate("WorkerWidget", u"0:00:00", None))
 #if QT_CONFIG(tooltip)
         self.pushButtonAbort.setToolTip(QCoreApplication.translate("WorkerWidget", u"Abort the worker", None))
 #endif // QT_CONFIG(tooltip)

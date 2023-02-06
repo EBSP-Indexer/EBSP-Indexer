@@ -10,6 +10,7 @@ from ui.ui_worker_widget import Ui_WorkerWidget
 
 class WorkerSignals(QObject):
 
+    isStarted = Signal(bool)
     isFinished = Signal(bool)
 
     def __init__(self) -> None:
@@ -30,9 +31,10 @@ class Worker(QRunnable):
 
     """
 
+    signals = WorkerSignals()
+
     def __init__(self, fn, output=sys.stdout, *args, **kwargs):
         super(Worker, self).__init__()
-        self.signals = WorkerSignals()
         # Store constructor arguments (re-used for processing)
         self.fn = fn
         self.name = fn.__str__()  # TODO CHANGE THIS
@@ -41,7 +43,6 @@ class Worker(QRunnable):
         self.console = output
         self.threadedStdout = ThreadedStdout()
         self.errorRedirect = Redirect(self.threadedStdout.errorwrite)
-
         self.setupConnections()
 
     def setupConnections(self):
@@ -54,6 +55,7 @@ class Worker(QRunnable):
         Initialise the runner function with passed args, kwargs, and redirects the output.
         """
         with redirect_stdout(self.threadedStdout), redirect_stderr(self.errorRedirect):
+            self.signals.isStarted.emit(True)
             self.fn(*self.args, **self.kwargs)
             self.signals.isFinished.emit(True)
 
@@ -77,10 +79,7 @@ class WorkerWidget(QWidget):
         self.output_directory = output_directory
         self.worker = worker
         self.ui.setupUi(self)
-        self.time.start()
-        self.updateTimerDisplay()
         self.setupConnections()
-        self.timer.start(1000)
 
     def setupConnections(self):
         # UI
@@ -89,6 +88,7 @@ class WorkerWidget(QWidget):
         self.ui.labelOutput.setText(f"{self.output_directory}")
         self.ui.pushButtonRemove.clicked.connect(self.sendRemoveItem)
         self.timer.timeout.connect(self.updateTimerDisplay)
+        self.worker.signals.isStarted.connect(self.time_worker)
         self.worker.signals.isFinished.connect(self.finalize)
 
         # Signals
@@ -96,6 +96,11 @@ class WorkerWidget(QWidget):
 
     def sendRemoveItem(self):
         self.removeMeSignal.emit(self.id)
+
+    def time_worker(self):
+        self.time.start()
+        self.updateTimerDisplay()
+        self.timer.start(1000)
 
     def finalize(self):
         self.timer.stop()
