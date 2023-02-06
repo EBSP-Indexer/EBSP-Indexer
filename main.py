@@ -29,6 +29,7 @@ from kikuchipy import load
 
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
+from matplotlib.widgets import Cursor
 
 from ui.ui_main_window import Ui_MainWindow
 from utils.filebrowser import FileBrowser
@@ -36,7 +37,7 @@ from utils.setting_file import SettingFile
 from utils.worker import toWorker
 from scripts.hough_indexing import HiSetupDialog
 from scripts.pattern_processing import PatternProcessingDialog
-from scripts.signal_navigation import signalNavigation
+from scripts.signal_navigation import open_pattern, get_navigation_figure
 from scripts.dictionary_indexing import DiSetupDialog
 from scripts.pre_indexing_maps import save_adp_map, save_mean_intensity_map, save_rgb_vbse, save_iq_map
 from scripts.advanced_settings import AdvancedSettingsDialog
@@ -91,7 +92,7 @@ class AppWindow(QMainWindow):
         self.ui.systemViewer.selectionModel().selectionChanged.connect(
             lambda new, old: self.onSystemModelChanged(new, old)
         )
-        self.ui.systemViewer.doubleClicked.connect(lambda: self.openTextFile())
+        self.ui.systemViewer.doubleClicked.connect(lambda: self.doubleClickEvent())
         self.ui.actionOpen_Workfolder.triggered.connect(
             lambda: self.selectWorkingDirectory()
         )
@@ -114,6 +115,9 @@ class AppWindow(QMainWindow):
         self.ui.actionImage_quality.triggered.connect(lambda: toWorker(save_iq_map, self.console, self.file_selected))
         self.ui.actionMean_intensity.triggered.connect(lambda: toWorker(save_mean_intensity_map, self.console, self.file_selected))
         self.ui.actionVirtual_backscatter_electron.triggered.connect(lambda: toWorker(save_rgb_vbse, self.console, self.file_selected))
+
+        self.ui.pushButtonMeanNav.clicked.connect(lambda: self.plot_navigator(self.file_selected, "mean_intensity"))
+        self.ui.pushButtonIQNav.clicked.connect(lambda: self.plot_navigator(self.file_selected, nav_type="iq"))
     
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
@@ -217,7 +221,7 @@ class AppWindow(QMainWindow):
         self.updateMenuButtons(self.file_selected)
         self.showImage(self.file_selected)
 
-    def openTextFile(self):
+    def doubleClickEvent(self):
         index = self.ui.systemViewer.currentIndex()
         self.file_selected = self.systemModel.filePath(index)
         
@@ -227,19 +231,16 @@ class AppWindow(QMainWindow):
             if platform.system().lower() == "windows":
                 startfile(self.file_selected)
 
+        if splitext(self.file_selected)[1] in [".h5", ".dat"]:
+            self.plot_navigator(self.file_selected)
+
     def process_finished(self):
         print("EBSD pattern closed.")
         self.p = None
 
     def selectSignalNavigation(self):
         try:
-            signalNavigation(self.file_selected)
-            #self.p = QProcess()
-            #print("Loading EBSD patterns ...")
-            #self.p.start("python", ['scripts/signal_navigation.py', self.file_selected])
-            #self.p.finished.connect(self.process_finished)
-            #subprocess.run(["python", "scripts/signal_navigation.py"], text=True, input=self.file_selected)
-    
+            self.plot_navigator(self.file_selected)
         
         except Exception as e:
             if self.file_selected == "":
@@ -328,6 +329,44 @@ class AppWindow(QMainWindow):
             self.ui.actionSignalNavigation.setEnabled(True)
             self.ui.menuPre_indexing_maps.setEnabled(False)
 
+    def plot_navigator(self, file_path, nav_type="mean_intensity"):
+        try:
+            self.ui.navigatorMplWidget.canvas.mpl_disconnect(self.cid)
+        except:
+            pass
+
+        s = open_pattern(file_path)
+        
+        navigator = get_navigation_figure(s, nav_type)
+
+        self.ui.navigatorMplWidget.vbl.setContentsMargins(0, 0, 0, 0)
+        self.ui.navigatorMplWidget.canvas.ax.clear()
+        self.ui.navigatorMplWidget.canvas.ax.axis(False)
+        self.cursor = Cursor(self.ui.navigatorMplWidget.canvas.ax, useblit=True, color="yellow", linewidth=3, linestyle="--", alpha=0.8)
+        self.cursor.set_active(True)
+        self.ui.navigatorMplWidget.canvas.ax.imshow(navigator, cmap="gray")
+        self.ui.navigatorMplWidget.canvas.draw()
+        #plot pattern from upper left corner
+        self.plot_signal(s, 0, 0)
+        #canvas id to later disconnect
+        self.cid = self.ui.navigatorMplWidget.canvas.mpl_connect("button_press_event", lambda event: self.on_click_navigator(event, s))
+
+
+    def plot_signal(self, pattern, x_index, y_index):
+        
+        signal = pattern.data[y_index, x_index]
+        
+        self.ui.signalMplWidget.vbl.setContentsMargins(0, 0, 0, 0)
+        self.ui.signalMplWidget.canvas.ax.clear()
+        self.ui.signalMplWidget.canvas.ax.axis(False)
+        self.ui.signalMplWidget.canvas.ax.imshow(signal, cmap="gray")
+        self.ui.signalMplWidget.canvas.draw()
+
+    def on_click_navigator(self, event, s):
+        if event.inaxes:
+            self.plot_signal(s, int(event.xdata), int(event.ydata))
+
+        
     @Slot(int)
     def removeWorker(self, worker_id: int):
         jobList = self.ui.jobList
