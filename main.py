@@ -231,6 +231,7 @@ class AppWindow(QMainWindow):
             if platform.system().lower() == "windows":
                 startfile(self.file_selected)
 
+        # open dataset for signal navigation
         if splitext(self.file_selected)[1] in [".h5", ".dat"]:
             self.plot_navigator(self.file_selected)
 

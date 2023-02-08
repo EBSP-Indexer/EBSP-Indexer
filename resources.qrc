@@ -2,7 +2,7 @@
   <qresource prefix="icons">
     <file alias="app_icon.ico">resources/ebsd_gui.ico</file>
   </qresource>
-  <qresource prefix="linea icons">
+  <qresource prefix="linea_icons">
     <file>resources/linea_basic_icons/basic_picture.svg</file>
     <file>resources/linea_basic_icons/basic_gear.svg</file>
     <file>resources/linea_basic_icons/basic_folder.svg</file>
