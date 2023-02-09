@@ -182,7 +182,7 @@ class Console(QtWidgets.QWidget):
 
     def errorwrite(self, line: str) -> None:
         """Capture stderr and display in outdisplay"""
-        self.writeoutput(line, self.errfmt)
+        self.writeoutput(line, fmt=self.errfmt)
 
     def writeoutput(self, line: str, fmt: QtGui.QTextCharFormat = None) -> None:
         """Set text formatting and display line in outdisplay"""
@@ -205,17 +205,15 @@ class Console(QtWidgets.QWidget):
         self.outdisplay.appendPlainText(line.rstrip())
 
 
-class ThreadedStdout(QtWidgets.QWidget):
+class ThreadedStdout(QtCore.QObject):
     """Widget for redirecting stdout from different thread to main console"""
 
     # TODO: Replace this class with code directly in worker.py
 
-    lineSignal = QtCore.Signal(str)
-    errorSignal = QtCore.Signal(str)
+    lineToWorker = QtCore.Signal(str)
+    errorToWorker = QtCore.Signal(str)
 
-    def __init__(
-        self,
-    ) -> "ThreadedStdout":
+    def __init__(self) -> None:
         super().__init__()
 
     def flush(self):
@@ -223,8 +221,8 @@ class ThreadedStdout(QtWidgets.QWidget):
 
     def write(self, line: str) -> None:
         """Capture stdout and emit signal"""
-        self.lineSignal.emit(line)
+        self.lineToWorker.emit(line)
 
     def errorwrite(self, line: str) -> None:
         """Capture stderr and emit signal"""
-        self.errorSignal.emit(line)
+        self.errorToWorker.emit(line)

@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QDialog, QDialogButtonBox
 from utils.setting_file import SettingFile
 
 from utils.filebrowser import FileBrowser
-from utils.worker import Worker, sendToJobManager
+from utils.worker import sendToJobManager
 from ui.ui_hi_setup import Ui_HISetupDialog
 
 import kikuchipy as kp
@@ -199,15 +199,7 @@ class HiSetupDialog(QDialog):
         self.phases = [lw.item(x).text() for x in range(lw.count())]
 
     def setupConnections(self):
-        self.ui.buttonBox.accepted.connect(
-            lambda: sendToJobManager(
-                job_title=f"Hough indexing of {self.pattern_name}",
-                output_directory=f"{self.working_dir}",
-                listview=self.parentWidget().ui.jobList,
-                stdout=self.console,
-                fn=self.hough_indexing,
-            )
-        )
+        self.ui.buttonBox.accepted.connect(lambda: self.run_hough_indexing())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
 
         self.ui.pushButtonAddPhase.clicked.connect(lambda: self.addPhase())
@@ -280,23 +272,12 @@ class HiSetupDialog(QDialog):
             s = kp.load(self.pattern_path, lazy=options.get("lazy"))
         except Exception as e:
             raise e
-        for i in range(1, 100):
-            try:
-                self.dir_out = path.join(self.working_dir, "hi_results" + str(i))
-                mkdir(self.dir_out)
-                break
-            except FileExistsError:
-                print(
-                    f"Directory '{self.dir_out}' exists, will try to create directory '{self.dir_out[:-1] + str(i + 1)}'"
-                )
         s.detector.pc = self.pc
         sig_shape = s.axes_manager.signal_shape[::-1]
         nav_shape = s.axes_manager.navigation_shape[::-1]
         sample_tilt = s.detector.sample_tilt
         camera_tilt = s.detector.tilt
-        print(f"Successfully loaded patterns from {self.pattern_name}")
-        print(s)
-        print("Getting image quality ...")
+        print(f"Successfully loaded {self.pattern_name}")
         maps_iq = s.get_image_quality()
         original_sig_shape = None
         if sig_shape != binning_shape:
@@ -324,18 +305,18 @@ class HiSetupDialog(QDialog):
             step_sizes=(s.axes_manager["y"].scale, s.axes_manager["x"].scale),
         )
         self.xmap = CrystalMap(
-            rotations=Rotation(data[-1]["quat"]),
-            phase_id=data[-1]["phase"],
+            rotations=Rotation(data[idx]["quat"]),
+            phase_id=data[idx]["phase"],
             x=xy["x"],
             y=xy["y"],
             phase_list=PhaseList(names=self.phases, space_groups=self.space_groups),
             prop=dict(
-                pq=data[-1]["pq"],  # Pattern quality
-                cm=data[-1]["cm"],  # Confidence metric
-                fit=data[-1]["fit"],  # Pattern fit
-                nmatch=data[-1]["nmatch"],  # Number of detected bands matched
-                matchattempts=data[-1]["matchattempts"],
-                totvotes=data[-1]["totvotes"],
+                pq=data[idx]["pq"],  # Pattern quality
+                cm=data[idx]["cm"],  # Confidence metric
+                fit=data[idx]["fit"],  # Pattern fit
+                nmatch=data[idx]["nmatch"],  # Number of detected bands matched
+                matchattempts=data[idx]["matchattempts"],
+                totvotes=data[idx]["totvotes"],
                 iq=maps_iq.ravel(),
             ),
             scan_unit="um",
@@ -366,12 +347,19 @@ class HiSetupDialog(QDialog):
         print(f"Finished indexing {self.pattern_name}")
 
     def run_hough_indexing(self):
+        for i in range(1, 100):
+            try:
+                self.dir_out = path.join(self.working_dir, "hi_results" + str(i))
+                mkdir(self.dir_out)
+                break
+            except FileExistsError:
+                pass
         sendToJobManager(
-            job_title=f"Hough indexing of {self.pattern_name}",
-            output_directory=f"{self.working_dir}",
+            job_title=f"HI {self.pattern_name}",
+            output_directory=self.dir_out,
             listview=self.parentWidget().ui.jobList,
-            stdout=self.console,
             fn=self.hough_indexing,
+            allow_cleanup=True,
         )
 
     def set_phases_properties(self):

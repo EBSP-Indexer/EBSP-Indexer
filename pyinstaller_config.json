@@ -1,105 +1,109 @@
 {
- "version": "auto-py-to-exe-configuration_v1",
- "pyinstallerOptions": [
-  {
-   "optionDest": "noconfirm",
-   "value": true
-  },
-  {
-   "optionDest": "filenames",
-   "value": "main.py"
-  },
-  {
-   "optionDest": "onefile",
-   "value": false
-  },
-  {
-   "optionDest": "console",
-   "value": false
-  },
-  {
-   "optionDest": "icon_file",
-   "value": "C:/EBSD-GUI/resources/ebsd_gui.ico"
-  },
-  {
-   "optionDest": "name",
-   "value": "EBSD-GUI"
-  },
-  {
-   "optionDest": "ascii",
-   "value": false
-  },
-  {
-   "optionDest": "clean_build",
-   "value": false
-  },
-  {
-   "optionDest": "splash",
-   "value": "C:/EBSD-GUI/resources/ebsd_gui.png"
-  },
-  {
-   "optionDest": "strip",
-   "value": false
-  },
-  {
-   "optionDest": "noupx",
-   "value": false
-  },
-  {
-   "optionDest": "disable_windowed_traceback",
-   "value": false
-  },
-  {
-   "optionDest": "embed_manifest",
-   "value": true
-  },
-  {
-   "optionDest": "uac_admin",
-   "value": false
-  },
-  {
-   "optionDest": "uac_uiaccess",
-   "value": false
-  },
-  {
-   "optionDest": "win_private_assemblies",
-   "value": false
-  },
-  {
-   "optionDest": "win_no_prefer_redirects",
-   "value": false
-  },
-  {
-   "optionDest": "bootloader_ignore_signals",
-   "value": false
-  },
-  {
-   "optionDest": "argv_emulation",
-   "value": false
-  },
-  {
-   "optionDest": "datas",
-   "value": "C:/EBSD-GUI/sample_rotations.txt;."
-  },
-  {
-   "optionDest": "datas",
-   "value": "C:/EBSD-GUI/resources;resources/"
-  },
-  {
-   "optionDest": "hookspath",
-   "value": "C:/EBSD-GUI/hooks"
-  },
-  {
-   "optionDest": "hiddenimports",
-   "value": "kikuchipy"
-  },
-  {
-   "optionDest": "hiddenimports",
-   "value": "hyperspy"
-  }
- ],
- "nonPyinstallerOptions": {
-  "increaseRecursionLimit": true,
-  "manualArguments": ""
- }
+    "version": "auto-py-to-exe-configuration_v1",
+    "pyinstallerOptions": [
+        {
+            "optionDest": "noconfirm",
+            "value": true
+        },
+        {
+            "optionDest": "filenames",
+            "value": "main.py"
+        },
+        {
+            "optionDest": "onefile",
+            "value": false
+        },
+        {
+            "optionDest": "console",
+            "value": false
+        },
+        {
+            "optionDest": "icon_file",
+            "value": "C:/EBSD-GUI/resources/ebsd_gui.ico"
+        },
+        {
+            "optionDest": "name",
+            "value": "EBSD-GUI"
+        },
+        {
+            "optionDest": "ascii",
+            "value": false
+        },
+        {
+            "optionDest": "clean_build",
+            "value": false
+        },
+        {
+            "optionDest": "splash",
+            "value": "C:/EBSD-GUI/resources/ebsd_gui.png"
+        },
+        {
+            "optionDest": "strip",
+            "value": false
+        },
+        {
+            "optionDest": "noupx",
+            "value": false
+        },
+        {
+            "optionDest": "disable_windowed_traceback",
+            "value": false
+        },
+        {
+            "optionDest": "embed_manifest",
+            "value": true
+        },
+        {
+            "optionDest": "uac_admin",
+            "value": false
+        },
+        {
+            "optionDest": "uac_uiaccess",
+            "value": false
+        },
+        {
+            "optionDest": "win_private_assemblies",
+            "value": false
+        },
+        {
+            "optionDest": "win_no_prefer_redirects",
+            "value": false
+        },
+        {
+            "optionDest": "bootloader_ignore_signals",
+            "value": false
+        },
+        {
+            "optionDest": "argv_emulation",
+            "value": false
+        },
+        {
+            "optionDest": "datas",
+            "value": "C:/EBSD-GUI/sample_rotations.txt;."
+        },
+        {
+            "optionDest": "datas",
+            "value": "C:/EBSD-GUI/resources;resources/"
+        },
+        {
+            "optionDest": "hookspath",
+            "value": "C:/EBSD-GUI/hooks"
+        },
+        {
+            "optionDest": "hiddenimports",
+            "value": "kikuchipy"
+        },
+        {
+            "optionDest": "hiddenimports",
+            "value": "hyperspy"
+        },
+        {
+            "optionDest": "hiddenimports",
+            "value": "pyebsdindex"
+        }
+    ],
+    "nonPyinstallerOptions": {
+        "increaseRecursionLimit": true,
+        "manualArguments": ""
+    }
 }

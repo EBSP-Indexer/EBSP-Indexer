@@ -11,6 +11,7 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
 
+import multiprocessing
 import sys
 import json
 from os.path import basename, splitext, exists
@@ -100,6 +101,10 @@ class AppWindow(QMainWindow):
 
         self.showImage(self.file_selected)
         self.importSettings()
+
+        QThreadPool.globalInstance().setMaxThreadCount(1)
+        self.updateActiveJobs()
+
         try:
             pyi_splash.close()
         except Exception as e:
@@ -369,11 +374,16 @@ class AppWindow(QMainWindow):
                 jobList.takeItem(jobList.row(item))
                 break
 
-    def countWorkers(self) -> int:
-        return self.ui.jobList.count()
+    @Slot()
+    def updateActiveJobs(self):
+        self.ui.threadsLabel.setText(f"{QThreadPool.globalInstance().activeThreadCount()} out of {QThreadPool.globalInstance().maxThreadCount()} active jobs")
+
 
 
 if __name__ == "__main__":
+    # Pyinstaller fix
+    multiprocessing.freeze_support()
+    
     app = QApplication(sys.argv)
     APP = AppWindow()
     # Redirect stdout to console.write and stderr to console.errorwrite
@@ -389,13 +399,6 @@ if __name__ == "__main__":
 This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.txt.
 This is free software, and you are welcome to redistribute it under certain conditions; see COPYING.txt for details.""",
         )
-        print(
-            f"\nMultithreading with maximum {QThreadPool.globalInstance().maxThreadCount()} threads."
-        )
-        print(
-            """Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'."""
-        )
-        print(pyopencl.tools.get_test_platforms_and_devices())
         try:
             sys.exit(app.exec())
         except Exception as e:
