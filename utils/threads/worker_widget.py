@@ -58,11 +58,6 @@ class WorkerWidget(QWidget):
         self.ui.labelJobNumber.setText(f"Job {self.id}: {self.job_title}")
         self.ui.labelJobName.setText(f"{self.job_title}")
         self.ui.labelOutput.setText(f"{self.output_directory}")
-        self.ui.labelStatusIcon.setPixmap(
-            QPixmap(":/linea_basic/resources/linea_basic_icons/basic_clock.svg").scaled(
-                40, 40
-            )
-        )
         self.jobItem.setSizeHint(self.sizeHint())
         self.inpfmt = self.ui.textBrowserStatus.currentCharFormat()
         self.outfmt = QTextCharFormat(self.inpfmt)
@@ -83,7 +78,6 @@ class WorkerWidget(QWidget):
         )
 
     def updateActiveJobs(self):
-        print("HELLO THIS IS WRONG", self.window())
         self.window().updateActiveJobs()
 
     def sendRemoveItem(self):
@@ -125,27 +119,12 @@ class WorkerWidget(QWidget):
             self.timer.stop()
             self.ui.pushButtonRemove.setEnabled(True)
             if failed:
-                self.ui.labelStatusIcon.setPixmap(
-                    QPixmap(
-                        ":/linea_basic/resources/linea_arrows_icons/arrows_exclamation.svg"
-                    ).scaled(40, 40)
-                )
                 self.ui.labelTime.setStyleSheet("QLabel { color : red; }")
                 self.ui.labelTime.setText(f"Failed in {self.ui.labelTime.text()}")
             elif cancelled:
-                self.ui.labelStatusIcon.setPixmap(
-                    QPixmap(
-                        ":/linea_basic/resources/linea_arrows_icons/arrows_circle_remove.svg"
-                    ).scaled(40, 40)
-                )
                 self.ui.labelTime.setStyleSheet("QLabel { color : green; }")
                 self.ui.labelTime.setText(f"Cancelled")
             else:
-                self.ui.labelStatusIcon.setPixmap(
-                    QPixmap(
-                        ":/linea_basic/resources/linea_arrows_icons/arrows_circle_check.svg"
-                    ).scaled(40, 40)
-                )
                 self.ui.labelTime.setStyleSheet("QLabel { color : green; }")
                 self.ui.labelTime.setText(f"Completed in {self.ui.labelTime.text()}")
             if cleanup:

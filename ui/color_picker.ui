@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>200</width>
-    <height>200</height>
+    <width>219</width>
+    <height>269</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -17,11 +17,11 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string/>
+   <string>Color Picker</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="horizontalSpacing">
-    <number>-1</number>
+    <number>7</number>
    </property>
    <property name="verticalSpacing">
     <number>26</number>
