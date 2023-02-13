@@ -1,25 +1,23 @@
 from os import path, mkdir
 from datetime import date
 import json
+import warnings
+
 from PySide6.QtCore import QThreadPool
 from PySide6.QtWidgets import QDialog, QDialogButtonBox
-from utils.setting_file import SettingFile
-
-from utils.filebrowser import FileBrowser
-from utils.worker import sendToJobManager
-from ui.ui_hi_setup import Ui_HISetupDialog
-
 import kikuchipy as kp
 from kikuchipy.signals.ebsd import EBSD, LazyEBSD
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
-import warnings
 from orix import io, plot
 from orix.crystal_map import CrystalMap, create_coordinate_arrays, PhaseList
 from orix.quaternion import Rotation
 from orix.vector import Vector3d
 from pyebsdindex.ebsd_index import EBSDIndexer
+
+from utils import SettingFile, FileBrowser, sendToJobManager
+from ui.ui_hi_setup import Ui_HISetupDialog
 
 # Ignore warnings to avoid crash with integrated console
 warnings.filterwarnings("ignore")
@@ -356,9 +354,9 @@ class HiSetupDialog(QDialog):
                 pass
         sendToJobManager(
             job_title=f"HI {self.pattern_name}",
-            output_directory=self.dir_out,
+            output_path=self.dir_out,
             listview=self.parentWidget().ui.jobList,
-            fn=self.hough_indexing,
+            func=self.hough_indexing,
             allow_cleanup=True,
         )
 

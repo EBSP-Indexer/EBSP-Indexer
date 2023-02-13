@@ -7,8 +7,7 @@ from os.path import exists
 
 from ui.ui_advanced_settings import Ui_AdvancedSettings
 from scripts.color_picker import ColorPicker
-from utils.setting_file import SettingFile
-from utils.filebrowser import FileBrowser
+from utils import SettingFile, FileBrowser
 
 class AdvancedSettingsDialog(QDialog):
     def __init__(self, parent=None):

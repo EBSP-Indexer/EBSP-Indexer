@@ -16,9 +16,7 @@ from PySide6.QtWidgets import QDialog, QDialogButtonBox
 from PySide6.QtCore import QThreadPool
 
 from ui.ui_di_setup import Ui_DiSetupDialog
-from utils.filebrowser import FileBrowser
-from utils.setting_file import SettingFile
-from utils.worker import Worker
+from utils import SettingFile, FileBrowser, sendToJobManager
 
 import gc
 
@@ -32,12 +30,11 @@ class DiSetupDialog(QDialog):
 
     def __init__(self, parent=None, pattern_path=None):
         super().__init__(parent)
-        # initate threadpool and output
-        self.threadPool = QThreadPool.globalInstance()
-        self.console = parent.console
-
         # pattern path
         self.pattern_path = pattern_path
+
+        # pattern name
+        self.pattern_name = path.basename(pattern_path)
 
         # working directory
         self.working_dir = path.dirname(self.pattern_path)
@@ -110,11 +107,16 @@ class DiSetupDialog(QDialog):
 
         self.update_pc_spinbox()
 
-        #Setup colors from program settings
+        # Setup colors from program settings
         try:
             self.colors = json.loads(self.program_settings.read("Colors"))
         except:
-            self.colors = ['lime', 'r', 'b', 'yellow',]
+            self.colors = [
+                "lime",
+                "r",
+                "b",
+                "yellow",
+            ]
 
         # Paths for master patterns
         self.mpPaths = {}
@@ -188,7 +190,7 @@ class DiSetupDialog(QDialog):
                     bin_shapes = np.append(bin_shapes, f"({num}, {num})")
 
             self.ui.comboBoxBinning.addItems(bin_shapes[::-1])
-            self.ui.sliderBinning.setMaximum(len(bin_shapes)-1)
+            self.ui.sliderBinning.setMaximum(len(bin_shapes) - 1)
 
             # Define pixel-scale globally
             self.scale = self.s.axes_manager["x"].scale
@@ -197,7 +199,6 @@ class DiSetupDialog(QDialog):
 
     def updateBinningShape(self):
         self.ui.comboBoxBinning.setCurrentIndex(self.ui.sliderBinning.value())
-        
 
     def set_save_fileformat(self):
         self.di_result_filetypes = [
@@ -206,7 +207,6 @@ class DiSetupDialog(QDialog):
 
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_dictionary_indexing())
-        self.ui.buttonBox.rejected.connect(lambda: self.reject())
 
         self.ui.pushButtonAddPhase.clicked.connect(lambda: self.addPhase())
         self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.removePhase())
@@ -220,9 +220,16 @@ class DiSetupDialog(QDialog):
             lambda: self.estimateSimulationSize()
         )
 
-        self.ui.sliderBinning.valueChanged.connect(lambda: self.ui.comboBoxBinning.setCurrentIndex(self.ui.sliderBinning.value()))
-        self.ui.comboBoxBinning.currentIndexChanged.connect(lambda: self.ui.sliderBinning.setValue(self.ui.comboBoxBinning.currentIndex()))
-
+        self.ui.sliderBinning.valueChanged.connect(
+            lambda: self.ui.comboBoxBinning.setCurrentIndex(
+                self.ui.sliderBinning.value()
+            )
+        )
+        self.ui.comboBoxBinning.currentIndexChanged.connect(
+            lambda: self.ui.sliderBinning.setValue(
+                self.ui.comboBoxBinning.currentIndex()
+            )
+        )
 
     def setNiterState(self):
         if self.ui.checkBoxLazy.isChecked():
@@ -313,18 +320,31 @@ class DiSetupDialog(QDialog):
 
     # Call worker to start DI in separate thread
     def run_dictionary_indexing(self):
+        # Create folder for storing DI results in working directory
+        i = 1
+        while True:
+            try:
+                self.results_dir = path.join(self.working_dir, f"di_results_{i}")
+                mkdir(self.results_dir)
+                break
+            except FileExistsError:
+                pass
+            i += 1
         # Pass the function to execute
-        di_worker = Worker(fn=self.dictionary_indexing, output=self.console)
-        # Execute
-        self.threadPool.start(di_worker)
-        self.accept()
+        sendToJobManager(
+            job_title=f"DI {self.pattern_name}",
+            output_path=self.results_dir,
+            listview=self.parentWidget().ui.jobList,
+            func=self.dictionary_indexing,
+            allow_cleanup=False
+        )
 
     # Master pattern dictionary
     def load_master_pattern(self):
         self.mp = {}
         for ph in self.phases:
             file_mp = path.join(self.mpPaths[ph])  # , f"{ph}_mc_mp_20kv.h5")
-            
+
             self.mp[f"{ph}"] = kp.load(
                 file_mp,
                 energy=self.energy,  # single energies like 10, 11, 12 etc. or a range like (10, 20)
@@ -336,9 +356,7 @@ class DiSetupDialog(QDialog):
     def signal_mask(self, sig_shape):  # Add signal mask
         if self.options["mask"]:
             print("Applying signal mask")
-            signal_mask = ~kp.filters.Window("circular", sig_shape).astype(
-                bool
-            )
+            signal_mask = ~kp.filters.Window("circular", sig_shape).astype(bool)
 
             # Set signal mask for dictionary indexing
             self.di_kwargs["signal_mask"] = signal_mask
@@ -388,7 +406,8 @@ class DiSetupDialog(QDialog):
             )
             ax.add_artist(scalebar)
             fig.savefig(
-                path.join(self.results_dir, f"ncc_{ph}_{xmap_type}.png"), **self.savefig_kwargs
+                path.join(self.results_dir, f"ncc_{ph}_{xmap_type}.png"),
+                **self.savefig_kwargs,
             )
 
             plt.close(fig)
@@ -401,7 +420,7 @@ class DiSetupDialog(QDialog):
 
             osm = kp.indexing.orientation_similarity_map(xmap_dict[f"{ph}"])
             ### Inspect dictionary indexing results for phase
-            
+
             fig, ax = plt.subplots()
             ax.axis("off")
             osm_map = ax.imshow(osm, cmap="gray")
@@ -469,7 +488,7 @@ class DiSetupDialog(QDialog):
                     path.join(self.results_dir, f"di_ref_results_{ph}.{filetype}"),
                     xmaps_ref[f"{ph}"],
                 )
-        
+
         return xmaps_ref
 
     def merge_crystal_maps(self, xmap_dict, xmap_type):
@@ -491,8 +510,8 @@ class DiSetupDialog(QDialog):
         for i in range(len(self.phases)):
             merged.phases[i].color = self.colors[i]
 
-#        for i, ph in enumerate(self.phases):
-#            merged.phases[ph].color = self.colors[i]
+        #        for i, ph in enumerate(self.phases):
+        #            merged.phases[ph].color = self.colors[i]
 
         for filetype in self.di_result_filetypes:  # [".ang", ".h5"]
             io.save(
@@ -592,20 +611,21 @@ class DiSetupDialog(QDialog):
 
         pc_copy = self.pc.copy()
         if self.convention == "TSL":
-            pc_copy[1] = 1-pc_copy[1]
+            pc_copy[1] = 1 - pc_copy[1]
 
         self.di_setting_file.write("PC convention", f"{self.convention}")
         self.di_setting_file.write("Pattern center (x*, y*, z*)", f"{pc_copy}")
-        
+
         if len(self.phases) > 1:
             for i, ph in enumerate(self.phases, 1):
                 phase_amount = xmap[f"{ph}"].size / xmap.size
                 self.di_setting_file.write(
-                    f"Phase {i}: {ph} [% ( # points)] ", f"{phase_amount:.1%}, ({xmap[f'{ph}'].size})"
+                    f"Phase {i}: {ph} [% ( # points)] ",
+                    f"{phase_amount:.1%}, ({xmap[f'{ph}'].size})",
                 )
 
             not_indexed_percent = xmap["not_indexed"].size / xmap.size
-            
+
             self.di_setting_file.write(
                 "Not indexed", f"{xmap['not_indexed'].size} ({not_indexed_percent:.1%})"
             )
@@ -628,16 +648,6 @@ class DiSetupDialog(QDialog):
         self.di_setting_file.save()
 
     def dictionary_indexing(self):
-        # Create folder for storing DI results in working directory
-        i = 1
-        while True:
-            try:
-                self.results_dir = path.join(self.working_dir, f"di_results_{i}")
-                mkdir(self.results_dir)
-                break
-            except FileExistsError:
-                pass
-            i += 1
         print("Initializing dictionary indexing")
 
         # get options from input
@@ -686,7 +696,9 @@ class DiSetupDialog(QDialog):
         ### Dictionary indexing
 
         for ph in self.phases:
-            self.mp[f"{ph}"].phase.name = ph #TO ensure that the master pattern is named correctly
+            self.mp[
+                f"{ph}"
+            ].phase.name = ph  # TO ensure that the master pattern is named correctly
             ### Sample orientations
             rot = sampling.get_sample_fundamental(
                 method="cubochoric",
@@ -778,9 +790,7 @@ class DiSetupDialog(QDialog):
                 rgb_all = np.zeros((merged.size, 3))
                 for i, phase in merged.phases:
                     if i != -1:
-                        rgb_i = ckey.orientation2color(
-                            merged[phase.name].orientations
-                        )
+                        rgb_i = ckey.orientation2color(merged[phase.name].orientations)
                         rgb_all[merged.phase_id == i] = rgb_i
 
                 fig = merged.plot(rgb_all, remove_padding=True, return_figure=True)

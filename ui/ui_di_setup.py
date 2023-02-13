@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'di_setup.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.4.0
+## Created by: Qt User Interface Compiler version 6.3.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -26,7 +26,7 @@ class Ui_DiSetupDialog(object):
     def setupUi(self, DiSetupDialog):
         if not DiSetupDialog.objectName():
             DiSetupDialog.setObjectName(u"DiSetupDialog")
-        DiSetupDialog.resize(931, 597)
+        DiSetupDialog.resize(931, 640)
         self.gridLayout_2 = QGridLayout(DiSetupDialog)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.centralwidget = QFrame(DiSetupDialog)
@@ -408,6 +408,8 @@ class Ui_DiSetupDialog(object):
 
 
         self.retranslateUi(DiSetupDialog)
+        self.buttonBox.accepted.connect(DiSetupDialog.accept)
+        self.buttonBox.rejected.connect(DiSetupDialog.reject)
 
         QMetaObject.connectSlotsByName(DiSetupDialog)
     # setupUi

@@ -70,45 +70,13 @@ class Ui_WorkerWidget(object):
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
 
-        self.line_3 = QFrame(WorkerWidget)
-        self.line_3.setObjectName(u"line_3")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Maximum)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.line_3.sizePolicy().hasHeightForWidth())
-        self.line_3.setSizePolicy(sizePolicy2)
-        self.line_3.setMinimumSize(QSize(0, 30))
-        self.line_3.setFrameShape(QFrame.VLine)
-        self.line_3.setFrameShadow(QFrame.Sunken)
-
-        self.horizontalLayout.addWidget(self.line_3)
-
-        self.labelStatusIcon = QLabel(WorkerWidget)
-        self.labelStatusIcon.setObjectName(u"labelStatusIcon")
-        sizePolicy1.setHeightForWidth(self.labelStatusIcon.sizePolicy().hasHeightForWidth())
-        self.labelStatusIcon.setSizePolicy(sizePolicy1)
-        self.labelStatusIcon.setPixmap(QPixmap(u":/linea_basic/resources/linea_basic_icons/basic_clock.svg"))
-        self.labelStatusIcon.setAlignment(Qt.AlignCenter)
-
-        self.horizontalLayout.addWidget(self.labelStatusIcon)
-
-        self.line_2 = QFrame(WorkerWidget)
-        self.line_2.setObjectName(u"line_2")
-        sizePolicy2.setHeightForWidth(self.line_2.sizePolicy().hasHeightForWidth())
-        self.line_2.setSizePolicy(sizePolicy2)
-        self.line_2.setMinimumSize(QSize(0, 30))
-        self.line_2.setFrameShape(QFrame.VLine)
-        self.line_2.setFrameShadow(QFrame.Sunken)
-
-        self.horizontalLayout.addWidget(self.line_2)
-
         self.labelTime = QLabel(WorkerWidget)
         self.labelTime.setObjectName(u"labelTime")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.labelTime.sizePolicy().hasHeightForWidth())
-        self.labelTime.setSizePolicy(sizePolicy3)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.labelTime.sizePolicy().hasHeightForWidth())
+        self.labelTime.setSizePolicy(sizePolicy2)
         self.labelTime.setStyleSheet(u"color: rgb(220, 190, 0);\n"
 "font: 75 9pt \"MS Shell Dlg 2\";")
 
@@ -126,11 +94,11 @@ class Ui_WorkerWidget(object):
         self.pushButtonRemove = QPushButton(WorkerWidget)
         self.pushButtonRemove.setObjectName(u"pushButtonRemove")
         self.pushButtonRemove.setEnabled(False)
-        sizePolicy4 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
-        sizePolicy4.setHorizontalStretch(0)
-        sizePolicy4.setVerticalStretch(0)
-        sizePolicy4.setHeightForWidth(self.pushButtonRemove.sizePolicy().hasHeightForWidth())
-        self.pushButtonRemove.setSizePolicy(sizePolicy4)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.pushButtonRemove.sizePolicy().hasHeightForWidth())
+        self.pushButtonRemove.setSizePolicy(sizePolicy3)
         icon2 = QIcon()
         icon2.addFile(u":/linea_basic/resources/linea_basic_icons/basic_trashcan.svg", QSize(), QIcon.Normal, QIcon.Off)
         self.pushButtonRemove.setIcon(icon2)
@@ -152,8 +120,8 @@ class Ui_WorkerWidget(object):
 
         self.labelJobName = QLabel(WorkerWidget)
         self.labelJobName.setObjectName(u"labelJobName")
-        sizePolicy3.setHeightForWidth(self.labelJobName.sizePolicy().hasHeightForWidth())
-        self.labelJobName.setSizePolicy(sizePolicy3)
+        sizePolicy2.setHeightForWidth(self.labelJobName.sizePolicy().hasHeightForWidth())
+        self.labelJobName.setSizePolicy(sizePolicy2)
         self.labelJobName.setStyleSheet(u"font: 75 12pt \"MS Shell Dlg 2\";\n"
 "text-decoration: underline;")
 
@@ -161,8 +129,8 @@ class Ui_WorkerWidget(object):
 
         self.labelOutput = QLabel(WorkerWidget)
         self.labelOutput.setObjectName(u"labelOutput")
-        sizePolicy3.setHeightForWidth(self.labelOutput.sizePolicy().hasHeightForWidth())
-        self.labelOutput.setSizePolicy(sizePolicy3)
+        sizePolicy2.setHeightForWidth(self.labelOutput.sizePolicy().hasHeightForWidth())
+        self.labelOutput.setSizePolicy(sizePolicy2)
         self.labelOutput.setStyleSheet(u"font: italic 8pt \"MS Sans Serif\";\n"
 "color: rgb(120, 120, 120);")
 
@@ -170,11 +138,11 @@ class Ui_WorkerWidget(object):
 
         self.textBrowserStatus = QTextBrowser(WorkerWidget)
         self.textBrowserStatus.setObjectName(u"textBrowserStatus")
-        sizePolicy5 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
-        sizePolicy5.setHorizontalStretch(0)
-        sizePolicy5.setVerticalStretch(0)
-        sizePolicy5.setHeightForWidth(self.textBrowserStatus.sizePolicy().hasHeightForWidth())
-        self.textBrowserStatus.setSizePolicy(sizePolicy5)
+        sizePolicy4 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Expanding)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.textBrowserStatus.sizePolicy().hasHeightForWidth())
+        self.textBrowserStatus.setSizePolicy(sizePolicy4)
         self.textBrowserStatus.setMaximumSize(QSize(16777215, 16777215))
         self.textBrowserStatus.setStyleSheet(u"font: 8pt \"Cascadia Code\";\n"
 "color: rgb(0, 0, 255);")
@@ -195,16 +163,15 @@ class Ui_WorkerWidget(object):
         WorkerWidget.setWindowTitle(QCoreApplication.translate("WorkerWidget", u"Form", None))
         self.labelJobNumber.setText(QCoreApplication.translate("WorkerWidget", u"job number", None))
         self.pushButtonShow.setText("")
-        self.labelStatusIcon.setText("")
         self.labelTime.setText(QCoreApplication.translate("WorkerWidget", u"In Queue", None))
 #if QT_CONFIG(tooltip)
         self.pushButtonCancel.setToolTip(QCoreApplication.translate("WorkerWidget", u"Cancel job", None))
 #endif // QT_CONFIG(tooltip)
-        self.pushButtonCancel.setText("")
+        self.pushButtonCancel.setText(QCoreApplication.translate("WorkerWidget", u"Cancel", None))
 #if QT_CONFIG(tooltip)
         self.pushButtonRemove.setToolTip(QCoreApplication.translate("WorkerWidget", u"Remove job from list", None))
 #endif // QT_CONFIG(tooltip)
-        self.pushButtonRemove.setText("")
+        self.pushButtonRemove.setText(QCoreApplication.translate("WorkerWidget", u"Remove", None))
         self.labelJobName.setText(QCoreApplication.translate("WorkerWidget", u"<html><head/><body><p>job name</p></body></html>", None))
         self.labelOutput.setText(QCoreApplication.translate("WorkerWidget", u"<html><head/><body><p>output_directory</p></body></html>", None))
         self.textBrowserStatus.setHtml(QCoreApplication.translate("WorkerWidget", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"

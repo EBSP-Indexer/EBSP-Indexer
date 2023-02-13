@@ -1,20 +1,18 @@
 import os
-import sys
+from typing import Callable
 from datetime import timedelta
-from contextlib import redirect_stderr, redirect_stdout
+
 from PySide6.QtCore import (
     QThreadPool,
-    QObject,
-    QRunnable,
     Slot,
     Signal,
     QElapsedTimer,
     QTimer,
 )
-from PySide6.QtWidgets import QWidget, QListWidget, QListWidgetItem
+from PySide6.QtWidgets import QMainWindow, QWidget, QListWidget, QListWidgetItem
 from PySide6.QtGui import QPixmap, QTextCharFormat, QBrush, QColor
 
-from scripts.console import ThreadedStdout, Redirect
+from utils.threads.worker import Worker
 from ui.ui_worker_widget import Ui_WorkerWidget
 
 
@@ -31,9 +29,9 @@ class WorkerWidget(QWidget):
         self,
         job_title: str,
         output_directory: str,
-        mainWindow: QWidget,
+        mainWindow: QMainWindow,
         jobItem: QListWidgetItem,
-        fn,
+        func: Callable,
         allow_cleanup: bool = False,
         *args,
         **kwargs,
@@ -41,7 +39,7 @@ class WorkerWidget(QWidget):
         super().__init__(parent=mainWindow)
         WorkerWidget.counter += 1
         self.id = WorkerWidget.counter
-        self.worker = Worker(self, fn, output=self.parent().console, *args, **kwargs)
+        self.worker = Worker(self, func, *args, **kwargs)
         self.ui = Ui_WorkerWidget()
         self.time = QElapsedTimer()
         self.timer = QTimer()
@@ -50,6 +48,7 @@ class WorkerWidget(QWidget):
         self.job_title = job_title
         self.output_directory = output_directory
         self.jobItem = jobItem
+        self.progress_bar_mode = False
         self.ui.setupUi(self)
         self.setupConnections()
         self.outdisplay = self.ui.textBrowserStatus
@@ -75,14 +74,17 @@ class WorkerWidget(QWidget):
         self.ui.pushButtonRemove.clicked.connect(self.sendRemoveItem)
         self.ui.pushButtonCancel.clicked.connect(self.sendCancelWorker)
         self.ui.pushButtonShow.clicked.connect(self.adjustSize)
-        self.removeMeSignal.connect(self.parentWidget().removeWorker)
+        self.removeMeSignal.connect(self.window().removeWorker)
         self.timer.timeout.connect(self.updateTimerDisplay)
         self.worker.isStarted.connect(self.time_worker)
-        self.worker.isStarted.connect(self.parentWidget().updateActiveJobs)
         self.worker.isFinished.connect(self.finalize)
-        self.worker.isFinished.connect(self.parentWidget().updateActiveJobs)
-        self.worker.isError.connect(lambda id: self.finalize(id, failed=True, cleanup=self.allow_cleanup))
-        self.worker.isError.connect(self.parentWidget().updateActiveJobs)
+        self.worker.isError.connect(
+            lambda id: self.finalize(id, failed=True, cleanup=self.allow_cleanup)
+        )
+
+    def updateActiveJobs(self):
+        print("HELLO THIS IS WRONG", self.window())
+        self.window().updateActiveJobs()
 
     def sendRemoveItem(self):
         self.removeMeSignal.emit(self.id)
@@ -90,6 +92,8 @@ class WorkerWidget(QWidget):
     def sendCancelWorker(self):
         if QThreadPool.globalInstance().tryTake(self.worker):
             self.finalize(id=self.id, cancelled=True, cleanup=self.allow_cleanup)
+        else:
+            self.ui.pushButtonCancel.setDisabled(True)
 
     def adjustSize(self):
         super().adjustSize()
@@ -102,6 +106,7 @@ class WorkerWidget(QWidget):
             self.time.start()
             self.updateTimerDisplay()
             self.timer.start(500)
+            self.ui.pushButtonCancel.setDisabled(True)
 
     @Slot(int)
     def finalize(
@@ -180,86 +185,37 @@ class WorkerWidget(QWidget):
             self.outdisplay.setPlainText("\n".join(content[:-2]))
         if "\r" in line:
             self.progress_bar_mode = True
+            sb = self.outdisplay.verticalScrollBar()
+            sb.setValue(sb.maximum())
+        if not self.progress_bar_mode:
+            sb = self.outdisplay.verticalScrollBar()
+            sb.setValue(sb.maximum())
         self.outdisplay.append(line.rstrip())
-
-
-class Worker(QRunnable, QObject):
-    """
-    Worker thread
-
-    Inherits from QRunnable to handler worker thread setup, signals and wrap-up.
-
-    :param callback: The function callback to run on this worker thread. Supplied args and
-                     kwargs will be passed through to the runner.
-    :type callback: function
-    :param args: Arguments to pass to the callback function
-    :param kwargs: Keywords to pass to the callback function
-
-    """
-
-    isStarted = Signal(int)
-    isFinished = Signal(int)
-    isError = Signal(int)
-
-    def __init__(
-        self, workerWidget: WorkerWidget, fn, output=sys.stdout, *args, **kwargs
-    ):
-        QObject.__init__(self)
-        QRunnable.__init__(self)
-        self.workerWidget = workerWidget
-        self.fn = fn
-        self.args = args
-        self.kwargs = kwargs
-        self.console = output
-        self.threadedStdout = ThreadedStdout()
-        self.errorRedirect = Redirect(self.threadedStdout.errorwrite)
-        self.setupConnections()
-
-    def setupConnections(self):
-        self.threadedStdout.lineToWorker.connect(self.workerWidget.write)
-        self.threadedStdout.errorToWorker.connect(self.workerWidget.errorwrite)
-
-    @Slot()
-    def run(self):
-        """
-        Initialise the runner function with passed args, kwargs, and redirects the output.
-        """
-        with redirect_stdout(self.threadedStdout), redirect_stderr(self.errorRedirect):
-            try:
-                self.isStarted.emit(self.workerWidget.id)
-                self.fn(*self.args, **self.kwargs)
-                self.isFinished.emit(self.workerWidget.id)
-            except Exception as e:
-                self.isError.emit(self.workerWidget.id)
-                self.workerWidget.errorwrite(str(e))
-                raise e
-
-
-# TODO: Delete when sendTOWorkManager is finished implemented
-def toWorker(function, stdout, *args, **kwargs):
-    """
-    Sends a function to a worker-thread that will redirect to stdout
-    """
-    worker = Worker(0, function, stdout, *args, **kwargs)
-    QThreadPool.globalInstance().start(worker)
 
 
 # TODO: Finish and use in all thread-related operations
 def sendToJobManager(
     job_title: str,
-    output_directory: str,
+    output_path: str,
     listview: QListWidget,
-    fn,
+    func: Callable,
     allow_cleanup: bool = False,
     *args,
     **kwargs,
 ):
     """
-    Threads a function fn with arguments *args and keyword arguments **kwargs, and adds a workerWidget to the listview.
+    Method for threading a function func with arguments *args and keyword arguments **kwargs, and adds a workerWidget to the listview.
     """
     item = QListWidgetItem()
     workerWidget = WorkerWidget(
-        job_title, output_directory, listview.window(), item, fn, allow_cleanup, *args, **kwargs
+        job_title,
+        output_path,
+        listview.window(),
+        item,
+        func,
+        allow_cleanup,
+        *args,
+        **kwargs,
     )
     listview.addItem(item)
     listview.setItemWidget(item, workerWidget)

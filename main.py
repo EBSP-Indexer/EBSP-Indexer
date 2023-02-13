@@ -46,9 +46,6 @@ import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 
 from ui.ui_main_window import Ui_MainWindow
-from utils.filebrowser import FileBrowser
-from utils.setting_file import SettingFile
-from utils.worker import toWorker
 from scripts.hough_indexing import HiSetupDialog
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.signal_navigation import signalNavigation
@@ -60,7 +57,8 @@ from scripts.pre_indexing_maps import (
     save_iq_map,
 )
 from scripts.advanced_settings import AdvancedSettingsDialog
-from scripts.console import Console, Redirect
+from scripts.console import Console
+from utils import Redirect, SettingFile, FileBrowser, sendToWorker
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
 
@@ -135,16 +133,16 @@ class AppWindow(QMainWindow):
             lambda: self.selectPatternCenter()
         )
         self.ui.actionAverage_dot_product.triggered.connect(
-            lambda: toWorker(save_adp_map, self.console, self.file_selected)
+            lambda: sendToWorker(self, save_adp_map, pattern_path=self.file_selected)
         )
         self.ui.actionImage_quality.triggered.connect(
-            lambda: toWorker(save_iq_map, self.console, self.file_selected)
+            lambda: sendToWorker(self, save_iq_map, pattern_path=self.file_selected)
         )
         self.ui.actionMean_intensity.triggered.connect(
-            lambda: toWorker(save_mean_intensity_map, self.console, self.file_selected)
+            lambda: sendToWorker(self, save_mean_intensity_map, pattern_path=self.file_selected)
         )
         self.ui.actionVirtual_backscatter_electron.triggered.connect(
-            lambda: toWorker(save_rgb_vbse, self.console, self.file_selected)
+            lambda: sendToWorker(self, save_rgb_vbse, pattern_path=self.file_selected)
         )
 
     def selectWorkingDirectory(self):
@@ -383,7 +381,7 @@ class AppWindow(QMainWindow):
 if __name__ == "__main__":
     # Pyinstaller fix
     multiprocessing.freeze_support()
-    
+
     app = QApplication(sys.argv)
     APP = AppWindow()
     # Redirect stdout to console.write and stderr to console.errorwrite
