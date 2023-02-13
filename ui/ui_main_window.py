@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'main_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.4.0
+## Created by: Qt User Interface Compiler version 6.3.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -48,7 +48,7 @@ class Ui_MainWindow(object):
         self.actionOpen_Workfolder = QAction(MainWindow)
         self.actionOpen_Workfolder.setObjectName(u"actionOpen_Workfolder")
         icon1 = QIcon()
-        icon1.addFile(u":/linea icons/resources/linea basic icons/basic_folder.svg", QSize(), QIcon.Normal, QIcon.Off)
+        icon1.addFile(u":/linea_basic/resources/linea_basic_icons/basic_folder.svg", QSize(), QIcon.Normal, QIcon.Off)
         self.actionOpen_Workfolder.setIcon(icon1)
         self.actionProcessingMenu = QAction(MainWindow)
         self.actionProcessingMenu.setObjectName(u"actionProcessingMenu")
@@ -67,7 +67,7 @@ class Ui_MainWindow(object):
         self.actionSettings = QAction(MainWindow)
         self.actionSettings.setObjectName(u"actionSettings")
         icon2 = QIcon()
-        icon2.addFile(u":/linea icons/resources/linea basic icons/basic_gear.svg", QSize(), QIcon.Normal, QIcon.Off)
+        icon2.addFile(u":/linea_basic/resources/linea_basic_icons/basic_gear.svg", QSize(), QIcon.Normal, QIcon.Off)
         self.actionSettings.setIcon(icon2)
         self.actionImage_quality = QAction(MainWindow)
         self.actionImage_quality.setObjectName(u"actionImage_quality")
@@ -247,7 +247,13 @@ class Ui_MainWindow(object):
         self.jobList.setObjectName(u"jobList")
         self.jobList.setSelectionMode(QAbstractItemView.NoSelection)
 
-        self.gridLayout_3.addWidget(self.jobList, 0, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.jobList, 1, 0, 1, 1)
+
+        self.threadsLabel = QLabel(self.dockWidgetContents)
+        self.threadsLabel.setObjectName(u"threadsLabel")
+        self.threadsLabel.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.gridLayout_3.addWidget(self.threadsLabel, 0, 0, 1, 1)
 
         self.dockWidgetJobManager.setWidget(self.dockWidgetContents)
         MainWindow.addDockWidget(Qt.TopDockWidgetArea, self.dockWidgetJobManager)
@@ -334,5 +340,6 @@ class Ui_MainWindow(object):
         self.folderLabel.setText(QCoreApplication.translate("MainWindow", u"NO FOLDER OPENED", None))
         self.dockWidgetImageViewer.setWindowTitle(QCoreApplication.translate("MainWindow", u"Image Viewer", None))
         self.dockWidgetJobManager.setWindowTitle(QCoreApplication.translate("MainWindow", u"Job Manager", None))
+        self.threadsLabel.setText(QCoreApplication.translate("MainWindow", u"0 out of 0 active jobs", None))
     # retranslateUi
 

@@ -2,7 +2,7 @@ from os import path
 import kikuchipy as kp
 from PySide6.QtWidgets import QDialog
 
-from utils.filebrowser import FileBrowser
+from utils import FileBrowser
 from ui.ui_roi_dialog import Ui_ROIDialog
 
 from matplotlib.widgets import RectangleSelector
