@@ -1,16 +1,14 @@
 from os import path
-import gc
-import copy
+#import gc
+#import copy
 
 import kikuchipy as kp
 from PySide6.QtWidgets import QDialog, QDialogButtonBox
 from PySide6.QtCore import QThreadPool
 
-from utils.filebrowser import FileBrowser
-from utils.worker import Worker
-from utils.setting_file import SettingFile
+from utils import FileBrowser, sendToJobManager
 
-from ui.ui_pattern_processing_dialog import Ui_PatternProcessingWindow
+from ui.ui_pattern_processing import Ui_PatternProcessingDialog
 
 
 class PatternProcessingDialog(QDialog):
@@ -20,17 +18,15 @@ class PatternProcessingDialog(QDialog):
         self.threadPool = QThreadPool.globalInstance()
         self.console = parent.console
         self.working_dir = path.dirname(pattern_path)
-
+        self.pattern_name = path.basename(pattern_path)
         self.pattern_path = pattern_path
 
         self.filenamebase = path.basename(self.pattern_path).split(".")[0]
 
         # Standard filename of processed pattern
-        self.save_path = path.join(
-            self.working_dir, f"{self.filenamebase}.h5"
-        )
+        self.save_path = path.join(self.working_dir, f"{self.filenamebase}.h5")
 
-        self.ui = Ui_PatternProcessingWindow()
+        self.ui = Ui_PatternProcessingDialog()
         self.ui.setupUi(self)
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
         self.setupConnections()
@@ -69,9 +65,10 @@ class PatternProcessingDialog(QDialog):
         self.ui.averageBox.stateChanged.connect(lambda: self.preview_processing())
 
     def close_dialog(self):
-        del self.s
-        gc.collect()
-        self.reject()
+        pass
+        #del self.s
+        #gc.collect()
+        #self.reject()
 
     def setSavePath(self):
         if self.fileBrowser.getFile():
@@ -82,7 +79,7 @@ class PatternProcessingDialog(QDialog):
 
     def setupInitialSettings(self):
         processing_steps = self.filenamebase.split("_")[1:]
-        
+
         for step in processing_steps:
             if step == "sb":
                 self.ui.staticBackgroundBox.setEnabled(False)
@@ -90,7 +87,7 @@ class PatternProcessingDialog(QDialog):
                 self.ui.dynamicBackgroundBox.setEnabled(False)
             if step == "adp":
                 self.ui.averageBox.setEnabled(False)
-        
+
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         """        
         self.sf = SettingFile(path.join(self.working_dir, "project_settings.txt"))
@@ -141,20 +138,22 @@ class PatternProcessingDialog(QDialog):
             self.average_neighbour(dataset=self.s_prev, show_progressbar=False)
             extensions += "_adp"
             box_checked = True
-        
+
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(box_checked)
 
         self.ui.filenameEdit.setText(f"{self.filenamebase}{extensions}.h5")
-        
 
         self.showImage(self.s_prev.inav[1, 1])
 
-        del self.s_prev
+        #del self.s_prev
 
     def run_processing(self):
-        worker = Worker(fn=self.apply_processing, output=self.console)
-        self.threadPool.start(worker)
-        self.accept()
+        sendToJobManager(
+            job_title = f"SN Improvement {self.pattern_name}",
+            output_path = path.join(self.working_dir, self.ui.filenameEdit.text()),
+            listview = self.parentWidget().ui.jobList,
+            func = self.apply_processing,
+        )
 
     def apply_processing(self):
 
@@ -168,7 +167,7 @@ class PatternProcessingDialog(QDialog):
             print("Dynamic background removed")
         if self.ui.averageBox.isChecked():
             self.average_neighbour(dataset=self.s)
-            print("Averaging neighbouring patterns")
+            print("Averaged neighbouring patterns")
 
         # Get current save path
 
@@ -179,12 +178,11 @@ class PatternProcessingDialog(QDialog):
                 overwrite=True,
             )
             print("Processing complete")
-            del self.s
-            gc.collect()
-        
+            #del self.s
+            #gc.collect()
+
         except Exception as e:
             print(f"Could not save processed pattern: {e}")
-            
-            del self.s
-            gc.collect()
-            self.reject()
+            #del self.s
+            #gc.collect()
+            #self.reject()

@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'main_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.3.2
+## Created by: Qt User Interface Compiler version 6.4.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -30,7 +30,7 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.setWindowModality(Qt.NonModal)
-        MainWindow.resize(1058, 737)
+        MainWindow.resize(960, 705)
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -44,14 +44,15 @@ class Ui_MainWindow(object):
         MainWindow.setDockOptions(QMainWindow.AllowTabbedDocks|QMainWindow.AnimatedDocks)
         self.actionOpen_Workfolder = QAction(MainWindow)
         self.actionOpen_Workfolder.setObjectName(u"actionOpen_Workfolder")
-        icon = QIcon()
-        icon.addFile(u":/linea icons/resources/linea basic icons/basic_folder.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.actionOpen_Workfolder.setIcon(icon)
+        icon1 = QIcon()
+        icon1.addFile(u":/linea_basic/resources/linea_basic_icons/basic_folder.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.actionOpen_Workfolder.setIcon(icon1)
         self.actionProcessingMenu = QAction(MainWindow)
         self.actionProcessingMenu.setObjectName(u"actionProcessingMenu")
         self.actionProcessingMenu.setEnabled(True)
         self.actionSignalNavigation = QAction(MainWindow)
         self.actionSignalNavigation.setObjectName(u"actionSignalNavigation")
+        self.actionSignalNavigation.setCheckable(False)
         self.actionSignalNavigation.setEnabled(True)
         self.actionDictionary_indexing = QAction(MainWindow)
         self.actionDictionary_indexing.setObjectName(u"actionDictionary_indexing")
@@ -63,9 +64,9 @@ class Ui_MainWindow(object):
         self.actionHough_indexing.setObjectName(u"actionHough_indexing")
         self.actionSettings = QAction(MainWindow)
         self.actionSettings.setObjectName(u"actionSettings")
-        icon1 = QIcon()
-        icon1.addFile(u":/linea icons/resources/linea basic icons/basic_gear.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.actionSettings.setIcon(icon1)
+        icon2 = QIcon()
+        icon2.addFile(u":/linea icons/resources/linea basic icons/basic_gear.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.actionSettings.setIcon(icon2)
         self.actionImage_quality = QAction(MainWindow)
         self.actionImage_quality.setObjectName(u"actionImage_quality")
         self.actionMean_intensity = QAction(MainWindow)
@@ -98,6 +99,10 @@ class Ui_MainWindow(object):
         self.actionToggleJob_Manager.setObjectName(u"actionToggleJob_Manager")
         self.actionToggleJob_Manager.setCheckable(True)
         self.actionToggleJob_Manager.setChecked(True)
+        self.actionToggleSignal_Navigation = QAction(MainWindow)
+        self.actionToggleSignal_Navigation.setObjectName(u"actionToggleSignal_Navigation")
+        self.actionToggleSignal_Navigation.setCheckable(True)
+        self.actionToggleSignal_Navigation.setChecked(False)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         sizePolicy.setHeightForWidth(self.centralwidget.sizePolicy().hasHeightForWidth())
@@ -108,7 +113,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1058, 24))
+        self.menubar.setGeometry(QRect(0, 0, 1058, 26))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuProcessing = QMenu(self.menubar)
@@ -116,7 +121,7 @@ class Ui_MainWindow(object):
         self.menuProcessing.setEnabled(False)
         self.menuPlot = QMenu(self.menubar)
         self.menuPlot.setObjectName(u"menuPlot")
-        self.menuPlot.setEnabled(False)
+        self.menuPlot.setEnabled(True)
         self.menuPre_indexing_maps = QMenu(self.menuPlot)
         self.menuPre_indexing_maps.setObjectName(u"menuPre_indexing_maps")
         self.menuPre_indexing_maps.setEnabled(False)
@@ -244,14 +249,33 @@ class Ui_MainWindow(object):
         self.jobList.setObjectName(u"jobList")
         self.jobList.setSelectionMode(QAbstractItemView.NoSelection)
 
-        self.gridLayout_3.addWidget(self.jobList, 0, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.jobList, 1, 0, 1, 1)
+
+        self.threadsLabel = QLabel(self.dockWidgetContents)
+        self.threadsLabel.setObjectName(u"threadsLabel")
+        self.threadsLabel.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.gridLayout_3.addWidget(self.threadsLabel, 0, 0, 1, 1)
 
         self.dockWidgetJobManager.setWidget(self.dockWidgetContents)
         MainWindow.addDockWidget(Qt.TopDockWidgetArea, self.dockWidgetJobManager)
+        self.dockWidgetSignalNavigation = QDockWidget(MainWindow)
+        self.dockWidgetSignalNavigation.setObjectName(u"dockWidgetSignalNavigation")
+        sizePolicy6 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        sizePolicy6.setHorizontalStretch(0)
+        sizePolicy6.setVerticalStretch(0)
+        sizePolicy6.setHeightForWidth(self.dockWidgetSignalNavigation.sizePolicy().hasHeightForWidth())
+        self.dockWidgetSignalNavigation.setSizePolicy(sizePolicy6)
+        self.dockWidgetSignalNavigation.setMinimumSize(QSize(346, 144))
+        self.dockWidgetContents_2 = QWidget()
+        self.dockWidgetContents_2.setObjectName(u"dockWidgetContents_2")
+        self.dockWidgetSignalNavigation.setWidget(self.dockWidgetContents_2)
+        MainWindow.addDockWidget(Qt.BottomDockWidgetArea, self.dockWidgetSignalNavigation)
         self.dockWidgetTerminal.raise_()
         self.dockWidgetSystemExplorer.raise_()
         self.dockWidgetImageViewer.raise_()
         self.dockWidgetJobManager.raise_()
+        self.dockWidgetSignalNavigation.raise_()
         QWidget.setTabOrder(self.systemViewer, self.consoleLog)
 
         self.menubar.addAction(self.menuFile.menuAction())
@@ -277,6 +301,7 @@ class Ui_MainWindow(object):
         self.menuView.addAction(self.actionToggleTerminal)
         self.menuView.addAction(self.actionToggleImage_Viewer)
         self.menuView.addAction(self.actionToggleJob_Manager)
+        self.menuView.addAction(self.actionToggleSignal_Navigation)
 
         self.retranslateUi(MainWindow)
         self.dockWidgetTerminal.visibilityChanged.connect(self.actionToggleTerminal.setChecked)
@@ -287,6 +312,9 @@ class Ui_MainWindow(object):
         self.dockWidgetImageViewer.visibilityChanged.connect(self.actionToggleImage_Viewer.setChecked)
         self.dockWidgetJobManager.visibilityChanged.connect(self.actionToggleJob_Manager.setChecked)
         self.actionToggleJob_Manager.triggered["bool"].connect(self.dockWidgetJobManager.setVisible)
+        self.dockWidgetSignalNavigation.visibilityChanged.connect(self.actionToggleSignal_Navigation.setChecked)
+        self.actionToggleSignal_Navigation.triggered["bool"].connect(self.dockWidgetSignalNavigation.setVisible)
+        self.actionSignalNavigation.triggered["bool"].connect(self.dockWidgetSignalNavigation.show)
 
         QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
@@ -319,6 +347,7 @@ class Ui_MainWindow(object):
         self.actionToggleTerminal.setText(QCoreApplication.translate("MainWindow", u"Terminal", None))
         self.actionToggleImage_Viewer.setText(QCoreApplication.translate("MainWindow", u"Image Viewer", None))
         self.actionToggleJob_Manager.setText(QCoreApplication.translate("MainWindow", u"Job Manager", None))
+        self.actionToggleSignal_Navigation.setText(QCoreApplication.translate("MainWindow", u"Signal Navigation", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuProcessing.setTitle(QCoreApplication.translate("MainWindow", u"Processing", None))
         self.menuPlot.setTitle(QCoreApplication.translate("MainWindow", u"Pattern inspection", None))
@@ -331,5 +360,7 @@ class Ui_MainWindow(object):
         self.folderLabel.setText(QCoreApplication.translate("MainWindow", u"NO FOLDER OPENED", None))
         self.dockWidgetImageViewer.setWindowTitle(QCoreApplication.translate("MainWindow", u"Image Viewer", None))
         self.dockWidgetJobManager.setWindowTitle(QCoreApplication.translate("MainWindow", u"Job Manager", None))
+        self.threadsLabel.setText(QCoreApplication.translate("MainWindow", u"0 out of 0 active jobs", None))
+        self.dockWidgetSignalNavigation.setWindowTitle(QCoreApplication.translate("MainWindow", u"Signal Navigation", None))
     # retranslateUi
 
