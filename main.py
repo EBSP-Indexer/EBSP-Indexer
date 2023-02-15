@@ -16,10 +16,10 @@ from contextlib import redirect_stdout, redirect_stderr
 from PySide6.QtCore import QDir, Qt, QThreadPool, Slot
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
 from PySide6.QtGui import QFont
-try: 
-    import pyi_splash
-except:
-    pass
+#try: 
+#    import pyi_splash
+#except:
+#    pass
 # Modules available from start in the console
 import kikuchipy as kp
 import hyperspy.api as hs
@@ -29,7 +29,7 @@ from kikuchipy import load
 
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
-
+''
 from ui.ui_main_window import Ui_MainWindow
 from utils.filebrowser import FileBrowser
 from utils.setting_file import SettingFile
@@ -81,10 +81,10 @@ class AppWindow(QMainWindow):
 
         self.showImage(self.file_selected)
         self.importSettings()
-        try:
-            pyi_splash.close()
-        except Exception as e:
-            pass
+        #try:
+        #    pyi_splash.close()
+        #except Exception as e:
+        #    pass
 
     def setupConnections(self):
         self.ui.systemViewer.setModel(self.systemModel)
@@ -284,21 +284,24 @@ class AppWindow(QMainWindow):
             )
 
     def showImage(self, image_path):
-        if image_path == None or not splitext(image_path)[1] in [
-            ".jpg",
-            ".png",
-            ".gif",
-            ".bmp",
-        ]:
-            image = mpimg.imread("resources/ebsd_gui.png")
-            self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer")
-        else:
-            image = mpimg.imread(image_path)
-            self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer - {image_path}")
-        self.ui.MplWidget.canvas.ax.clear()
-        self.ui.MplWidget.canvas.ax.axis(False)
-        self.ui.MplWidget.canvas.ax.imshow(image)
-        self.ui.MplWidget.canvas.draw()
+        try:
+            if image_path == None or not splitext(image_path)[1] in [
+                ".jpg",
+                ".png",
+                ".gif",
+                ".bmp",
+            ]:
+                image = mpimg.imread("resources/ebsd_gui.png")
+                self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer")
+            else:
+                image = mpimg.imread(image_path)
+                self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer - {image_path}")
+            self.ui.MplWidget.canvas.ax.clear()
+            self.ui.MplWidget.canvas.ax.axis(False)
+            self.ui.MplWidget.canvas.ax.imshow(image)
+            self.ui.MplWidget.canvas.draw()
+        except:
+            print("show Image failed")
 
     def updateMenuButtons(self, file_path):
         """
