@@ -19,9 +19,8 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QDockWidget, QGridLayout,
     QHBoxLayout, QHeaderView, QLabel, QListWidget,
     QListWidgetItem, QMainWindow, QMenu, QMenuBar,
-    QPlainTextEdit, QPushButton, QSizePolicy, QSpacerItem,
-    QStatusBar, QTabWidget, QTreeView, QVBoxLayout,
-    QWidget)
+    QPlainTextEdit, QSizePolicy, QStatusBar, QTabWidget,
+    QTreeView, QVBoxLayout, QWidget)
 
 from mplwidget import MplWidget
 import resources_rc
@@ -31,7 +30,7 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.setWindowModality(Qt.NonModal)
-        MainWindow.resize(926, 633)
+        MainWindow.resize(960, 705)
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -117,7 +116,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 926, 22))
+        self.menubar.setGeometry(QRect(0, 0, 960, 22))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuProcessing = QMenu(self.menubar)
@@ -264,60 +263,9 @@ class Ui_MainWindow(object):
         sizePolicy6.setVerticalStretch(0)
         sizePolicy6.setHeightForWidth(self.dockWidgetSignalNavigation.sizePolicy().hasHeightForWidth())
         self.dockWidgetSignalNavigation.setSizePolicy(sizePolicy6)
-        self.dockWidgetSignalNavigation.setMinimumSize(QSize(346, 137))
+        self.dockWidgetSignalNavigation.setMinimumSize(QSize(346, 144))
         self.dockWidgetContents_2 = QWidget()
         self.dockWidgetContents_2.setObjectName(u"dockWidgetContents_2")
-        self.verticalLayout = QVBoxLayout(self.dockWidgetContents_2)
-        self.verticalLayout.setObjectName(u"verticalLayout")
-        self.horizontalLayout_2 = QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.navigatorMplWidget = MplWidget(self.dockWidgetContents_2)
-        self.navigatorMplWidget.setObjectName(u"navigatorMplWidget")
-        self.navigatorMplWidget.setEnabled(True)
-        sizePolicy5.setHeightForWidth(self.navigatorMplWidget.sizePolicy().hasHeightForWidth())
-        self.navigatorMplWidget.setSizePolicy(sizePolicy5)
-        self.navigatorMplWidget.setMinimumSize(QSize(0, 0))
-        self.navigatorMplWidget.setAutoFillBackground(False)
-        self.navigatorMplWidget.setStyleSheet(u"background-color: transparent")
-
-        self.horizontalLayout_2.addWidget(self.navigatorMplWidget)
-
-        self.signalMplWidget = MplWidget(self.dockWidgetContents_2)
-        self.signalMplWidget.setObjectName(u"signalMplWidget")
-        sizePolicy5.setHeightForWidth(self.signalMplWidget.sizePolicy().hasHeightForWidth())
-        self.signalMplWidget.setSizePolicy(sizePolicy5)
-        self.signalMplWidget.setMinimumSize(QSize(0, 0))
-        self.signalMplWidget.setAutoFillBackground(False)
-        self.signalMplWidget.setStyleSheet(u"background-color: transparent")
-
-        self.horizontalLayout_2.addWidget(self.signalMplWidget)
-
-
-        self.verticalLayout.addLayout(self.horizontalLayout_2)
-
-        self.horizontalLayout_3 = QHBoxLayout()
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_3.addItem(self.horizontalSpacer_2)
-
-        self.pushButtonMeanNav = QPushButton(self.dockWidgetContents_2)
-        self.pushButtonMeanNav.setObjectName(u"pushButtonMeanNav")
-
-        self.horizontalLayout_3.addWidget(self.pushButtonMeanNav)
-
-        self.pushButtonIQNav = QPushButton(self.dockWidgetContents_2)
-        self.pushButtonIQNav.setObjectName(u"pushButtonIQNav")
-
-        self.horizontalLayout_3.addWidget(self.pushButtonIQNav)
-
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_3.addItem(self.horizontalSpacer)
-
-
-        self.verticalLayout.addLayout(self.horizontalLayout_3)
-
         self.dockWidgetSignalNavigation.setWidget(self.dockWidgetContents_2)
         MainWindow.addDockWidget(Qt.BottomDockWidgetArea, self.dockWidgetSignalNavigation)
         self.dockWidgetTerminal.raise_()
@@ -410,10 +358,5 @@ class Ui_MainWindow(object):
         self.dockWidgetImageViewer.setWindowTitle(QCoreApplication.translate("MainWindow", u"Image Viewer", None))
         self.dockWidgetJobManager.setWindowTitle(QCoreApplication.translate("MainWindow", u"Job Manager", None))
         self.dockWidgetSignalNavigation.setWindowTitle(QCoreApplication.translate("MainWindow", u"Signal Navigation", None))
-#if QT_CONFIG(whatsthis)
-        self.pushButtonMeanNav.setWhatsThis("")
-#endif // QT_CONFIG(whatsthis)
-        self.pushButtonMeanNav.setText(QCoreApplication.translate("MainWindow", u"Mean instensity", None))
-        self.pushButtonIQNav.setText(QCoreApplication.translate("MainWindow", u"Image quality", None))
     # retranslateUi
 
