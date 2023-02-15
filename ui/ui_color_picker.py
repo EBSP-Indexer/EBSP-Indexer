@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'color_picker.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.4.0
+## Created by: Qt User Interface Compiler version 6.3.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -22,11 +22,11 @@ class Ui_color_picker(object):
     def setupUi(self, color_picker):
         if not color_picker.objectName():
             color_picker.setObjectName(u"color_picker")
-        color_picker.resize(200, 200)
+        color_picker.resize(219, 269)
         color_picker.setMinimumSize(QSize(200, 200))
         self.gridLayout = QGridLayout(color_picker)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.gridLayout.setHorizontalSpacing(-1)
+        self.gridLayout.setHorizontalSpacing(7)
         self.gridLayout.setVerticalSpacing(26)
         self.pushButton = QPushButton(color_picker)
         self.pushButton.setObjectName(u"pushButton")
@@ -181,7 +181,7 @@ class Ui_color_picker(object):
     # setupUi
 
     def retranslateUi(self, color_picker):
-        color_picker.setWindowTitle("")
+        color_picker.setWindowTitle(QCoreApplication.translate("color_picker", u"Color Picker", None))
         self.pushButton.setText("")
         self.pushButton_2.setText("")
         self.pushButton_3.setText("")

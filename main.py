@@ -1,3 +1,17 @@
+# Copyright (c) 2022 EBSD-GUI developers
+#
+# This file is part of EBSD-GUI.
+
+# EBSD-GUI is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+# EBSD-GUI is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+import multiprocessing
 import sys
 import json
 from os.path import basename, splitext, exists
@@ -7,8 +21,7 @@ try:
 except:
     import subprocess
 try:
-    import pyopencl
-    from pyopencl.tools import get_test_platforms_and_devices
+    import pyopencl.tools
 except:
     print("PyOpenCL could not be imported")
 import platform
@@ -35,9 +48,6 @@ from matplotlib.widgets import Cursor
 from matplotlib.patches import Rectangle
 
 from ui.ui_main_window import Ui_MainWindow
-from utils.filebrowser import FileBrowser
-from utils.setting_file import SettingFile
-from utils.worker import toWorker
 from scripts.hough_indexing import HiSetupDialog
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.dictionary_indexing import DiSetupDialog
@@ -48,7 +58,8 @@ from scripts.pre_indexing_maps import (
     save_iq_map,
 )
 from scripts.advanced_settings import AdvancedSettingsDialog
-from scripts.console import Console, Redirect
+from scripts.console import Console
+from utils import Redirect, SettingFile, FileBrowser, sendToWorker
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
 from scripts.signal_navigation_widget import SignalNavigationWidget
@@ -96,6 +107,10 @@ class AppWindow(QMainWindow):
 
         self.showImage(self.file_selected)
         self.importSettings()
+
+        QThreadPool.globalInstance().setMaxThreadCount(1)
+        self.updateActiveJobs()
+
         try:
             pyi_splash.close()
         except Exception as e:
@@ -129,17 +144,16 @@ class AppWindow(QMainWindow):
             lambda: self.selectPatternCenter()
         )
         self.ui.actionAverage_dot_product.triggered.connect(
-            lambda: toWorker(save_adp_map, self.console, self.file_selected)
+            lambda: sendToWorker(self, save_adp_map, pattern_path=self.file_selected)
         )
         self.ui.actionImage_quality.triggered.connect(
-            lambda: toWorker(save_iq_map, self.console, self.file_selected)
+            lambda: sendToWorker(self, save_iq_map, pattern_path=self.file_selected)
         )
         self.ui.actionMean_intensity.triggered.connect(
-            lambda: toWorker(save_mean_intensity_map, self.console, self.file_selected)
+            lambda: sendToWorker(self, save_mean_intensity_map, pattern_path=self.file_selected)
         )
         self.ui.actionVirtual_backscatter_electron.triggered.connect(
-            lambda: toWorker(save_rgb_vbse, self.console, self.file_selected)
-        )
+            lambda: sendToWorker(self, save_rgb_vbse, pattern_path=self.file_selected)
 
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
@@ -367,11 +381,17 @@ class AppWindow(QMainWindow):
                 jobList.takeItem(jobList.row(item))
                 break
 
-    def countWorkers(self) -> int:
-        return self.ui.jobList.count()
+    @Slot()
+    def updateActiveJobs(self):
+        self.ui.threadsLabel.setText(f"{QThreadPool.globalInstance().activeThreadCount()} out of {QThreadPool.globalInstance().maxThreadCount()} active jobs")
+
+
 
 
 if __name__ == "__main__":
+    # Pyinstaller fix
+    multiprocessing.freeze_support()
+
     app = QApplication(sys.argv)
     APP = AppWindow()
     # Redirect stdout to console.write and stderr to console.errorwrite
@@ -383,12 +403,10 @@ if __name__ == "__main__":
         )  # NB! Only set to none if there are nothing inside the central widget
         APP.show()
         print(
-            f"Multithreading with maximum {QThreadPool.globalInstance().maxThreadCount()} threads"
+            """EBSD-GUI  Copyright (C) 2023  EBSD-GUI developers 
+This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.txt.
+This is free software, and you are welcome to redistribute it under certain conditions; see COPYING.txt for details.""",
         )
-        print(
-            """Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'"""
-        )
-        print(get_test_platforms_and_devices())
         try:
             sys.exit(app.exec())
         except Exception as e:
