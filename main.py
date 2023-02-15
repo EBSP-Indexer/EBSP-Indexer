@@ -154,6 +154,7 @@ class AppWindow(QMainWindow):
         )
         self.ui.actionVirtual_backscatter_electron.triggered.connect(
             lambda: sendToWorker(self, save_rgb_vbse, pattern_path=self.file_selected)
+        )
 
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():

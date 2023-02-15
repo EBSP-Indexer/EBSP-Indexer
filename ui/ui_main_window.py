@@ -365,6 +365,5 @@ class Ui_MainWindow(object):
         self.dockWidgetJobManager.setWindowTitle(QCoreApplication.translate("MainWindow", u"Job Manager", None))
         self.threadsLabel.setText(QCoreApplication.translate("MainWindow", u"0 out of 0 active jobs", None))
         self.dockWidgetSignalNavigation.setWindowTitle(QCoreApplication.translate("MainWindow", u"Signal Navigation", None))
-
     # retranslateUi
 
