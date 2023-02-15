@@ -44,11 +44,12 @@ from kikuchipy import load
 
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
+from matplotlib.widgets import Cursor
+from matplotlib.patches import Rectangle
 
 from ui.ui_main_window import Ui_MainWindow
 from scripts.hough_indexing import HiSetupDialog
 from scripts.pattern_processing import PatternProcessingDialog
-from scripts.signal_navigation import signalNavigation
 from scripts.dictionary_indexing import DiSetupDialog
 from scripts.pre_indexing_maps import (
     save_adp_map,
@@ -61,6 +62,7 @@ from scripts.console import Console
 from utils import Redirect, SettingFile, FileBrowser, sendToWorker
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
+from scripts.signal_navigation_widget import SignalNavigationWidget
 
 hs.set_log_level("CRITICAL")
 
@@ -92,10 +94,16 @@ class AppWindow(QMainWindow):
             self.stayOnTopHint = False
 
         self.ui.systemViewer.setModel(self.systemModel)
+
+        self.signalNavigationWidget = SignalNavigationWidget(mainWindow=self)
+
+
         self.setupConnections()
 
         self.console = Console(parent=self, context=globals())
         self.console.setfont(QFont("Lucida Sans Typewriter", 10))
+
+        
 
         self.showImage(self.file_selected)
         self.importSettings()
@@ -113,7 +121,10 @@ class AppWindow(QMainWindow):
         self.ui.systemViewer.selectionModel().selectionChanged.connect(
             lambda new, old: self.onSystemModelChanged(new, old)
         )
-        self.ui.systemViewer.doubleClicked.connect(lambda: self.openTextFile())
+
+        self.ui.dockWidgetSignalNavigation.setWidget(self.signalNavigationWidget)
+
+        self.ui.systemViewer.doubleClicked.connect(lambda: self.doubleClickEvent())
         self.ui.actionOpen_Workfolder.triggered.connect(
             lambda: self.selectWorkingDirectory()
         )
@@ -143,7 +154,6 @@ class AppWindow(QMainWindow):
         )
         self.ui.actionVirtual_backscatter_electron.triggered.connect(
             lambda: sendToWorker(self, save_rgb_vbse, pattern_path=self.file_selected)
-        )
 
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
@@ -251,7 +261,7 @@ class AppWindow(QMainWindow):
         self.updateMenuButtons(self.file_selected)
         self.showImage(self.file_selected)
 
-    def openTextFile(self):
+    def doubleClickEvent(self):
         index = self.ui.systemViewer.currentIndex()
         self.file_selected = self.systemModel.filePath(index)
 
@@ -261,18 +271,17 @@ class AppWindow(QMainWindow):
             if platform.system().lower() == "windows":
                 startfile(self.file_selected)
 
+        # TODO: more functionality, open dataset for signal navigation
+        if splitext(self.file_selected)[1] in [".h5", ".dat"]:
+            self.selectSignalNavigation()
+
     def process_finished(self):
         print("EBSD pattern closed.")
         self.p = None
 
     def selectSignalNavigation(self):
         try:
-            signalNavigation(self.file_selected)
-            # self.p = QProcess()
-            # print("Loading EBSD patterns ...")
-            # self.p.start("python", ['scripts/signal_navigation.py', self.file_selected])
-            # self.p.finished.connect(self.process_finished)
-            # subprocess.run(["python", "scripts/signal_navigation.py"], text=True, input=self.file_selected)
+            self.signalNavigationWidget.plot_navigator(self.file_selected)
 
         except Exception as e:
             if self.file_selected == "":
@@ -361,7 +370,7 @@ class AppWindow(QMainWindow):
         if basename(file_path) == "Setting.txt":
             self.ui.menuPlot.setEnabled(True)
             self.ui.actionSignalNavigation.setEnabled(True)
-            self.ui.menuPre_indexing_maps.setEnabled(False)
+            self.ui.menuPre_indexing_maps.setEnabled(False)    
 
     @Slot(int)
     def removeWorker(self, worker_id: int):
@@ -375,6 +384,7 @@ class AppWindow(QMainWindow):
     @Slot()
     def updateActiveJobs(self):
         self.ui.threadsLabel.setText(f"{QThreadPool.globalInstance().activeThreadCount()} out of {QThreadPool.globalInstance().maxThreadCount()} active jobs")
+
 
 
 
