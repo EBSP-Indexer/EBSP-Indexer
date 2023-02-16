@@ -422,7 +422,6 @@ class HiSetupDialog(QDialog):
             ckey = plot.IPFColorKeyTSL(
                 self.xmap.phases[0].point_group, direction=Vector3d((0, 0, 1))
             )
-            self.bob
             fig = ckey.plot(return_figure=True)
             fig.savefig(
                 path.join(self.dir_out, "orientation_colour_key.png"),
