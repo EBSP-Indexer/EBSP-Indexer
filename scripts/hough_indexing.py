@@ -358,6 +358,7 @@ class HiSetupDialog(QDialog):
             listview=self.parentWidget().ui.jobList,
             func=self.hough_indexing,
             allow_cleanup=True,
+            allow_logging=True
         )
 
     def set_phases_properties(self):
@@ -421,6 +422,7 @@ class HiSetupDialog(QDialog):
             ckey = plot.IPFColorKeyTSL(
                 self.xmap.phases[0].point_group, direction=Vector3d((0, 0, 1))
             )
+            self.bob
             fig = ckey.plot(return_figure=True)
             fig.savefig(
                 path.join(self.dir_out, "orientation_colour_key.png"),
@@ -455,7 +457,7 @@ def create_log(
     Assumes convention is BRUKER for pattern center if none is given
     """
 
-    log = SettingFile(path.join(dir_out, "log.txt"))
+    log = SettingFile(path.join(dir_out, "hi_parameters.txt"))
     K = ["strs"]
     ### Time and date
     log.write("Date", f"{date.today()}\n")
