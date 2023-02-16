@@ -1,6 +1,6 @@
 from os import path
-#import gc
-#import copy
+import gc
+import copy
 
 import kikuchipy as kp
 from PySide6.QtWidgets import QDialog, QDialogButtonBox
@@ -66,9 +66,9 @@ class PatternProcessingDialog(QDialog):
 
     def close_dialog(self):
         pass
-        #del self.s
-        #gc.collect()
-        #self.reject()
+        del self.s
+        gc.collect()
+        self.reject()
 
     def setSavePath(self):
         if self.fileBrowser.getFile():
@@ -145,7 +145,7 @@ class PatternProcessingDialog(QDialog):
 
         self.showImage(self.s_prev.inav[1, 1])
 
-        #del self.s_prev
+        del self.s_prev
 
     def run_processing(self):
         sendToJobManager(
@@ -178,11 +178,11 @@ class PatternProcessingDialog(QDialog):
                 overwrite=True,
             )
             print("Processing complete")
-            #del self.s
-            #gc.collect()
+            del self.s
+            gc.collect()
 
         except Exception as e:
             print(f"Could not save processed pattern: {e}")
-            #del self.s
-            #gc.collect()
-            #self.reject()
+            del self.s
+            gc.collect()
+            self.reject()
