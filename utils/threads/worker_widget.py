@@ -10,7 +10,7 @@ from PySide6.QtCore import (
     QTimer,
 )
 from PySide6.QtWidgets import QMainWindow, QWidget, QListWidget, QListWidgetItem
-from PySide6.QtGui import QPixmap, QTextCharFormat, QBrush, QColor
+from PySide6.QtGui import QTextCharFormat, QBrush, QColor
 
 from utils.threads.worker import Worker
 from ui.ui_worker_widget import Ui_WorkerWidget
@@ -18,13 +18,35 @@ from ui.ui_worker_widget import Ui_WorkerWidget
 
 class WorkerWidget(QWidget):
     """
-    Widget displaying information about the worker to be shown in the job manager
+    Widget displaying information about a worker
+
+    Signals
+    ---------
+    removeMeSignal : Signal(int)
+        Emits the id of the worker widget which is to be removed
+
+    Attributes
+    ---------
+    worker : Worker
+        The worker associated with the worker widget
+    id : int
+        Unique number used to identify communication across signals between worker, worker widget and job manager
+    job_title : str
+        The title of the job that is to be executed by the worker
+    output_directory : str
+        The location where results will appear
+    job_item : QListWidgetItem
+        The item in the job manager list which contains the worker widget, is resized when the worker widget is resized.
+    allow_cleanup : bool
+        If the output_directory should be deleted if the task of the worker fails or is cancelled
+    ui : Ui_WorkerWidget
+        User interface used by the class
     """
 
     counter = 0
     removeMeSignal = Signal(int)
 
-    # TODO: mainWindow should be replaced by a jobManagerList
+    # TODO: mainWindow should be replaced by a jobManagerList class
     def __init__(
         self,
         job_title: str,
@@ -33,9 +55,32 @@ class WorkerWidget(QWidget):
         jobItem: QListWidgetItem,
         func: Callable,
         allow_cleanup: bool = False,
+        allow_logging: bool = False,
         *args,
         **kwargs,
     ) -> None:
+        """
+        Parameters
+        ---------
+        job_title : str
+            The title of the job that is to be executed by the worker
+        output_directory : str
+            The location where results will appear
+        mainWindow : AppWindow
+            The main app winow which contains the job manager (should be replaced by the job manager list later)
+        job_item : QListWidgetItem
+            The item in the job manager list which contains the worker widget, is resized when the worker widget is resized.
+        func : Callable
+            The function callback to run on this worker thread,
+            Supplied args and kwargs will be passed through to the runner
+        allow_cleanup : bool, optional
+            If the output_directory should be deleted if the task of the worker fails or is cancelled (default is False)
+        args : tuple
+            Arguments to pass to the callback function
+        kwargs: dict[str, Any]
+            Keywords to pass to the callback function
+        """
+
         super().__init__(parent=mainWindow)
         WorkerWidget.counter += 1
         self.id = WorkerWidget.counter
@@ -45,6 +90,7 @@ class WorkerWidget(QWidget):
         self.timer = QTimer()
 
         self.allow_cleanup = allow_cleanup
+        self.allow_logging = allow_logging
         self.job_title = job_title
         self.output_directory = output_directory
         self.jobItem = jobItem
@@ -72,9 +118,9 @@ class WorkerWidget(QWidget):
         self.removeMeSignal.connect(self.window().removeWorker)
         self.timer.timeout.connect(self.updateTimerDisplay)
         self.worker.isStarted.connect(self.time_worker)
-        self.worker.isFinished.connect(self.finalize)
+        self.worker.isFinished.connect(lambda id: self.finalize(id, logging=self.allow_logging))
         self.worker.isError.connect(
-            lambda id: self.finalize(id, failed=True, cleanup=self.allow_cleanup)
+            lambda id: self.finalize(id, failed=True, cleanup=False, logging=self.allow_logging)
         )
 
     def updateActiveJobs(self):
@@ -89,6 +135,7 @@ class WorkerWidget(QWidget):
         else:
             self.ui.pushButtonCancel.setDisabled(True)
 
+    # TODO resize jobItem in a job manager class instead so it can be removed from this class
     def adjustSize(self):
         super().adjustSize()
         self.jobItem.setSizeHint(self.sizeHint())
@@ -109,6 +156,7 @@ class WorkerWidget(QWidget):
         failed: bool = False,
         cancelled: bool = False,
         cleanup: bool = False,
+        logging: bool = False
     ):
         """
         #TODO Description here
@@ -132,6 +180,16 @@ class WorkerWidget(QWidget):
                     os.rmdir(path=self.output_directory)
                 except Exception as e:
                     self.errorwrite(f"Cleanup failed:\n{e}")
+            if logging:
+                path = os.path.join(self.output_directory, "log.txt")
+                try:
+                    self.file = open(path, "w")
+                    self.file.write("----------- OUTPUT LOG -----------\n")
+                    self.file.write(self.outdisplay.toPlainText())
+                    self.file.close()
+                except Exception as e:
+                    raise e
+            self.updateActiveJobs()
 
     @Slot()
     def updateTimerDisplay(self):
@@ -179,6 +237,7 @@ def sendToJobManager(
     listview: QListWidget,
     func: Callable,
     allow_cleanup: bool = False,
+    allow_logging: bool = False,
     *args,
     **kwargs,
 ):
@@ -193,6 +252,7 @@ def sendToJobManager(
         item,
         func,
         allow_cleanup,
+        allow_logging,
         *args,
         **kwargs,
     )
