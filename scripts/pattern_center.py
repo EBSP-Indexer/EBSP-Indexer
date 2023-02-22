@@ -41,6 +41,7 @@ class PatterCenterDialog(QDialog):
         #self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         self.fileBrowserOD = FileBrowser(
             mode=FileBrowser.OpenFile,
+            filter_name="*.h5"
         )
 
     def findSettingsFile(self):
