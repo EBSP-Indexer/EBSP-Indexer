@@ -40,7 +40,6 @@ import hyperspy.api as hs
 
 # Import something from kikutchipy to avoid load times during dialog initalizations
 from kikuchipy import load
-
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 
