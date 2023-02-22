@@ -142,7 +142,7 @@ class DiSetupDialog(QDialog):
     # Lookup table for sample rotations
     def generate_rotation_lookup_dict(self):
         self.sample_rotations = {}
-        with open("sample_rotations.txt", "r") as f:
+        with open("resources/sample_rotations.txt", "r") as f:
             for line in f:
                 (key, value) = line.strip().split("\t")
                 self.sample_rotations[f"{float(key):.2}"] = eval(value)
