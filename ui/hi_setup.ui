@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>676</width>
-    <height>497</height>
+    <width>848</width>
+    <height>469</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,7 +46,7 @@
           <item>
            <widget class="QLabel" name="label_7">
             <property name="text">
-             <string>Binning shape</string>
+             <string>Binning</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -54,17 +54,44 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="comboBoxBinning">
-            <property name="maximumSize">
-             <size>
-              <width>80</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="layoutDirection">
-             <enum>Qt::LeftToRight</enum>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QComboBox" name="comboBoxBinning">
+              <property name="maximumSize">
+               <size>
+                <width>80</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Detector binning, i.e. how many pixels are binned into one, default is no binning&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="labelSignalShape">
+              <property name="text">
+               <string>Signal shape: </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>
@@ -84,6 +111,9 @@
               <width>60</width>
               <height>16777215</height>
              </size>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of detected bands to use in triplet voting, default is 9&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="minimum">
              <number>3</number>
@@ -114,6 +144,9 @@
             </property>
             <item>
              <widget class="QSlider" name="horizontalSliderRho">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The fraction of the pattern to be considered when detecting bands, default is 85%. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
               <property name="minimum">
                <number>40</number>
               </property>
@@ -215,7 +248,7 @@
        </layout>
       </item>
       <item row="2" column="2">
-       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,2,0,0,0,0,0,0,0,1">
+       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,5,0,0,0,0,0,0,0,1">
         <item>
          <widget class="QLabel" name="label">
           <property name="text">
@@ -224,33 +257,144 @@
          </widget>
         </item>
         <item>
-         <widget class="QListWidget" name="listWidgetPhase">
-          <property name="editTriggers">
-           <set>QAbstractItemView::EditKeyPressed</set>
+         <widget class="QTableWidget" name="tableWidgetPhase">
+          <property name="minimumSize">
+           <size>
+            <width>470</width>
+            <height>50</height>
+           </size>
           </property>
-          <property name="alternatingRowColors">
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>90</number>
+          </attribute>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <attribute name="verticalHeaderStretchLastSection">
            <bool>false</bool>
-          </property>
-          <property name="selectionMode">
-           <enum>QAbstractItemView::SingleSelection</enum>
-          </property>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Name</string>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Number</string>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>ISS</string>
+           </property>
+           <property name="toolTip">
+            <string>International short symbol</string>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Crystal System</string>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>7</pointsize>
+            </font>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Color</string>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+          </column>
          </widget>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
            <widget class="QPushButton" name="pushButtonAddPhase">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create and add a custom phase&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
-             <string>Add Phase</string>
+             <string>Add</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonLoadPhase">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add phase from master pattern (*.h5)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Load</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="pushButtonRemovePhase">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove the selected phase&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
-             <string>Remove Phase</string>
+             <string>Remove</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </item>
@@ -266,6 +410,9 @@
           <property name="text">
            <string>Pattern center</string>
           </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
          </widget>
         </item>
         <item>
@@ -277,7 +424,7 @@
         </item>
         <item>
          <layout class="QGridLayout" name="gridLayout_2">
-          <item row="1" column="1">
+          <item row="1" column="2">
            <widget class="QDoubleSpinBox" name="patternCenterY">
             <property name="decimals">
              <number>3</number>
@@ -290,7 +437,7 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
+          <item row="0" column="2">
            <widget class="QDoubleSpinBox" name="patternCenterX">
             <property name="decimals">
              <number>3</number>
@@ -303,7 +450,7 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="2" column="2">
            <widget class="QDoubleSpinBox" name="patternCenterZ">
             <property name="prefix">
              <string/>
@@ -319,20 +466,7 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="layoutDirection">
-             <enum>Qt::LeftToRight</enum>
-            </property>
-            <property name="text">
-             <string>Y:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
+          <item row="0" column="1">
            <widget class="QLabel" name="label_3">
             <property name="maximumSize">
              <size>
@@ -348,7 +482,20 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="1" column="1">
+           <widget class="QLabel" name="label_4">
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="text">
+             <string>Y:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
            <widget class="QLabel" name="label_5">
             <property name="text">
              <string>Z:</string>
@@ -357,6 +504,19 @@
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
+          </item>
+          <item row="1" column="0">
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </item>
@@ -442,8 +602,7 @@
   <tabstop>checkBoxLazy</tabstop>
   <tabstop>checkBoxPhase</tabstop>
   <tabstop>checkBoxQuality</tabstop>
-  <tabstop>listWidgetPhase</tabstop>
-  <tabstop>pushButtonAddPhase</tabstop>
+  <tabstop>pushButtonLoadPhase</tabstop>
   <tabstop>pushButtonRemovePhase</tabstop>
   <tabstop>patternCenterX</tabstop>
   <tabstop>patternCenterY</tabstop>

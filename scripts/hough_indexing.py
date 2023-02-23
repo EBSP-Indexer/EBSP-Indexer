@@ -1,20 +1,20 @@
 from os import path, mkdir
 from datetime import date
+from typing import Optional
 import json
 import warnings
 
-from PySide6.QtCore import QThreadPool
-from PySide6.QtWidgets import QDialog, QDialogButtonBox
+from PySide6.QtCore import QThreadPool, Qt
+from PySide6.QtWidgets import QDialog, QDialogButtonBox, QMainWindow, QTableWidgetItem
 import kikuchipy as kp
 from kikuchipy.signals.ebsd import EBSD, LazyEBSD
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
+
 from orix import io, plot
-from orix.crystal_map import CrystalMap, create_coordinate_arrays, PhaseList
-from orix.quaternion import Rotation
+from orix.crystal_map import CrystalMap, PhaseList
 from orix.vector import Vector3d
-from pyebsdindex.ebsd_index import EBSDIndexer
 
 from utils import SettingFile, FileBrowser, sendToJobManager
 from ui.ui_hi_setup import Ui_HISetupDialog
@@ -24,11 +24,9 @@ warnings.filterwarnings("ignore")
 
 
 class HiSetupDialog(QDialog):
-    SG_NUM_TO_PROXY = {"225": "FCC", "227": "FCC", "229": "BCC"}
 
-    def __init__(self, parent, pattern_path=None):
+    def __init__(self, parent: QMainWindow, pattern_path: str):
         super().__init__(parent)
-        self.threadPool = QThreadPool.globalInstance()
         self.console = self.parentWidget().console
         self.pattern_path = pattern_path
         self.pattern_name = path.basename(pattern_path)
@@ -43,31 +41,76 @@ class HiSetupDialog(QDialog):
 
         # Load pattern-file to get acquisition resolution
         try:
-            s_preview: LazyEBSD = kp.load(self.pattern_path, lazy=True)
+            s_prew: LazyEBSD = kp.load(self.pattern_path, lazy=True)
         except Exception as e:
             raise e
-
-        self.setupInitialSettings()
-        self.setupBinningShapes(s_preview)
+        self.binnings = self.getBinningShapes(s_prew)
+        self.colors = [
+            "blue",
+            "orange",
+            "lime",
+            "yellow",
+        ]
+        self.mp_paths = {}
+        self.phases = PhaseList()
 
         self.setupConnections()
-        self.checkPhaseList()
-
-        # self.phases = []
-        # self.lat_param = []
-        self.space_groups = []
-        self.phase_proxys = []
-        self.xmap = None
-        self.data = None
+        self.load_parameters()
+        self.setAvailableButtons()
 
         # Matplotlib configuration
+        mpl.use("agg")
         plt.rcParams.update({"font.size": 20})
         self.savefig_kwds = dict(pad_inches=0, bbox_inches="tight", dpi=150)
 
-    def setupInitialSettings(self):
-        # matplotlib settings
-        mpl.use("agg")
+    def setupConnections(self):
+        self.ui.buttonBox.accepted.connect(lambda: self.run_hough_indexing())
+        self.ui.buttonBox.rejected.connect(lambda: self.reject())
 
+        self.ui.pushButtonLoadPhase.clicked.connect(
+            lambda: self.load_master_pattern_phase()
+        )
+        self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.remove_phase())
+
+        # self.ui.comboBoxConvention.currentTextChanged.connect(
+        #     lambda: self.update_pc_convention()
+        # )
+        self.ui.comboBoxBinning.currentTextChanged.connect(
+            lambda: self.ui.labelSignalShape.setText(
+                f"Signal Shape: {self.binnings[self.ui.comboBoxBinning.currentText()]}"
+            )
+        )
+
+        self.ui.horizontalSliderRho.valueChanged.connect(
+            lambda: self.ui.labelRho.setText(f"{self.ui.horizontalSliderRho.value()}%")
+        )
+
+        self.ui.comboBoxBinning.addItems(self.binnings.keys())
+
+    def getOptions(self) -> dict:
+        return {
+            "binning": self.ui.comboBoxBinning.currentText(),
+            "bands": self.ui.spinBoxBands.value(),
+            "rho": self.ui.horizontalSliderRho.value(),
+            "lazy": self.ui.checkBoxLazy.isChecked(),
+            "quality": [
+                self.ui.checkBoxQuality.isChecked(),
+                self.save_quality_metrics,
+            ],
+            "phase": [self.ui.checkBoxPhase.isChecked(), self.save_phase_map],
+            "orientation": [
+                self.ui.checkBoxOrientation.isChecked(),
+                self.save_ipf_map,
+            ],
+            "convention": self.ui.comboBoxConvention.currentText().lower(),
+            "pc": (
+                self.ui.patternCenterX.value(),
+                self.ui.patternCenterY.value(),
+                self.ui.patternCenterZ.value(),
+            ),
+        }
+
+    def load_parameters(self):
         # read current setting from project_settings.txt, advanced_settings.txt
         self.setting_file = SettingFile(
             path.join(self.working_dir, "project_settings.txt")
@@ -81,160 +124,174 @@ class HiSetupDialog(QDialog):
             self.convention = self.program_settings.read("Convention")
 
         try:
-            self.pc = np.array(
-                [
-                    float(self.setting_file.read("X star")),
-                    float(self.setting_file.read("Y star")),
-                    float(self.setting_file.read("Z star")),
-                ]
-            )
-
-            if self.convention == "TSL":
-                self.pc[1] = 1 - self.pc[1]
+            self.ui.patternCenterX.setValue(float(self.setting_file.read("X star")))
+            self.ui.patternCenterY.setValue(float(self.setting_file.read("Y star")))
+            self.ui.patternCenterZ.setValue(float(self.setting_file.read("Z star")))
         except:
             self.pc = np.array([0.500, 0.200, 0.500])
 
-        self.update_pc_spinbox()
+        #self.update_pc_spinbox()
         self.ui.comboBoxConvention.setCurrentText(self.convention)
 
         try:
             self.colors = json.loads(self.program_settings.read("Colors"))
         except:
-            self.colors = [
-                "lime",
-                "r",
-                "b",
-                "yellow",
-            ]
-
+            pass
         try:
-            self.colors = json.loads(self.program_settings.read("Colors"))
+            if self.program_settings.read("Lazy Loading") == "False":
+                self.ui.checkBoxLazy.setChecked(False)
         except:
-            self.colors = [
-                "lime",
-                "r",
-                "b",
-                "yellow",
-            ]
+            pass
 
-        if self.program_settings.read("Lazy Loading") == "False":
-            self.ui.checkBoxLazy.setChecked(False)
+        binningBox = self.ui.comboBoxBinning
+        try:
+            binning = json.loads(self.setting_file.read("Binning"))
+            binningBox.setCurrentIndex(binningBox.findText(str(binning)))
+        except:
+            binningBox.setCurrentIndex(binningBox.findText("None"))
 
-        self.mp_paths = {}
         i = 1
         while True:
             try:
-                mpPath = self.setting_file.read(f"Master pattern {i}")
-                phase = path.dirname(mpPath).split("/").pop()
-                self.mp_paths[phase] = mpPath
-                self.ui.listWidgetPhase.addItem(phase)
+                mp_path = self.setting_file.read(f"Master pattern {i}")
+                self.load_master_pattern_phase(mp_path)
                 i += 1
             except:
                 break
 
-        self.getPhases()
-
     # TODO
     # Write to use more parameters instead of self
-    def save_project_settings(self, binning_shape):
+    def save_parameters(self):
         self.setting_file.delete_all_entries()  # clean up initial dictionary
 
         ### Sample parameters
-        for i, mppath in enumerate(self.mp_paths.values(), 1):
-            self.setting_file.write(f"Master pattern {i}", mppath)
-        self.setting_file.write("Convention", self.convention)
-        self.update_pc_array_from_spinbox()
-        if self.convention == "BRUKER":
-            self.setting_file.write("Y star", f"{self.pc[1]}")
-        elif self.convention == "TSL":
-            self.setting_file.write("Y star", f"{1-self.pc[1]}")
-        self.setting_file.write("X star", f"{self.pc[0]}")
-        self.setting_file.write("Z star", f"{self.pc[2]}")
-        self.setting_file.write("Binning", f"({binning_shape})")
+        options = self.getOptions()
+        for i, mp_path in enumerate(self.mp_paths.values(), 1):
+            self.setting_file.write(f"Master pattern {i}", mp_path)
+        self.setting_file.write("Convention", options["convention"])
+        # if self.convention == "BRUKER":
+        #     self.setting_file.write("Y star", f"{self.pc[1]}")
+        # elif self.convention == "TSL":
+        #     self.setting_file.write("Y star", f"{1-self.pc[1]}")
+        pc = options["pc"]
+        self.setting_file.write("X star", pc[0])
+        self.setting_file.write("Y star", pc[1])
+        self.setting_file.write("Z star", pc[2])
+        self.setting_file.write("Binning", options["binning"])
         self.setting_file.save()
-        print("Project settings saved")
 
-    def update_pc_spinbox(self):
-        self.ui.patternCenterX.setValue(self.pc[0])
-        self.ui.patternCenterZ.setValue(self.pc[2])
-        if self.convention == "BRUKER":
-            self.ui.patternCenterY.setValue(self.pc[1])
-        elif self.convention == "TSL":
-            self.ui.patternCenterY.setValue(1 - self.pc[1])
+    # def update_pc_spinbox(self):
+    #     self.ui.patternCenterX.setValue(self.pc[0])
+    #     self.ui.patternCenterZ.setValue(self.pc[2])
+    #     if self.convention == "BRUKER":
+    #         self.ui.patternCenterY.setValue(self.pc[1])
+    #     elif self.convention == "TSL":
+    #         self.ui.patternCenterY.setValue(1 - self.pc[1])
 
-    def update_pc_array_from_spinbox(self):
-        self.pc[0] = self.ui.patternCenterX.value()
-        self.pc[2] = self.ui.patternCenterZ.value()
-        if self.convention == "BRUKER":
-            self.pc[1] = self.ui.patternCenterY.value()
-        elif self.convention == "TSL":
-            self.pc[1] = 1 - self.ui.patternCenterY.value()
+    # def update_pc_convention(self):
+    #     self.convention = self.ui.comboBoxConvention.currentText()
+    #     self.ui.patternCenterY.setValue(self.ui.patternCenterY)
+    #     self.update_pc_spinbox()
 
-    def update_pc_convention(self):
-        self.convention = self.ui.comboBoxConvention.currentText()
-        self.update_pc_spinbox()
+    def load_master_pattern_phase(self, mp_path: Optional[str] = None):
+        if mp_path is not None:
+            try:
+                mp = kp.load(mp_path, lazy=True)
+                if mp.phase.name == "":
+                    mp.phase.name = path.dirname(mp_path).split("/").pop()
+                self.phases.add(mp.phase)
+                mp.phase.color = self.colors[len(self.phases.ids) - 1]
+                self.mp_paths[mp.phase.name] = mp_path
+            except Exception as e:
+                print("Phase could not be loaded from master pattern", e)
+            self.updatePhaseTable()
+        elif self.fileBrowserOF.getFile():
+            mp_paths = self.fileBrowserOF.getPaths()
+            for mp_path in mp_paths:
+                try:
+                    mp = kp.load(mp_path, lazy=True)
+                    if mp.phase.name == "":
+                        mp.phase.name = path.dirname(mp_path).split("/").pop()
+                    self.phases.add(mp.phase)
+                    mp.phase.color = self.colors[len(self.phases.ids) - 1]
+                    self.mp_paths[mp.phase.name] = mp_path
+                except Exception as e:
+                    print("Phase could not be loaded from master pattern", e)
+            self.updatePhaseTable()
 
-    def addPhase(self):
-        if self.fileBrowserOF.getFile():
-            mpPath = self.fileBrowserOF.getPaths()[0]
-            phase = path.dirname(mpPath).split("/").pop()
-            self.fileBrowserOF.setDefaultDir(mpPath[0 : -len(phase) - 1])
+    def updatePhaseTable(self):
+        """
+        NAME_COL = 0
+        NUMBER_COL = 1
+        ISS_COL = 2
+        CRYSTAL_COL = 3
+        COLOR_COL = 4
+        """
+        phasesTable = self.ui.tableWidgetPhase
+        phasesTable.setRowCount(len(self.phases.ids))
+        row = 0
+        for _, phase in self.phases:
+            sg = phase.space_group
+            entries = [
+                phase.name,
+                sg.number,
+                sg.short_name,
+                sg.crystal_system,
+                phase.color,
+            ]
+            for col, entry in enumerate(entries):
+                item = QTableWidgetItem(str(entry))
+                item.setFlags(item.flags() ^ Qt.ItemIsEditable)
+                phasesTable.setItem(row, col, item)
+            row += 1
+        self.setAvailableButtons()
 
-            if phase not in self.mp_paths.keys():
-                self.mp_paths[phase] = mpPath
-                self.ui.listWidgetPhase.addItem(phase)
-        self.getPhases()
-        self.checkPhaseList()
+    # def addPhase(self):
+    #     if self.fileBrowserOF.getFile():
+    #         mpPath = self.fileBrowserOF.getPaths()[0]
+    #         phase = path.dirname(mpPath).split("/").pop()
+    #         self.fileBrowserOF.setDefaultDir(mpPath[0 : -len(phase) - 1])
 
-    def removePhase(self):
-        self.mp_paths.pop(str(self.ui.listWidgetPhase.currentItem().text()))
-        self.ui.listWidgetPhase.takeItem(self.ui.listWidgetPhase.currentRow())
-        self.getPhases()
-        self.checkPhaseList()
+    #         if phase not in self.mp_paths.keys():
+    #             self.mp_paths[phase] = mpPath
+    #             self.ui.listWidgetPhase.addItem(phase)
+    #     self.getPhases()
+    #     self.checkPhaseList()
 
-    def getPhases(self):
-        lw = self.ui.listWidgetPhase
-        self.phases = [lw.item(x).text() for x in range(lw.count())]
+    def remove_phase(self):
+        phaseTable = self.ui.tableWidgetPhase
+        indexes = phaseTable.selectionModel().selectedRows()
+        countRow = len(indexes)
+        for i in range(countRow, 0, -1):
+            phase_key = phaseTable.item(indexes[i - 1].row(), 0).text()
+            self.phases.__delitem__(phase_key)
+            self.mp_paths.pop(phase_key)
+            phaseTable.removeRow(indexes[i - 1].row())
+        self.setAvailableButtons()
 
-    def setupConnections(self):
-        self.ui.buttonBox.accepted.connect(lambda: self.run_hough_indexing())
-        self.ui.buttonBox.rejected.connect(lambda: self.reject())
+    # def getPhases(self):
+    #     lw = self.ui.listWidgetPhase
+    #     self.phases = [lw.item(x).text() for x in range(lw.count())]
 
-        self.ui.pushButtonAddPhase.clicked.connect(lambda: self.addPhase())
-        self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.removePhase())
+    # def set_phases_properties(self):
+    #     for ph in self.phases:
+    #         mp = kp.load(self.mp_paths[ph])
+    #         try:
+    #             space_group, phase_proxy = (
+    #                 mp.phase.space_group.number,
+    #                 self.SG_NUM_TO_PROXY[f"{mp.phase.space_group.number}"],
+    #             )
+    #         except Exception as e:
+    #             print("Space group is not supported, only 225, 227, 229 is supported")
+    #             raise e
+    #         self.space_groups.append(space_group)
+    #         self.phase_proxys.append(phase_proxy)
 
-        self.ui.comboBoxConvention.currentTextChanged.connect(
-            lambda: self.update_pc_convention()
-        )
-
-        self.ui.horizontalSliderRho.valueChanged.connect(
-            lambda: self.ui.labelRho.setText(f"{self.ui.horizontalSliderRho.value()}%")
-        )
-
-    def getOptions(self) -> dict:
-        return {
-            "binning": self.ui.comboBoxBinning.currentText(),
-            "bands": self.ui.spinBoxBands.value(),
-            "rho": self.ui.horizontalSliderRho.value(),
-            "phase_list": self.ui.listWidgetPhase.selectedItems(),
-            "lazy": self.ui.checkBoxLazy.isChecked(),
-            "quality": [
-                self.ui.checkBoxQuality.isChecked(),
-                self.generate_combined_map,
-            ],
-            "phase": [self.ui.checkBoxPhase.isChecked(), self.generate_phase_map],
-            "orientation": [
-                self.ui.checkBoxOrientation.isChecked(),
-                self.generate_orientation_colour,
-            ],
-            "convention": self.ui.comboBoxConvention.currentText(),
-        }
-
-    def checkPhaseList(self):
+    def setAvailableButtons(self):
         ok_flag = False
         phase_map_flag = False
         add_phase_flag = True
-        n_phases = self.ui.listWidgetPhase.count()
+        n_phases = self.ui.tableWidgetPhase.rowCount()
         if n_phases != 0:
             ok_flag = True
             if n_phases == 2:
@@ -244,103 +301,83 @@ class HiSetupDialog(QDialog):
         self.ui.checkBoxPhase.setEnabled(phase_map_flag)
         self.ui.checkBoxPhase.setChecked(phase_map_flag)
         self.ui.pushButtonAddPhase.setEnabled(add_phase_flag)
+        self.ui.pushButtonLoadPhase.setEnabled(add_phase_flag)
 
-    def setupBinningShapes(self, signal: LazyEBSD):
+    def getBinningShapes(self, signal: LazyEBSD) -> dict:
         sig_shape = signal.axes_manager.signal_shape[::-1]
-        bin_shapes = np.array([])
-        for num in range(10, sig_shape[0] + 1):
-            if sig_shape[0] % num == 0:
-                bin_shapes = np.append(bin_shapes, f"({num}, {num})")
-        self.ui.comboBoxBinning.addItems(bin_shapes[::-1])
+        binnings: dict = {"None": sig_shape}
+        for num in range(2, 17):
+            if sig_shape[0] % num == 0 and sig_shape[1] % num == 0:
+                binnings[f"{num}"] = (int(sig_shape[0] / num), int(sig_shape[1] / num))
+        return binnings
 
-    # TODO Remove extra print statements
     def hough_indexing(self):
-        # Load pattern-file
         options = self.getOptions()
-        self.update_pc_array_from_spinbox()
-        self.phases = [phase for phase in self.mp_paths.keys()]
-        self.set_phases_properties()
         self.rho_mask = (100.0 - options["rho"]) / 100.0
         self.number_bands = options["bands"]
-        binning_shape = eval(options["binning"])
-        self.save_project_settings(binning_shape)
-
-        print(f"Initializing hough indexing of {self.pattern_name} ...")
+        binning = eval(options["binning"])
+        pc = options["pc"]
+        convention = options["convention"]
+        self.save_parameters()
+        print(f"Loading {self.pattern_name} | lazy = {options['lazy']}")
         try:
-            s = kp.load(self.pattern_path, lazy=options.get("lazy"))
+            s = kp.load(self.pattern_path, lazy=options["lazy"])
         except Exception as e:
             raise e
-        s.detector.pc = self.pc
-        sig_shape = s.axes_manager.signal_shape[::-1]
-        nav_shape = s.axes_manager.navigation_shape[::-1]
-        sample_tilt = s.detector.sample_tilt
-        camera_tilt = s.detector.tilt
-        print(f"Successfully loaded {self.pattern_name}")
-        maps_iq = s.get_image_quality()
-        original_sig_shape = None
-        if sig_shape != binning_shape:
-            print(f"Rebinning signal shape to {binning_shape} ...")
-            original_sig_shape = sig_shape
-            s = s.rebin(new_shape=nav_shape + binning_shape)
-            s.rescale_intensity(dtype_out=np.uint8)
-            sig_shape = s.axes_manager.signal_shape[::-1]
 
-        indexer = EBSDIndexer(
-            phaselist=self.phase_proxys,  # FCC, BCC or both
-            vendor="BRUKER",
-            PC=self.pc,
-            sampleTilt=sample_tilt,
-            camElev=camera_tilt,
+        nav_shape = s.axes_manager.navigation_shape[::-1]
+        if binning is None:
+            binning = 1
+        else:
+            print(s.axes_manager.navigation_shape + self.binnings[str(binning)])
+            s = s.rebin(
+                new_shape=s.axes_manager.navigation_shape + self.binnings[str(binning)]
+            )
+        sig_shape = s.axes_manager.signal_shape[::-1]  # (Rows, columns)
+
+        det = kp.detectors.EBSDDetector(
+            shape=sig_shape,
+            binning=binning,
+            sample_tilt=s.detector.sample_tilt,
+            tilt=s.detector.tilt,
+            pc=pc,
+            convention=convention,
+        )
+        indexer = det.get_indexer(
+            phase_list=self.phases,
             rhoMaskFrac=self.rho_mask,
             nBands=self.number_bands,
-            patDim=sig_shape,
         )
+        print("------- Detector stats -------")
+        print(f"Vendor: {indexer.vendor}")
+        print(f"Sample tilt: {indexer.sampleTilt}")
+        print(f"Camera elevation: {indexer.camElev}")
+        print(f"Atomic arrangements: {indexer.phaselist}")
+        print(f"Navigation shape: {nav_shape}")
+        print(f"Signal shape: {sig_shape}")
+        print(f"PC convention: {convention}")
+
         print("Indexing ...")
-        data, *_ = indexer.index_pats(s.data.reshape(-1, *sig_shape), verbose=1)
-        idx = -1
-        xy, _ = create_coordinate_arrays(
-            nav_shape,
-            step_sizes=(s.axes_manager["y"].scale, s.axes_manager["x"].scale),
-        )
-        self.xmap = CrystalMap(
-            rotations=Rotation(data[idx]["quat"]),
-            phase_id=data[idx]["phase"],
-            x=xy["x"],
-            y=xy["y"],
-            phase_list=PhaseList(names=self.phases, space_groups=self.space_groups),
-            prop=dict(
-                pq=data[idx]["pq"],  # Pattern quality
-                cm=data[idx]["cm"],  # Confidence metric
-                fit=data[idx]["fit"],  # Pattern fit
-                nmatch=data[idx]["nmatch"],  # Number of detected bands matched
-                matchattempts=data[idx]["matchattempts"],
-                totvotes=data[idx]["totvotes"],
-                iq=maps_iq.ravel(),
-            ),
-            scan_unit="um",
-        )
-        # io.save(path.join(self.dir_out, "xmap_hi.h5"), self.xmap)
-        io.save(
-            path.join(self.dir_out, "xmap_hi.ang"),
-            self.xmap,
-            image_quality_prop="pq",
-            confidence_index_prop="cm",
-            pattern_fit_prop="fit",
-            extra_prop=["nmatch", "matchattempts", "totvotes"],
-        )
-        print("Result was saved as xmap_hi.ang")  # and xmap_hi.h5
+        xmap = s.hough_indexing(phase_list=self.phases, indexer=indexer, verbose=1)
+        io.save(path.join(self.dir_out, "xmap_hi.h5"), xmap)
+        io.save(path.join(self.dir_out, "xmap_hi.ang"), xmap)
+        print("Result was saved as xmap_hi.ang and xmap_hi.h5")
         for key in ["quality", "phase", "orientation"]:
             optionEnabled, optionExecute = options.get(key)
             if optionEnabled:
-                optionExecute()
+                try:
+                    optionExecute(xmap)
+                except Exception as e:
+                    print(f"Could not save {key}_map:\n{e}")
         print("Logging results ...")
         create_log(
             self.dir_out,
             s,
-            self.xmap,
+            xmap,
             self.mp_paths,
             convention=options["convention"],
-            original_signal_shape=original_sig_shape,
+            binning=binning,
+            pattern_center=pc,
         )
         print(f"Finished indexing {self.pattern_name}")
 
@@ -358,88 +395,95 @@ class HiSetupDialog(QDialog):
             listview=self.parentWidget().ui.jobList,
             func=self.hough_indexing,
             allow_cleanup=True,
-            allow_logging=True
+            allow_logging=True,
         )
 
-    def set_phases_properties(self):
-        for ph in self.phases:
-            mp = kp.load(self.mp_paths[ph])
-            try:
-                space_group, phase_proxy = (
-                    mp.phase.space_group.number,
-                    self.SG_NUM_TO_PROXY[f"{mp.phase.space_group.number}"],
-                )
-            except Exception as e:
-                print("Space group is not supported, only 225, 227, 229 is supported")
-                raise e
-            self.space_groups.append(space_group)
-            self.phase_proxys.append(phase_proxy)
-
-    def generate_combined_map(self):
+    def save_quality_metrics(self, xmap):
         """
-        Plot quality metrics for combined map
+        Save plots of quality metrics
         """
-        print("Generating quality metric for combined map ...")
-        try:
-            to_plot = ["pq", "cm", "fit", "nmatch", "totvotes", "matchattempts"]
-            fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(20, 10))
-            for i, a in enumerate(ax.ravel()):
-                a.axis("off")
-                if i == 5:  # Currently not plotting matchattempts
-                    break
-                arr = self.xmap.get_map_data(to_plot[i])
-                im = a.imshow(arr)
-                fig.colorbar(im, ax=a, label=to_plot[i])
-                plt.imsave(
-                    path.join(self.dir_out, f"maps_{to_plot[i]}.png"),
-                    arr,
-                    cmap="gray",
-                )
-            fig.tight_layout()
-            fig.savefig(path.join(self.dir_out, "maps_all.png"), **self.savefig_kwds)
-        except Exception as e:
-            raise e
+        print("Saving quality metric for combined map ...")
+        aspect_ratio = xmap.shape[1] / xmap.shape[0]
+        figsize = (8 * aspect_ratio, 4.5 * aspect_ratio)
+        fig, ax = plt.subplots(nrows=2, ncols=2, figsize=figsize)
+        for a, to_plot in zip(ax.ravel(), ["pq", "cm", "fit", "nmatch"]):
+            arr = xmap.get_map_data(to_plot)
+            im = a.imshow(arr)
+            fig.colorbar(im, ax=a, label=to_plot)
+            a.axis("off")
+            plt.imsave(
+                path.join(self.dir_out, f"quality_metrics_{to_plot}.png"),
+                arr,
+            )
+        fig.subplots_adjust(wspace=0, hspace=0.05)
+        fig.savefig(
+            path.join(self.dir_out, "quality_metrics_all.png"), **self.savefig_kwds
+        )
 
-    def generate_phase_map(self):
+    def save_phase_map(self, xmap):
         """
         Plot phase map
         """
-        print("Generating phase map ...")
-        for i, ph in enumerate(self.phases):
-            self.xmap.phases[ph].color = self.colors[i]
-        try:
-            fig = self.xmap.plot(return_figure=True, remove_padding=True)
-            fig.savefig(path.join(self.dir_out, "maps_phase.png"), **self.savefig_kwds)
-        except Exception as e:
-            raise e
+        print("Saving phase map ...")
+        # for i, ph in enumerate(self.phases):
+        #     xmap.phases[ph].color = self.colors[i]
+        fig = xmap.plot(return_figure=True, remove_padding=True)
+        fig.savefig(path.join(self.dir_out, "maps_phase.png"), **self.savefig_kwds)
 
-    def generate_orientation_colour(self):
+    def save_ipf_map(self, xmap: CrystalMap, ckey_on_top: Optional[bool] = False):
         """
-        Plot orientation colour key
+        Plot inverse pole figure map with orientation colour key
+
+        Parameters
+        ----------
+        xmap : CrystalMap
+            The crystal map which the orientations originates from
+        ckey_on_top : bool
+            Whether the colour orientation key is shown on top of the map or saved to seperate png, default is seperate
         """
-        print("Generating orientation-colored map ...")
-        try:
-            ckey = plot.IPFColorKeyTSL(
-                self.xmap.phases[0].point_group, direction=Vector3d((0, 0, 1))
+        print("Saving inverse pole figure map ...")
+        v_ipf = Vector3d.zvector()
+        sym = xmap.phases[0].point_group
+        ckey = plot.IPFColorKeyTSL(sym, v_ipf)
+        print(ckey)
+        fig_ckey = ckey.plot(return_figure=True)
+        rgb_z = ckey.orientation2color(xmap.rotations)
+        fig = xmap.plot(rgb_z, remove_padding=True, return_figure=True)
+        if ckey_on_top:
+            ax_ckey = fig.add_axes(
+                [0.77, 0.07, 0.2, 0.2], projection="ipf", symmetry=sym
             )
-            fig = ckey.plot(return_figure=True)
-            fig.savefig(
+            ax_ckey.plot_ipf_color_key(show_title=False)
+            ax_ckey.patch.set_facecolor("None")
+        else:
+            fig_ckey.savefig(
                 path.join(self.dir_out, "orientation_colour_key.png"),
                 **self.savefig_kwds,
             )
+        fig.savefig(path.join(self.dir_out, "maps_ipfz.png"), **self.savefig_kwds)
 
-            rgb_all = np.zeros((self.xmap.size, 3))
-            for i, phase in self.xmap.phases:
-                if i != -1:
-                    rgb_i = ckey.orientation2color(self.xmap[phase.name].orientations)
-                    rgb_all[self.xmap.phase_id == i] = rgb_i
+        # try:
+        #     ckey = plot.IPFColorKeyTSL(
+        #         xmap.phases[0].point_group, direction=Vector3d((0, 0, 1))
+        #     )
+        #     fig = ckey.plot(return_figure=True)
+        #     fig.savefig(
+        #         path.join(self.dir_out, "orientation_colour_key.png"),
+        #         **self.savefig_kwds,
+        #     )
 
-                fig = self.xmap.plot(rgb_all, remove_padding=True, return_figure=True)
-                fig.savefig(
-                    path.join(self.dir_out, "maps_ipfz.png"), **self.savefig_kwds
-                )
-        except Exception as e:
-            raise e
+        #     rgb_all = np.zeros((xmap.size, 3))
+        #     for i, phase in xmap.phases:
+        #         if i != -1:
+        #             rgb_i = ckey.orientation2color(self.xmap[phase.name].orientations)
+        #             rgb_all[xmap.phase_id == i] = rgb_i
+
+        #         fig = xmap.plot(rgb_all, remove_padding=True, return_figure=True)
+        #         fig.savefig(
+        #             path.join(self.dir_out, "maps_ipfz.png"), **self.savefig_kwds
+        #         )
+        # except Exception as e:
+        #     raise e
 
 
 # TODO Add more Hough related properties, better way to sort?
@@ -450,7 +494,7 @@ def create_log(
     mp_paths: dict = None,
     pattern_center: np.ndarray = None,
     convention: str = "BRUKER",
-    original_signal_shape: str = None,
+    binning: int = 1,
 ):
     """
     Assumes convention is BRUKER for pattern center if none is given
@@ -478,10 +522,11 @@ def create_log(
         "Navigation shape (rows, columns)",
         signal.axes_manager.navigation_shape[::-1],
     )
+    if binning == 1:
+        log.write("Binning", None)
+    else:
+        log.write("Binning", binning)
     log.write("Signal shape (rows, columns)", signal.axes_manager.signal_shape[::-1])
-    if original_signal_shape is not None:
-        log.write("Original signal shape (rows, columns)", original_signal_shape)
-
     log.write("Step size", f"{signal.axes_manager[0].scale} um\n")
 
     ### HI parameteres
@@ -491,16 +536,8 @@ def create_log(
     if mp_paths is not None:
         for i, mp_path in enumerate(mp_paths.values(), 1):
             log.write(f"Master pattern path {i}", mp_path)
-
-    if pattern_center != None:
-        displayed_pc = pattern_center
-    else:
-        if convention == "BRUKER":
-            displayed_pc = signal.detector.pc_bruker()
-        elif convention == "TSL":
-            displayed_pc = signal.detector.pc_tsl()
-    log.write("PC convention", f"{convention}")
-    log.write("Pattern center (x*, y*, z*)", f"{displayed_pc[0]}")
+    log.write("PC convention", f"{convention.upper()}")
+    log.write("Pattern center (x*, y*, z*)", f"{pattern_center}")
 
     if len(xmap.phases.names) > 1:
         for i, ph in enumerate(xmap.phases.names, 1):

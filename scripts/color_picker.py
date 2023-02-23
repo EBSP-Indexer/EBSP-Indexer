@@ -30,7 +30,7 @@ class ColorPicker(QDialog):
     
     def buttonPushed(self, button):
         colors = [
-            'b', 'g', 'r', 'c', 'm', 'y', 'k', 'w',
+            'blue', 'green', 'red', 'darkcyan', 'magenta', 'y', 'white', 'black',
             'cyan', 'orange', 'yellow', 'lime',
             'brown', 'pink', 'gray', 'olive'
         ]

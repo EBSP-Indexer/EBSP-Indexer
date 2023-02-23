@@ -120,6 +120,7 @@ class Console(QtWidgets.QWidget):
         self.inpedit = self.parent.ui.consoleInput
         self.inpedit.newline.connect(self.push)
         self.inpedit.setFrame(False)
+        self.setfont(QtGui.QFont("Lucida Sans Typewriter", 10))
 
     def setcontext(self, context):
         """Set context for interpreter"""

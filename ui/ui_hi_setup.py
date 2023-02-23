@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'hi_setup.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.4.0
+## Created by: Qt User Interface Compiler version 6.3.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -17,16 +17,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QAbstractItemView, QApplication, QCheckBox,
     QComboBox, QDialog, QDialogButtonBox, QDoubleSpinBox,
-    QFrame, QGridLayout, QHBoxLayout, QLabel,
-    QListWidget, QListWidgetItem, QPushButton, QSizePolicy,
-    QSlider, QSpacerItem, QSpinBox, QVBoxLayout,
-    QWidget)
+    QFrame, QGridLayout, QHBoxLayout, QHeaderView,
+    QLabel, QPushButton, QSizePolicy, QSlider,
+    QSpacerItem, QSpinBox, QTableWidget, QTableWidgetItem,
+    QVBoxLayout, QWidget)
 
 class Ui_HISetupDialog(object):
     def setupUi(self, HISetupDialog):
         if not HISetupDialog.objectName():
             HISetupDialog.setObjectName(u"HISetupDialog")
-        HISetupDialog.resize(676, 497)
+        HISetupDialog.resize(848, 469)
         self.gridLayout = QGridLayout(HISetupDialog)
         self.gridLayout.setObjectName(u"gridLayout")
         self.frame = QFrame(HISetupDialog)
@@ -50,12 +50,26 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout_4.addWidget(self.label_7)
 
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.comboBoxBinning = QComboBox(self.frame)
         self.comboBoxBinning.setObjectName(u"comboBoxBinning")
         self.comboBoxBinning.setMaximumSize(QSize(80, 16777215))
         self.comboBoxBinning.setLayoutDirection(Qt.LeftToRight)
 
-        self.verticalLayout_4.addWidget(self.comboBoxBinning)
+        self.horizontalLayout_2.addWidget(self.comboBoxBinning)
+
+        self.labelSignalShape = QLabel(self.frame)
+        self.labelSignalShape.setObjectName(u"labelSignalShape")
+
+        self.horizontalLayout_2.addWidget(self.labelSignalShape)
+
+        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_5)
+
+
+        self.verticalLayout_4.addLayout(self.horizontalLayout_2)
 
 
         self.verticalLayout.addLayout(self.verticalLayout_4)
@@ -163,25 +177,67 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout_2.addWidget(self.label)
 
-        self.listWidgetPhase = QListWidget(self.frame)
-        self.listWidgetPhase.setObjectName(u"listWidgetPhase")
-        self.listWidgetPhase.setEditTriggers(QAbstractItemView.EditKeyPressed)
-        self.listWidgetPhase.setAlternatingRowColors(False)
-        self.listWidgetPhase.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidgetPhase = QTableWidget(self.frame)
+        if (self.tableWidgetPhase.columnCount() < 5):
+            self.tableWidgetPhase.setColumnCount(5)
+        font = QFont()
+        font.setPointSize(8)
+        font.setBold(False)
+        __qtablewidgetitem = QTableWidgetItem()
+        __qtablewidgetitem.setFont(font);
+        self.tableWidgetPhase.setHorizontalHeaderItem(0, __qtablewidgetitem)
+        __qtablewidgetitem1 = QTableWidgetItem()
+        __qtablewidgetitem1.setFont(font);
+        self.tableWidgetPhase.setHorizontalHeaderItem(1, __qtablewidgetitem1)
+        font1 = QFont()
+        font1.setPointSize(9)
+        __qtablewidgetitem2 = QTableWidgetItem()
+        __qtablewidgetitem2.setFont(font1);
+        self.tableWidgetPhase.setHorizontalHeaderItem(2, __qtablewidgetitem2)
+        font2 = QFont()
+        font2.setPointSize(7)
+        __qtablewidgetitem3 = QTableWidgetItem()
+        __qtablewidgetitem3.setFont(font2);
+        self.tableWidgetPhase.setHorizontalHeaderItem(3, __qtablewidgetitem3)
+        font3 = QFont()
+        font3.setPointSize(8)
+        __qtablewidgetitem4 = QTableWidgetItem()
+        __qtablewidgetitem4.setFont(font3);
+        self.tableWidgetPhase.setHorizontalHeaderItem(4, __qtablewidgetitem4)
+        self.tableWidgetPhase.setObjectName(u"tableWidgetPhase")
+        self.tableWidgetPhase.setMinimumSize(QSize(470, 50))
+        self.tableWidgetPhase.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidgetPhase.horizontalHeader().setDefaultSectionSize(90)
+        self.tableWidgetPhase.horizontalHeader().setStretchLastSection(True)
+        self.tableWidgetPhase.verticalHeader().setStretchLastSection(False)
 
-        self.verticalLayout_2.addWidget(self.listWidgetPhase)
+        self.verticalLayout_2.addWidget(self.tableWidgetPhase)
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer_3)
+
         self.pushButtonAddPhase = QPushButton(self.frame)
         self.pushButtonAddPhase.setObjectName(u"pushButtonAddPhase")
+        self.pushButtonAddPhase.setEnabled(True)
 
         self.horizontalLayout_3.addWidget(self.pushButtonAddPhase)
+
+        self.pushButtonLoadPhase = QPushButton(self.frame)
+        self.pushButtonLoadPhase.setObjectName(u"pushButtonLoadPhase")
+
+        self.horizontalLayout_3.addWidget(self.pushButtonLoadPhase)
 
         self.pushButtonRemovePhase = QPushButton(self.frame)
         self.pushButtonRemovePhase.setObjectName(u"pushButtonRemovePhase")
 
         self.horizontalLayout_3.addWidget(self.pushButtonRemovePhase)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer_2)
 
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
@@ -195,6 +251,7 @@ class Ui_HISetupDialog(object):
 
         self.label_2 = QLabel(self.frame)
         self.label_2.setObjectName(u"label_2")
+        self.label_2.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
 
         self.verticalLayout_2.addWidget(self.label_2)
 
@@ -213,7 +270,7 @@ class Ui_HISetupDialog(object):
         self.patternCenterY.setMaximum(1.000000000000000)
         self.patternCenterY.setSingleStep(0.000100000000000)
 
-        self.gridLayout_2.addWidget(self.patternCenterY, 1, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.patternCenterY, 1, 2, 1, 1)
 
         self.patternCenterX = QDoubleSpinBox(self.frame)
         self.patternCenterX.setObjectName(u"patternCenterX")
@@ -221,7 +278,7 @@ class Ui_HISetupDialog(object):
         self.patternCenterX.setMaximum(1.000000000000000)
         self.patternCenterX.setSingleStep(0.000100000000000)
 
-        self.gridLayout_2.addWidget(self.patternCenterX, 0, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.patternCenterX, 0, 2, 1, 1)
 
         self.patternCenterZ = QDoubleSpinBox(self.frame)
         self.patternCenterZ.setObjectName(u"patternCenterZ")
@@ -229,27 +286,31 @@ class Ui_HISetupDialog(object):
         self.patternCenterZ.setMaximum(1.000000000000000)
         self.patternCenterZ.setSingleStep(0.000100000000000)
 
-        self.gridLayout_2.addWidget(self.patternCenterZ, 2, 1, 1, 1)
-
-        self.label_4 = QLabel(self.frame)
-        self.label_4.setObjectName(u"label_4")
-        self.label_4.setLayoutDirection(Qt.LeftToRight)
-        self.label_4.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.gridLayout_2.addWidget(self.label_4, 1, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.patternCenterZ, 2, 2, 1, 1)
 
         self.label_3 = QLabel(self.frame)
         self.label_3.setObjectName(u"label_3")
         self.label_3.setMaximumSize(QSize(16777215, 20))
         self.label_3.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
-        self.gridLayout_2.addWidget(self.label_3, 0, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.label_3, 0, 1, 1, 1)
+
+        self.label_4 = QLabel(self.frame)
+        self.label_4.setObjectName(u"label_4")
+        self.label_4.setLayoutDirection(Qt.LeftToRight)
+        self.label_4.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.gridLayout_2.addWidget(self.label_4, 1, 1, 1, 1)
 
         self.label_5 = QLabel(self.frame)
         self.label_5.setObjectName(u"label_5")
         self.label_5.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
-        self.gridLayout_2.addWidget(self.label_5, 2, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.label_5, 2, 1, 1, 1)
+
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.gridLayout_2.addItem(self.horizontalSpacer_4, 1, 0, 1, 1)
 
 
         self.verticalLayout_2.addLayout(self.gridLayout_2)
@@ -282,7 +343,7 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout_2.addItem(self.verticalSpacer)
 
-        self.verticalLayout_2.setStretch(1, 2)
+        self.verticalLayout_2.setStretch(1, 5)
         self.verticalLayout_2.setStretch(9, 1)
 
         self.gridLayout_3.addLayout(self.verticalLayout_2, 2, 2, 1, 1)
@@ -304,9 +365,8 @@ class Ui_HISetupDialog(object):
 
         QWidget.setTabOrder(self.checkBoxLazy, self.checkBoxPhase)
         QWidget.setTabOrder(self.checkBoxPhase, self.checkBoxQuality)
-        QWidget.setTabOrder(self.checkBoxQuality, self.listWidgetPhase)
-        QWidget.setTabOrder(self.listWidgetPhase, self.pushButtonAddPhase)
-        QWidget.setTabOrder(self.pushButtonAddPhase, self.pushButtonRemovePhase)
+        QWidget.setTabOrder(self.checkBoxQuality, self.pushButtonLoadPhase)
+        QWidget.setTabOrder(self.pushButtonLoadPhase, self.pushButtonRemovePhase)
         QWidget.setTabOrder(self.pushButtonRemovePhase, self.patternCenterX)
         QWidget.setTabOrder(self.patternCenterX, self.patternCenterY)
         QWidget.setTabOrder(self.patternCenterY, self.patternCenterZ)
@@ -320,21 +380,54 @@ class Ui_HISetupDialog(object):
 
     def retranslateUi(self, HISetupDialog):
         HISetupDialog.setWindowTitle(QCoreApplication.translate("HISetupDialog", u"Hough Indexing", None))
-        self.label_7.setText(QCoreApplication.translate("HISetupDialog", u"Binning shape", None))
+        self.label_7.setText(QCoreApplication.translate("HISetupDialog", u"Binning", None))
+#if QT_CONFIG(tooltip)
+        self.comboBoxBinning.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Detector binning, i.e. how many pixels are binned into one, default is no binning</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.labelSignalShape.setText(QCoreApplication.translate("HISetupDialog", u"Signal shape: ", None))
         self.label_9.setText(QCoreApplication.translate("HISetupDialog", u"Number of bands", None))
+#if QT_CONFIG(tooltip)
+        self.spinBoxBands.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Number of detected bands to use in triplet voting, default is 9</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
         self.label_8.setText(QCoreApplication.translate("HISetupDialog", u"Rho fraction (\u03c1) ", None))
+#if QT_CONFIG(tooltip)
+        self.horizontalSliderRho.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>The fraction of the pattern to be considered when detecting bands, default is 85%. </p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
         self.labelRho.setText(QCoreApplication.translate("HISetupDialog", u"85%", None))
         self.checkBoxLazy.setText(QCoreApplication.translate("HISetupDialog", u"Lazy loading of patterns", None))
         self.checkBoxOrientation.setText(QCoreApplication.translate("HISetupDialog", u"Generate orientation maps", None))
         self.checkBoxPhase.setText(QCoreApplication.translate("HISetupDialog", u"Generate phase maps", None))
         self.checkBoxQuality.setText(QCoreApplication.translate("HISetupDialog", u"Generate quality metrics for combined maps", None))
         self.label.setText(QCoreApplication.translate("HISetupDialog", u"Phases", None))
-        self.pushButtonAddPhase.setText(QCoreApplication.translate("HISetupDialog", u"Add Phase", None))
-        self.pushButtonRemovePhase.setText(QCoreApplication.translate("HISetupDialog", u"Remove Phase", None))
+        ___qtablewidgetitem = self.tableWidgetPhase.horizontalHeaderItem(0)
+        ___qtablewidgetitem.setText(QCoreApplication.translate("HISetupDialog", u"Name", None));
+        ___qtablewidgetitem1 = self.tableWidgetPhase.horizontalHeaderItem(1)
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("HISetupDialog", u"Number", None));
+        ___qtablewidgetitem2 = self.tableWidgetPhase.horizontalHeaderItem(2)
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("HISetupDialog", u"ISS", None));
+#if QT_CONFIG(tooltip)
+        ___qtablewidgetitem2.setToolTip(QCoreApplication.translate("HISetupDialog", u"International short symbol", None));
+#endif // QT_CONFIG(tooltip)
+        ___qtablewidgetitem3 = self.tableWidgetPhase.horizontalHeaderItem(3)
+        ___qtablewidgetitem3.setText(QCoreApplication.translate("HISetupDialog", u"Crystal System", None));
+        ___qtablewidgetitem4 = self.tableWidgetPhase.horizontalHeaderItem(4)
+        ___qtablewidgetitem4.setText(QCoreApplication.translate("HISetupDialog", u"Color", None));
+#if QT_CONFIG(tooltip)
+        self.pushButtonAddPhase.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Create and add a custom phase</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.pushButtonAddPhase.setText(QCoreApplication.translate("HISetupDialog", u"Add", None))
+#if QT_CONFIG(tooltip)
+        self.pushButtonLoadPhase.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Add phase from master pattern (*.h5)</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.pushButtonLoadPhase.setText(QCoreApplication.translate("HISetupDialog", u"Load", None))
+#if QT_CONFIG(tooltip)
+        self.pushButtonRemovePhase.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Remove the selected phase</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.pushButtonRemovePhase.setText(QCoreApplication.translate("HISetupDialog", u"Remove", None))
         self.label_2.setText(QCoreApplication.translate("HISetupDialog", u"Pattern center", None))
         self.patternCenterZ.setPrefix("")
-        self.label_4.setText(QCoreApplication.translate("HISetupDialog", u"Y:", None))
         self.label_3.setText(QCoreApplication.translate("HISetupDialog", u"X:", None))
+        self.label_4.setText(QCoreApplication.translate("HISetupDialog", u"Y:", None))
         self.label_5.setText(QCoreApplication.translate("HISetupDialog", u"Z:", None))
         self.label_6.setText(QCoreApplication.translate("HISetupDialog", u"PC convention", None))
         self.comboBoxConvention.setItemText(0, QCoreApplication.translate("HISetupDialog", u"BRUKER", None))

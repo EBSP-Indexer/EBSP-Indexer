@@ -17,10 +17,10 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QDockWidget, QGridLayout,
-    QHBoxLayout, QHeaderView, QLabel, QListWidget,
-    QListWidgetItem, QMainWindow, QMenu, QMenuBar,
-    QPlainTextEdit, QSizePolicy, QStatusBar, QTabWidget,
-    QTreeView, QVBoxLayout, QWidget)
+    QHBoxLayout, QLabel, QListWidget, QListWidgetItem,
+    QMainWindow, QMenu, QMenuBar, QPlainTextEdit,
+    QSizePolicy, QSpacerItem, QStatusBar, QTabWidget,
+    QVBoxLayout, QWidget)
 
 from mplwidget import MplWidget
 import resources_rc
@@ -30,7 +30,7 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.setWindowModality(Qt.NonModal)
-        MainWindow.resize(1058, 737)
+        MainWindow.resize(1233, 824)
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -111,7 +111,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1058, 26))
+        self.menubar.setGeometry(QRect(0, 0, 1233, 26))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuProcessing = QMenu(self.menubar)
@@ -174,48 +174,20 @@ class Ui_MainWindow(object):
         self.dockWidgetSystemExplorerContents.setObjectName(u"dockWidgetSystemExplorerContents")
         self.gridLayout = QGridLayout(self.dockWidgetSystemExplorerContents)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.systemViewerLayout = QVBoxLayout()
-        self.systemViewerLayout.setObjectName(u"systemViewerLayout")
-        self.folderLabel = QLabel(self.dockWidgetSystemExplorerContents)
-        self.folderLabel.setObjectName(u"folderLabel")
-        sizePolicy.setHeightForWidth(self.folderLabel.sizePolicy().hasHeightForWidth())
-        self.folderLabel.setSizePolicy(sizePolicy)
+        self.horizontalSpacer = QSpacerItem(320, 320, QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
 
-        self.systemViewerLayout.addWidget(self.folderLabel)
-
-        self.systemViewer = QTreeView(self.dockWidgetSystemExplorerContents)
-        self.systemViewer.setObjectName(u"systemViewer")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.systemViewer.sizePolicy().hasHeightForWidth())
-        self.systemViewer.setSizePolicy(sizePolicy3)
-        self.systemViewer.setMinimumSize(QSize(320, 320))
-        self.systemViewer.setMouseTracking(False)
-        self.systemViewer.setTabletTracking(True)
-        self.systemViewer.setStyleSheet(u"")
-        self.systemViewer.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.CurrentChanged|QAbstractItemView.DoubleClicked|QAbstractItemView.SelectedClicked)
-        self.systemViewer.setTabKeyNavigation(True)
-        self.systemViewer.setDragEnabled(False)
-        self.systemViewer.setDragDropOverwriteMode(False)
-        self.systemViewer.setAlternatingRowColors(False)
-        self.systemViewer.setAnimated(True)
-        self.systemViewer.header().setStretchLastSection(True)
-
-        self.systemViewerLayout.addWidget(self.systemViewer)
-
-
-        self.gridLayout.addLayout(self.systemViewerLayout, 0, 0, 1, 1)
+        self.gridLayout.addItem(self.horizontalSpacer, 0, 0, 1, 1)
 
         self.dockWidgetSystemExplorer.setWidget(self.dockWidgetSystemExplorerContents)
         MainWindow.addDockWidget(Qt.TopDockWidgetArea, self.dockWidgetSystemExplorer)
         self.dockWidgetImageViewer = QDockWidget(MainWindow)
         self.dockWidgetImageViewer.setObjectName(u"dockWidgetImageViewer")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy4.setHorizontalStretch(10)
-        sizePolicy4.setVerticalStretch(10)
-        sizePolicy4.setHeightForWidth(self.dockWidgetImageViewer.sizePolicy().hasHeightForWidth())
-        self.dockWidgetImageViewer.setSizePolicy(sizePolicy4)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy3.setHorizontalStretch(10)
+        sizePolicy3.setVerticalStretch(10)
+        sizePolicy3.setHeightForWidth(self.dockWidgetImageViewer.sizePolicy().hasHeightForWidth())
+        self.dockWidgetImageViewer.setSizePolicy(sizePolicy3)
+        self.dockWidgetImageViewer.setMinimumSize(QSize(0, 0))
         self.dockWidgetContentsImageViewer = QWidget()
         self.dockWidgetContentsImageViewer.setObjectName(u"dockWidgetContentsImageViewer")
         sizePolicy.setHeightForWidth(self.dockWidgetContentsImageViewer.sizePolicy().hasHeightForWidth())
@@ -224,11 +196,11 @@ class Ui_MainWindow(object):
         self.gridLayout_4.setObjectName(u"gridLayout_4")
         self.MplWidget = MplWidget(self.dockWidgetContentsImageViewer)
         self.MplWidget.setObjectName(u"MplWidget")
-        sizePolicy5 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy5.setHorizontalStretch(0)
-        sizePolicy5.setVerticalStretch(0)
-        sizePolicy5.setHeightForWidth(self.MplWidget.sizePolicy().hasHeightForWidth())
-        self.MplWidget.setSizePolicy(sizePolicy5)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.MplWidget.sizePolicy().hasHeightForWidth())
+        self.MplWidget.setSizePolicy(sizePolicy4)
         self.MplWidget.setMinimumSize(QSize(320, 320))
         self.MplWidget.setAutoFillBackground(False)
         self.MplWidget.setStyleSheet(u"background-color: transparent")
@@ -261,7 +233,6 @@ class Ui_MainWindow(object):
         self.dockWidgetSystemExplorer.raise_()
         self.dockWidgetImageViewer.raise_()
         self.dockWidgetJobManager.raise_()
-        QWidget.setTabOrder(self.systemViewer, self.consoleLog)
 
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuProcessing.menuAction())
@@ -337,7 +308,6 @@ class Ui_MainWindow(object):
         self.dockWidgetTerminal.setWindowTitle(QCoreApplication.translate("MainWindow", u"Terminal", None))
         self.consolePrompt.setText(QCoreApplication.translate("MainWindow", u">>>", None))
         self.dockWidgetSystemExplorer.setWindowTitle(QCoreApplication.translate("MainWindow", u"System Viewer", None))
-        self.folderLabel.setText(QCoreApplication.translate("MainWindow", u"NO FOLDER OPENED", None))
         self.dockWidgetImageViewer.setWindowTitle(QCoreApplication.translate("MainWindow", u"Image Viewer", None))
         self.dockWidgetJobManager.setWindowTitle(QCoreApplication.translate("MainWindow", u"Job Manager", None))
         self.threadsLabel.setText(QCoreApplication.translate("MainWindow", u"0 out of 0 active jobs", None))
