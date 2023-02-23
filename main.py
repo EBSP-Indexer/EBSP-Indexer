@@ -50,12 +50,13 @@ import hyperspy.api as hs
 from kikuchipy import load
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
+from matplotlib.widgets import Cursor
+from matplotlib.patches import Rectangle
 
 from ui.ui_main_window import Ui_MainWindow
 from scripts.system_explorer import SystemExplorerWidget
 from scripts.hough_indexing import HiSetupDialog
 from scripts.pattern_processing import PatternProcessingDialog
-from scripts.signal_navigation import signalNavigation
 from scripts.dictionary_indexing import DiSetupDialog
 from scripts.pre_indexing_maps import (
     save_adp_map,
@@ -68,6 +69,7 @@ from scripts.console import Console
 from utils import Redirect, SettingFile, FileBrowser, sendToWorker
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
+from scripts.signal_navigation_widget import SignalNavigationWidget
 
 hs.set_log_level("CRITICAL")
 
@@ -95,6 +97,7 @@ class AppWindow(QMainWindow):
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         #self.systemModel = QFileSystemModel()
         self.console = Console(parent=self, context=globals())
+        self.signalNavigationWidget = SignalNavigationWidget(mainWindow=self)
 
         # Check platform and set windowStayOnTopHint
         if platform.system() == "Darwin":
@@ -128,6 +131,8 @@ class AppWindow(QMainWindow):
         #     lambda new, old: self.onSystemModelChanged(new, old)
         # )
         # self.ui.systemViewer.doubleClicked.connect(lambda: self.openTextFile())
+
+        self.ui.dockWidgetSignalNavigation.setWidget(self.signalNavigationWidget)
         self.ui.actionOpen_Workfolder.triggered.connect(
             lambda: self.selectWorkingDirectory()
         )
@@ -329,7 +334,7 @@ class AppWindow(QMainWindow):
     #     self.updateMenuButtons(self.file_selected)
     #     self.showImage(self.file_selected)
 
-    # def openTextFile(self):
+    # def doubleClickEvent(self):
     #     index = self.ui.systemViewer.currentIndex()
     #     self.file_selected = self.systemModel.filePath(index)
 
@@ -339,18 +344,13 @@ class AppWindow(QMainWindow):
     #         if platform.system().lower() == "windows":
     #             startfile(self.file_selected)
 
-    def process_finished(self):
-        print("EBSD pattern closed.")
-        self.p = None
+    #     # TODO: more functionality, open dataset for signal navigation
+    #     if splitext(self.file_selected)[1] in [".h5", ".dat"]:
+    #         self.selectSignalNavigation()
 
     def selectSignalNavigation(self):
         try:
-            signalNavigation(self.getSelectedPath())
-            # self.p = QProcess()
-            # print("Loading EBSD patterns ...")
-            # self.p.start("python", ['scripts/signal_navigation.py', self.file_selected])
-            # self.p.finished.connect(self.process_finished)
-            # subprocess.run(["python", "scripts/signal_navigation.py"], text=True, input=self.file_selected)
+            self.signalNavigationWidget.plot_navigator(self.getSelectedPath())
 
         except Exception as e:
             if self.getSelectedPath() == "":
@@ -439,7 +439,7 @@ class AppWindow(QMainWindow):
         if path.basename(file_path) == "Setting.txt":
             self.ui.menuPlot.setEnabled(True)
             self.ui.actionSignalNavigation.setEnabled(True)
-            self.ui.menuPre_indexing_maps.setEnabled(False)
+            self.ui.menuPre_indexing_maps.setEnabled(False)    
 
     @Slot(int)
     def removeWorker(self, worker_id: int):
@@ -455,6 +455,7 @@ class AppWindow(QMainWindow):
         self.ui.threadsLabel.setText(
             f"{QThreadPool.globalInstance().activeThreadCount()} out of {QThreadPool.globalInstance().maxThreadCount()} active jobs"
         )
+
 
 
 if __name__ == "__main__":
