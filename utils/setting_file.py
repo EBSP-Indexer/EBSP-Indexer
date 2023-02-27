@@ -7,11 +7,13 @@ class SettingFile:
         self.dict = {}
         try:
             self.file = open(file_path, "r")
-
             for line in self.file:
-                (key, value) = line.split(":\t")
-                self.dict[key] = value
+                
+                if line.strip():
+                    (key, value) = line.split(":\t")
+                    self.dict[key] = value
             self.file.close()
+
         except Exception as e:
             #raise e
             #warnings.warn(f"Could not open settings file '{self.path}'.")

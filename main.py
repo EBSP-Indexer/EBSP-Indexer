@@ -282,7 +282,7 @@ class AppWindow(QMainWindow):
 
     def selectSignalNavigation(self):
         try:
-            self.signalNavigationWidget.plot_navigator(self.file_selected)
+            self.signalNavigationWidget.load_dataset(self.file_selected)
 
         except Exception as e:
             if self.file_selected == "":
