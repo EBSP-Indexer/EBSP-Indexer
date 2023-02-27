@@ -28,8 +28,8 @@ class SystemExplorerWidget(QWidget):
     )
     KP_EXTENSIONS = (".h5", ".dat")
 
-    pathChangedSignal = Signal(str)
-    selected_path = ""
+    pathChanged = Signal(str)
+    requestSignalNavigation = Signal(str)
 
     def __init__(self, parent: Optional[QWidget] = ...) -> None:
         super().__init__(parent)
@@ -38,6 +38,7 @@ class SystemExplorerWidget(QWidget):
         self.app = self.window()
 
         self.systemModel = QFileSystemModel()
+        self.selected_path = ""
 
         self.setupConnections()
 
@@ -46,7 +47,7 @@ class SystemExplorerWidget(QWidget):
         self.ui.systemViewer.selectionModel().selectionChanged.connect(
             lambda new, old: self.onSystemModelChanged(new, old)
         )
-        self.ui.systemViewer.doubleClicked.connect(lambda: self.openTextFile())
+        self.ui.systemViewer.doubleClicked.connect(lambda: self.doubleClickEvent())
         self.ui.systemViewer.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.systemViewer.customContextMenuRequested.connect(self.contextMenu)
 
@@ -63,44 +64,62 @@ class SystemExplorerWidget(QWidget):
 
     def contextMenu(self):
         menu = QMenu()
+        menu_path = self.selected_path
+        file = path.isfile(menu_path)
+        ext = path.splitext(menu_path)[-1]
         # Kikuchipy available actions
-        if path.isfile(self.selected_path) and path.splitext(self.selected_path)[-1] in self.KP_EXTENSIONS:
+        if file and ext in self.KP_EXTENSIONS:
+            snAction = menu.addAction("Open in Signal Navigation")
+            snAction.triggered.connect(lambda: self.requestSignalNavigation.emit(menu_path))
+            menu.addSeparator()
             hiAction = menu.addAction("Index with HI")
             diAction = menu.addAction("Index with DI")
-            hiAction.triggered.connect(lambda: self.app.selectHoughIndexingSetup(self.selected_path))
-            diAction.triggered.connect(lambda: self.app.selectDictionaryIndexingSetup(self.selected_path))
+            # Replace these two with signals for more flexible implementation
+            hiAction.triggered.connect(lambda: self.app.selectHoughIndexingSetup(menu_path))
+            diAction.triggered.connect(lambda: self.app.selectDictionaryIndexingSetup(menu_path))
+        # Misc available actions
+        elif file and ext in [".txt"]:
+            txtAction = menu.addAction("Open")
+            txtAction.triggered.connect(lambda: self.openTxtFile(menu_path))
+            
         # Globally available actions
         menu.addSeparator()
         revealAction = menu.addAction("Reveal in File Explorer")
         deleteAction = menu.addAction("Delete")
-        revealAction.triggered.connect(self.revealInExplorer)
-        deleteAction.triggered.connect(self.displayDeleteWarning)
+        revealAction.triggered.connect(lambda: self.revealInExplorer(self.selected_path))
+        deleteAction.triggered.connect(lambda: self.displayDeleteWarning(self.selected_path))
         
         cursor = QCursor()
         menu.exec(cursor.pos())
 
-    def revealInExplorer(self):
-        if path.isdir(self.selected_path):
-            webbrowser.open(self.selected_path)
-        elif path.isfile(self.selected_path):
-            webbrowser.open(path.dirname(self.selected_path))
+    def openTxtFile(self, txt_path: str):
+        if platform.system().lower() == "darwin":
+                subprocess.call(["open", "-a", "TextEdit", txt_path])
+        if platform.system().lower() == "windows":
+            startfile(txt_path)
+
+    def revealInExplorer(self, revealed_path):
+        if path.isdir(revealed_path):
+            webbrowser.open(revealed_path)
+        elif path.isfile(revealed_path):
+            webbrowser.open(path.dirname(revealed_path))
     
-    def displayDeleteWarning(self):
+    def displayDeleteWarning(self, deletion_path):
         msg = QMessageBox(self)
         msg.setWindowTitle("EBSD-GUI Delete Information")
         msg.setIcon(QMessageBox.Information)
-        msg.setText(f"Are you sure you want to permentantly delete '{path.basename(self.selected_path)}'?")
+        msg.setText(f"Are you sure you want to permentantly delete '{path.basename(deletion_path)}'?")
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
-        msg.accepted.connect(self.deleteSelected)
+        msg.accepted.connect(lambda: self.deleteSelected(deletion_path))
         msg.exec()
 
-    def deleteSelected(self):
-        if path.isdir(self.selected_path):
+    def deleteSelected(self, deletion_path):
+        if path.isdir(deletion_path):
             result = self.systemModel.rmdir(self.ui.systemViewer.currentIndex())
             if not result:
-                dir = QDir(self.selected_path)
+                dir = QDir(deletion_path)
                 dir.removeRecursively()
-        elif path.isfile(self.selected_path):
+        elif path.isfile(deletion_path):
             result = self.systemModel.remove(self.ui.systemViewer.currentIndex())
         self.ui.systemViewer.selectionModel().clearCurrentIndex()
 
@@ -111,14 +130,16 @@ class SystemExplorerWidget(QWidget):
             self.selected_path = self.systemModel.filePath(
                 self.ui.systemViewer.currentIndex()
             )
-        self.pathChangedSignal.emit(self.selected_path)
+        self.pathChanged.emit(self.selected_path)
 
-    def openTextFile(self):
+    def doubleClickEvent(self):
         index = self.ui.systemViewer.currentIndex()
         self.selected_path = self.systemModel.filePath(index)
-
         if path.splitext(self.selected_path)[1] in [".txt"]:
             if platform.system().lower() == "darwin":
                 subprocess.call(["open", "-a", "TextEdit", self.selected_path])
             if platform.system().lower() == "windows":
                 startfile(self.selected_path)
+        # TODO: more functionality, open dataset for signal navigation
+        if path.splitext(self.selected_path)[1] in self.KP_EXTENSIONS:
+            self.requestSignalNavigation.emit(self.selected_path)

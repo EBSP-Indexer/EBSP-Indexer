@@ -268,7 +268,7 @@ class Ui_HISetupDialog(object):
         self.patternCenterY.setObjectName(u"patternCenterY")
         self.patternCenterY.setDecimals(3)
         self.patternCenterY.setMaximum(1.000000000000000)
-        self.patternCenterY.setSingleStep(0.000100000000000)
+        self.patternCenterY.setSingleStep(0.001000000000000)
 
         self.gridLayout_2.addWidget(self.patternCenterY, 1, 2, 1, 1)
 
@@ -276,15 +276,15 @@ class Ui_HISetupDialog(object):
         self.patternCenterX.setObjectName(u"patternCenterX")
         self.patternCenterX.setDecimals(3)
         self.patternCenterX.setMaximum(1.000000000000000)
-        self.patternCenterX.setSingleStep(0.000100000000000)
+        self.patternCenterX.setSingleStep(0.001000000000000)
 
         self.gridLayout_2.addWidget(self.patternCenterX, 0, 2, 1, 1)
 
         self.patternCenterZ = QDoubleSpinBox(self.frame)
         self.patternCenterZ.setObjectName(u"patternCenterZ")
         self.patternCenterZ.setDecimals(3)
-        self.patternCenterZ.setMaximum(1.000000000000000)
-        self.patternCenterZ.setSingleStep(0.000100000000000)
+        self.patternCenterZ.setMaximum(3.000000000000000)
+        self.patternCenterZ.setSingleStep(0.001000000000000)
 
         self.gridLayout_2.addWidget(self.patternCenterZ, 2, 2, 1, 1)
 

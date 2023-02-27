@@ -13,18 +13,18 @@ import matplotlib as mpl
 import numpy as np
 
 from orix import io, plot
-from orix.crystal_map import CrystalMap, PhaseList
+from orix.crystal_map import CrystalMap, PhaseList, Phase
 from orix.vector import Vector3d
 
 from utils import SettingFile, FileBrowser, sendToJobManager
 from ui.ui_hi_setup import Ui_HISetupDialog
+from ui.ui_new_phase import Ui_NewPhaseDialog
 
 # Ignore warnings to avoid crash with integrated console
 warnings.filterwarnings("ignore")
 
 
 class HiSetupDialog(QDialog):
-
     def __init__(self, parent: QMainWindow, pattern_path: str):
         super().__init__(parent)
         self.console = self.parentWidget().console
@@ -66,7 +66,9 @@ class HiSetupDialog(QDialog):
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_hough_indexing())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
-
+        self.ui.pushButtonAddPhase.clicked.connect(
+            lambda: self.create_phase()
+        )
         self.ui.pushButtonLoadPhase.clicked.connect(
             lambda: self.load_master_pattern_phase()
         )
@@ -130,7 +132,7 @@ class HiSetupDialog(QDialog):
         except:
             self.pc = np.array([0.500, 0.200, 0.500])
 
-        #self.update_pc_spinbox()
+        # self.update_pc_spinbox()
         self.ui.comboBoxConvention.setCurrentText(self.convention)
 
         try:
@@ -158,6 +160,15 @@ class HiSetupDialog(QDialog):
                 i += 1
             except:
                 break
+        i = 1
+        while True:
+            try:
+                phase_settings = self.setting_file.read(f"Phase {i}")
+                print(phase_settings)
+                self.add_phase(eval(phase_settings))
+                i += 1
+            except:
+                break
 
     # TODO
     # Write to use more parameters instead of self
@@ -166,32 +177,30 @@ class HiSetupDialog(QDialog):
 
         ### Sample parameters
         options = self.getOptions()
-        for i, mp_path in enumerate(self.mp_paths.values(), 1):
-            self.setting_file.write(f"Master pattern {i}", mp_path)
-        self.setting_file.write("Convention", options["convention"])
-        # if self.convention == "BRUKER":
-        #     self.setting_file.write("Y star", f"{self.pc[1]}")
-        # elif self.convention == "TSL":
-        #     self.setting_file.write("Y star", f"{1-self.pc[1]}")
+        # for i, mp_path in enumerate(self.mp_paths.values(), 1):
+        #     self.setting_file.write(f"Master pattern {i}", mp_path)
+        master_idx = 1
+        phase_idx = 1
+        for _, phase in self.phases:
+            if phase.name in self.mp_paths.keys():
+                self.setting_file.write(f"Master pattern {master_idx}", self.mp_paths[phase.name])
+                master_idx += 1
+            else:
+                sg = phase.space_group
+                phase_settings = {
+                    "name": phase.name,
+                    "space_group" : sg.number,
+                    "color" : phase.color,
+                }
+                self.setting_file.write(f"Phase {phase_idx}", phase_settings)
+                phase_idx += 1
+        self.setting_file.write("Convention", options["convention"].upper())
         pc = options["pc"]
         self.setting_file.write("X star", pc[0])
         self.setting_file.write("Y star", pc[1])
         self.setting_file.write("Z star", pc[2])
         self.setting_file.write("Binning", options["binning"])
         self.setting_file.save()
-
-    # def update_pc_spinbox(self):
-    #     self.ui.patternCenterX.setValue(self.pc[0])
-    #     self.ui.patternCenterZ.setValue(self.pc[2])
-    #     if self.convention == "BRUKER":
-    #         self.ui.patternCenterY.setValue(self.pc[1])
-    #     elif self.convention == "TSL":
-    #         self.ui.patternCenterY.setValue(1 - self.pc[1])
-
-    # def update_pc_convention(self):
-    #     self.convention = self.ui.comboBoxConvention.currentText()
-    #     self.ui.patternCenterY.setValue(self.ui.patternCenterY)
-    #     self.update_pc_spinbox()
 
     def load_master_pattern_phase(self, mp_path: Optional[str] = None):
         if mp_path is not None:
@@ -218,6 +227,46 @@ class HiSetupDialog(QDialog):
                 except Exception as e:
                     print("Phase could not be loaded from master pattern", e)
             self.updatePhaseTable()
+
+    #TODO Move checks to the new phase dialog class
+    def add_phase(self, phase_settings: dict):
+        name = phase_settings["name"]
+        space_group=phase_settings["space_group"]
+        color=phase_settings["color"]
+        if not len(name):
+            print("No name was given to phase")
+            return
+        if space_group < 1 or space_group > 230:
+            print("Invalid space group number")
+            return
+        if not len(color):
+            color = self.colors[len(self.phases.ids) - 1]
+            print(color)
+        try:
+            self.phases.add(Phase(name , space_group, color=color))
+        except Exception as e:
+            raise e
+        self.updatePhaseTable()
+
+    def create_phase(self):
+        class NewPhaseDialog(QDialog):
+            def __init__(self, parent) -> None:
+                super().__init__(parent)
+                self.ui = Ui_NewPhaseDialog()
+                self.ui.setupUi(self)
+
+            def getPhaseSettings(self) -> dict:
+                return {
+                    "name": self.ui.lineName.text(),
+                    "space_group": int(self.ui.lineSpaceGroup.text()),
+                    "color": self.ui.lineColor.text(),
+                }
+
+        newPhaseDialog = NewPhaseDialog(self)
+        newPhaseDialog.ui.buttonBox.accepted.connect(
+            lambda: self.add_phase(newPhaseDialog.getPhaseSettings())
+        )
+        newPhaseDialog.exec()
 
     def updatePhaseTable(self):
         """
@@ -265,7 +314,8 @@ class HiSetupDialog(QDialog):
         for i in range(countRow, 0, -1):
             phase_key = phaseTable.item(indexes[i - 1].row(), 0).text()
             self.phases.__delitem__(phase_key)
-            self.mp_paths.pop(phase_key)
+            if phase_key in self.mp_paths.keys():
+                self.mp_paths.pop(phase_key)
             phaseTable.removeRow(indexes[i - 1].row())
         self.setAvailableButtons()
 

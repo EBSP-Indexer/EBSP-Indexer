@@ -22,6 +22,7 @@ class SignalNavigationWidget(QWidget):
         self.ui = Ui_SignalNavigationWidget()
         self.ui.setupUi(self)
 
+        self.file_selected = ""
         self.setupConnection()
 
     def setupConnection(self):
@@ -37,7 +38,7 @@ class SignalNavigationWidget(QWidget):
             self.ui.navigatorMplWidget.canvas.mpl_disconnect(self.cid)
         except:
             pass
-
+        self.file_selected = file_path
         s, nav_shape = open_pattern(file_path)
 
         navigator = get_navigation_figure(s, nav_type)

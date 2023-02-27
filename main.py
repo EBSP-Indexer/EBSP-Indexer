@@ -14,10 +14,7 @@ import platform
 import multiprocessing
 import sys
 import json
-import webbrowser
-import os
 import os.path as path
-import shutil
 from contextlib import redirect_stdout, redirect_stderr
 
 try:
@@ -33,11 +30,8 @@ from PySide6.QtCore import QDir, Qt, QThreadPool, Slot, QDir
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
-    QFileSystemModel,
     QMessageBox,
-    QMenu,
 )
-from PySide6.QtGui import QFont, QCursor
 
 try:
     import pyi_splash
@@ -95,7 +89,6 @@ class AppWindow(QMainWindow):
 
         self.systemExplorer = SystemExplorerWidget(self)
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
-        #self.systemModel = QFileSystemModel()
         self.console = Console(parent=self, context=globals())
         self.signalNavigationWidget = SignalNavigationWidget(mainWindow=self)
 
@@ -119,19 +112,16 @@ class AppWindow(QMainWindow):
 
     def setupConnections(self):
         self.ui.dockWidgetSystemExplorer.setWidget(self.systemExplorer)
-        #self.ui.dockWidgetSystemExplorer.adjustSize()
-        self.systemExplorer.pathChangedSignal.connect(
+        # self.ui.dockWidgetSystemExplorer.adjustSize()
+        self.systemExplorer.pathChanged.connect(
             lambda new_path: self.updateMenuButtons(new_path)
         )
-        self.systemExplorer.pathChangedSignal.connect(
+        self.systemExplorer.pathChanged.connect(
             lambda new_path: self.showImage(new_path)
         )
-        # self.ui.systemViewer.setModel(self.systemModel)
-        # self.ui.systemViewer.selectionModel().selectionChanged.connect(
-        #     lambda new, old: self.onSystemModelChanged(new, old)
-        # )
-        # self.ui.systemViewer.doubleClicked.connect(lambda: self.openTextFile())
-
+        self.systemExplorer.requestSignalNavigation.connect(
+            lambda signal_path: self.selectSignalNavigation(signal_path)
+        )
         self.ui.dockWidgetSignalNavigation.setWidget(self.signalNavigationWidget)
         self.ui.actionOpen_Workfolder.triggered.connect(
             lambda: self.selectWorkingDirectory()
@@ -181,73 +171,18 @@ class AppWindow(QMainWindow):
                 try:
                     file_types = json.loads(setting_file.read("File Types"))
                     system_view_filter = ["*" + x for x in file_types]
-                    self.systemExplorer.setSystemViewer(self.working_dir, system_view_filter)
+                    self.systemExplorer.setSystemViewer(
+                        self.working_dir, system_view_filter
+                    )
                 except:
                     self.systemExplorer.setSystemViewer(self.working_dir)
             else:
                 self.systemExplorer.setSystemViewer(self.working_dir)
-            
+
             self.setWindowTitle(f"EBSD-GUI - {self.working_dir}")
 
     def getSelectedPath(self) -> str:
         return self.systemExplorer.selected_path
-
-    # def setSystemViewer(self, working_dir):
-    #     self.systemModel.setRootPath(working_dir)
-    #     self.systemModel.setNameFilters(self.system_view_filter)
-    #     self.systemModel.setNameFilterDisables(0)
-    #     self.ui.systemViewer.setModel(self.systemModel)
-    #     self.ui.systemViewer.setRootIndex(self.systemModel.index(working_dir))
-    #     self.ui.systemViewer.setColumnWidth(0, 250)
-    #     self.ui.systemViewer.hideColumn(2)
-    #     self.ui.systemViewer.setContextMenuPolicy(Qt.CustomContextMenu)
-    #     self.ui.systemViewer.customContextMenuRequested.connect(self.contextMenu)
-
-    #     self.ui.folderLabel.setText(path.basename(working_dir))
-    #     self.setWindowTitle(f"EBSD-GUI - {working_dir}")
-
-    # def contextMenu(self):
-    #     menu = QMenu()
-    #     # Kikuchipy available actions
-    #     if path.isfile(self.file_selected) and path.splitext(self.file_selected)[-1] in KP_EXTENSIONS:
-    #         hiAction = menu.addAction("Index with HI")
-    #         diAction = menu.addAction("Index with DI")
-    #         hiAction.triggered.connect(self.selectHoughIndexingSetup)
-    #         diAction.triggered.connect(self.selectDictionaryIndexingSetup)
-    #     # Globally available actions
-    #     menu.addSeparator()
-    #     revealAction = menu.addAction("Reveal in File Explorer")
-    #     deleteAction = menu.addAction("Delete")
-    #     revealAction.triggered.connect(self.revealInExplorer)
-    #     deleteAction.triggered.connect(self.displayDeleteWarning)
-
-    #     cursor = QCursor()
-    #     menu.exec(cursor.pos())
-
-    # def revealInExplorer(self):
-    #     if path.isdir(self.file_selected):
-    #         webbrowser.open(self.file_selected)
-    #     elif path.isfile(self.file_selected):
-    #         webbrowser.open(path.dirname(self.file_selected))
-
-    # def displayDeleteWarning(self):
-    #     msg = QMessageBox(self)
-    #     msg.setWindowTitle("EBSD-GUI Delete Information")
-    #     msg.setIcon(QMessageBox.Information)
-    #     msg.setText(f"Are you sure you want to permentantly delete '{path.basename(self.file_selected)}'?")
-    #     msg.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
-    #     msg.accepted.connect(self.deleteSelected)
-    #     msg.exec()
-
-    # def deleteSelected(self):
-    #     if path.isdir(self.file_selected):
-    #         result = self.systemModel.rmdir(self.ui.systemViewer.currentIndex())
-    #         if not result:
-    #             dir = QDir(self.file_selected)
-    #             dir.removeRecursively()
-    #     elif path.isfile(self.file_selected):
-    #         result = self.systemModel.remove(self.ui.systemViewer.currentIndex())
-    #     self.ui.systemViewer.selectionModel().clearCurrentIndex()
 
     def importSettings(self):
         if path.exists("advanced_settings.txt"):
@@ -267,7 +202,9 @@ class AppWindow(QMainWindow):
 
             if path.exists(setting_file.read("Default Directory")):
                 self.working_dir = setting_file.read("Default Directory")
-                self.systemExplorer.setSystemViewer(self.working_dir, system_view_filter)
+                self.systemExplorer.setSystemViewer(
+                    self.working_dir, system_view_filter
+                )
         else:
             AdvancedSettingsDialog(parent=self).createSettingsFile()
             setting_file = SettingFile("advanced_settings.txt")
@@ -286,6 +223,7 @@ class AppWindow(QMainWindow):
                 f"Could not initialize settings dialog:\n{str(e)}\n"
             )
 
+        # TODO: This whole thing should be changed to inside AdvancedSettingsDialog, and should only be executed when ok is pressed
         # updates file browser to changes:
         setting_file = SettingFile("advanced_settings.txt")
         file_types = json.loads(setting_file.read("File Types"))
@@ -293,7 +231,9 @@ class AppWindow(QMainWindow):
         if setting_file.read("Default Directory") not in ["False", ""]:
             if self.working_dir == QDir.currentPath():
                 self.working_dir = setting_file.read("Default Directory")
-            self.systemExplorer.setSystemViewer(self.working_dir, filters=system_view_filters)
+            self.systemExplorer.setSystemViewer(
+                self.working_dir, filters=system_view_filters
+            )
 
     def selectProcessing(self):
         try:
@@ -348,10 +288,9 @@ class AppWindow(QMainWindow):
     #     if splitext(self.file_selected)[1] in [".h5", ".dat"]:
     #         self.selectSignalNavigation()
 
-    def selectSignalNavigation(self):
+    def selectSignalNavigation(self, signal_path: str):
         try:
-            self.signalNavigationWidget.plot_navigator(self.getSelectedPath())
-
+            self.signalNavigationWidget.plot_navigator(signal_path)
         except Exception as e:
             if self.getSelectedPath() == "":
                 dlg = QMessageBox(self)
@@ -439,7 +378,7 @@ class AppWindow(QMainWindow):
         if path.basename(file_path) == "Setting.txt":
             self.ui.menuPlot.setEnabled(True)
             self.ui.actionSignalNavigation.setEnabled(True)
-            self.ui.menuPre_indexing_maps.setEnabled(False)    
+            self.ui.menuPre_indexing_maps.setEnabled(False)
 
     @Slot(int)
     def removeWorker(self, worker_id: int):
@@ -455,7 +394,6 @@ class AppWindow(QMainWindow):
         self.ui.threadsLabel.setText(
             f"{QThreadPool.globalInstance().activeThreadCount()} out of {QThreadPool.globalInstance().maxThreadCount()} active jobs"
         )
-
 
 
 if __name__ == "__main__":
