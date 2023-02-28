@@ -12,7 +12,6 @@ from numpy import array
 
 import matplotlib.pyplot as plt
 
-
 def open_file(file_path):
     """
     File check, checks if the file header is an EBSD pattern or a crystal map
@@ -41,7 +40,7 @@ def return_ebsd_pattern(s):
     mean_intensity_map = s.mean(axis=(2, 3))
     image_quality_map = s.get_image_quality().compute()
 
-    ebsd_pattern["navigator"] = {"1": mean_intensity_map, "2": image_quality_map}
+    ebsd_pattern["navigator"] = {"Mean intensity map": mean_intensity_map, "Image quality map": image_quality_map}
 
     return ebsd_pattern
 
@@ -83,22 +82,19 @@ def return_crystal_map(file_path, s):
     # Generate IPF for navigation of crystal map
     ckey = orix.plot.IPFColorKeyTSL(s.phases.point_groups[0])
 
-    rgb = ckey.orientation2color(s["ni"].orientations)
-    rgb = rgb.reshape(s.shape + (3,))
-    
-    crystal_map["navigator"] = {"1": rgb}
+    ipf = ckey.orientation2color(s["ni"].orientations)
+    ipf = ipf.reshape(s.shape + (3,))
 
-    # 
+    #Generate NCC map
+
+
+    crystal_map["navigator"] = {"Inverse pole figure": ipf}
 
     return crystal_map
 
+def export_image(navigator, signal, ):
+    fig, ax = plt.subplots(1, 2, figsize=(12, 6))
+    ax[0].imshow(navigator)
+    ax[1].imshow(signal)
 
-def get_navigation_figure(pattern, nav_type="mean_intensity"):
-    if nav_type == "mean_intensity":
-        navigator = pattern.mean(axis=(2, 3))
-
-    if nav_type == "iq":
-        print("ok")
-        navigator = pattern.get_image_quality()
-
-    return navigator
+    fig.imsave()
