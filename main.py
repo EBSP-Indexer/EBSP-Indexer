@@ -15,6 +15,9 @@ import multiprocessing
 import sys
 import json
 import os.path as path
+import logging
+logging.getLogger("pyopencl").setLevel(logging.WARNING)
+logging.getLogger("hyperspy").setLevel(logging.WARNING)
 from contextlib import redirect_stdout, redirect_stderr
 
 try:
@@ -130,7 +133,7 @@ class AppWindow(QMainWindow):
         self.ui.actionProcessingMenu.triggered.connect(lambda: self.selectProcessing())
         self.ui.actionROI.triggered.connect(lambda: self.selectROI())
         self.ui.actionSignalNavigation.triggered.connect(
-            lambda: self.selectSignalNavigation()
+            lambda: self.selectSignalNavigation(signal_path=self.getSelectedPath())
         )
         self.ui.actionDictionary_indexing.triggered.connect(
             lambda: self.selectDictionaryIndexingSetup(
@@ -380,6 +383,7 @@ class AppWindow(QMainWindow):
             self.ui.actionSignalNavigation.setEnabled(True)
             self.ui.menuPre_indexing_maps.setEnabled(False)
 
+    #TODO Move removeWorker and updateActiveJobs to a jobmanagerlist class
     @Slot(int)
     def removeWorker(self, worker_id: int):
         jobList = self.ui.jobList

@@ -134,6 +134,7 @@ class WorkerWidget(QWidget):
             self.finalize(id=self.id, cancelled=True, cleanup=self.allow_cleanup)
         else:
             self.ui.pushButtonCancel.setDisabled(True)
+            self.ui.pushButtonCancel.setHidden(True)
 
     # TODO resize jobItem in a job manager class instead so it can be removed from this class
     def adjustSize(self):
@@ -148,6 +149,7 @@ class WorkerWidget(QWidget):
             self.updateTimerDisplay()
             self.timer.start(500)
             self.ui.pushButtonCancel.setDisabled(True)
+            self.ui.pushButtonCancel.setHidden(True)
 
     @Slot(int)
     def finalize(

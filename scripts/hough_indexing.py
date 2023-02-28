@@ -1,10 +1,10 @@
 from os import path, mkdir
 from datetime import date
-from typing import Optional
+from typing import Optional, Sequence
 import json
 import warnings
 
-from PySide6.QtCore import QThreadPool, Qt
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDialog, QDialogButtonBox, QMainWindow, QTableWidgetItem
 import kikuchipy as kp
 from kikuchipy.signals.ebsd import EBSD, LazyEBSD
@@ -66,27 +66,19 @@ class HiSetupDialog(QDialog):
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_hough_indexing())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
-        self.ui.pushButtonAddPhase.clicked.connect(
-            lambda: self.create_phase()
-        )
+        self.ui.pushButtonAddPhase.clicked.connect(lambda: self.create_phase())
         self.ui.pushButtonLoadPhase.clicked.connect(
             lambda: self.load_master_pattern_phase()
         )
         self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.remove_phase())
-
-        # self.ui.comboBoxConvention.currentTextChanged.connect(
-        #     lambda: self.update_pc_convention()
-        # )
         self.ui.comboBoxBinning.currentTextChanged.connect(
             lambda: self.ui.labelSignalShape.setText(
                 f"Signal Shape: {self.binnings[self.ui.comboBoxBinning.currentText()]}"
             )
         )
-
         self.ui.horizontalSliderRho.valueChanged.connect(
             lambda: self.ui.labelRho.setText(f"{self.ui.horizontalSliderRho.value()}%")
         )
-
         self.ui.comboBoxBinning.addItems(self.binnings.keys())
 
     def getOptions(self) -> dict:
@@ -104,6 +96,7 @@ class HiSetupDialog(QDialog):
                 self.ui.checkBoxOrientation.isChecked(),
                 self.save_ipf_map,
             ],
+            "ckey_direction" : self.ui.lineEditColorKey.text(),
             "convention": self.ui.comboBoxConvention.currentText().lower(),
             "pc": (
                 self.ui.patternCenterX.value(),
@@ -119,22 +112,17 @@ class HiSetupDialog(QDialog):
         )
         self.program_settings = SettingFile("advanced_settings.txt")
 
-        # PC convention, default is TSL
         try:
             self.convention = self.setting_file.read("Convention")
         except:
             self.convention = self.program_settings.read("Convention")
-
         try:
             self.ui.patternCenterX.setValue(float(self.setting_file.read("X star")))
             self.ui.patternCenterY.setValue(float(self.setting_file.read("Y star")))
             self.ui.patternCenterZ.setValue(float(self.setting_file.read("Z star")))
         except:
             self.pc = np.array([0.500, 0.200, 0.500])
-
-        # self.update_pc_spinbox()
         self.ui.comboBoxConvention.setCurrentText(self.convention)
-
         try:
             self.colors = json.loads(self.program_settings.read("Colors"))
         except:
@@ -170,27 +158,23 @@ class HiSetupDialog(QDialog):
             except:
                 break
 
-    # TODO
-    # Write to use more parameters instead of self
     def save_parameters(self):
-        self.setting_file.delete_all_entries()  # clean up initial dictionary
-
-        ### Sample parameters
+        self.setting_file.delete_all_entries()  # Clean up initial dictionary
         options = self.getOptions()
-        # for i, mp_path in enumerate(self.mp_paths.values(), 1):
-        #     self.setting_file.write(f"Master pattern {i}", mp_path)
         master_idx = 1
         phase_idx = 1
         for _, phase in self.phases:
             if phase.name in self.mp_paths.keys():
-                self.setting_file.write(f"Master pattern {master_idx}", self.mp_paths[phase.name])
+                self.setting_file.write(
+                    f"Master pattern {master_idx}", self.mp_paths[phase.name]
+                )
                 master_idx += 1
             else:
                 sg = phase.space_group
                 phase_settings = {
                     "name": phase.name,
-                    "space_group" : sg.number,
-                    "color" : phase.color,
+                    "space_group": sg.number,
+                    "color": phase.color,
                 }
                 self.setting_file.write(f"Phase {phase_idx}", phase_settings)
                 phase_idx += 1
@@ -228,11 +212,11 @@ class HiSetupDialog(QDialog):
                     print("Phase could not be loaded from master pattern", e)
             self.updatePhaseTable()
 
-    #TODO Move checks to the new phase dialog class
+    # TODO Move checks to the new phase dialog class
     def add_phase(self, phase_settings: dict):
         name = phase_settings["name"]
-        space_group=phase_settings["space_group"]
-        color=phase_settings["color"]
+        space_group = phase_settings["space_group"]
+        color = phase_settings["color"]
         if not len(name):
             print("No name was given to phase")
             return
@@ -241,9 +225,8 @@ class HiSetupDialog(QDialog):
             return
         if not len(color):
             color = self.colors[len(self.phases.ids) - 1]
-            print(color)
         try:
-            self.phases.add(Phase(name , space_group, color=color))
+            self.phases.add(Phase(name, space_group, color=color))
         except Exception as e:
             raise e
         self.updatePhaseTable()
@@ -295,18 +278,6 @@ class HiSetupDialog(QDialog):
             row += 1
         self.setAvailableButtons()
 
-    # def addPhase(self):
-    #     if self.fileBrowserOF.getFile():
-    #         mpPath = self.fileBrowserOF.getPaths()[0]
-    #         phase = path.dirname(mpPath).split("/").pop()
-    #         self.fileBrowserOF.setDefaultDir(mpPath[0 : -len(phase) - 1])
-
-    #         if phase not in self.mp_paths.keys():
-    #             self.mp_paths[phase] = mpPath
-    #             self.ui.listWidgetPhase.addItem(phase)
-    #     self.getPhases()
-    #     self.checkPhaseList()
-
     def remove_phase(self):
         phaseTable = self.ui.tableWidgetPhase
         indexes = phaseTable.selectionModel().selectedRows()
@@ -318,24 +289,6 @@ class HiSetupDialog(QDialog):
                 self.mp_paths.pop(phase_key)
             phaseTable.removeRow(indexes[i - 1].row())
         self.setAvailableButtons()
-
-    # def getPhases(self):
-    #     lw = self.ui.listWidgetPhase
-    #     self.phases = [lw.item(x).text() for x in range(lw.count())]
-
-    # def set_phases_properties(self):
-    #     for ph in self.phases:
-    #         mp = kp.load(self.mp_paths[ph])
-    #         try:
-    #             space_group, phase_proxy = (
-    #                 mp.phase.space_group.number,
-    #                 self.SG_NUM_TO_PROXY[f"{mp.phase.space_group.number}"],
-    #             )
-    #         except Exception as e:
-    #             print("Space group is not supported, only 225, 227, 229 is supported")
-    #             raise e
-    #         self.space_groups.append(space_group)
-    #         self.phase_proxys.append(phase_proxy)
 
     def setAvailableButtons(self):
         ok_flag = False
@@ -406,8 +359,6 @@ class HiSetupDialog(QDialog):
         print(f"Navigation shape: {nav_shape}")
         print(f"Signal shape: {sig_shape}")
         print(f"PC convention: {convention}")
-
-        print("Indexing ...")
         xmap = s.hough_indexing(phase_list=self.phases, indexer=indexer, verbose=1)
         io.save(path.join(self.dir_out, "xmap_hi.h5"), xmap)
         io.save(path.join(self.dir_out, "xmap_hi.ang"), xmap)
@@ -416,11 +367,14 @@ class HiSetupDialog(QDialog):
             optionEnabled, optionExecute = options.get(key)
             if optionEnabled:
                 try:
-                    optionExecute(xmap)
+                    if key == "orientation":
+                        optionExecute(xmap, eval(f"[{options['ckey_direction']}]"))
+                    else:
+                        optionExecute(xmap)
                 except Exception as e:
                     print(f"Could not save {key}_map:\n{e}")
         print("Logging results ...")
-        create_log(
+        log_hi_parameters(
             self.dir_out,
             s,
             xmap,
@@ -480,7 +434,12 @@ class HiSetupDialog(QDialog):
         fig = xmap.plot(return_figure=True, remove_padding=True)
         fig.savefig(path.join(self.dir_out, "maps_phase.png"), **self.savefig_kwds)
 
-    def save_ipf_map(self, xmap: CrystalMap, ckey_on_top: Optional[bool] = False):
+    def save_ipf_map(
+        self,
+        xmap: CrystalMap,
+        ckey_direction: Optional[Sequence] = [0, 0, 1],
+        ckey_overlay: Optional[bool] = False,
+    ):
         """
         Plot inverse pole figure map with orientation colour key
 
@@ -488,18 +447,20 @@ class HiSetupDialog(QDialog):
         ----------
         xmap : CrystalMap
             The crystal map which the orientations originates from
-        ckey_on_top : bool
+        ckey_direction: sequence
+            3D vector used to determine the orientation color key
+        ckey_overlay : bool
             Whether the colour orientation key is shown on top of the map or saved to seperate png, default is seperate
         """
         print("Saving inverse pole figure map ...")
-        v_ipf = Vector3d.zvector()
+        v_ipf = Vector3d(ckey_direction)
         sym = xmap.phases[0].point_group
         ckey = plot.IPFColorKeyTSL(sym, v_ipf)
         print(ckey)
         fig_ckey = ckey.plot(return_figure=True)
-        rgb_z = ckey.orientation2color(xmap.rotations)
-        fig = xmap.plot(rgb_z, remove_padding=True, return_figure=True)
-        if ckey_on_top:
+        rgb_direction = ckey.orientation2color(xmap.rotations)
+        fig = xmap.plot(rgb_direction, remove_padding=True, return_figure=True)
+        if ckey_overlay:
             ax_ckey = fig.add_axes(
                 [0.77, 0.07, 0.2, 0.2], projection="ipf", symmetry=sym
             )
@@ -510,34 +471,11 @@ class HiSetupDialog(QDialog):
                 path.join(self.dir_out, "orientation_colour_key.png"),
                 **self.savefig_kwds,
             )
-        fig.savefig(path.join(self.dir_out, "maps_ipfz.png"), **self.savefig_kwds)
-
-        # try:
-        #     ckey = plot.IPFColorKeyTSL(
-        #         xmap.phases[0].point_group, direction=Vector3d((0, 0, 1))
-        #     )
-        #     fig = ckey.plot(return_figure=True)
-        #     fig.savefig(
-        #         path.join(self.dir_out, "orientation_colour_key.png"),
-        #         **self.savefig_kwds,
-        #     )
-
-        #     rgb_all = np.zeros((xmap.size, 3))
-        #     for i, phase in xmap.phases:
-        #         if i != -1:
-        #             rgb_i = ckey.orientation2color(self.xmap[phase.name].orientations)
-        #             rgb_all[xmap.phase_id == i] = rgb_i
-
-        #         fig = xmap.plot(rgb_all, remove_padding=True, return_figure=True)
-        #         fig.savefig(
-        #             path.join(self.dir_out, "maps_ipfz.png"), **self.savefig_kwds
-        #         )
-        # except Exception as e:
-        #     raise e
+        fig.savefig(path.join(self.dir_out, "IPF.png"), **self.savefig_kwds)
 
 
 # TODO Add more Hough related properties, better way to sort?
-def create_log(
+def log_hi_parameters(
     dir_out: str,
     signal: EBSD | LazyEBSD = None,
     xmap: CrystalMap = None,
