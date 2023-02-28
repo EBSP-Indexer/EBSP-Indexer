@@ -2,11 +2,25 @@
   <qresource prefix="icons">
     <file alias="app_icon.ico">resources/ebsd_gui.ico</file>
   </qresource>
-  <qresource prefix="linea_icons">
+  <qresource prefix="linea_basic">
+    <file>resources/linea_basic_icons/basic_ban.svg</file>
     <file>resources/linea_basic_icons/basic_picture.svg</file>
     <file>resources/linea_basic_icons/basic_gear.svg</file>
     <file>resources/linea_basic_icons/basic_folder.svg</file>
     <file>resources/linea_basic_icons/basic_trashcan.svg</file>
     <file>resources/linea_basic_icons/basic_clock.svg</file>
+  </qresource>
+  <qresource prefix="linea_arrows">
+    <file>resources/linea_arrows_icons/arrows_right.svg</file>
+    <file>resources/linea_arrows_icons/arrows_up.svg</file>
+    <file>resources/linea_arrows_icons/arrows_down.svg</file>
+    <file>resources/linea_arrows_icons/arrows_remove.svg</file>
+    <file>resources/linea_arrows_icons/arrows_circle_remove.svg</file>
+    <file>resources/linea_arrows_icons/arrows_circle_check.svg</file>
+    <file>resources/linea_arrows_icons/arrows_exclamation.svg</file>
+  </qresource>
+  <qresource prefix="linea_software">
+    <file>resources/linea_software_icons/software_scale_expand.svg</file>
+    <file>resources/linea_software_icons/software_scale_reduce.svg</file>
   </qresource>
 </RCC>

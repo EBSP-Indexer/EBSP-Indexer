@@ -1,13 +1,27 @@
+# Copyright (c) 2022 EBSD-GUI developers
+#
+# This file is part of EBSD-GUI.
+
+# EBSD-GUI is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+# EBSD-GUI is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
+
+import multiprocessing
 import sys
 import json
 from os.path import basename, splitext, exists
+
 try:
     from os import startfile
 except:
     import subprocess
 try:
-    import pyopencl
-    from pyopencl.tools import get_test_platforms_and_devices
+    import pyopencl.tools
 except:
     print("PyOpenCL could not be imported")
 import platform
@@ -16,7 +30,8 @@ from contextlib import redirect_stdout, redirect_stderr
 from PySide6.QtCore import QDir, Qt, QThreadPool, Slot
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
 from PySide6.QtGui import QFont
-try: 
+
+try:
     import pyi_splash
 except:
     pass
@@ -30,22 +45,26 @@ from kikuchipy import load
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Cursor
+from matplotlib.patches import Rectangle
 
 from ui.ui_main_window import Ui_MainWindow
-from utils.filebrowser import FileBrowser
-from utils.setting_file import SettingFile
-from utils.worker import toWorker
 from scripts.hough_indexing import HiSetupDialog
 from scripts.pattern_processing import PatternProcessingDialog
-from scripts.signal_navigation import open_pattern, get_navigation_figure
 from scripts.dictionary_indexing import DiSetupDialog
-from scripts.pre_indexing_maps import save_adp_map, save_mean_intensity_map, save_rgb_vbse, save_iq_map
+from scripts.pre_indexing_maps import (
+    save_adp_map,
+    save_mean_intensity_map,
+    save_rgb_vbse,
+    save_iq_map,
+)
 from scripts.advanced_settings import AdvancedSettingsDialog
-from scripts.console import Console, Redirect
+from scripts.console import Console
+from utils import Redirect, SettingFile, FileBrowser, sendToWorker
 from scripts.pattern_center import PatterCenterDialog
 from scripts.region_of_interest import RegionOfInteresDialog
+from scripts.signal_navigation_widget import SignalNavigationWidget
 
-hs.set_log_level('CRITICAL')
+hs.set_log_level("CRITICAL")
 
 KP_EXTENSIONS = (".h5", ".dat")
 IMAGE_EXTENSIONS = ()
@@ -68,20 +87,30 @@ class AppWindow(QMainWindow):
         self.fileBrowserOD = FileBrowser(FileBrowser.OpenDirectory)
         self.systemModel = QFileSystemModel()
 
-        #Check platform and set windowStayOnTopHint
+        # Check platform and set windowStayOnTopHint
         if platform.system() == "Darwin":
             self.stayOnTopHint = True
         else:
             self.stayOnTopHint = False
 
         self.ui.systemViewer.setModel(self.systemModel)
+
+        self.signalNavigationWidget = SignalNavigationWidget(mainWindow=self)
+
+
         self.setupConnections()
 
         self.console = Console(parent=self, context=globals())
         self.console.setfont(QFont("Lucida Sans Typewriter", 10))
 
+        
+
         self.showImage(self.file_selected)
         self.importSettings()
+
+        QThreadPool.globalInstance().setMaxThreadCount(1)
+        self.updateActiveJobs()
+
         try:
             pyi_splash.close()
         except Exception as e:
@@ -92,6 +121,9 @@ class AppWindow(QMainWindow):
         self.ui.systemViewer.selectionModel().selectionChanged.connect(
             lambda new, old: self.onSystemModelChanged(new, old)
         )
+
+        self.ui.dockWidgetSignalNavigation.setWidget(self.signalNavigationWidget)
+
         self.ui.systemViewer.doubleClicked.connect(lambda: self.doubleClickEvent())
         self.ui.actionOpen_Workfolder.triggered.connect(
             lambda: self.selectWorkingDirectory()
@@ -111,14 +143,19 @@ class AppWindow(QMainWindow):
         self.ui.actionPattern_Center.triggered.connect(
             lambda: self.selectPatternCenter()
         )
-        self.ui.actionAverage_dot_product.triggered.connect(lambda: toWorker(save_adp_map, self.console, self.file_selected))
-        self.ui.actionImage_quality.triggered.connect(lambda: toWorker(save_iq_map, self.console, self.file_selected))
-        self.ui.actionMean_intensity.triggered.connect(lambda: toWorker(save_mean_intensity_map, self.console, self.file_selected))
-        self.ui.actionVirtual_backscatter_electron.triggered.connect(lambda: toWorker(save_rgb_vbse, self.console, self.file_selected))
+        self.ui.actionAverage_dot_product.triggered.connect(
+            lambda: sendToWorker(self, save_adp_map, pattern_path=self.file_selected)
+        )
+        self.ui.actionImage_quality.triggered.connect(
+            lambda: sendToWorker(self, save_iq_map, pattern_path=self.file_selected)
+        )
+        self.ui.actionMean_intensity.triggered.connect(
+            lambda: sendToWorker(self, save_mean_intensity_map, pattern_path=self.file_selected)
+        )
+        self.ui.actionVirtual_backscatter_electron.triggered.connect(
+            lambda: sendToWorker(self, save_rgb_vbse, pattern_path=self.file_selected)
+        )
 
-        self.ui.pushButtonMeanNav.clicked.connect(lambda: self.plot_navigator(self.file_selected, "mean_intensity"))
-        self.ui.pushButtonIQNav.clicked.connect(lambda: self.plot_navigator(self.file_selected, nav_type="iq"))
-    
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
             self.working_dir = self.fileBrowserOD.getPaths()[0]
@@ -166,7 +203,9 @@ class AppWindow(QMainWindow):
     def openSettings(self):
         try:
             self.settingsDialog = AdvancedSettingsDialog(parent=self)
-            self.settingsDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
+            self.settingsDialog.setWindowFlag(
+                Qt.WindowStaysOnTopHint, self.stayOnTopHint
+            )
             self.settingsDialog.exec()
         except Exception as e:
             self.console.errorwrite(
@@ -189,7 +228,9 @@ class AppWindow(QMainWindow):
             self.processingDialog = PatternProcessingDialog(
                 parent=self, pattern_path=self.file_selected
             )
-            self.processingDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
+            self.processingDialog.setWindowFlag(
+                Qt.WindowStaysOnTopHint, self.stayOnTopHint
+            )
             self.processingDialog.exec()
         except Exception as e:
             self.console.errorwrite(
@@ -224,16 +265,16 @@ class AppWindow(QMainWindow):
     def doubleClickEvent(self):
         index = self.ui.systemViewer.currentIndex()
         self.file_selected = self.systemModel.filePath(index)
-        
+
         if splitext(self.file_selected)[1] in [".txt"]:
             if platform.system().lower() == "darwin":
-                subprocess.call(['open', '-a', 'TextEdit', self.file_selected])
+                subprocess.call(["open", "-a", "TextEdit", self.file_selected])
             if platform.system().lower() == "windows":
                 startfile(self.file_selected)
 
-        # open dataset for signal navigation
+        # TODO: more functionality, open dataset for signal navigation
         if splitext(self.file_selected)[1] in [".h5", ".dat"]:
-            self.plot_navigator(self.file_selected)
+            self.selectSignalNavigation()
 
     def process_finished(self):
         print("EBSD pattern closed.")
@@ -241,8 +282,8 @@ class AppWindow(QMainWindow):
 
     def selectSignalNavigation(self):
         try:
-            self.plot_navigator(self.file_selected)
-        
+            self.signalNavigationWidget.load_dataset(self.file_selected)
+
         except Exception as e:
             if self.file_selected == "":
                 dlg = QMessageBox(self)
@@ -278,7 +319,9 @@ class AppWindow(QMainWindow):
             self.patternCenter = PatterCenterDialog(
                 parent=self, file_selected=self.file_selected
             )
-            self.patternCenter.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
+            self.patternCenter.setWindowFlag(
+                Qt.WindowStaysOnTopHint, self.stayOnTopHint
+            )
             self.patternCenter.show()
         except Exception as e:
             self.console.errorwrite(
@@ -328,72 +371,43 @@ class AppWindow(QMainWindow):
         if basename(file_path) == "Setting.txt":
             self.ui.menuPlot.setEnabled(True)
             self.ui.actionSignalNavigation.setEnabled(True)
-            self.ui.menuPre_indexing_maps.setEnabled(False)
+            self.ui.menuPre_indexing_maps.setEnabled(False)    
 
-    def plot_navigator(self, file_path, nav_type="mean_intensity"):
-        try:
-            self.ui.navigatorMplWidget.canvas.mpl_disconnect(self.cid)
-        except:
-            pass
-
-        s = open_pattern(file_path)
-        
-        navigator = get_navigation_figure(s, nav_type)
-
-        self.ui.navigatorMplWidget.vbl.setContentsMargins(0, 0, 0, 0)
-        self.ui.navigatorMplWidget.canvas.ax.clear()
-        self.ui.navigatorMplWidget.canvas.ax.axis(False)
-        self.cursor = Cursor(self.ui.navigatorMplWidget.canvas.ax, useblit=True, color="yellow", linewidth=3, linestyle="--", alpha=0.8)
-        self.cursor.set_active(True)
-        self.ui.navigatorMplWidget.canvas.ax.imshow(navigator, cmap="gray")
-        self.ui.navigatorMplWidget.canvas.draw()
-        #plot pattern from upper left corner
-        self.plot_signal(s, 0, 0)
-        #canvas id to later disconnect
-        self.cid = self.ui.navigatorMplWidget.canvas.mpl_connect("button_press_event", lambda event: self.on_click_navigator(event, s))
-
-
-    def plot_signal(self, pattern, x_index, y_index):
-        
-        signal = pattern.data[y_index, x_index]
-        
-        self.ui.signalMplWidget.vbl.setContentsMargins(0, 0, 0, 0)
-        self.ui.signalMplWidget.canvas.ax.clear()
-        self.ui.signalMplWidget.canvas.ax.axis(False)
-        self.ui.signalMplWidget.canvas.ax.imshow(signal, cmap="gray")
-        self.ui.signalMplWidget.canvas.draw()
-
-    def on_click_navigator(self, event, s):
-        if event.inaxes:
-            self.plot_signal(s, int(event.xdata), int(event.ydata))
-
-        
     @Slot(int)
     def removeWorker(self, worker_id: int):
         jobList = self.ui.jobList
         for i in range(jobList.count()):
             item = jobList.item(i)
-            if(jobList.itemWidget(item).id == worker_id):
+            if jobList.itemWidget(item).id == worker_id:
                 jobList.takeItem(jobList.row(item))
                 break
 
-    def countWorkers(self) -> int:
-        return self.ui.jobList.count()
+    @Slot()
+    def updateActiveJobs(self):
+        self.ui.threadsLabel.setText(f"{QThreadPool.globalInstance().activeThreadCount()} out of {QThreadPool.globalInstance().maxThreadCount()} active jobs")
+
+
+
 
 if __name__ == "__main__":
+    # Pyinstaller fix
+    multiprocessing.freeze_support()
+
     app = QApplication(sys.argv)
     APP = AppWindow()
     # Redirect stdout to console.write and stderr to console.errorwrite
     with redirect_stdout(APP.console), redirect_stderr(
         Redirect(APP.console.errorwrite)
     ):
-        APP.setCentralWidget(None)  #NB! Only set to none if there are nothing inside the central widget
+        APP.setCentralWidget(
+            None
+        )  # NB! Only set to none if there are nothing inside the central widget
         APP.show()
-        print(f"Multithreading with maximum {QThreadPool.globalInstance().maxThreadCount()} threads")
         print(
-            """Use keyword APP to access application components, e.g. 'APP.setWindowTitle("My window")'"""
+            """EBSD-GUI  Copyright (C) 2023  EBSD-GUI developers 
+This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.txt.
+This is free software, and you are welcome to redistribute it under certain conditions; see COPYING.txt for details.""",
         )
-        print(get_test_platforms_and_devices())
         try:
             sys.exit(app.exec())
         except Exception as e:

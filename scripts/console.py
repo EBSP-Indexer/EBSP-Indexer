@@ -6,7 +6,6 @@ Original code created by deanhystad, sourcecode from https://python-forum.io/thr
 """
 import code
 import re
-from typing import Callable
 import PySide6.QtWidgets as QtWidgets
 import PySide6.QtCore as QtCore
 import PySide6.QtGui as QtGui
@@ -82,16 +81,6 @@ class LineEdit(QtWidgets.QLineEdit):
             self.historylist.pop()
         self.historylist.append(line)
         self.historyindex = min(self.historyindex, len(self.historylist))
-
-
-class Redirect:
-    """Map self.write to a function"""
-
-    def __init__(self, func: Callable) -> "Redirect":
-        self.func = func
-
-    def write(self, line: str) -> None:
-        self.func(line)
 
 
 class Console(QtWidgets.QWidget):
@@ -182,7 +171,7 @@ class Console(QtWidgets.QWidget):
 
     def errorwrite(self, line: str) -> None:
         """Capture stderr and display in outdisplay"""
-        self.writeoutput(line, self.errfmt)
+        self.writeoutput(line, fmt=self.errfmt)
 
     def writeoutput(self, line: str, fmt: QtGui.QTextCharFormat = None) -> None:
         """Set text formatting and display line in outdisplay"""
@@ -203,28 +192,3 @@ class Console(QtWidgets.QWidget):
             sb = self.outdisplay.verticalScrollBar()
             sb.setValue(sb.maximum())
         self.outdisplay.appendPlainText(line.rstrip())
-
-
-class ThreadedStdout(QtWidgets.QWidget):
-    """Widget for redirecting stdout from different thread to main console"""
-
-    # TODO: Replace this class with code directly in worker.py
-
-    lineSignal = QtCore.Signal(str)
-    errorSignal = QtCore.Signal(str)
-
-    def __init__(
-        self,
-    ) -> "ThreadedStdout":
-        super().__init__()
-
-    def flush(self):
-        pass
-
-    def write(self, line: str) -> None:
-        """Capture stdout and emit signal"""
-        self.lineSignal.emit(line)
-
-    def errorwrite(self, line: str) -> None:
-        """Capture stderr and emit signal"""
-        self.errorSignal.emit(line)
