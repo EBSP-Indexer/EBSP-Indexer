@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>HISetupDialog</class>
- <widget class="QDialog" name="HISetupDialog">
+ <class>RefineSetupDialog</class>
+ <widget class="QDialog" name="RefineSetupDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>802</width>
-    <height>656</height>
+    <width>727</width>
+    <height>680</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Hough Indexing</string>
+   <string>Refine Crystal Map</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
@@ -22,7 +22,7 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,0,1" columnstretch="0,0,0,1">
+     <layout class="QGridLayout" name="gridLayout_3" rowstretch="2,0,0,2" columnstretch="2,0,0,2">
       <item row="2" column="0">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
@@ -67,31 +67,38 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="checkBoxLazy">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
-          </property>
-          <property name="text">
-           <string>Lazy loading of patterns</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-          <property name="tristate">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <widget class="QCheckBox" name="checkBoxLazy">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>Lazy loading of patterns</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+              <property name="tristate">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBoxMask">
+              <property name="text">
+               <string>Apply circular mask to patterns </string>
+              </property>
+             </widget>
+            </item>
             <item>
              <widget class="QLabel" name="label_7">
               <property name="text">
@@ -121,7 +128,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
-               <spacer name="horizontalSpacer_8">
+               <spacer name="horizontalSpacer_9">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
@@ -163,6 +170,35 @@
          </layout>
         </item>
         <item>
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>Accelerating Voltage (keV)</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="spinBoxEnergy">
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>30</number>
+          </property>
+          <property name="value">
+           <number>20</number>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="verticalSpacer_4">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -188,7 +224,7 @@
            <string notr="true">font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
           </property>
           <property name="text">
-           <string>Hough Transform</string>
+           <string>Refinement</string>
           </property>
          </widget>
         </item>
@@ -204,77 +240,105 @@
           <item>
            <widget class="QLabel" name="label_9">
             <property name="text">
-             <string>Number of bands</string>
+             <string>Method</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="spinBoxBands">
-            <property name="maximumSize">
-             <size>
-              <width>60</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of detected bands to use in triplet voting, default is 9&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="minimum">
-             <number>3</number>
-            </property>
-            <property name="maximum">
-             <number>20</number>
-            </property>
-            <property name="value">
-             <number>9</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <widget class="QLabel" name="label_8">
-            <property name="text">
-             <string>Rho fraction (ρ) </string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <property name="spacing">
-             <number>20</number>
-            </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_10">
             <item>
-             <widget class="QSlider" name="horizontalSliderRho">
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The fraction of the pattern to be considered when detecting bands, default is 85%. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <widget class="QComboBox" name="comboBox">
+              <property name="minimumSize">
+               <size>
+                <width>150</width>
+                <height>0</height>
+               </size>
               </property>
-              <property name="minimum">
-               <number>40</number>
-              </property>
-              <property name="maximum">
-               <number>100</number>
-              </property>
-              <property name="value">
-               <number>85</number>
-              </property>
+              <item>
+               <property name="text">
+                <string>minimze</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>ln_neldermead</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>differential_evolution</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>dual_annealing</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>basinhopping</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>shgo</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_10">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <spacer name="horizontalSpacer_8">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_8">
+              <property name="text">
+               <string>(Optional) kwargs.</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="labelRho">
-              <property name="text">
-               <string>85%</string>
+             <widget class="QLineEdit" name="lineEditRefKwargs">
+              <property name="placeholderText">
+               <string>e.g. method=&quot;Powell&quot;, tol=1e-4</string>
               </property>
              </widget>
             </item>
            </layout>
           </item>
          </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_3"/>
         </item>
         <item>
          <spacer name="verticalSpacer_5">
@@ -321,7 +385,7 @@
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Orientations are given a color based on which crystal direction &amp;lt;&lt;span style=&quot; font-style:italic;&quot;&gt;uvw&lt;/span&gt;&amp;gt; points in a certain sample direction, producing the so-called inverse pole figure (IPF) map&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>Inverse Pole Figure</string>
+             <string>Refined Inverse Pole Figure</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -398,20 +462,30 @@
         <item>
          <widget class="QCheckBox" name="checkBoxPhase">
           <property name="toolTip">
-           <string>Generate map of different phases present</string>
+           <string>Map of different phases present</string>
           </property>
           <property name="text">
-           <string>Phases</string>
+           <string>Refined Phases</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="checkBoxQuality">
+         <widget class="QCheckBox" name="checkBoxNCC">
           <property name="toolTip">
-           <string>Generate quality metrics for combined maps</string>
+           <string>Normalized cross correlation scores plotted on a map</string>
           </property>
           <property name="text">
-           <string>Quality Metrics</string>
+           <string>Normalized Cross Correlation</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBoxEvaluations">
+          <property name="toolTip">
+           <string>the number of optimization evaluations (iterations) necessary for each pattern</string>
+          </property>
+          <property name="text">
+           <string>Number Of Evaluations</string>
           </property>
          </widget>
         </item>
@@ -430,10 +504,171 @@
         </item>
        </layout>
       </item>
+      <item row="2" column="1">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="2" column="2">
+       <widget class="Line" name="line_10">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QDialogButtonBox" name="buttonBox">
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="standardButtons">
+         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+        </property>
+       </widget>
+      </item>
       <item row="2" column="3">
-       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,5,0,0,0,0,1">
+       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1">
         <item>
          <widget class="Line" name="line_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_16">
+          <property name="styleSheet">
+           <string notr="true">font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
+          </property>
+          <property name="text">
+           <string>Crystal Map</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line_17">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QLabel" name="labelXmapPath">
+            <property name="styleSheet">
+             <string notr="true">font: italic 8pt &quot;MS Sans Serif&quot;;
+color: rgb(127, 127, 127);</string>
+            </property>
+            <property name="text">
+             <string>No crystal map loaded</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_11">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QTableWidget" name="tableWidgetXmap">
+          <property name="selectionMode">
+           <enum>QAbstractItemView::NoSelection</enum>
+          </property>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <attribute name="verticalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Orientations</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_9">
+          <item>
+           <spacer name="horizontalSpacer_19">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonLoadXmap">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add phase from master pattern (*.h5)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Load</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_20">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_10">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="Line" name="line_19">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -459,7 +694,7 @@
         <item>
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>Phases</string>
+           <string>Master Patterns</string>
           </property>
          </widget>
         </item>
@@ -558,20 +793,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButtonAddPhase">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create and add a custom phase&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Add</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButtonLoadPhase">
+           <widget class="QPushButton" name="pushButtonLoadMP">
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add phase from master pattern (*.h5)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
@@ -581,7 +803,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButtonRemovePhase">
+           <widget class="QPushButton" name="pushButtonRemoveMP">
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove the selected phase&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
@@ -760,39 +982,6 @@
         </item>
        </layout>
       </item>
-      <item row="2" column="1">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="3" column="3">
-       <widget class="QDialogButtonBox" name="buttonBox">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="standardButtons">
-         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="Line" name="line_10">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -800,9 +989,9 @@
  </widget>
  <tabstops>
   <tabstop>checkBoxPhase</tabstop>
-  <tabstop>checkBoxQuality</tabstop>
-  <tabstop>pushButtonLoadPhase</tabstop>
-  <tabstop>pushButtonRemovePhase</tabstop>
+  <tabstop>checkBoxNCC</tabstop>
+  <tabstop>pushButtonLoadMP</tabstop>
+  <tabstop>pushButtonRemoveMP</tabstop>
   <tabstop>patternCenterX</tabstop>
   <tabstop>patternCenterY</tabstop>
   <tabstop>patternCenterZ</tabstop>
@@ -812,7 +1001,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>HISetupDialog</receiver>
+   <receiver>RefineSetupDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -828,7 +1017,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>HISetupDialog</receiver>
+   <receiver>RefineSetupDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">

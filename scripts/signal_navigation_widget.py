@@ -23,6 +23,7 @@ class SignalNavigationWidget(QWidget):
         self.ui.setupUi(self)
         self.ui.checkBox.setVisible(False)
 
+        self.file_selected = ""
         self.setupConnection()
 
         self.changetype = True
@@ -48,9 +49,9 @@ class SignalNavigationWidget(QWidget):
 
     def load_dataset(self, file_path):
         self.file_dir = path.dirname(file_path)
-
         try:
             self.dataset = open_file(file_path)
+            self.file_selected = file_path
         except Exception as e:
             print("open file failed")
             raise e
@@ -77,7 +78,6 @@ class SignalNavigationWidget(QWidget):
             self.ui.navigatorMplWidget.canvas.mpl_disconnect(self.hover_id)
         except:
             pass
-
         navigator = dataset["navigator"][navigator]
 
         #plot to MplCanvas

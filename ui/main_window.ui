@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>960</width>
-    <height>705</height>
+    <width>1233</width>
+    <height>824</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -58,8 +58,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>960</width>
-     <height>22</height>
+     <width>1233</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -81,9 +81,9 @@
     <addaction name="actionROI"/>
     <addaction name="actionPattern_Center"/>
    </widget>
-   <widget class="QMenu" name="menuPlot">
+   <widget class="QMenu" name="menuPatternInspection">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="title">
      <string>Pattern inspection</string>
@@ -110,8 +110,8 @@
     <property name="title">
      <string>Indexing</string>
     </property>
-    <addaction name="actionDictionary_indexing"/>
-    <addaction name="actionHough_indexing"/>
+    <addaction name="actionDictionaryIndexing"/>
+    <addaction name="actionHoughIndexing"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -123,10 +123,20 @@
     <addaction name="actionToggleJob_Manager"/>
     <addaction name="actionToggleSignal_Navigation"/>
    </widget>
+   <widget class="QMenu" name="menuRefinement">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="title">
+     <string>Refinement</string>
+    </property>
+    <addaction name="actionRefineOrientations"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuProcessing"/>
-   <addaction name="menuPlot"/>
+   <addaction name="menuPatternInspection"/>
    <addaction name="menuIndexing"/>
+   <addaction name="menuRefinement"/>
    <addaction name="menuView"/>
   </widget>
   <widget class="QDockWidget" name="dockWidgetTerminal">
@@ -182,67 +192,20 @@
    <widget class="QWidget" name="dockWidgetSystemExplorerContents">
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
-      <layout class="QVBoxLayout" name="systemViewerLayout" stretch="0,0">
-       <item>
-        <widget class="QLabel" name="folderLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>NO FOLDER OPENED</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QTreeView" name="systemViewer">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>320</width>
-           <height>320</height>
-          </size>
-         </property>
-         <property name="mouseTracking">
-          <bool>false</bool>
-         </property>
-         <property name="tabletTracking">
-          <bool>true</bool>
-         </property>
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
-         <property name="editTriggers">
-          <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::CurrentChanged|QAbstractItemView::DoubleClicked|QAbstractItemView::SelectedClicked</set>
-         </property>
-         <property name="tabKeyNavigation">
-          <bool>true</bool>
-         </property>
-         <property name="dragEnabled">
-          <bool>false</bool>
-         </property>
-         <property name="dragDropOverwriteMode">
-          <bool>false</bool>
-         </property>
-         <property name="alternatingRowColors">
-          <bool>false</bool>
-         </property>
-         <property name="animated">
-          <bool>true</bool>
-         </property>
-         <attribute name="headerStretchLastSection">
-          <bool>true</bool>
-         </attribute>
-        </widget>
-       </item>
-      </layout>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::MinimumExpanding</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>320</width>
+         <height>320</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </widget>
@@ -253,6 +216,12 @@
      <horstretch>10</horstretch>
      <verstretch>10</verstretch>
     </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>342</width>
+     <height>368</height>
+    </size>
    </property>
    <property name="windowTitle">
     <string>Image Viewer</string>
@@ -377,7 +346,7 @@
     <string>Signal navigation</string>
    </property>
   </action>
-  <action name="actionDictionary_indexing">
+  <action name="actionDictionaryIndexing">
    <property name="text">
     <string>Dictionary indexing</string>
    </property>
@@ -392,7 +361,7 @@
     <string>Region of interest</string>
    </property>
   </action>
-  <action name="actionHough_indexing">
+  <action name="actionHoughIndexing">
    <property name="text">
     <string>Hough indexing</string>
    </property>
@@ -501,6 +470,11 @@
     <string>Signal Navigation</string>
    </property>
   </action>
+  <action name="actionRefineOrientations">
+   <property name="text">
+    <string>Refine Crystal Map Orientations</string>
+   </property>
+  </action>
   <zorder>dockWidgetTerminal</zorder>
   <zorder>dockWidgetSystemExplorer</zorder>
   <zorder>dockWidgetImageViewer</zorder>
@@ -516,7 +490,6 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>systemViewer</tabstop>
   <tabstop>consoleLog</tabstop>
  </tabstops>
  <resources>

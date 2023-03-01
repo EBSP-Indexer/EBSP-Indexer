@@ -63,6 +63,7 @@ class Worker(QRunnable, QObject):
         self.args = args
         self.kwargs = kwargs
         self.thdout = ThreadedOutput()
+        self.failed = False
         self.error_redirect = Redirect(self.thdout.errorwrite)
         self.setupConnections()
 
@@ -90,8 +91,11 @@ class Worker(QRunnable, QObject):
                 self.isFinished.emit(self.id)
             except Exception as e:
                 self.thdout.errorwrite(f"{e} (See terminal for traceback)")
-                self.isError.emit(self.id)
+                self.failed = True
                 raise e
+            finally:
+                if self.failed:
+                    self.isError.emit(self.id)
 
 
 def sendToWorker(parent: QMainWindow | QObject, func: Callable, *args, **kwargs):

@@ -32,7 +32,7 @@ class FileBrowser(QWidget):
         """
         Method returns 1 if one or more paths are set. Abort/ cancel returns 0
         """
-        self.filepaths = []
+        self.filepaths: list[str] = []
         if self.browser_mode == FileBrowser.OpenFile:
             self.filepaths.append(
                 QFileDialog.getOpenFileName(
@@ -74,5 +74,5 @@ class FileBrowser(QWidget):
             return 0
         return 1
 
-    def getPaths(self):
+    def getPaths(self) -> list[str]:
         return self.filepaths

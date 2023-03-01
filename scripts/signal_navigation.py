@@ -67,7 +67,7 @@ def return_crystal_map(file_path, s):
     # Get detector from indexing routine
     detector = kp.detectors.EBSDDetector.load(path.join(path.dirname(file_path), "detector.txt"))
     detector.shape = pattern.axes_manager.signal_shape
-
+    print(detector)
     # Generate geometrical simulation based on orientations in crystal map
     rlv = ReciprocalLatticeVector(
         phase=s.phases[0], hkl=[[1, 1, 1], [2, 0, 0], [2, 2, 0], [3, 1, 1]]
