@@ -38,7 +38,7 @@ class HiSetupDialog(QDialog):
         self.ui.setupUi(self)
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
         self.fileBrowserOF = FileBrowser(
-            mode=FileBrowser.OpenFile, filter_name="Hierarchical Data Format (*.h5);"
+            mode=FileBrowser.OpenFile, filter_name="*.h5"
         )
 
         # Load pattern-file to get acquisition resolution

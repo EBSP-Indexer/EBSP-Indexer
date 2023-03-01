@@ -45,7 +45,7 @@ class DiSetupDialog(QDialog):
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
         self.fileBrowserOD = FileBrowser(
             mode=FileBrowser.OpenFile,
-            filter_name="Hierarchical Data Format (*.h5);",
+            filter_name="*.h5",
         )
 
         self.load_pattern()

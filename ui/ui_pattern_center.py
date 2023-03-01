@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'pattern_center.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.3.2
+## Created by: Qt User Interface Compiler version 6.4.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -296,9 +296,9 @@ class Ui_PatternCenter(object):
         self.bandButton.setText(QCoreApplication.translate("PatternCenter", u"Show bands", None))
         self.buttonAddPhase.setText(QCoreApplication.translate("PatternCenter", u"Add Phase", None))
         self.buttonRemovePhase.setText(QCoreApplication.translate("PatternCenter", u"Remove Phase", None))
-        self.labelXStar.setText(QCoreApplication.translate("PatternCenter", u"X (%):", None))
-        self.labelYStar.setText(QCoreApplication.translate("PatternCenter", u"Y (%):", None))
-        self.labelZStar.setText(QCoreApplication.translate("PatternCenter", u"Z (%):", None))
+        self.labelXStar.setText(QCoreApplication.translate("PatternCenter", u"X:", None))
+        self.labelYStar.setText(QCoreApplication.translate("PatternCenter", u"Y:", None))
+        self.labelZStar.setText(QCoreApplication.translate("PatternCenter", u"Z:", None))
         self.conventionLabel.setText(QCoreApplication.translate("PatternCenter", u"PC Convention", None))
         self.conventionBox.setItemText(0, QCoreApplication.translate("PatternCenter", u"BRUKER", None))
         self.conventionBox.setItemText(1, QCoreApplication.translate("PatternCenter", u"TSL", None))
