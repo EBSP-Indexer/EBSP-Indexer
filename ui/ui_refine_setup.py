@@ -597,7 +597,7 @@ class Ui_RefineSetupDialog(object):
         RefineSetupDialog.setWindowTitle(QCoreApplication.translate("RefineSetupDialog", u"Refine Crystal Map", None))
         self.label_10.setText(QCoreApplication.translate("RefineSetupDialog", u"Signal", None))
         self.checkBoxLazy.setText(QCoreApplication.translate("RefineSetupDialog", u"Lazy loading of patterns", None))
-        self.checkBoxMask.setText(QCoreApplication.translate("RefineSetupDialog", u"Apply circular mask to patterns", None))
+        self.checkBoxMask.setText(QCoreApplication.translate("RefineSetupDialog", u"Apply circular mask to patterns ", None))
         self.label_7.setText(QCoreApplication.translate("RefineSetupDialog", u"Binning", None))
 #if QT_CONFIG(tooltip)
         self.comboBoxBinning.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Detector binning, i.e. how many pixels are binned into one, default is no binning</p></body></html>", None))

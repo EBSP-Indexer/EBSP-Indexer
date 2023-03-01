@@ -95,7 +95,7 @@
             <item>
              <widget class="QCheckBox" name="checkBoxMask">
               <property name="text">
-               <string>Apply circular mask to patterns</string>
+               <string>Apply circular mask to patterns </string>
               </property>
              </widget>
             </item>

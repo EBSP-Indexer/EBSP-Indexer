@@ -46,6 +46,7 @@ class RefineSetupDialog(QDialog):
         self.fileBrowserOF = FileBrowser(
             mode=FileBrowser.OpenFile, filter_name="Hierarchical Data Format (*.h5);"
         )
+        self.fileBrowserOF.setDefaultDir(self.working_dir)
         # Load file
         try:
             try:

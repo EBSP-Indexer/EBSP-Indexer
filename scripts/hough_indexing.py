@@ -11,7 +11,7 @@ from kikuchipy.signals.ebsd import EBSD, LazyEBSD
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
-
+from kikuchipy.signals.ebsd import EBSD
 from orix import io, plot
 from orix.crystal_map import CrystalMap, PhaseList, Phase
 from orix.vector import Vector3d
@@ -23,6 +23,7 @@ from ui.ui_new_phase import Ui_NewPhaseDialog
 # Ignore warnings to avoid crash with integrated console
 warnings.filterwarnings("ignore")
 
+EBSD.refine_orientation
 
 class HiSetupDialog(QDialog):
     def __init__(self, parent: QMainWindow, pattern_path: str):
@@ -325,7 +326,6 @@ class HiSetupDialog(QDialog):
             s = kp.load(self.pattern_path, lazy=options["lazy"])
         except Exception as e:
             raise e
-
         nav_shape = s.axes_manager.navigation_shape[::-1]
         if binning is None:
             binning = 1
@@ -335,7 +335,6 @@ class HiSetupDialog(QDialog):
                 new_shape=s.axes_manager.navigation_shape + self.binnings[str(binning)]
             )
         sig_shape = s.axes_manager.signal_shape[::-1]  # (Rows, columns)
-
         det = kp.detectors.EBSDDetector(
             shape=sig_shape,
             binning=binning,
@@ -357,7 +356,7 @@ class HiSetupDialog(QDialog):
         print(f"Navigation shape: {nav_shape}")
         print(f"Signal shape: {sig_shape}")
         print(f"PC convention: {convention}")
-        xmap = s.hough_indexing(phase_list=self.phases, indexer=indexer, verbose=1)
+        xmap = s.hough_indexing(phase_list=self.phases, indexer=indexer, verbose=0)
         io.save(path.join(self.dir_out, "xmap_hi.h5"), xmap)
         io.save(path.join(self.dir_out, "xmap_hi.ang"), xmap)
         print("Result was saved as xmap_hi.ang and xmap_hi.h5")
