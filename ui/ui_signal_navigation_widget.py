@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'signal_navigation_widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.4.0
+## Created by: Qt User Interface Compiler version 6.3.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -15,9 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QGridLayout,
-    QHBoxLayout, QLabel, QPushButton, QSizePolicy,
-    QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFrame,
+    QGridLayout, QHBoxLayout, QLabel, QPushButton,
+    QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 
 from mplwidget import MplWidget
 
@@ -25,17 +25,46 @@ class Ui_SignalNavigationWidget(object):
     def setupUi(self, SignalNavigationWidget):
         if not SignalNavigationWidget.objectName():
             SignalNavigationWidget.setObjectName(u"SignalNavigationWidget")
-        SignalNavigationWidget.resize(591, 317)
+        SignalNavigationWidget.resize(645, 392)
         self.gridLayout = QGridLayout(SignalNavigationWidget)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.horizontalLayout_3 = QHBoxLayout()
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.navigatorLabel = QLabel(SignalNavigationWidget)
         self.navigatorLabel.setObjectName(u"navigatorLabel")
+        font = QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setUnderline(False)
+        self.navigatorLabel.setFont(font)
+        self.navigatorLabel.setScaledContents(False)
 
-        self.verticalLayout.addWidget(self.navigatorLabel)
+        self.horizontalLayout.addWidget(self.navigatorLabel)
+
+        self.navigatorCoordinates = QLabel(SignalNavigationWidget)
+        self.navigatorCoordinates.setObjectName(u"navigatorCoordinates")
+
+        self.horizontalLayout.addWidget(self.navigatorCoordinates)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout)
+
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.label = QLabel(SignalNavigationWidget)
+        self.label.setObjectName(u"label")
+
+        self.horizontalLayout_3.addWidget(self.label)
+
+        self.comboBoxNavigator = QComboBox(SignalNavigationWidget)
+        self.comboBoxNavigator.setObjectName(u"comboBoxNavigator")
+
+        self.horizontalLayout_3.addWidget(self.comboBoxNavigator)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
 
         self.navigatorMplWidget = MplWidget(SignalNavigationWidget)
         self.navigatorMplWidget.setObjectName(u"navigatorMplWidget")
@@ -51,30 +80,8 @@ class Ui_SignalNavigationWidget(object):
 
         self.verticalLayout.addWidget(self.navigatorMplWidget)
 
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.pushButtonMeanNav = QPushButton(SignalNavigationWidget)
-        self.pushButtonMeanNav.setObjectName(u"pushButtonMeanNav")
 
-        self.horizontalLayout.addWidget(self.pushButtonMeanNav)
-
-        self.pushButtonIQNav = QPushButton(SignalNavigationWidget)
-        self.pushButtonIQNav.setObjectName(u"pushButtonIQNav")
-
-        self.horizontalLayout.addWidget(self.pushButtonIQNav)
-
-
-        self.verticalLayout.addLayout(self.horizontalLayout)
-
-
-        self.horizontalLayout_3.addLayout(self.verticalLayout)
-
-        self.line = QFrame(SignalNavigationWidget)
-        self.line.setObjectName(u"line")
-        self.line.setFrameShape(QFrame.VLine)
-        self.line.setFrameShadow(QFrame.Sunken)
-
-        self.horizontalLayout_3.addWidget(self.line)
+        self.gridLayout.addLayout(self.verticalLayout, 0, 1, 1, 1)
 
         self.verticalLayout_2 = QVBoxLayout()
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
@@ -82,6 +89,11 @@ class Ui_SignalNavigationWidget(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.signalLabel = QLabel(SignalNavigationWidget)
         self.signalLabel.setObjectName(u"signalLabel")
+        font1 = QFont()
+        font1.setPointSize(10)
+        font1.setBold(True)
+        self.signalLabel.setFont(font1)
+        self.signalLabel.setTextFormat(Qt.AutoText)
 
         self.horizontalLayout_2.addWidget(self.signalLabel)
 
@@ -105,14 +117,39 @@ class Ui_SignalNavigationWidget(object):
 
         self.checkBox = QCheckBox(SignalNavigationWidget)
         self.checkBox.setObjectName(u"checkBox")
+        self.checkBox.setEnabled(True)
 
         self.verticalLayout_2.addWidget(self.checkBox)
 
 
-        self.horizontalLayout_3.addLayout(self.verticalLayout_2)
+        self.gridLayout.addLayout(self.verticalLayout_2, 0, 3, 1, 1)
 
+        self.line = QFrame(SignalNavigationWidget)
+        self.line.setObjectName(u"line")
+        self.line.setFrameShape(QFrame.VLine)
+        self.line.setFrameShadow(QFrame.Sunken)
 
-        self.gridLayout.addLayout(self.horizontalLayout_3, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.line, 0, 2, 1, 1)
+
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer)
+
+        self.pushButtonExportImage = QPushButton(SignalNavigationWidget)
+        self.pushButtonExportImage.setObjectName(u"pushButtonExportImage")
+
+        self.horizontalLayout_4.addWidget(self.pushButtonExportImage)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_2)
+
+        self.horizontalLayout_4.setStretch(0, 3)
+        self.horizontalLayout_4.setStretch(1, 3)
+
+        self.gridLayout.addLayout(self.horizontalLayout_4, 1, 3, 1, 1)
 
 
         self.retranslateUi(SignalNavigationWidget)
@@ -122,14 +159,12 @@ class Ui_SignalNavigationWidget(object):
 
     def retranslateUi(self, SignalNavigationWidget):
         SignalNavigationWidget.setWindowTitle(QCoreApplication.translate("SignalNavigationWidget", u"Form", None))
-        self.navigatorLabel.setText(QCoreApplication.translate("SignalNavigationWidget", u"Dataset", None))
-#if QT_CONFIG(whatsthis)
-        self.pushButtonMeanNav.setWhatsThis("")
-#endif // QT_CONFIG(whatsthis)
-        self.pushButtonMeanNav.setText(QCoreApplication.translate("SignalNavigationWidget", u"Mean instensity", None))
-        self.pushButtonIQNav.setText(QCoreApplication.translate("SignalNavigationWidget", u"Image quality", None))
-        self.signalLabel.setText(QCoreApplication.translate("SignalNavigationWidget", u"Index", None))
+        self.navigatorLabel.setText(QCoreApplication.translate("SignalNavigationWidget", u"Navigation:", None))
+        self.navigatorCoordinates.setText(QCoreApplication.translate("SignalNavigationWidget", u"(x, y)", None))
+        self.label.setText(QCoreApplication.translate("SignalNavigationWidget", u"Select navigator:", None))
+        self.signalLabel.setText(QCoreApplication.translate("SignalNavigationWidget", u"EBSD signal:", None))
         self.signalIndex.setText(QCoreApplication.translate("SignalNavigationWidget", u"(x, y)", None))
-        self.checkBox.setText(QCoreApplication.translate("SignalNavigationWidget", u"Gemoetrical simulation", None))
+        self.checkBox.setText(QCoreApplication.translate("SignalNavigationWidget", u"Geometrical simulation", None))
+        self.pushButtonExportImage.setText(QCoreApplication.translate("SignalNavigationWidget", u"Export image", None))
     # retranslateUi
 

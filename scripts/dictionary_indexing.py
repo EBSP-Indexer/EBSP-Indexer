@@ -45,7 +45,7 @@ class DiSetupDialog(QDialog):
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
         self.fileBrowserOD = FileBrowser(
             mode=FileBrowser.OpenFile,
-            filter_name="Hierarchical Data Format (*.h5);",
+            filter_name="(*.h5)",
         )
 
         self.load_pattern()
@@ -588,8 +588,8 @@ class DiSetupDialog(QDialog):
         self.di_setting_file.write(
             "Microscope", self.s.metadata.Acquisition_instrument.SEM.microscope
         )
-        self.di_setting_file.write("Acceleration voltage", f"{self.energy} kV")
-        self.di_setting_file.write("Sample tilt", f"{self.sample_tilt} degrees")
+        self.di_setting_file.write("Acceleration voltage [kV]", f"{self.energy}")
+        self.di_setting_file.write("Sample tilt [degrees]", f"{self.sample_tilt}")
         self.di_setting_file.write(
             "Working distance",
             self.s.metadata.Acquisition_instrument.SEM.working_distance,
@@ -615,7 +615,7 @@ class DiSetupDialog(QDialog):
             pc_copy[1] = 1 - pc_copy[1]
 
         self.di_setting_file.write("PC convention", f"{self.convention}")
-        self.di_setting_file.write("Pattern center (x*, y*, z*)", f"{pc_copy}")
+        self.di_setting_file.write("Pattern center (x*, y*, z*)", f"{tuple(pc_copy)}")
 
         if len(self.phases) > 1:
             for i, ph in enumerate(self.phases, 1):
@@ -646,6 +646,8 @@ class DiSetupDialog(QDialog):
         for i, mp_path in enumerate(self.mpPaths.values(), 1):
             self.di_setting_file.write(f"Master pattern path {i}", mp_path)
 
+        self.di_setting_file.write("Dataset path", self.pattern_path)
+        
         self.di_setting_file.save()
 
     def dictionary_indexing(self):
@@ -681,6 +683,7 @@ class DiSetupDialog(QDialog):
             pc=self.pc,
             convention="BRUKER",  # Default is Bruker
         )
+        detector.save(path.join(self.results_dir, "detector.txt"))
 
         # Apply signal mask
         self.signal_mask(sig_shape)
