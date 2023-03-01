@@ -429,7 +429,7 @@ class Ui_DiSetupDialog(object):
 
         self.label.setText(QCoreApplication.translate("DiSetupDialog", u"Pre-processing parameters:", None))
         self.label_7.setText(QCoreApplication.translate("DiSetupDialog", u"Binning shape", None))
-        self.checkBoxMask.setText(QCoreApplication.translate("DiSetupDialog", u"Apply circular mask to pattern", None))
+        self.checkBoxMask.setText(QCoreApplication.translate("DiSetupDialog", u"Apply circular mask to patterns", None))
         self.checkBoxLazy.setText(QCoreApplication.translate("DiSetupDialog", u"Lazy loading of patterns", None))
         self.label_6.setText(QCoreApplication.translate("DiSetupDialog", u"Dictionary indexing parameters:", None))
         self.label_8.setText(QCoreApplication.translate("DiSetupDialog", u"Angular step size (\u00b0)", None))

@@ -21,11 +21,6 @@ logging.getLogger("hyperspy").setLevel(logging.WARNING)
 from contextlib import redirect_stdout, redirect_stderr
 
 try:
-    from os import startfile
-except:
-    import subprocess
-
-try:
     import pyopencl.tools
 except:
     print("PyOpenCL could not be imported")
@@ -55,6 +50,7 @@ from scripts.system_explorer import SystemExplorerWidget
 from scripts.hough_indexing import HiSetupDialog
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.dictionary_indexing import DiSetupDialog
+from scripts.refinement import RefineSetupDialog
 from scripts.pre_indexing_maps import (
     save_adp_map,
     save_mean_intensity_map,
@@ -135,13 +131,16 @@ class AppWindow(QMainWindow):
         self.ui.actionSignalNavigation.triggered.connect(
             lambda: self.selectSignalNavigation(signal_path=self.getSelectedPath())
         )
-        self.ui.actionDictionary_indexing.triggered.connect(
+        self.ui.actionDictionaryIndexing.triggered.connect(
             lambda: self.selectDictionaryIndexingSetup(
                 pattern_path=self.getSelectedPath()
             )
         )
-        self.ui.actionHough_indexing.triggered.connect(
+        self.ui.actionHoughIndexing.triggered.connect(
             lambda: self.selectHoughIndexingSetup(pattern_path=self.getSelectedPath())
+        )
+        self.ui.actionRefineOrientations.triggered.connect(
+            lambda: self.selectRefineOrientations(file_path=self.getSelectedPath())
         )
         self.ui.actionPattern_Center.triggered.connect(
             lambda: self.selectPatternCenter()
@@ -236,6 +235,20 @@ class AppWindow(QMainWindow):
                 self.working_dir = setting_file.read("Default Directory")
             self.systemExplorer.setSystemViewer(
                 self.working_dir, filters=system_view_filters
+            )
+
+    def selectRefineOrientations(self, file_path: str):
+        try:
+            self.refineDialog = RefineSetupDialog(
+                parent=self, file_path=file_path
+            )
+            self.refineDialog.setWindowFlag(
+                Qt.WindowStaysOnTopHint, self.stayOnTopHint
+            )
+            self.refineDialog.exec()
+        except Exception as e:
+            self.console.errorwrite(
+                f"Could not initialize refinement dialog:\n{str(e)}\n"
             )
 
     def selectProcessing(self):
@@ -360,14 +373,16 @@ class AppWindow(QMainWindow):
         Updates the menu buttons based on the extension of file_path
         """
 
-        def setAllMenu(enabled):
+        def setAvailableMenuActions(enabled):
             self.ui.menuProcessing.setEnabled(enabled)
-            self.ui.menuPlot.setEnabled(enabled)
+            self.ui.menuPatternInspection.setEnabled(enabled)
             self.ui.menuIndexing.setEnabled(enabled)
             self.ui.menuPre_indexing_maps.setEnabled(enabled)
             self.ui.actionSignalNavigation.setEnabled(enabled)
+            self.ui.menuRefinement.setEnabled(enabled)
 
-        if file_path == None:
+        if file_path == "":
+            setAvailableMenuActions(False)
             return
         file_extension = path.splitext(file_path)[1]
 
@@ -375,11 +390,11 @@ class AppWindow(QMainWindow):
             kp_enabled = True
         else:
             kp_enabled = False
-        setAllMenu(kp_enabled)
+        setAvailableMenuActions(kp_enabled)
 
         # Special case for plotting calibration patterns from Settings.txt
         if path.basename(file_path) == "Setting.txt":
-            self.ui.menuPlot.setEnabled(True)
+            self.ui.menuPatternInspection.setEnabled(True)
             self.ui.actionSignalNavigation.setEnabled(True)
             self.ui.menuPre_indexing_maps.setEnabled(False)
 

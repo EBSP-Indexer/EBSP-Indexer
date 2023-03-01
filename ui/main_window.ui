@@ -81,9 +81,9 @@
     <addaction name="actionROI"/>
     <addaction name="actionPattern_Center"/>
    </widget>
-   <widget class="QMenu" name="menuPlot">
+   <widget class="QMenu" name="menuPatternInspection">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="title">
      <string>Pattern inspection</string>
@@ -110,8 +110,8 @@
     <property name="title">
      <string>Indexing</string>
     </property>
-    <addaction name="actionDictionary_indexing"/>
-    <addaction name="actionHough_indexing"/>
+    <addaction name="actionDictionaryIndexing"/>
+    <addaction name="actionHoughIndexing"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -123,10 +123,20 @@
     <addaction name="actionToggleJob_Manager"/>
     <addaction name="actionToggleSignal_Navigation"/>
    </widget>
+   <widget class="QMenu" name="menuRefinement">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="title">
+     <string>Refinement</string>
+    </property>
+    <addaction name="actionRefineOrientations"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuProcessing"/>
-   <addaction name="menuPlot"/>
+   <addaction name="menuPatternInspection"/>
    <addaction name="menuIndexing"/>
+   <addaction name="menuRefinement"/>
    <addaction name="menuView"/>
   </widget>
   <widget class="QDockWidget" name="dockWidgetTerminal">
@@ -209,8 +219,8 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>0</width>
-     <height>0</height>
+     <width>342</width>
+     <height>368</height>
     </size>
    </property>
    <property name="windowTitle">
@@ -336,7 +346,7 @@
     <string>Signal navigation</string>
    </property>
   </action>
-  <action name="actionDictionary_indexing">
+  <action name="actionDictionaryIndexing">
    <property name="text">
     <string>Dictionary indexing</string>
    </property>
@@ -351,7 +361,7 @@
     <string>Region of interest</string>
    </property>
   </action>
-  <action name="actionHough_indexing">
+  <action name="actionHoughIndexing">
    <property name="text">
     <string>Hough indexing</string>
    </property>
@@ -458,6 +468,11 @@
    </property>
    <property name="text">
     <string>Signal Navigation</string>
+   </property>
+  </action>
+  <action name="actionRefineOrientations">
+   <property name="text">
+    <string>Refine Crystal Map Orientations</string>
    </property>
   </action>
   <zorder>dockWidgetTerminal</zorder>

@@ -309,7 +309,7 @@
           <item row="1" column="0">
            <widget class="QCheckBox" name="checkBoxMask">
             <property name="text">
-             <string>Apply circular mask to pattern</string>
+             <string>Apply circular mask to patterns</string>
             </property>
            </widget>
           </item>

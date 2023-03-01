@@ -66,6 +66,16 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout.addWidget(self.line_6)
 
+        self.checkBoxLazy = QCheckBox(self.frame)
+        self.checkBoxLazy.setObjectName(u"checkBoxLazy")
+        self.checkBoxLazy.setEnabled(True)
+        self.checkBoxLazy.setLayoutDirection(Qt.LeftToRight)
+        self.checkBoxLazy.setCheckable(True)
+        self.checkBoxLazy.setChecked(True)
+        self.checkBoxLazy.setTristate(False)
+
+        self.verticalLayout.addWidget(self.checkBoxLazy)
+
         self.verticalLayout_6 = QVBoxLayout()
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
         self.verticalLayout_4 = QVBoxLayout()
@@ -76,14 +86,18 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout_4.addWidget(self.label_7)
 
-        self.horizontalLayout_2 = QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.comboBoxBinning = QComboBox(self.frame)
         self.comboBoxBinning.setObjectName(u"comboBoxBinning")
         self.comboBoxBinning.setMaximumSize(QSize(80, 16777215))
         self.comboBoxBinning.setLayoutDirection(Qt.LeftToRight)
 
-        self.horizontalLayout_2.addWidget(self.comboBoxBinning)
+        self.verticalLayout_4.addWidget(self.comboBoxBinning)
+
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_8)
 
         self.labelSignalShape = QLabel(self.frame)
         self.labelSignalShape.setObjectName(u"labelSignalShape")
@@ -99,16 +113,6 @@ class Ui_HISetupDialog(object):
 
 
         self.verticalLayout_6.addLayout(self.verticalLayout_4)
-
-        self.checkBoxLazy = QCheckBox(self.frame)
-        self.checkBoxLazy.setObjectName(u"checkBoxLazy")
-        self.checkBoxLazy.setEnabled(True)
-        self.checkBoxLazy.setLayoutDirection(Qt.LeftToRight)
-        self.checkBoxLazy.setCheckable(True)
-        self.checkBoxLazy.setChecked(True)
-        self.checkBoxLazy.setTristate(False)
-
-        self.verticalLayout_6.addWidget(self.checkBoxLazy)
 
 
         self.verticalLayout.addLayout(self.verticalLayout_6)
@@ -493,13 +497,13 @@ class Ui_HISetupDialog(object):
 
     def retranslateUi(self, HISetupDialog):
         HISetupDialog.setWindowTitle(QCoreApplication.translate("HISetupDialog", u"Hough Indexing", None))
-        self.label_10.setText(QCoreApplication.translate("HISetupDialog", u"Pre-indexing", None))
+        self.label_10.setText(QCoreApplication.translate("HISetupDialog", u"Signal", None))
+        self.checkBoxLazy.setText(QCoreApplication.translate("HISetupDialog", u"Lazy loading of patterns", None))
         self.label_7.setText(QCoreApplication.translate("HISetupDialog", u"Binning", None))
 #if QT_CONFIG(tooltip)
         self.comboBoxBinning.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Detector binning, i.e. how many pixels are binned into one, default is no binning</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.labelSignalShape.setText(QCoreApplication.translate("HISetupDialog", u"Signal shape: (00x00)", None))
-        self.checkBoxLazy.setText(QCoreApplication.translate("HISetupDialog", u"Lazy loading of patterns", None))
         self.label_11.setText(QCoreApplication.translate("HISetupDialog", u"Hough Transform", None))
         self.label_9.setText(QCoreApplication.translate("HISetupDialog", u"Number of bands", None))
 #if QT_CONFIG(tooltip)
