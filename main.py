@@ -306,7 +306,8 @@ class AppWindow(QMainWindow):
 
     def selectSignalNavigation(self, signal_path: str):
         try:
-            self.signalNavigationWidget.plot_navigator(signal_path)
+            self.signalNavigationWidget.load_dataset(signal_path)
+
         except Exception as e:
             if self.getSelectedPath() == "":
                 dlg = QMessageBox(self)

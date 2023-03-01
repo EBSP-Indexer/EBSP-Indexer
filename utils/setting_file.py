@@ -10,11 +10,13 @@ class SettingFile:
         self.sep = sep
         try:
             self.file = open(file_path, "r")
-
             for line in self.file:
-                (key, value) = line.split(self.sep)
-                self.dict[key] = value
+
+                if line.strip(): #check if line is not empty
+                    (key, value) = line.split(self.sep)
+                    self.dict[key] = value
             self.file.close()
+
         except Exception as e:
             #raise e
             #warnings.warn(f"Could not open settings file '{self.path}'.")

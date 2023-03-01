@@ -485,7 +485,7 @@ def log_hi_parameters(
     Assumes convention is BRUKER for pattern center if none is given
     """
 
-    log = SettingFile(path.join(dir_out, "hi_parameters.txt"))
+    log = SettingFile(path.join(dir_out, "indexing_parameters.txt"))
     K = ["strs"]
     ### Time and date
     log.write("Date", f"{date.today()}\n")
@@ -532,7 +532,7 @@ def log_hi_parameters(
                 f"{phase_amount:.1%}, ({xmap[f'{ph}'].size})",
             )
 
-        not_indexed_percent = xmap["not_indexed"].size / xmap.size
+        # not_indexed_percent = xmap["not_indexed"].size / xmap.size
         # log.write(
         #     "Not indexed", f"{xmap['not_indexed'].size} ({not_indexed_percent:.1%})"
         # )

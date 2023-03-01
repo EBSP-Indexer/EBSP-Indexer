@@ -1,58 +1,100 @@
-import sys
+from utils import SettingFile
+
+from os import path
+
 import kikuchipy as kp
+
+import orix
+from diffsims.crystallography import ReciprocalLatticeVector
+
+
+from numpy import array
+
 import matplotlib.pyplot as plt
 
-class SignalNaviagtion():
-    def __init__(self) -> None:
-        super().__init__
+def open_file(file_path):
+    """
+    File check, checks if the file header is an EBSD pattern or a crystal map
 
-    def plot_navigator(self, file_path, nav_type="mean_intensity"):
-        try:
-            self.ui.navigatorMplWidget.canvas.mpl_disconnect(self.cid)
-        except:
-            pass
+    """
 
-        s = open_pattern(file_path)
-        
-        navigator = get_navigation_figure(s, nav_type)
+    try:
+        s = kp.load(file_path, lazy=True)
+    except:
+        s = orix.io.load(file_path)
 
-        self.ui.navigatorMplWidget.vbl.setContentsMargins(0, 0, 0, 0)
-        self.ui.navigatorMplWidget.canvas.ax.clear()
-        self.ui.navigatorMplWidget.canvas.ax.axis(False)
-        self.cursor = Cursor(self.ui.navigatorMplWidget.canvas.ax, useblit=True, color="yellow", linewidth=3, linestyle="--", alpha=0.8)
-        self.cursor.set_active(True)
-        self.ui.navigatorMplWidget.canvas.ax.imshow(navigator, cmap="gray")
-        self.ui.navigatorMplWidget.canvas.draw()
-        #plot pattern from upper left corner
-        self.plot_signal(s, 0, 0)
-        #canvas id to later disconnect
-        self.cid = self.ui.navigatorMplWidget.canvas.mpl_connect("button_press_event", lambda event: self.on_click_navigator(event, s))
+    if isinstance(s, kp.signals.ebsd.EBSD):
+        return return_ebsd_pattern(s)
+
+    if isinstance(s, orix.crystal_map.crystal_map.CrystalMap):
+        return return_crystal_map(file_path, s)
 
 
-    def plot_signal(self, pattern, x_index, y_index):
-        
-        signal = pattern.data[y_index, x_index]
-        
-        self.ui.signalMplWidget.vbl.setContentsMargins(0, 0, 0, 0)
-        self.ui.signalMplWidget.canvas.ax.clear()
-        self.ui.signalMplWidget.canvas.ax.axis(False)
-        self.ui.signalMplWidget.canvas.ax.imshow(signal, cmap="gray")
-        self.ui.signalMplWidget.canvas.draw()
+def return_ebsd_pattern(s):
 
-    def on_click_navigator(self, event, s):
-        if event.inaxes:
-            self.plot_signal(s, int(event.xdata), int(event.ydata))
+    ebsd_pattern = {}
+    ebsd_pattern["type"] = "ebsd dataset"
+    ebsd_pattern["ebsd_data"] = s
+    ebsd_pattern["nav_shape"] = s.axes_manager.navigation_shape
+    
+    mean_intensity_map = s.mean(axis=(2, 3))
+    image_quality_map = s.get_image_quality().compute()
 
-def open_pattern(file_path):
-    s = kp.load(file_path, lazy=True)
-    nav_shape = s.axes_manager.navigation_shape
-    return s, nav_shape
+    ebsd_pattern["navigator"] = {"Mean intensity map": mean_intensity_map, "Image quality map": image_quality_map}
 
-def get_navigation_figure(pattern, nav_type="mean_intensity"):
-    if nav_type == "mean_intensity":
-        navigator = pattern.mean(axis=(2,3))
-    if nav_type == "iq":
-        print("ok")
-        navigator = pattern.get_image_quality()
+    return ebsd_pattern
 
-    return navigator
+
+def return_crystal_map(file_path, s):
+
+    crystal_map = {}
+    crystal_map["type"] = "crystal map"
+    crystal_map["nav_shape"] = s.shape[::-1]
+
+    try:
+        # returns a dictionary with values stored in di_parameters.txt
+        print(path.join(path.dirname(file_path), "di_parameters.txt"))
+        # param_directory = path.dirname(file_path)
+        parameter_file = SettingFile(
+            path.join(path.dirname(file_path), "di_parameters.txt")
+        )
+    except FileNotFoundError as e:
+        raise e
+
+    pattern_path = parameter_file.read("Dataset path")
+    pattern = kp.load(pattern_path)
+
+    # Get detector from indexing routine
+    detector = kp.detectors.EBSDDetector.load(path.join(path.dirname(file_path), "detector.txt"))
+    detector.shape = pattern.axes_manager.signal_shape
+    print(detector)
+    # Generate geometrical simulation based on orientations in crystal map
+    rlv = ReciprocalLatticeVector(
+        phase=s.phases[0], hkl=[[1, 1, 1], [2, 0, 0], [2, 2, 0], [3, 1, 1]]
+    )
+    rlv = rlv.symmetrise()
+    simulator = kp.simulations.KikuchiPatternSimulator(rlv)
+    sim = simulator.on_detector(detector, s.rotations.reshape(*s.shape))
+
+    crystal_map["ebsd_data"] = pattern
+    crystal_map["geo_sim"] = sim
+
+    # Generate IPF for navigation of crystal map
+    ckey = orix.plot.IPFColorKeyTSL(s.phases.point_groups[0])
+
+    ipf = ckey.orientation2color(s["ni"].orientations)
+    ipf = ipf.reshape(s.shape + (3,))
+
+    #Generate NCC map
+
+
+    crystal_map["navigator"] = {"Inverse pole figure": ipf}
+
+    return crystal_map
+
+def export_image(navigator, signal, ):
+    fig, ax = plt.subplots(1, 2, figsize=(12, 6))
+    ax[0].imshow(navigator)
+    ax[1].imshow(signal)
+
+    fig.imsave()
