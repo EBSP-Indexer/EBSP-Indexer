@@ -336,7 +336,8 @@ class DiSetupDialog(QDialog):
             output_path=self.results_dir,
             listview=self.parentWidget().ui.jobList,
             func=self.dictionary_indexing,
-            allow_cleanup=True
+            allow_cleanup=True,
+            allow_logging=True
         )
 
     # Master pattern dictionary

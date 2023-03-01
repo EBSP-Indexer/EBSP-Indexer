@@ -358,6 +358,7 @@ class HiSetupDialog(QDialog):
             listview=self.parentWidget().ui.jobList,
             func=self.hough_indexing,
             allow_cleanup=True,
+            allow_logging=True
         )
 
     def set_phases_properties(self):
@@ -455,7 +456,7 @@ def create_log(
     Assumes convention is BRUKER for pattern center if none is given
     """
 
-    log = SettingFile(path.join(dir_out, "log.txt"))
+    log = SettingFile(path.join(dir_out, "hi_parameters.txt"))
     K = ["strs"]
     ### Time and date
     log.write("Date", f"{date.today()}\n")

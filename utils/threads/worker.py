@@ -1,5 +1,4 @@
-import sys
-from typing import Callable, Optional, TextIO, Union
+from typing import Callable
 from contextlib import redirect_stderr, redirect_stdout
 
 from PySide6.QtCore import QThreadPool, QObject, QRunnable, Slot, Signal
@@ -11,31 +10,44 @@ from utils.threads.thdout import ThreadedOutput
 
 class Worker(QRunnable, QObject):
     """
-    #TODO CHANGE DESCRIPTION
+    Inherits from QRunnable and QObject to handle thread setup, signals and wrap-up.
 
-    Worker thread
-
-    Inherits from QRunnable to handler worker thread setup, signals and wrap-up.
-
-    :param callback: The function callback to run on this worker thread. Supplied args and
-                     kwargs will be passed through to the runner.
-    :type callback: function
-    :param args: Arguments to pass to the callback function
-    :param kwargs: Keywords to pass to the callback function
-
+    Attributes
+    ----------
+    parent : QMainWindow, QWidget
+        The parenting QWidget which is either a WorkerWidget or the main application window,
+        contains methods for writing output
+    func : Callable
+        The function callback to run on this worker thread,
+        supplied args and kwargs will be passed through to the runner
+    args : tuple
+        Arguments to pass to the callback function
+    kwargs: dict[str, Any]
+        Keywords to pass to the callback function
+    thdout : ThreadedOutput
+        Redirects standard output to the signals outputLine and outputError
     """
 
     isStarted = Signal(int)
     isFinished = Signal(int)
     isError = Signal(int)
 
-    def __init__(
-        self,
-        parent: QMainWindow | QWidget,
-        func: Callable,
-        *args,
-        **kwargs
-    ):
+    def __init__(self, parent: QMainWindow | QWidget, func: Callable, *args, **kwargs):
+        """
+        Parameters
+        ----------
+        parent : QMainWindow, QWidget
+            The parenting QWidget which is either a WorkerWidget or the main application window,
+            contains methods for writing output
+        func : Callable
+            The function callback to run on this worker thread,
+            Supplied args and kwargs will be passed through to the runner
+        args : tuple
+            Arguments to pass to the callback function
+        kwargs: dict[str, Any]
+            Keywords to pass to the callback function
+        """
+
         QObject.__init__(self, parent=parent)
         QRunnable.__init__(self)
         if issubclass(parent.__class__, QMainWindow):
@@ -64,7 +76,12 @@ class Worker(QRunnable, QObject):
     @Slot()
     def run(self) -> None:
         """
-        Initialise the runner function with passed args, kwargs, and redirects the output.
+        Initialise the runner function with passed args, kwargs, and redirects standard output and error.
+
+        Raises
+        ------
+        Exception
+            If an error occurs in the task of the thread
         """
         with redirect_stdout(self.thdout), redirect_stderr(self.error_redirect):
             try:
@@ -72,14 +89,27 @@ class Worker(QRunnable, QObject):
                 self.fn(*self.args, **self.kwargs)
                 self.isFinished.emit(self.id)
             except Exception as e:
+                self.thdout.errorwrite(f"{e} (See terminal for traceback)")
                 self.isError.emit(self.id)
-                self.thdout.errorwrite(str(e))
                 raise e
 
 
-def sendToWorker(parent: QObject, func: Callable, *args, **kwargs):
+def sendToWorker(parent: QMainWindow | QObject, func: Callable, *args, **kwargs):
     """
-    Sends a function to a worker-thread that will redirect to stdout
+    Sends a function to a worker-thread with args and kwargs, and redirects standard output and error to parent.
+
+    Parameters
+    ----------
+    parent : QMainWindow, QWidget
+        The parenting QWidget which is either a WorkerWidget or the main application window,
+        contains methods for writing output
+    func : Callable
+        The function callback to run on this worker thread,
+        Supplied args and kwargs will be passed through to the runner
+    args : tuple
+        Arguments to pass to the callback function
+    kwargs: dict[str, Any]
+        Keywords to pass to the callback function
     """
     worker = Worker(parent, func, *args, **kwargs)
     QThreadPool.globalInstance().start(worker)
