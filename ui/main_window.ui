@@ -22,10 +22,6 @@
   <property name="windowTitle">
    <string>EBSD-GUI</string>
   </property>
-  <property name="windowIcon">
-   <iconset resource="../resources.qrc">
-    <normaloff>:/icons/app_icon.ico</normaloff>:/icons/app_icon.ico</iconset>
-  </property>
   <property name="layoutDirection">
    <enum>Qt::LeftToRight</enum>
   </property>
@@ -321,7 +317,7 @@
   <action name="actionOpen_Workfolder">
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/linea_basic/resources/linea_basic_icons/basic_folder.svg</normaloff>:/linea_basic/resources/linea_basic_icons/basic_folder.svg</iconset>
+     <normaloff>:/linea icons/resources/linea basic icons/basic_folder.svg</normaloff>:/linea icons/resources/linea basic icons/basic_folder.svg</iconset>
    </property>
    <property name="text">
     <string>Open Workfolder...</string>
@@ -375,7 +371,7 @@
   <action name="actionSettings">
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/linea_basic/resources/linea_basic_icons/basic_gear.svg</normaloff>:/linea_basic/resources/linea_basic_icons/basic_gear.svg</iconset>
+     <normaloff>:/linea icons/resources/linea basic icons/basic_gear.svg</normaloff>:/linea icons/resources/linea basic icons/basic_gear.svg</iconset>
    </property>
    <property name="text">
     <string>Settings</string>
