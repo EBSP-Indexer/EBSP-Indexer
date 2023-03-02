@@ -313,7 +313,7 @@ class HiSetupDialog(QDialog):
                 binnings[f"{num}"] = (int(sig_shape[0] / num), int(sig_shape[1] / num))
         return binnings
 
-    def hough_indexing(self):
+    def hough_indexing(self, s):
         options = self.getOptions()
         self.rho_mask = (100.0 - options["rho"]) / 100.0
         self.number_bands = options["bands"]
@@ -322,10 +322,6 @@ class HiSetupDialog(QDialog):
         convention = options["convention"]
         self.save_parameters()
         print(f"Loading {self.pattern_name} | lazy = {options['lazy']}")
-        try:
-            s = kp.load(self.pattern_path, lazy=options["lazy"])
-        except Exception as e:
-            raise e
         nav_shape = s.axes_manager.navigation_shape[::-1]
         if binning is None:
             binning = 1
@@ -343,6 +339,7 @@ class HiSetupDialog(QDialog):
             pc=pc,
             convention=convention,
         )
+        det.save(path.join(self.dir_out, "detector.txt"), convention)
         indexer = det.get_indexer(
             phase_list=self.phases,
             rhoMaskFrac=self.rho_mask,
@@ -372,6 +369,7 @@ class HiSetupDialog(QDialog):
                     print(f"Could not save {key}_map:\n{e}")
         print("Logging results ...")
         log_hi_parameters(
+            self.pattern_path,
             self.dir_out,
             s,
             xmap,
@@ -390,6 +388,12 @@ class HiSetupDialog(QDialog):
                 break
             except FileExistsError:
                 pass
+        # Load s outside of thread to avoid leaked sesmaphores 
+        options = self.getOptions()
+        try:
+            signal = kp.load(self.pattern_path, lazy=options["lazy"])
+        except Exception as e:
+            raise e
         sendToJobManager(
             job_title=f"HI {self.pattern_name}",
             output_path=self.dir_out,
@@ -397,6 +401,7 @@ class HiSetupDialog(QDialog):
             func=self.hough_indexing,
             allow_cleanup=True,
             allow_logging=True,
+            s = signal
         )
 
     def save_quality_metrics(self, xmap):
@@ -473,6 +478,7 @@ class HiSetupDialog(QDialog):
 
 # TODO Add more Hough related properties, better way to sort?
 def log_hi_parameters(
+    pattern_path: str,
     dir_out: str,
     signal: EBSD | LazyEBSD = None,
     xmap: CrystalMap = None,
@@ -496,6 +502,7 @@ def log_hi_parameters(
         "Acceleration voltage",
         f"{signal.metadata.Acquisition_instrument.SEM.beam_energy} kV",
     )
+    log.write("Pattern path", pattern_path)
     log.write("Sample tilt", f"{signal.detector.sample_tilt} degrees")
     log.write("Camera tilt", f"{signal.detector.tilt} degrees")
     log.write(

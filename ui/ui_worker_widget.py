@@ -24,12 +24,6 @@ class Ui_WorkerWidget(object):
     def setupUi(self, WorkerWidget):
         if not WorkerWidget.objectName():
             WorkerWidget.setObjectName(u"WorkerWidget")
-        WorkerWidget.resize(504, 387)
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(WorkerWidget.sizePolicy().hasHeightForWidth())
-        WorkerWidget.setSizePolicy(sizePolicy)
         WorkerWidget.setLocale(QLocale(QLocale.English, QLocale.UnitedKingdom))
         self.verticalLayout = QVBoxLayout(WorkerWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -38,11 +32,11 @@ class Ui_WorkerWidget(object):
         self.horizontalLayout.setSizeConstraint(QLayout.SetDefaultConstraint)
         self.labelJobNumber = QLabel(WorkerWidget)
         self.labelJobNumber.setObjectName(u"labelJobNumber")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.labelJobNumber.sizePolicy().hasHeightForWidth())
-        self.labelJobNumber.setSizePolicy(sizePolicy1)
+        sizePolicy = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.labelJobNumber.sizePolicy().hasHeightForWidth())
+        self.labelJobNumber.setSizePolicy(sizePolicy)
 
         self.horizontalLayout.addWidget(self.labelJobNumber)
 
@@ -72,11 +66,11 @@ class Ui_WorkerWidget(object):
 
         self.labelTime = QLabel(WorkerWidget)
         self.labelTime.setObjectName(u"labelTime")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.labelTime.sizePolicy().hasHeightForWidth())
-        self.labelTime.setSizePolicy(sizePolicy2)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.labelTime.sizePolicy().hasHeightForWidth())
+        self.labelTime.setSizePolicy(sizePolicy1)
         self.labelTime.setStyleSheet(u"color: rgb(220, 190, 0);\n"
 "font: 75 9pt \"MS Shell Dlg 2\";")
 
@@ -94,11 +88,11 @@ class Ui_WorkerWidget(object):
         self.pushButtonRemove = QPushButton(WorkerWidget)
         self.pushButtonRemove.setObjectName(u"pushButtonRemove")
         self.pushButtonRemove.setEnabled(False)
-        sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.pushButtonRemove.sizePolicy().hasHeightForWidth())
-        self.pushButtonRemove.setSizePolicy(sizePolicy3)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.pushButtonRemove.sizePolicy().hasHeightForWidth())
+        self.pushButtonRemove.setSizePolicy(sizePolicy2)
         icon2 = QIcon()
         icon2.addFile(u":/linea_basic/resources/linea_basic_icons/basic_trashcan.svg", QSize(), QIcon.Normal, QIcon.Off)
         self.pushButtonRemove.setIcon(icon2)
@@ -111,8 +105,11 @@ class Ui_WorkerWidget(object):
 
         self.line = QFrame(WorkerWidget)
         self.line.setObjectName(u"line")
-        sizePolicy.setHeightForWidth(self.line.sizePolicy().hasHeightForWidth())
-        self.line.setSizePolicy(sizePolicy)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.line.sizePolicy().hasHeightForWidth())
+        self.line.setSizePolicy(sizePolicy3)
         self.line.setFrameShape(QFrame.HLine)
         self.line.setFrameShadow(QFrame.Sunken)
 
@@ -120,8 +117,8 @@ class Ui_WorkerWidget(object):
 
         self.labelJobName = QLabel(WorkerWidget)
         self.labelJobName.setObjectName(u"labelJobName")
-        sizePolicy2.setHeightForWidth(self.labelJobName.sizePolicy().hasHeightForWidth())
-        self.labelJobName.setSizePolicy(sizePolicy2)
+        sizePolicy1.setHeightForWidth(self.labelJobName.sizePolicy().hasHeightForWidth())
+        self.labelJobName.setSizePolicy(sizePolicy1)
         self.labelJobName.setStyleSheet(u"font: 75 12pt \"MS Shell Dlg 2\";\n"
 "text-decoration: underline;")
 
@@ -129,8 +126,8 @@ class Ui_WorkerWidget(object):
 
         self.labelOutput = QLabel(WorkerWidget)
         self.labelOutput.setObjectName(u"labelOutput")
-        sizePolicy2.setHeightForWidth(self.labelOutput.sizePolicy().hasHeightForWidth())
-        self.labelOutput.setSizePolicy(sizePolicy2)
+        sizePolicy1.setHeightForWidth(self.labelOutput.sizePolicy().hasHeightForWidth())
+        self.labelOutput.setSizePolicy(sizePolicy1)
         self.labelOutput.setStyleSheet(u"font: italic 8pt \"MS Sans Serif\";\n"
 "color: rgb(120, 120, 120);")
 
