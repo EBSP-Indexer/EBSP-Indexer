@@ -7,6 +7,10 @@ try:
 except:
     import subprocess
 
+import kikuchipy as kp
+from kikuchipy.signals.ebsd import EBSD, LazyEBSD
+from orix import io
+from orix.crystal_map import CrystalMap
 from PySide6.QtCore import Qt, Signal, QDir
 from PySide6.QtWidgets import QWidget, QFileSystemModel, QMessageBox, QMenu
 from PySide6.QtGui import QCursor
@@ -71,12 +75,24 @@ class SystemExplorerWidget(QWidget):
         if file and ext in self.KP_EXTENSIONS:
             snAction = menu.addAction("Open in Signal Navigation")
             snAction.triggered.connect(lambda: self.requestSignalNavigation.emit(menu_path))
-            menu.addSeparator()
-            hiAction = menu.addAction("Index with HI")
-            diAction = menu.addAction("Index with DI")
-            # Replace these two with signals for more flexible implementation
-            hiAction.triggered.connect(lambda: self.app.selectHoughIndexingSetup(menu_path))
-            diAction.triggered.connect(lambda: self.app.selectDictionaryIndexingSetup(menu_path))
+            try:
+                s_prew = kp.load(menu_path, lazy=True)
+                if isinstance(s_prew, (EBSD, LazyEBSD)):
+                    menu.addSeparator()
+                    hiAction = menu.addAction("Hough Indexing")
+                    diAction = menu.addAction("Dictionary Indexing")
+                    # Replace these two with signals for more flexible implementation
+                    hiAction.triggered.connect(lambda: self.app.selectHoughIndexingSetup(menu_path))
+                    diAction.triggered.connect(lambda: self.app.selectDictionaryIndexingSetup(menu_path))
+            except:
+                try:
+                    xmap_prew = io.load(menu_path)
+                    if isinstance(xmap_prew, CrystalMap):
+                        menu.addSeparator()
+                        refineAction = menu.addAction("Refine Orientations")
+                        refineAction.triggered.connect(lambda: self.app.selectRefineOrientations(menu_path))
+                except Exception as e:
+                    pass
         # Misc available actions
         elif file and ext in [".txt"]:
             txtAction = menu.addAction("Open")

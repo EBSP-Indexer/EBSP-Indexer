@@ -273,6 +273,12 @@
     <layout class="QGridLayout" name="gridLayout_3">
      <item row="1" column="0">
       <widget class="QListWidget" name="jobList">
+       <property name="minimumSize">
+        <size>
+         <width>400</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="selectionMode">
         <enum>QAbstractItemView::NoSelection</enum>
        </property>
@@ -464,7 +470,7 @@
     <bool>true</bool>
    </property>
    <property name="checked">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Signal Navigation</string>

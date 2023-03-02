@@ -105,7 +105,7 @@ class Ui_MainWindow(object):
         self.actionToggleSignal_Navigation = QAction(MainWindow)
         self.actionToggleSignal_Navigation.setObjectName(u"actionToggleSignal_Navigation")
         self.actionToggleSignal_Navigation.setCheckable(True)
-        self.actionToggleSignal_Navigation.setChecked(False)
+        self.actionToggleSignal_Navigation.setChecked(True)
         self.actionRefineOrientations = QAction(MainWindow)
         self.actionRefineOrientations.setObjectName(u"actionRefineOrientations")
         self.centralwidget = QWidget(MainWindow)
@@ -227,6 +227,7 @@ class Ui_MainWindow(object):
         self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.jobList = QListWidget(self.dockWidgetContents)
         self.jobList.setObjectName(u"jobList")
+        self.jobList.setMinimumSize(QSize(400, 0))
         self.jobList.setSelectionMode(QAbstractItemView.NoSelection)
 
         self.gridLayout_3.addWidget(self.jobList, 1, 0, 1, 1)
