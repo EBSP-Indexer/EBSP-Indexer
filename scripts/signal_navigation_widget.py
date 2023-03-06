@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from matplotlib.widgets import Cursor
 
+from utils import FileBrowser
 
 class SignalNavigationWidget(QWidget):
     def __init__(self, mainWindow: QMainWindow) -> None:
@@ -53,7 +54,6 @@ class SignalNavigationWidget(QWidget):
             self.dataset = open_file(file_path)
             self.file_selected = file_path
         except Exception as e:
-            print("open file failed")
             raise e
 
         self.plot_navigator(self.dataset, navigator=list(self.dataset["navigator"])[0])
@@ -61,13 +61,20 @@ class SignalNavigationWidget(QWidget):
 
         for key in self.dataset["navigator"].keys():
             self.ui.comboBoxNavigator.addItem(key)
+        
+        self.ui.checkBox.setChecked(False)
 
         if self.dataset["type"] == "crystal map":
-            self.ui.checkBox.setVisible(True)
-            self.ui.checkBox.setChecked(False)
+            show_labels_and_checkbox = True
         else:
-            self.ui.checkBox.setVisible(False)
-            self.ui.checkBox.setChecked(False)
+            show_labels_and_checkbox = False
+
+        
+        self.ui.checkBox.setVisible(show_labels_and_checkbox)            
+        self.ui.labelPhaseClick.setVisible(show_labels_and_checkbox)
+        self.ui.LabelPhase2.setVisible(show_labels_and_checkbox)
+        self.ui.labelPhaseHover.setVisible(show_labels_and_checkbox)
+        self.ui.labelPhase1.setVisible(show_labels_and_checkbox)
 
     def plot_navigator(self, dataset, navigator: str, x=0, y=0):
         if navigator == "":
@@ -80,7 +87,7 @@ class SignalNavigationWidget(QWidget):
             pass
         navigator = dataset["navigator"][navigator]
 
-        #plot to MplCanvas
+        # plot to MplCanvas
         self.ui.navigatorMplWidget.vbl.setContentsMargins(0, 0, 0, 0)
         self.ui.navigatorMplWidget.canvas.ax.clear()
         self.ui.navigatorMplWidget.canvas.ax.axis(False)
@@ -101,8 +108,6 @@ class SignalNavigationWidget(QWidget):
             extent=(0, dataset["nav_shape"][0], dataset["nav_shape"][1], 0),
         )
         self.ui.navigatorMplWidget.canvas.draw()
-
-        # plot to self.fig_to_save
 
         # plot pattern from upper left corner
         self.plot_signal(dataset, x, y)
@@ -126,7 +131,7 @@ class SignalNavigationWidget(QWidget):
         self.ui.signalMplWidget.canvas.ax.imshow(signal, cmap="gray")
 
         if dataset["type"] == "crystal map" and self.add_geosim:
-            hkl_lines = dataset["geo_sim"].as_collections(
+            hkl_lines = dataset["geo_sim"][dataset["phase_id_map"][y_index, x_index]].as_collections(
                 (y_index, x_index), zone_axes_labels=False
             )
             self.ui.signalMplWidget.canvas.ax.add_collection(
@@ -182,37 +187,49 @@ class SignalNavigationWidget(QWidget):
             click_annot.set_bbox(dict(facecolor="white", alpha=0.5, edgecolor="grey"))
             self.ui.navigatorMplWidget.canvas.draw()
             click_annot.remove()
+            if self.dataset["type"] == "crystal map":
+                phase_name = self.dataset["crystal_map"].phases[self.dataset["phase_id_map"][y, x]].name
+                self.ui.labelPhaseClick.setText(f"{phase_name}")
 
     def on_hover_navigator(self, event):
         if event.inaxes:
             x_hover, y_hover = floor(event.xdata), floor(event.ydata)
             self.ui.navigatorCoordinates.setText(f"({x_hover}, {y_hover})")
+            if self.dataset["type"] == "crystal map":
+                phase_name = self.dataset["crystal_map"].phases[self.dataset["phase_id_map"][y_hover, x_hover]].name
+                self.ui.labelPhaseHover.setText(f"{phase_name}")
         else:
             self.ui.navigatorCoordinates.setText(f"(x, y)")
 
     def export_image(self, navigator, signal):
+        saveImageBrowser = FileBrowser(
+            mode=FileBrowser.SaveFile, dirpath=self.file_dir, filter_name="*.png"
+        )
+        if saveImageBrowser.getFile():
+            image_export_path = saveImageBrowser.getPaths()[0]
         x, y = self.current_x, self.current_y
         fig, ax = plt.subplots(1, 2, figsize=(12, 6))
         ax[0].set_title(self.ui.comboBoxNavigator.currentText())
-        ax[0].imshow(navigator)
-        ax[0].add_patch(Rectangle(
-                    (x, y),
-                    1,
-                    1,
-                    linewidth=0.5,
-                    edgecolor="black",
-                    facecolor="red",
-                    alpha=1,
-                ))
+        ax[0].imshow(navigator, cmap="gray", extent=(0, self.dataset["nav_shape"][0], self.dataset["nav_shape"][1], 0))
+        ax[0].add_patch(
+            Rectangle(
+                (x, y),
+                1,
+                1,
+                linewidth=0.5,
+                edgecolor="black",
+                facecolor="red",
+                alpha=1,
+            )
+        )
+        ax[0].axis("off")
 
         ax[1].set_title(f"EBSD signal ({x}, {y})")
         ax[1].imshow(signal, cmap="gray")
-        if self.ui.checkBox.isChecked():    
-            hkl_lines = self.dataset["geo_sim"].as_collections(
-                    (y, x), zone_axes_labels=False
-                )
-            ax[1].add_collection(
-                hkl_lines[0], autolim=False
-                )
-        #plt.tight_layout()
-        fig.savefig(path.join(self.file_dir, "pattern.png"))
+        ax[1].axis("off")
+        if self.ui.checkBox.isChecked():
+            hkl_lines = self.dataset["geo_sim"][self.dataset["phase_id_map"][y, x]].as_collections(
+                (y, x), zone_axes_labels=False
+            )
+            ax[1].add_collection(hkl_lines[0], autolim=False)
+        fig.savefig(image_export_path) #image is saved as .png by default, as of now no other file format is supported
