@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'refine_setup.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.3.2
+## Created by: Qt User Interface Compiler version 6.4.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -19,8 +19,8 @@ from PySide6.QtWidgets import (QAbstractButton, QAbstractItemView, QApplication,
     QComboBox, QDialog, QDialogButtonBox, QDoubleSpinBox,
     QFrame, QGridLayout, QHBoxLayout, QHeaderView,
     QLabel, QLineEdit, QPushButton, QSizePolicy,
-    QSpacerItem, QSpinBox, QTableWidget, QTableWidgetItem,
-    QVBoxLayout, QWidget)
+    QSpacerItem, QTableWidget, QTableWidgetItem, QVBoxLayout,
+    QWidget)
 
 class Ui_RefineSetupDialog(object):
     def setupUi(self, RefineSetupDialog):
@@ -65,6 +65,40 @@ class Ui_RefineSetupDialog(object):
         self.line_6.setFrameShadow(QFrame.Sunken)
 
         self.verticalLayout.addWidget(self.line_6)
+
+        self.horizontalLayout_12 = QHBoxLayout()
+        self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
+        self.labelSignalPath = QLabel(self.frame)
+        self.labelSignalPath.setObjectName(u"labelSignalPath")
+        self.labelSignalPath.setStyleSheet(u"font: italic 8pt \"MS Sans Serif\";\n"
+"color: rgb(127, 127, 127);")
+
+        self.horizontalLayout_12.addWidget(self.labelSignalPath)
+
+        self.horizontalSpacer_23 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_12.addItem(self.horizontalSpacer_23)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_12)
+
+        self.horizontalLayout_11 = QHBoxLayout()
+        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
+        self.horizontalSpacer_21 = QSpacerItem(40, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        self.horizontalLayout_11.addItem(self.horizontalSpacer_21)
+
+        self.labelNavigationShape = QLabel(self.frame)
+        self.labelNavigationShape.setObjectName(u"labelNavigationShape")
+
+        self.horizontalLayout_11.addWidget(self.labelNavigationShape)
+
+        self.horizontalSpacer_22 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_11.addItem(self.horizontalSpacer_22)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_11)
 
         self.verticalLayout_6 = QVBoxLayout()
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
@@ -122,21 +156,6 @@ class Ui_RefineSetupDialog(object):
 
         self.verticalLayout.addLayout(self.verticalLayout_6)
 
-        self.label_15 = QLabel(self.frame)
-        self.label_15.setObjectName(u"label_15")
-        self.label_15.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
-
-        self.verticalLayout.addWidget(self.label_15)
-
-        self.spinBoxEnergy = QSpinBox(self.frame)
-        self.spinBoxEnergy.setObjectName(u"spinBoxEnergy")
-        self.spinBoxEnergy.setMaximumSize(QSize(50, 16777215))
-        self.spinBoxEnergy.setMinimum(1)
-        self.spinBoxEnergy.setMaximum(30)
-        self.spinBoxEnergy.setValue(20)
-
-        self.verticalLayout.addWidget(self.spinBoxEnergy)
-
         self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout.addItem(self.verticalSpacer_4)
@@ -170,17 +189,17 @@ class Ui_RefineSetupDialog(object):
 
         self.horizontalLayout_10 = QHBoxLayout()
         self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
-        self.comboBox = QComboBox(self.frame)
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.setObjectName(u"comboBox")
-        self.comboBox.setMinimumSize(QSize(150, 0))
+        self.comboBoxMethod = QComboBox(self.frame)
+        self.comboBoxMethod.addItem("")
+        self.comboBoxMethod.addItem("")
+        self.comboBoxMethod.addItem("")
+        self.comboBoxMethod.addItem("")
+        self.comboBoxMethod.addItem("")
+        self.comboBoxMethod.addItem("")
+        self.comboBoxMethod.setObjectName(u"comboBoxMethod")
+        self.comboBoxMethod.setMinimumSize(QSize(150, 0))
 
-        self.horizontalLayout_10.addWidget(self.comboBox)
+        self.horizontalLayout_10.addWidget(self.comboBoxMethod)
 
         self.horizontalSpacer_10 = QSpacerItem(40, 0, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
@@ -488,13 +507,35 @@ class Ui_RefineSetupDialog(object):
 
         self.gridLayout_2 = QGridLayout()
         self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.patternCenterX = QDoubleSpinBox(self.frame)
-        self.patternCenterX.setObjectName(u"patternCenterX")
-        self.patternCenterX.setDecimals(3)
-        self.patternCenterX.setMaximum(1.000000000000000)
-        self.patternCenterX.setSingleStep(0.001000000000000)
+        self.label_4 = QLabel(self.frame)
+        self.label_4.setObjectName(u"label_4")
+        self.label_4.setLayoutDirection(Qt.LeftToRight)
+        self.label_4.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
-        self.gridLayout_2.addWidget(self.patternCenterX, 0, 3, 1, 1)
+        self.gridLayout_2.addWidget(self.label_4, 1, 2, 1, 1)
+
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.gridLayout_2.addItem(self.horizontalSpacer_4, 1, 1, 1, 1)
+
+        self.label_5 = QLabel(self.frame)
+        self.label_5.setObjectName(u"label_5")
+        self.label_5.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.gridLayout_2.addWidget(self.label_5, 2, 2, 1, 1)
+
+        self.label_2 = QLabel(self.frame)
+        self.label_2.setObjectName(u"label_2")
+        self.label_2.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+
+        self.gridLayout_2.addWidget(self.label_2, 1, 0, 1, 1)
+
+        self.label_3 = QLabel(self.frame)
+        self.label_3.setObjectName(u"label_3")
+        self.label_3.setMaximumSize(QSize(16777215, 20))
+        self.label_3.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.gridLayout_2.addWidget(self.label_3, 0, 2, 1, 1)
 
         self.patternCenterY = QDoubleSpinBox(self.frame)
         self.patternCenterY.setObjectName(u"patternCenterY")
@@ -512,35 +553,13 @@ class Ui_RefineSetupDialog(object):
 
         self.gridLayout_2.addWidget(self.patternCenterZ, 2, 3, 1, 1)
 
-        self.label_4 = QLabel(self.frame)
-        self.label_4.setObjectName(u"label_4")
-        self.label_4.setLayoutDirection(Qt.LeftToRight)
-        self.label_4.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.patternCenterX = QDoubleSpinBox(self.frame)
+        self.patternCenterX.setObjectName(u"patternCenterX")
+        self.patternCenterX.setDecimals(3)
+        self.patternCenterX.setMaximum(1.000000000000000)
+        self.patternCenterX.setSingleStep(0.001000000000000)
 
-        self.gridLayout_2.addWidget(self.label_4, 1, 2, 1, 1)
-
-        self.label_5 = QLabel(self.frame)
-        self.label_5.setObjectName(u"label_5")
-        self.label_5.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.gridLayout_2.addWidget(self.label_5, 2, 2, 1, 1)
-
-        self.label_3 = QLabel(self.frame)
-        self.label_3.setObjectName(u"label_3")
-        self.label_3.setMaximumSize(QSize(16777215, 20))
-        self.label_3.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.gridLayout_2.addWidget(self.label_3, 0, 2, 1, 1)
-
-        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.gridLayout_2.addItem(self.horizontalSpacer_4, 1, 1, 1, 1)
-
-        self.label_2 = QLabel(self.frame)
-        self.label_2.setObjectName(u"label_2")
-        self.label_2.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
-
-        self.gridLayout_2.addWidget(self.label_2, 1, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.patternCenterX, 0, 3, 1, 1)
 
 
         self.verticalLayout_2.addLayout(self.gridLayout_2)
@@ -596,6 +615,8 @@ class Ui_RefineSetupDialog(object):
     def retranslateUi(self, RefineSetupDialog):
         RefineSetupDialog.setWindowTitle(QCoreApplication.translate("RefineSetupDialog", u"Refine Crystal Map", None))
         self.label_10.setText(QCoreApplication.translate("RefineSetupDialog", u"Signal", None))
+        self.labelSignalPath.setText(QCoreApplication.translate("RefineSetupDialog", u"Signal path", None))
+        self.labelNavigationShape.setText(QCoreApplication.translate("RefineSetupDialog", u"Navigation shape: (00x00)", None))
         self.checkBoxLazy.setText(QCoreApplication.translate("RefineSetupDialog", u"Lazy loading of patterns", None))
         self.checkBoxMask.setText(QCoreApplication.translate("RefineSetupDialog", u"Apply circular mask to patterns ", None))
         self.label_7.setText(QCoreApplication.translate("RefineSetupDialog", u"Binning", None))
@@ -603,15 +624,14 @@ class Ui_RefineSetupDialog(object):
         self.comboBoxBinning.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Detector binning, i.e. how many pixels are binned into one, default is no binning</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.labelSignalShape.setText(QCoreApplication.translate("RefineSetupDialog", u"Signal shape: (00x00)", None))
-        self.label_15.setText(QCoreApplication.translate("RefineSetupDialog", u"Accelerating Voltage (keV)", None))
         self.label_11.setText(QCoreApplication.translate("RefineSetupDialog", u"Refinement", None))
         self.label_9.setText(QCoreApplication.translate("RefineSetupDialog", u"Method", None))
-        self.comboBox.setItemText(0, QCoreApplication.translate("RefineSetupDialog", u"minimze", None))
-        self.comboBox.setItemText(1, QCoreApplication.translate("RefineSetupDialog", u"ln_neldermead", None))
-        self.comboBox.setItemText(2, QCoreApplication.translate("RefineSetupDialog", u"differential_evolution", None))
-        self.comboBox.setItemText(3, QCoreApplication.translate("RefineSetupDialog", u"dual_annealing", None))
-        self.comboBox.setItemText(4, QCoreApplication.translate("RefineSetupDialog", u"basinhopping", None))
-        self.comboBox.setItemText(5, QCoreApplication.translate("RefineSetupDialog", u"shgo", None))
+        self.comboBoxMethod.setItemText(0, QCoreApplication.translate("RefineSetupDialog", u"minimize", None))
+        self.comboBoxMethod.setItemText(1, QCoreApplication.translate("RefineSetupDialog", u"ln_neldermead", None))
+        self.comboBoxMethod.setItemText(2, QCoreApplication.translate("RefineSetupDialog", u"differential_evolution", None))
+        self.comboBoxMethod.setItemText(3, QCoreApplication.translate("RefineSetupDialog", u"dual_annealing", None))
+        self.comboBoxMethod.setItemText(4, QCoreApplication.translate("RefineSetupDialog", u"basinhopping", None))
+        self.comboBoxMethod.setItemText(5, QCoreApplication.translate("RefineSetupDialog", u"shgo", None))
 
         self.label_8.setText(QCoreApplication.translate("RefineSetupDialog", u"(Optional) kwargs.", None))
         self.lineEditRefKwargs.setPlaceholderText(QCoreApplication.translate("RefineSetupDialog", u"e.g. method=\"Powell\", tol=1e-4", None))
@@ -669,11 +689,11 @@ class Ui_RefineSetupDialog(object):
         self.pushButtonRemoveMP.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Remove the selected phase</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.pushButtonRemoveMP.setText(QCoreApplication.translate("RefineSetupDialog", u"Remove", None))
-        self.patternCenterZ.setPrefix("")
         self.label_4.setText(QCoreApplication.translate("RefineSetupDialog", u"Y:", None))
         self.label_5.setText(QCoreApplication.translate("RefineSetupDialog", u"Z:", None))
-        self.label_3.setText(QCoreApplication.translate("RefineSetupDialog", u"X:", None))
         self.label_2.setText(QCoreApplication.translate("RefineSetupDialog", u"Pattern Center", None))
+        self.label_3.setText(QCoreApplication.translate("RefineSetupDialog", u"X:", None))
+        self.patternCenterZ.setPrefix("")
         self.label_6.setText(QCoreApplication.translate("RefineSetupDialog", u"Convention", None))
         self.comboBoxConvention.setItemText(0, QCoreApplication.translate("RefineSetupDialog", u"BRUKER", None))
         self.comboBoxConvention.setItemText(1, QCoreApplication.translate("RefineSetupDialog", u"TSL", None))

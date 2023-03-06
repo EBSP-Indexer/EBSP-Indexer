@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'main_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.3.2
+## Created by: Qt User Interface Compiler version 6.4.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -36,9 +36,6 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
-        icon = QIcon()
-        icon.addFile(u":/icons/app_icon.ico", QSize(), QIcon.Normal, QIcon.Off)
-        MainWindow.setWindowIcon(icon)
         MainWindow.setLayoutDirection(Qt.LeftToRight)
         MainWindow.setAutoFillBackground(False)
         MainWindow.setLocale(QLocale(QLocale.English, QLocale.UnitedKingdom))
@@ -47,9 +44,9 @@ class Ui_MainWindow(object):
         MainWindow.setDockOptions(QMainWindow.AllowTabbedDocks|QMainWindow.AnimatedDocks)
         self.actionOpen_Workfolder = QAction(MainWindow)
         self.actionOpen_Workfolder.setObjectName(u"actionOpen_Workfolder")
-        icon1 = QIcon()
-        icon1.addFile(u":/linea_basic/resources/linea_basic_icons/basic_folder.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.actionOpen_Workfolder.setIcon(icon1)
+        icon = QIcon()
+        icon.addFile(u":/linea icons/resources/linea basic icons/basic_folder.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.actionOpen_Workfolder.setIcon(icon)
         self.actionProcessingMenu = QAction(MainWindow)
         self.actionProcessingMenu.setObjectName(u"actionProcessingMenu")
         self.actionProcessingMenu.setEnabled(True)
@@ -67,9 +64,9 @@ class Ui_MainWindow(object):
         self.actionHoughIndexing.setObjectName(u"actionHoughIndexing")
         self.actionSettings = QAction(MainWindow)
         self.actionSettings.setObjectName(u"actionSettings")
-        icon2 = QIcon()
-        icon2.addFile(u":/linea_basic/resources/linea_basic_icons/basic_gear.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.actionSettings.setIcon(icon2)
+        icon1 = QIcon()
+        icon1.addFile(u":/linea icons/resources/linea basic icons/basic_gear.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.actionSettings.setIcon(icon1)
         self.actionImage_quality = QAction(MainWindow)
         self.actionImage_quality.setObjectName(u"actionImage_quality")
         self.actionMean_intensity = QAction(MainWindow)
@@ -105,7 +102,7 @@ class Ui_MainWindow(object):
         self.actionToggleSignal_Navigation = QAction(MainWindow)
         self.actionToggleSignal_Navigation.setObjectName(u"actionToggleSignal_Navigation")
         self.actionToggleSignal_Navigation.setCheckable(True)
-        self.actionToggleSignal_Navigation.setChecked(False)
+        self.actionToggleSignal_Navigation.setChecked(True)
         self.actionRefineOrientations = QAction(MainWindow)
         self.actionRefineOrientations.setObjectName(u"actionRefineOrientations")
         self.centralwidget = QWidget(MainWindow)
@@ -227,6 +224,7 @@ class Ui_MainWindow(object):
         self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.jobList = QListWidget(self.dockWidgetContents)
         self.jobList.setObjectName(u"jobList")
+        self.jobList.setMinimumSize(QSize(400, 0))
         self.jobList.setSelectionMode(QAbstractItemView.NoSelection)
 
         self.gridLayout_3.addWidget(self.jobList, 1, 0, 1, 1)

@@ -45,7 +45,7 @@ class DiSetupDialog(QDialog):
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
         self.fileBrowserOD = FileBrowser(
             mode=FileBrowser.OpenFile,
-            filter_name="(*.h5)",
+            filter_name="*.h5",
         )
 
         self.load_pattern()
@@ -140,7 +140,7 @@ class DiSetupDialog(QDialog):
     # Lookup table for sample rotations
     def generate_rotation_lookup_dict(self):
         self.sample_rotations = {}
-        with open("sample_rotations.txt", "r") as f:
+        with open("resources/sample_rotations.txt", "r") as f:
             for line in f:
                 (key, value) = line.strip().split("\t")
                 self.sample_rotations[f"{float(key):.2}"] = eval(value)
@@ -625,7 +625,7 @@ class DiSetupDialog(QDialog):
         ]
         self.refine = self.options["refine"]
         self.new_signal_shape = self.options["binning"]
-        self.angular_step_size = self.options["angular_step_size"]
+        self.   angular_step_size = self.options["angular_step_size"]
 
         self.n_per_iteration = None
         if self.options["n_iter"] != 0:

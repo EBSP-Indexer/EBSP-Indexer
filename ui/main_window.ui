@@ -22,10 +22,6 @@
   <property name="windowTitle">
    <string>EBSD-GUI</string>
   </property>
-  <property name="windowIcon">
-   <iconset resource="../resources.qrc">
-    <normaloff>:/icons/app_icon.ico</normaloff>:/icons/app_icon.ico</iconset>
-  </property>
   <property name="layoutDirection">
    <enum>Qt::LeftToRight</enum>
   </property>
@@ -273,6 +269,12 @@
     <layout class="QGridLayout" name="gridLayout_3">
      <item row="1" column="0">
       <widget class="QListWidget" name="jobList">
+       <property name="minimumSize">
+        <size>
+         <width>400</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="selectionMode">
         <enum>QAbstractItemView::NoSelection</enum>
        </property>
@@ -315,7 +317,7 @@
   <action name="actionOpen_Workfolder">
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/linea_basic/resources/linea_basic_icons/basic_folder.svg</normaloff>:/linea_basic/resources/linea_basic_icons/basic_folder.svg</iconset>
+     <normaloff>:/linea icons/resources/linea basic icons/basic_folder.svg</normaloff>:/linea icons/resources/linea basic icons/basic_folder.svg</iconset>
    </property>
    <property name="text">
     <string>Open Workfolder...</string>
@@ -369,7 +371,7 @@
   <action name="actionSettings">
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/linea_basic/resources/linea_basic_icons/basic_gear.svg</normaloff>:/linea_basic/resources/linea_basic_icons/basic_gear.svg</iconset>
+     <normaloff>:/linea icons/resources/linea basic icons/basic_gear.svg</normaloff>:/linea icons/resources/linea basic icons/basic_gear.svg</iconset>
    </property>
    <property name="text">
     <string>Settings</string>
@@ -464,7 +466,7 @@
     <bool>true</bool>
    </property>
    <property name="checked">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Signal Navigation</string>
