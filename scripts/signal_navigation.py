@@ -17,11 +17,13 @@ import numpy as np
 def find_hkl(phase):
     FCC = ["ni", "al", "austenite", "cu", "si"]
     BCC = ["ferrite"]
-    #TETRAGONAL = ["steel_sigma"]
+    TETRAGONAL = ["steel_sigma"]
     if phase.lower() in FCC:
         return [[1, 1, 1], [2, 0, 0], [2, 2, 0], [3, 1, 1]]
     elif phase.lower() in BCC:
         return [[0, 1, 1], [0, 0, 2], [1, 1, 2], [0, 2, 2]]
+    elif phase.lower() in TETRAGONAL:
+        return [[1, 1, 0], [2, 0, 0], [1, 0, 1], [2, 1, 0], [1, 1, 1], [2, 2, 0], [2, 1, 1]]
 
 def open_file(file_path):
     """

@@ -301,6 +301,11 @@ class DiSetupDialog(QDialog):
             except FileExistsError:
                 pass
             i += 1
+
+        #load pattern
+
+        self.load_pattern(lazy_load=self.ui.checkBoxLazy.isChecked())
+        
         # Pass the function to execute
         sendToJobManager(
             job_title=f"DI {self.pattern_name}",
@@ -616,7 +621,6 @@ class DiSetupDialog(QDialog):
 
         # get options from input
         self.options = self.getOptions()
-        self.load_pattern(self.options["lazy"])
         
         self.pc = self.options["pc"]
         
