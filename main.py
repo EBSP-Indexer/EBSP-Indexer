@@ -348,7 +348,7 @@ class AppWindow(QMainWindow):
 
     def showImage(self, image_path):
         try:
-            if image_path == None or not splitext(image_path)[1] in [
+            if image_path == None or not path.splitext(image_path)[1] in [
                 ".jpg",
                 ".png",
                 ".gif",
