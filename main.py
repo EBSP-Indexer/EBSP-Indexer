@@ -14,7 +14,7 @@ import platform
 import multiprocessing
 import sys
 import json
-import os.path as path
+import os
 import logging
 logging.getLogger("pyopencl").setLevel(logging.WARNING)
 logging.getLogger("hyperspy").setLevel(logging.WARNING)
@@ -24,17 +24,18 @@ try:
     import pyopencl.tools
 except:
     print("PyOpenCL could not be imported")
-from PySide6.QtCore import QDir, Qt, QThreadPool, Slot, QDir
-from PySide6.QtWidgets import (
-    QApplication,
-    QMainWindow,
-    QMessageBox,
-)
+import platform
 
-try:
-    import pyi_splash
-except:
-    pass
+from contextlib import redirect_stdout, redirect_stderr
+import resources_rc
+from PySide6.QtCore import QDir, Qt, QThreadPool, Slot
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
+from PySide6.QtGui import QIcon
+#try: 
+#    import pyi_splash
+#except:
+#    pass
+# Modules available from start in the console
 import kikuchipy as kp
 import hyperspy.api as hs
 
@@ -42,8 +43,6 @@ import hyperspy.api as hs
 from kikuchipy import load
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
-from matplotlib.widgets import Cursor
-from matplotlib.patches import Rectangle
 
 from ui.ui_main_window import Ui_MainWindow
 from scripts.system_explorer import SystemExplorerWidget
@@ -100,14 +99,12 @@ class AppWindow(QMainWindow):
         self.setupConnections()
         self.showImage(self.getSelectedPath())
         self.importSettings()
-
         QThreadPool.globalInstance().setMaxThreadCount(1)
         self.updateActiveJobs()
-
-        try:
-            pyi_splash.close()
-        except Exception as e:
-            pass
+        #try:
+        #    pyi_splash.close()
+        #except Exception as e:
+        #    pass
 
     def setupConnections(self):
         self.ui.dockWidgetSystemExplorer.setWidget(self.systemExplorer)
@@ -168,7 +165,7 @@ class AppWindow(QMainWindow):
         if self.fileBrowserOD.getFile():
             self.working_dir = self.fileBrowserOD.getPaths()[0]
             self.fileBrowserOD.setDefaultDir(self.working_dir)
-            if path.exists("advanced_settings.txt"):
+            if os.path.exists("advanced_settings.txt"):
                 setting_file = SettingFile("advanced_settings.txt")
                 try:
                     file_types = json.loads(setting_file.read("File Types"))
@@ -187,7 +184,7 @@ class AppWindow(QMainWindow):
         return self.systemExplorer.selected_path
 
     def importSettings(self):
-        if path.exists("advanced_settings.txt"):
+        if os.path.exists("advanced_settings.txt"):
             setting_file = SettingFile("advanced_settings.txt")
             try:
                 file_types = json.loads(setting_file.read("File Types"))
@@ -202,7 +199,7 @@ class AppWindow(QMainWindow):
                     "*.txt",
                 ]
 
-            if path.exists(setting_file.read("Default Directory")):
+            if os.path.exists(setting_file.read("Default Directory")):
                 self.working_dir = setting_file.read("Default Directory")
                 self.systemExplorer.setSystemViewer(
                     self.working_dir, system_view_filter
@@ -353,21 +350,24 @@ class AppWindow(QMainWindow):
             )
 
     def showImage(self, image_path):
-        if image_path == None or not path.splitext(image_path)[1] in [
-            ".jpg",
-            ".png",
-            ".gif",
-            ".bmp",
-        ]:
-            image = mpimg.imread("resources/ebsd_gui.png")
-            self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer")
-        else:
-            image = mpimg.imread(image_path)
-            self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer - {image_path}")
-        self.ui.MplWidget.canvas.ax.clear()
-        self.ui.MplWidget.canvas.ax.axis(False)
-        self.ui.MplWidget.canvas.ax.imshow(image)
-        self.ui.MplWidget.canvas.draw()
+        try:
+            if image_path == None or not os.path.splitext(image_path)[1] in [
+                ".jpg",
+                ".png",
+                ".gif",
+                ".bmp",
+            ]:
+                image = mpimg.imread("resources/ebsd_gui.png")
+                self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer")
+            else:
+                image = mpimg.imread(image_path)
+                self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer - {image_path}")
+            self.ui.MplWidget.canvas.ax.clear()
+            self.ui.MplWidget.canvas.ax.axis(False)
+            self.ui.MplWidget.canvas.ax.imshow(image)
+            self.ui.MplWidget.canvas.draw()
+        except:
+            pass
 
     def updateMenuButtons(self, file_path):
         """
@@ -385,7 +385,7 @@ class AppWindow(QMainWindow):
         if file_path == "":
             setAvailableMenuActions(False)
             return
-        file_extension = path.splitext(file_path)[1]
+        file_extension = os.path.splitext(file_path)[1]
 
         if file_extension in KP_EXTENSIONS:
             kp_enabled = True
@@ -394,7 +394,7 @@ class AppWindow(QMainWindow):
         setAvailableMenuActions(kp_enabled)
 
         # Special case for plotting calibration patterns from Settings.txt
-        if path.basename(file_path) == "Setting.txt":
+        if os.path.basename(file_path) == "Setting.txt":
             self.ui.menuPatternInspection.setEnabled(True)
             self.ui.actionSignalNavigation.setEnabled(True)
             self.ui.menuPre_indexing_maps.setEnabled(False)
@@ -421,6 +421,7 @@ if __name__ == "__main__":
     multiprocessing.freeze_support()
 
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon(':/icons/app_icon.ico'))
     APP = AppWindow()
     # Redirect stdout to console.write and stderr to console.errorwrite
     with redirect_stdout(APP.console), redirect_stderr(

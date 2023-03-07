@@ -34,7 +34,7 @@ class DiSetupDialog(QDialog):
         self.pattern_path = pattern_path
 
         # pattern name
-        self.pattern_name = path.basename(pattern_path)
+        self.pattern_name = path.basename(self.pattern_path)
 
         # working directory
         self.working_dir = path.dirname(self.pattern_path)
@@ -45,7 +45,7 @@ class DiSetupDialog(QDialog):
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
         self.fileBrowserOD = FileBrowser(
             mode=FileBrowser.OpenFile,
-            filter_name="(*.h5)",
+            filter_name="*.h5",
         )
 
         self.load_pattern()
@@ -99,14 +99,12 @@ class DiSetupDialog(QDialog):
                     float(self.setting_file.read("Z star")),
                 ]
             )
-            if self.convention == "TSL":
-                # Ensure that PC is stored in BRUKER convention
-                self.pc[1] = 1 - self.pc[1]
+            self.ui.patternCenterX.setValue(self.pc[0])
+            self.ui.patternCenterY.setValue(self.pc[1])
+            self.ui.patternCenterZ.setValue(self.pc[2])
+        
         except:
-            self.pc = np.array([0.500, 0.200, 0.500])
-
-        self.update_pc_spinbox()
-
+            self.pc = np.array([0.500, 0.500, 0.500])
         # Setup colors from program settings
         try:
             self.colors = json.loads(self.program_settings.read("Colors"))
@@ -142,7 +140,7 @@ class DiSetupDialog(QDialog):
     # Lookup table for sample rotations
     def generate_rotation_lookup_dict(self):
         self.sample_rotations = {}
-        with open("sample_rotations.txt", "r") as f:
+        with open("resources/sample_rotations.txt", "r") as f:
             for line in f:
                 (key, value) = line.strip().split("\t")
                 self.sample_rotations[f"{float(key):.2}"] = eval(value)
@@ -196,30 +194,19 @@ class DiSetupDialog(QDialog):
             self.scale = self.s.axes_manager["x"].scale
         except Exception as e:
             raise e
-
-    def updateBinningShape(self):
-        self.ui.comboBoxBinning.setCurrentIndex(self.ui.sliderBinning.value())
-
-    def set_save_fileformat(self):
-        self.di_result_filetypes = [
-            el.strip(".") for el in self.ui.comboBoxFiletype.currentText().split(", ")
-        ]
-
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_dictionary_indexing())
 
         self.ui.pushButtonAddPhase.clicked.connect(lambda: self.addPhase())
         self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.removePhase())
-
-        self.ui.comboBoxConvention.currentTextChanged.connect(
-            lambda: self.update_pc_convention()
-        )
+        
         self.ui.checkBoxLazy.stateChanged.connect(lambda: self.setNiterState())
         self.ui.checkBoxLazy.stateChanged.connect(lambda: self.setupBinningShapes())
+        
         self.ui.doubleSpinBoxStepSize.valueChanged.connect(
             lambda: self.estimateSimulationSize()
         )
-
+        
         self.ui.sliderBinning.valueChanged.connect(
             lambda: self.ui.comboBoxBinning.setCurrentIndex(
                 self.ui.sliderBinning.value()
@@ -250,29 +237,9 @@ class DiSetupDialog(QDialog):
         if len(self.phases) == 1:
             self.ui.checkBoxPM.setEnabled(False)
         else:
-            self.ui.checkBoxPM.setEnabled(True)
+            self.ui.checkBoxPM.setEnabled(True)        
 
-    ### Pattern center functions
-
-    def update_pc_convention(self):
-        self.convention = self.ui.comboBoxConvention.currentText()
-        self.update_pc_spinbox()
-
-    def update_pc_spinbox(self):
-        self.ui.patternCenterX.setValue(self.pc[0])
-        self.ui.patternCenterZ.setValue(self.pc[2])
-        if self.convention == "BRUKER":
-            self.ui.patternCenterY.setValue(self.pc[1])
-        elif self.convention == "TSL":
-            self.ui.patternCenterY.setValue(1 - self.pc[1])
-
-    def update_pc_array_from_spinbox(self):
-        self.pc[0] = self.ui.patternCenterX.value()
-        self.pc[2] = self.ui.patternCenterZ.value()
-        if self.convention == "BRUKER":
-            self.pc[1] = self.ui.patternCenterY.value()
-        elif self.convention == "TSL":
-            self.pc[1] = 1 - self.ui.patternCenterY.value()
+        
 
     ### Phases
     def addPhase(self):
@@ -305,6 +272,9 @@ class DiSetupDialog(QDialog):
 
     # Read options from interactive elements in dialog box
     def getOptions(self) -> dict:
+        pc = np.array((self.ui.patternCenterX.value(), 
+        self.ui.patternCenterY.value(), 
+        self.ui.patternCenterZ.value()))
         return {
             "refine": self.ui.checkBoxRefine.isChecked(),
             "lazy": self.ui.checkBoxLazy.isChecked(),
@@ -316,8 +286,9 @@ class DiSetupDialog(QDialog):
             "osm": self.ui.checkBoxOSM.isChecked(),
             "ipf": self.ui.checkBoxIPF.isChecked(),
             "pm": self.ui.checkBoxPM.isChecked(),
+            "pc": pc
         }
-
+    
     # Call worker to start DI in separate thread
     def run_dictionary_indexing(self):
         # Create folder for storing DI results in working directory
@@ -330,6 +301,11 @@ class DiSetupDialog(QDialog):
             except FileExistsError:
                 pass
             i += 1
+
+        #load pattern
+
+        self.load_pattern(lazy_load=self.ui.checkBoxLazy.isChecked())
+        
         # Pass the function to execute
         sendToJobManager(
             job_title=f"DI {self.pattern_name}",
@@ -554,14 +530,9 @@ class DiSetupDialog(QDialog):
 
         self.setting_file.write("Convention", self.convention)
 
-        self.update_pc_array_from_spinbox()
+        self.setting_file.write("Pattern center (x*, y*, z*)", f"{self.pc}")
         self.setting_file.write("X star", f"{self.pc[0]}")
-
-        if self.convention == "BRUKER":
-            self.setting_file.write("Y star", f"{self.pc[1]}")
-        elif self.convention == "TSL":
-            self.setting_file.write("Y star", f"{1-self.pc[1]}")
-
+        self.setting_file.write("Y star", f"{self.pc[1]}")
         self.setting_file.write("Z star", f"{self.pc[2]}")
 
         self.setting_file.write("Binning", f"({self.new_signal_shape})")
@@ -573,7 +544,7 @@ class DiSetupDialog(QDialog):
 
     def save_di_settings(self, xmap):
         self.di_setting_file = SettingFile(
-            path.join(self.results_dir, "di_parameters.txt")
+            path.join(self.results_dir, "indexing_parameters.txt")
         )
 
         ### Time and date
@@ -609,13 +580,8 @@ class DiSetupDialog(QDialog):
         ### DI parameteres
 
         self.di_setting_file.write("kikuchipy version", kp.__version__)
-
-        pc_copy = self.pc.copy()
-        if self.convention == "TSL":
-            pc_copy[1] = 1 - pc_copy[1]
-
         self.di_setting_file.write("PC convention", f"{self.convention}")
-        self.di_setting_file.write("Pattern center (x*, y*, z*)", f"{tuple(pc_copy)}")
+        self.di_setting_file.write("Pattern center (x*, y*, z*)", f"{tuple(self.pc)}")
 
         if len(self.phases) > 1:
             for i, ph in enumerate(self.phases, 1):
@@ -646,7 +612,7 @@ class DiSetupDialog(QDialog):
         for i, mp_path in enumerate(self.mpPaths.values(), 1):
             self.di_setting_file.write(f"Master pattern path {i}", mp_path)
 
-        self.di_setting_file.write("Dataset path", self.pattern_path)
+        self.di_setting_file.write("Dataset name", self.pattern_path)
         
         self.di_setting_file.save()
 
@@ -655,12 +621,15 @@ class DiSetupDialog(QDialog):
 
         # get options from input
         self.options = self.getOptions()
-        self.load_pattern(self.options["lazy"])
-        self.update_pc_array_from_spinbox()
-        self.set_save_fileformat()
+        
+        self.pc = self.options["pc"]
+        
+        self.di_result_filetypes = [
+            el.strip(".") for el in self.ui.comboBoxFiletype.currentText().split(", ")
+        ]
         self.refine = self.options["refine"]
         self.new_signal_shape = self.options["binning"]
-        self.angular_step_size = self.options["angular_step_size"]
+        self.   angular_step_size = self.options["angular_step_size"]
 
         self.n_per_iteration = None
         if self.options["n_iter"] != 0:
@@ -681,7 +650,7 @@ class DiSetupDialog(QDialog):
             shape=sig_shape,
             sample_tilt=self.sample_tilt,  # Degrees
             pc=self.pc,
-            convention="BRUKER",  # Default is Bruker
+            convention= self.ui.comboBoxConvention.currentText().upper(),  # Default is Bruker
         )
         detector.save(path.join(self.results_dir, "detector.txt"))
 

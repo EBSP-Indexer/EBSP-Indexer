@@ -22,10 +22,6 @@
   <property name="windowTitle">
    <string>EBSD-GUI</string>
   </property>
-  <property name="windowIcon">
-   <iconset resource="../resources.qrc">
-    <normaloff>:/icons/app_icon.ico</normaloff>:/icons/app_icon.ico</iconset>
-  </property>
   <property name="layoutDirection">
    <enum>Qt::LeftToRight</enum>
   </property>
