@@ -60,7 +60,6 @@ def get_setting_file_bottom_top(start_path: str, target_file_name: str, return_d
     else:
         dir_path = start_path
     while dir_path != path.dirname(dir_path):
-        print(f"Searched for {path.join(dir_path, target_file_name)}")
         if path.isfile(path.join(dir_path, target_file_name)):
             if return_dir_path:
                 return (SettingFile(path.join(dir_path, target_file_name)), dir_path)
@@ -69,6 +68,8 @@ def get_setting_file_bottom_top(start_path: str, target_file_name: str, return_d
         else:
             dir_path = path.dirname(dir_path)
     if return_dir_path:
+        print(f"Could not find {target_file_name}")
         return (None, None)
     else:
+        print(f"Could not find {target_file_name}")
         return None

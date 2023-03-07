@@ -92,7 +92,7 @@ def return_crystal_map(file_path, crystal_map):
     except FileNotFoundError as e:
         raise e
 
-    pattern_name = parameter_file.read("Dataset name")
+    pattern_name = parameter_file.read("Pattern name")
     pattern = kp.load(path.join(path.dirname(path.dirname(file_path)), pattern_name))
 
     # Get detector from indexing routine
@@ -107,13 +107,14 @@ def return_crystal_map(file_path, crystal_map):
         sims = []
 
         for i, ph in crystal_map.phases:
-            rlv = ReciprocalLatticeVector(
-                phase=ph, hkl=find_hkl(ph.name)
-            )
-            rlv = rlv.symmetrise()
-            simulator = kp.simulations.KikuchiPatternSimulator(rlv)
-            sims.append(simulator.on_detector(detector, crystal_map.rotations.reshape(*crystal_map.shape)))
-       
+            if ph.name != "not_indexed":
+                rlv = ReciprocalLatticeVector(
+                    phase=ph, hkl=find_hkl(ph.name)
+                )
+                rlv = rlv.symmetrise()
+                simulator = kp.simulations.KikuchiPatternSimulator(rlv)
+                sims.append(simulator.on_detector(detector, crystal_map.rotations.reshape(*crystal_map.shape)))
+        
         crystal_map_dict["ebsd_data"] = pattern
         crystal_map_dict["geo_sim"] = sims
 

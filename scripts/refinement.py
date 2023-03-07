@@ -9,7 +9,6 @@ from PySide6.QtWidgets import QDialog, QDialogButtonBox, QMainWindow, QTableWidg
 import kikuchipy as kp
 from kikuchipy.signals.ebsd import EBSD, LazyEBSD
 from kikuchipy.signals.ebsd_master_pattern import (
-    EBSDMasterPattern,
     LazyEBSDMasterPattern,
 )
 from kikuchipy.indexing._merge_crystal_maps import merge_crystal_maps
@@ -37,18 +36,17 @@ class RefineSetupDialog(QDialog):
     def __init__(self, parent: QMainWindow, file_path: Optional[str] = ""):
         super().__init__(parent)
 
-        parameter_file, self.working_dir = get_setting_file_bottom_top(
+        parameter_file, self.xmap_dir = get_setting_file_bottom_top(
             file_path, "indexing_parameters.txt", return_dir_path=True
         )
-        self.setting_file = get_setting_file_bottom_top(
-            file_path, "project_settings.txt"
+        self.setting_file, self.working_dir = get_setting_file_bottom_top(
+            file_path, "project_settings.txt", return_dir_path=True
         )
         self.program_settings = SettingFile("advanced_settings.txt")
-        if self.working_dir is None:
-            self.working_dir = path.dirname(file_path)
+        # if self.xmap_dir is None:
+        #     self.xmap_dir = path.dirname(file_path)
         self.pattern_path = ""
         self.xmap_path = ""
-
         self.ui = Ui_RefineSetupDialog()
         self.ui.setupUi(self)
         self.setWindowTitle(f"{self.windowTitle()} - {file_path}")
@@ -71,7 +69,7 @@ class RefineSetupDialog(QDialog):
                             "No indexing parameters associated with selected crystal map"
                         )
                         raise Exception
-                    self.pattern_path = parameter_file.read("Pattern path")
+                    self.pattern_path = path.join(self.working_dir,parameter_file.read("Pattern name"))
                     self.load_crystal_map(self.xmap_path)
                     try:
                         s_prew = kp.load(self.pattern_path)
@@ -200,12 +198,13 @@ class RefineSetupDialog(QDialog):
         if xmap_path is not None:
             self.xmap_path = xmap_path
             self.xmap_name = path.basename(self.xmap_path)
-            self.working_dir = path.dirname(self.xmap_path)
+            self.xmap_dir = path.dirname(self.xmap_path)
             xmap = io.load(xmap_path)
             self.updateCrystalMapTable(xmap)
         elif self.fileBrowserOF.getFile():
             self.xmap_path = self.fileBrowserOF.getPaths()[0]
             self.xmap_name = path.basename(self.xmap_path)
+            self.xmap_dir = path.dirname(self.xmap_path)
             xmap = io.load(self.xmap_path)
             self.updateCrystalMapTable(xmap)
 
@@ -301,9 +300,8 @@ class RefineSetupDialog(QDialog):
         n_xmap = self.ui.tableWidgetXmap.rowCount()
         if n_phases:
             ok_flag = True
-            if n_phases == 2:
+            if n_phases > 1:
                 phase_map_flag = True
-                add_phase_flag = False
         if n_xmap:
             xmap_flag = True
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(ok_flag and xmap_flag)
@@ -380,6 +378,7 @@ class RefineSetupDialog(QDialog):
                 mp.phase.name == ""
             ):  # If the master pattern is missing the name of the phase
                 mp.phase.name = path.dirname(mp_path).split("/").pop()
+            mp.phase.color = self.colors[xmap.phases.id_from_name(mp_key)]
             print(f"\nRefining with Master Pattern: {mp.phase.name}")
             nav_mask_phase = ~(xmap.phase_id == xmap.phases.id_from_name(mp_key))
             nav_mask_phase = nav_mask_phase.reshape(xmap.shape)
@@ -401,13 +400,13 @@ class RefineSetupDialog(QDialog):
             ref_xmap = merge_crystal_maps(list(ref_xmaps.values()))
         io.save(
             path.join(
-                self.working_dir, f"refined_{path.splitext(self.xmap_name)[0]}.h5"
+                self.xmap_dir, f"refined_{path.splitext(self.xmap_name)[0]}.h5"
             ),
             ref_xmap,
         )
         io.save(
             path.join(
-                self.working_dir, f"refined_{path.splitext(self.xmap_name)[0]}.ang"
+                self.xmap_dir, f"refined_{path.splitext(self.xmap_name)[0]}.ang"
             ),
             ref_xmap,
         )
@@ -428,7 +427,7 @@ class RefineSetupDialog(QDialog):
     def run_refinement(self):
         sendToJobManager(
             job_title=f"Refine orientations {self.xmap_name}",
-            output_path=self.working_dir,
+            output_path=self.xmap_dir,
             listview=self.parentWidget().ui.jobList,
             func=self.refine_orientations,
             allow_cleanup=False,
@@ -449,12 +448,12 @@ class RefineSetupDialog(QDialog):
             fig.colorbar(im, ax=a, label=to_plot)
             a.axis("off")
             plt.imsave(
-                path.join(self.working_dir, f"quality_metrics_{to_plot}.png"),
+                path.join(self.xmap_dir, f"quality_metrics_{to_plot}.png"),
                 arr,
             )
         fig.subplots_adjust(wspace=0, hspace=0.05)
         fig.savefig(
-            path.join(self.working_dir, "quality_metrics_all.png"), **self.savefig_kwds
+            path.join(self.xmap_dir, "quality_metrics_all.png"), **self.savefig_kwds
         )
 
     def save_phase_map(self, xmap):
@@ -466,7 +465,7 @@ class RefineSetupDialog(QDialog):
         #     xmap.phases[ph].color = self.colors[i]
         fig = xmap.plot(return_figure=True, remove_padding=True)
         fig.savefig(
-            path.join(self.working_dir, "refined_phase_map.png"), **self.savefig_kwds
+            path.join(self.xmap_dir, "refined_phase_map.png"), **self.savefig_kwds
         )
 
     def save_ipf_map(
@@ -503,14 +502,13 @@ class RefineSetupDialog(QDialog):
             ax_ckey.patch.set_facecolor("None")
         else:
             fig_ckey.savefig(
-                path.join(self.working_dir, "orientation_colour_key.png"),
+                path.join(self.xmap_dir, "orientation_colour_key.png"),
                 **self.savefig_kwds,
             )
-        fig.savefig(path.join(self.working_dir, "refined_IPF.png"), **self.savefig_kwds)
+        fig.savefig(path.join(self.xmap_dir, "refined_IPF.png"), **self.savefig_kwds)
 
     def save_ncc_map(self, xmap: CrystalMap):
         if len(xmap.phases.ids) == 1:
-            print("JUST ONE")
             fig = xmap.plot(
                 "scores",
                 return_figure=True,
@@ -520,10 +518,9 @@ class RefineSetupDialog(QDialog):
                 remove_padding=True,
             )
             fig.savefig(
-                path.join(self.working_dir, "refined_NCC.png"), **self.savefig_kwds
+                path.join(self.xmap_dir, "refined_NCC.png"), **self.savefig_kwds
             )
         else:
-            print(xmap.merged_scores[:, 0].shape)
             fig = xmap.plot(
                 value=xmap.merged_scores[:, 0],
                 colorbar=True,
@@ -534,7 +531,7 @@ class RefineSetupDialog(QDialog):
             )
 
             fig.savefig(
-                path.join(self.working_dir, "refined_merged_NCC.png"),
+                path.join(self.xmap_dir, "refined_merged_NCC.png"),
                 **self.savefig_kwds,
             )
 

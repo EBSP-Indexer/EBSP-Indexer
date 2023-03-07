@@ -305,7 +305,7 @@ class DiSetupDialog(QDialog):
         #load pattern
 
         self.load_pattern(lazy_load=self.ui.checkBoxLazy.isChecked())
-        
+
         # Pass the function to execute
         sendToJobManager(
             job_title=f"DI {self.pattern_name}",
@@ -612,7 +612,7 @@ class DiSetupDialog(QDialog):
         for i, mp_path in enumerate(self.mpPaths.values(), 1):
             self.di_setting_file.write(f"Master pattern path {i}", mp_path)
 
-        self.di_setting_file.write("Dataset name", self.pattern_path)
+        self.di_setting_file.write("Pattern name", path.basename(self.pattern_path))
         
         self.di_setting_file.save()
 
