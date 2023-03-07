@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>727</width>
-    <height>680</height>
+    <width>825</width>
+    <height>684</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -295,12 +295,12 @@ color: rgb(127, 127, 127);</string>
               </property>
               <item>
                <property name="text">
-                <string>minimize</string>
+                <string>ln_neldermead</string>
                </property>
               </item>
               <item>
                <property name="text">
-                <string>ln_neldermead</string>
+                <string>minimize</string>
                </property>
               </item>
               <item>
@@ -515,16 +515,6 @@ color: rgb(127, 127, 127);</string>
           </property>
           <property name="text">
            <string>Normalized Cross Correlation</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="checkBoxEvaluations">
-          <property name="toolTip">
-           <string>the number of optimization evaluations (iterations) necessary for each pattern</string>
-          </property>
-          <property name="text">
-           <string>Number Of Evaluations</string>
           </property>
          </widget>
         </item>
@@ -874,21 +864,21 @@ color: rgb(127, 127, 127);</string>
          </widget>
         </item>
         <item>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="1" column="2">
-           <widget class="QLabel" name="label_4">
-            <property name="layoutDirection">
-             <enum>Qt::LeftToRight</enum>
-            </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_13">
+          <property name="spacing">
+           <number>10</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>Y:</string>
+             <string>Pattern Center</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item>
            <spacer name="horizontalSpacer_4">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -901,27 +891,7 @@ color: rgb(127, 127, 127);</string>
             </property>
            </spacer>
           </item>
-          <item row="2" column="2">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>Z:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Pattern Center</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
+          <item>
            <widget class="QLabel" name="label_3">
             <property name="maximumSize">
              <size>
@@ -937,7 +907,33 @@ color: rgb(127, 127, 127);</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="3">
+          <item>
+           <widget class="QDoubleSpinBox" name="patternCenterX">
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="maximum">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.001000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_4">
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="text">
+             <string>Y:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QDoubleSpinBox" name="patternCenterY">
             <property name="decimals">
              <number>3</number>
@@ -950,7 +946,17 @@ color: rgb(127, 127, 127);</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="3">
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>Z:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QDoubleSpinBox" name="patternCenterZ">
             <property name="prefix">
              <string/>
@@ -960,19 +966,6 @@ color: rgb(127, 127, 127);</string>
             </property>
             <property name="maximum">
              <double>3.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>0.001000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QDoubleSpinBox" name="patternCenterX">
-            <property name="decimals">
-             <number>3</number>
-            </property>
-            <property name="maximum">
-             <double>1.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.001000000000000</double>
@@ -1027,13 +1020,24 @@ color: rgb(127, 127, 127);</string>
   </layout>
  </widget>
  <tabstops>
+  <tabstop>checkBoxLazy</tabstop>
+  <tabstop>checkBoxMask</tabstop>
+  <tabstop>comboBoxBinning</tabstop>
+  <tabstop>comboBoxMethod</tabstop>
+  <tabstop>lineEditRefKwargs</tabstop>
+  <tabstop>checkBoxOrientation</tabstop>
+  <tabstop>lineEditColorKey</tabstop>
   <tabstop>checkBoxPhase</tabstop>
   <tabstop>checkBoxNCC</tabstop>
+  <tabstop>tableWidgetXmap</tabstop>
+  <tabstop>pushButtonLoadXmap</tabstop>
+  <tabstop>tableWidgetPhase</tabstop>
   <tabstop>pushButtonLoadMP</tabstop>
   <tabstop>pushButtonRemoveMP</tabstop>
   <tabstop>patternCenterX</tabstop>
   <tabstop>patternCenterY</tabstop>
   <tabstop>patternCenterZ</tabstop>
+  <tabstop>comboBoxConvention</tabstop>
  </tabstops>
  <resources/>
  <connections>

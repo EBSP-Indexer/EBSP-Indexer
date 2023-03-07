@@ -326,7 +326,6 @@ class HiSetupDialog(QDialog):
         if binning is None:
             binning = 1
         else:
-            print(s.axes_manager.navigation_shape + self.binnings[str(binning)])
             s = s.rebin(
                 new_shape=s.axes_manager.navigation_shape + self.binnings[str(binning)]
             )

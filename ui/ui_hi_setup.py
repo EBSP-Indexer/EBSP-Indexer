@@ -26,7 +26,7 @@ class Ui_HISetupDialog(object):
     def setupUi(self, HISetupDialog):
         if not HISetupDialog.objectName():
             HISetupDialog.setObjectName(u"HISetupDialog")
-        HISetupDialog.resize(802, 656)
+        HISetupDialog.resize(821, 586)
         self.gridLayout = QGridLayout(HISetupDialog)
         self.gridLayout.setObjectName(u"gridLayout")
         self.frame = QFrame(HISetupDialog)
@@ -273,6 +273,10 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout_2 = QVBoxLayout()
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalSpacer_6 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_2.addItem(self.verticalSpacer_6)
+
         self.line_4 = QFrame(self.frame)
         self.line_4.setObjectName(u"line_4")
         self.line_4.setFrameShape(QFrame.HLine)
@@ -370,15 +374,40 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout_2.addWidget(self.line)
 
-        self.gridLayout_2 = QGridLayout()
-        self.gridLayout_2.setObjectName(u"gridLayout_2")
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setSpacing(10)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.label_2 = QLabel(self.frame)
+        self.label_2.setObjectName(u"label_2")
+        self.label_2.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+
+        self.horizontalLayout_4.addWidget(self.label_2)
+
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_4)
+
+        self.label_3 = QLabel(self.frame)
+        self.label_3.setObjectName(u"label_3")
+        self.label_3.setMaximumSize(QSize(16777215, 20))
+        self.label_3.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.horizontalLayout_4.addWidget(self.label_3)
+
         self.patternCenterX = QDoubleSpinBox(self.frame)
         self.patternCenterX.setObjectName(u"patternCenterX")
         self.patternCenterX.setDecimals(3)
         self.patternCenterX.setMaximum(1.000000000000000)
         self.patternCenterX.setSingleStep(0.001000000000000)
 
-        self.gridLayout_2.addWidget(self.patternCenterX, 0, 3, 1, 1)
+        self.horizontalLayout_4.addWidget(self.patternCenterX)
+
+        self.label_4 = QLabel(self.frame)
+        self.label_4.setObjectName(u"label_4")
+        self.label_4.setLayoutDirection(Qt.LeftToRight)
+        self.label_4.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.horizontalLayout_4.addWidget(self.label_4)
 
         self.patternCenterY = QDoubleSpinBox(self.frame)
         self.patternCenterY.setObjectName(u"patternCenterY")
@@ -386,7 +415,13 @@ class Ui_HISetupDialog(object):
         self.patternCenterY.setMaximum(1.000000000000000)
         self.patternCenterY.setSingleStep(0.001000000000000)
 
-        self.gridLayout_2.addWidget(self.patternCenterY, 1, 3, 1, 1)
+        self.horizontalLayout_4.addWidget(self.patternCenterY)
+
+        self.label_5 = QLabel(self.frame)
+        self.label_5.setObjectName(u"label_5")
+        self.label_5.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.horizontalLayout_4.addWidget(self.label_5)
 
         self.patternCenterZ = QDoubleSpinBox(self.frame)
         self.patternCenterZ.setObjectName(u"patternCenterZ")
@@ -394,40 +429,10 @@ class Ui_HISetupDialog(object):
         self.patternCenterZ.setMaximum(3.000000000000000)
         self.patternCenterZ.setSingleStep(0.001000000000000)
 
-        self.gridLayout_2.addWidget(self.patternCenterZ, 2, 3, 1, 1)
-
-        self.label_4 = QLabel(self.frame)
-        self.label_4.setObjectName(u"label_4")
-        self.label_4.setLayoutDirection(Qt.LeftToRight)
-        self.label_4.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.gridLayout_2.addWidget(self.label_4, 1, 2, 1, 1)
-
-        self.label_5 = QLabel(self.frame)
-        self.label_5.setObjectName(u"label_5")
-        self.label_5.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.gridLayout_2.addWidget(self.label_5, 2, 2, 1, 1)
-
-        self.label_3 = QLabel(self.frame)
-        self.label_3.setObjectName(u"label_3")
-        self.label_3.setMaximumSize(QSize(16777215, 20))
-        self.label_3.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.gridLayout_2.addWidget(self.label_3, 0, 2, 1, 1)
-
-        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.gridLayout_2.addItem(self.horizontalSpacer_4, 1, 1, 1, 1)
-
-        self.label_2 = QLabel(self.frame)
-        self.label_2.setObjectName(u"label_2")
-        self.label_2.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
-
-        self.gridLayout_2.addWidget(self.label_2, 1, 0, 1, 1)
+        self.horizontalLayout_4.addWidget(self.patternCenterZ)
 
 
-        self.verticalLayout_2.addLayout(self.gridLayout_2)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_4)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -450,8 +455,9 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout_2.addItem(self.verticalSpacer)
 
-        self.verticalLayout_2.setStretch(4, 5)
-        self.verticalLayout_2.setStretch(9, 1)
+        self.verticalLayout_2.setStretch(0, 1)
+        self.verticalLayout_2.setStretch(5, 5)
+        self.verticalLayout_2.setStretch(10, 1)
 
         self.gridLayout_3.addLayout(self.verticalLayout_2, 2, 3, 1, 1)
 
@@ -479,12 +485,21 @@ class Ui_HISetupDialog(object):
 
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
 
+        QWidget.setTabOrder(self.checkBoxLazy, self.comboBoxBinning)
+        QWidget.setTabOrder(self.comboBoxBinning, self.spinBoxBands)
+        QWidget.setTabOrder(self.spinBoxBands, self.horizontalSliderRho)
+        QWidget.setTabOrder(self.horizontalSliderRho, self.checkBoxOrientation)
+        QWidget.setTabOrder(self.checkBoxOrientation, self.lineEditColorKey)
+        QWidget.setTabOrder(self.lineEditColorKey, self.checkBoxPhase)
         QWidget.setTabOrder(self.checkBoxPhase, self.checkBoxQuality)
-        QWidget.setTabOrder(self.checkBoxQuality, self.pushButtonLoadPhase)
+        QWidget.setTabOrder(self.checkBoxQuality, self.tableWidgetPhase)
+        QWidget.setTabOrder(self.tableWidgetPhase, self.pushButtonAddPhase)
+        QWidget.setTabOrder(self.pushButtonAddPhase, self.pushButtonLoadPhase)
         QWidget.setTabOrder(self.pushButtonLoadPhase, self.pushButtonRemovePhase)
         QWidget.setTabOrder(self.pushButtonRemovePhase, self.patternCenterX)
         QWidget.setTabOrder(self.patternCenterX, self.patternCenterY)
         QWidget.setTabOrder(self.patternCenterY, self.patternCenterZ)
+        QWidget.setTabOrder(self.patternCenterZ, self.comboBoxConvention)
 
         self.retranslateUi(HISetupDialog)
         self.buttonBox.rejected.connect(HISetupDialog.reject)
@@ -558,11 +573,11 @@ class Ui_HISetupDialog(object):
         self.pushButtonRemovePhase.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Remove the selected phase</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.pushButtonRemovePhase.setText(QCoreApplication.translate("HISetupDialog", u"Remove", None))
-        self.patternCenterZ.setPrefix("")
+        self.label_2.setText(QCoreApplication.translate("HISetupDialog", u"Pattern Center", None))
+        self.label_3.setText(QCoreApplication.translate("HISetupDialog", u"X:", None))
         self.label_4.setText(QCoreApplication.translate("HISetupDialog", u"Y:", None))
         self.label_5.setText(QCoreApplication.translate("HISetupDialog", u"Z:", None))
-        self.label_3.setText(QCoreApplication.translate("HISetupDialog", u"X:", None))
-        self.label_2.setText(QCoreApplication.translate("HISetupDialog", u"Pattern Center", None))
+        self.patternCenterZ.setPrefix("")
         self.label_6.setText(QCoreApplication.translate("HISetupDialog", u"Convention", None))
         self.comboBoxConvention.setItemText(0, QCoreApplication.translate("HISetupDialog", u"BRUKER", None))
         self.comboBoxConvention.setItemText(1, QCoreApplication.translate("HISetupDialog", u"TSL", None))
