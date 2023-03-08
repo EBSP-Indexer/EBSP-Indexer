@@ -1,16 +1,18 @@
-from PySide6.QtWidgets import QDialog, QApplication, QColorDialog, QTreeWidgetItem, QTreeWidgetItemIterator
+from PySide6.QtWidgets import QDialog
 from PySide6.QtGui import QColor
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 import matplotlib.colors as mplcolors
 import json
 from os.path import exists
 
 from ui.ui_advanced_settings import Ui_AdvancedSettings
 from scripts.color_picker import ColorPicker
-from utils.setting_file import SettingFile
-from utils.filebrowser import FileBrowser
+from utils import SettingFile, FileBrowser
 
 class AdvancedSettingsDialog(QDialog):
+
+    settingsChanged = Signal()
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.ui = Ui_AdvancedSettings()
@@ -22,6 +24,7 @@ class AdvancedSettingsDialog(QDialog):
         self.ui.colorTreeWidget.setColumnWidth(0, 200)
     
     def setupConnections(self):
+        self.ui.buttonBox.accepted.connect(lambda: self.settingsChanged.emit())
         self.ui.addFileTypeButton.clicked.connect(lambda: self.addFileType())
         self.ui.removeFileTypeButton.clicked.connect(lambda: self.removeFileType())
         self.ui.resetFileTypeButton.clicked.connect(lambda: self.resetFileType())
@@ -173,7 +176,7 @@ class AdvancedSettingsDialog(QDialog):
             "Convention"            : "TSL",
             "Lazy Loading"          : True,
             "Default Directory"     : False,
-            "Colors"                : json.dumps(['lime', 'r', 'b', 'yellow'])
+            "Colors"                : json.dumps(['lime', 'red', 'blue', 'yellow'])
         }
 
         self.setting_file = SettingFile("advanced_settings.txt")
