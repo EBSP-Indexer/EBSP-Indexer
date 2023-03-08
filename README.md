@@ -38,7 +38,7 @@ Alternativly you could download the repo as a zip and upack it manually.
     ```
     python3 -m venv env
     ```
-    Then activte the enviroment in your current running terminal, e.g. for windows by executing:
+    Then activte the enviroment in your current running terminal, e.g. for windows powershell by executing:
     ```
     & env/Scripts/Activate.ps1
     ```
