@@ -59,7 +59,7 @@ def return_ebsd_pattern(ebsd_signal):
 
 
 def return_crystal_map(file_path, crystal_map):
-    #thdout = ThreadedOutput()
+    thdout = ThreadedOutput()
     crystal_map_dict = {}
     crystal_map_dict["type"] = "crystal map"
 
@@ -103,17 +103,17 @@ def return_crystal_map(file_path, crystal_map):
     
     
     #Generate geometrical simulation based on orientations in crystal map
-    #with redirect_stdout(thdout):
-    sims = []
+    with redirect_stdout(thdout):
+        sims = []
 
-    for i, ph in crystal_map.phases:
-        if ph.name != "not_indexed":
-            rlv = ReciprocalLatticeVector(
-                phase=ph, hkl=find_hkl(ph.name)
-            )
-            rlv = rlv.symmetrise()
-            simulator = kp.simulations.KikuchiPatternSimulator(rlv)
-            sims.append(simulator.on_detector(detector, crystal_map.rotations.reshape(*crystal_map.shape)))
+        for i, ph in crystal_map.phases:
+            if ph.name != "not_indexed":
+                rlv = ReciprocalLatticeVector(
+                    phase=ph, hkl=find_hkl(ph.name)
+                )
+                rlv = rlv.symmetrise()
+                simulator = kp.simulations.KikuchiPatternSimulator(rlv)
+                sims.append(simulator.on_detector(detector, crystal_map.rotations.reshape(*crystal_map.shape)))
     
     crystal_map_dict["ebsd_data"] = pattern
     crystal_map_dict["geo_sim"] = sims
