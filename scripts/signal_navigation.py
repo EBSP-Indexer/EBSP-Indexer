@@ -59,7 +59,7 @@ def return_ebsd_pattern(ebsd_signal):
 
 
 def return_crystal_map(file_path, crystal_map):
-    thdout = ThreadedOutput()
+    #thdout = ThreadedOutput()
     crystal_map_dict = {}
     crystal_map_dict["type"] = "crystal map"
 
@@ -70,7 +70,7 @@ def return_crystal_map(file_path, crystal_map):
 
     crystal_map_dict["crystal_map"] = crystal_map
     #crystal_map_dict["crystal_map"] = crystal_map_object.crystal_map
-
+    print("hit")
     crystal_map_dict["nav_shape"] = crystal_map.shape[::-1]
     #crystal_map_dict["nav_shape"] = crystal_map_object.nav_shape
 
@@ -103,38 +103,37 @@ def return_crystal_map(file_path, crystal_map):
     
     
     #Generate geometrical simulation based on orientations in crystal map
-    with redirect_stdout(thdout):
-        sims = []
+    #with redirect_stdout(thdout):
+    sims = []
 
-        for i, ph in crystal_map.phases:
-            if ph.name != "not_indexed":
-                rlv = ReciprocalLatticeVector(
-                    phase=ph, hkl=find_hkl(ph.name)
-                )
-                rlv = rlv.symmetrise()
-                simulator = kp.simulations.KikuchiPatternSimulator(rlv)
-                sims.append(simulator.on_detector(detector, crystal_map.rotations.reshape(*crystal_map.shape)))
-        
-        crystal_map_dict["ebsd_data"] = pattern
-        crystal_map_dict["geo_sim"] = sims
+    for i, ph in crystal_map.phases:
+        if ph.name != "not_indexed":
+            rlv = ReciprocalLatticeVector(
+                phase=ph, hkl=find_hkl(ph.name)
+            )
+            rlv = rlv.symmetrise()
+            simulator = kp.simulations.KikuchiPatternSimulator(rlv)
+            sims.append(simulator.on_detector(detector, crystal_map.rotations.reshape(*crystal_map.shape)))
+    
+    crystal_map_dict["ebsd_data"] = pattern
+    crystal_map_dict["geo_sim"] = sims
 
-        ckey = orix.plot.IPFColorKeyTSL(crystal_map.phases.point_groups[0])
-        
-        rgb_all = np.zeros((crystal_map.size, 3))
-        for i, phase in crystal_map.phases:
-            if i != -1:
-                rgb_i = ckey.orientation2color(crystal_map[phase.name].orientations)
-                rgb_all[crystal_map.phase_id == i] = rgb_i
+    ckey = orix.plot.IPFColorKeyTSL(crystal_map.phases[0].point_group)
+    rgb_all = np.zeros((crystal_map.size, 3))
+    for i, phase in crystal_map.phases:
+        if i != -1:
+            rgb_i = ckey.orientation2color(crystal_map[phase.name].orientations)
+            rgb_all[crystal_map.phase_id == i] = rgb_i
 
-        ipf_all = rgb_all.reshape(crystal_map.shape + (3,))
+    ipf_all = rgb_all.reshape(crystal_map.shape + (3,))
 
-        #Generating a phase map array, adapted from the orix method orix_map_plot with minor adjustments
-        phase_id = crystal_map.get_map_data("phase_id")
-        unique_phase_ids = np.unique(phase_id[~np.isnan(phase_id)])
-        data = np.ones(phase_id.shape + (3,))
-        for i, color in zip(unique_phase_ids, crystal_map.phases_in_data.colors_rgb):
-            mask = phase_id == int(i)
-            data[mask] = data[mask] * color
+    #Generating a phase map array, adapted from the orix method orix_map_plot with minor adjustments
+    phase_id = crystal_map.get_map_data("phase_id")
+    unique_phase_ids = np.unique(phase_id[~np.isnan(phase_id)])
+    data = np.ones(phase_id.shape + (3,))
+    for i, color in zip(unique_phase_ids, crystal_map.phases_in_data.colors_rgb):
+        mask = phase_id == int(i)
+        data[mask] = data[mask] * color
 
     # Add legend patches to plot
     #patches = []
