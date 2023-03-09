@@ -70,7 +70,6 @@ def return_crystal_map(file_path, crystal_map):
 
     crystal_map_dict["crystal_map"] = crystal_map
     #crystal_map_dict["crystal_map"] = crystal_map_object.crystal_map
-    print("hit")
     crystal_map_dict["nav_shape"] = crystal_map.shape[::-1]
     #crystal_map_dict["nav_shape"] = crystal_map_object.nav_shape
 
