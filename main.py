@@ -303,7 +303,7 @@ class AppWindow(QMainWindow):
     def selectSignalNavigation(self, signal_path: str):
         try:
             self.signalNavigationWidget.load_dataset(signal_path)
-
+            self.ui.dockWidgetSignalNavigation.setWindowTitle(f"Signal Navigation - {os.path.basename(signal_path)}")
         except Exception as e:
             if self.getSelectedPath() == "":
                 dlg = QMessageBox(self)
@@ -361,7 +361,7 @@ class AppWindow(QMainWindow):
             else:
                 image = mpimg.imread(image_path)
                 self.ui.dockWidgetImageViewer.setWindowTitle(
-                    f"Image Viewer - {image_path}"
+                    f"Image Viewer - {os.path.basename(image_path)}"
                 )
             self.ui.MplWidget.canvas.ax.clear()
             self.ui.MplWidget.canvas.ax.axis(False)
