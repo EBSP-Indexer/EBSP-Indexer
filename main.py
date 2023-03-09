@@ -23,6 +23,7 @@ import qdarktheme
 
 logging.getLogger("pyopencl").setLevel(logging.WARNING)
 logging.getLogger("hyperspy").setLevel(logging.WARNING)
+logging.getLogger("kikuchipy").setLevel(logging.WARNING)
 from contextlib import redirect_stdout, redirect_stderr
 
 try:
