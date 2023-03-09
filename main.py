@@ -23,6 +23,7 @@ import qdarktheme
 
 logging.getLogger("pyopencl").setLevel(logging.WARNING)
 logging.getLogger("hyperspy").setLevel(logging.WARNING)
+logging.getLogger("kikuchipy").setLevel(logging.WARNING)
 from contextlib import redirect_stdout, redirect_stderr
 
 try:
@@ -34,7 +35,7 @@ import platform
 from contextlib import redirect_stdout, redirect_stderr
 import resources_rc
 from PySide6.QtCore import QDir, Qt, QThreadPool, Slot
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PySide6.QtGui import QIcon
 
 # try:
@@ -302,7 +303,7 @@ class AppWindow(QMainWindow):
     def selectSignalNavigation(self, signal_path: str):
         try:
             self.signalNavigationWidget.load_dataset(signal_path)
-
+            self.ui.dockWidgetSignalNavigation.setWindowTitle(f"Signal Navigation - {os.path.basename(signal_path)}")
         except Exception as e:
             if self.getSelectedPath() == "":
                 dlg = QMessageBox(self)
@@ -360,7 +361,7 @@ class AppWindow(QMainWindow):
             else:
                 image = mpimg.imread(image_path)
                 self.ui.dockWidgetImageViewer.setWindowTitle(
-                    f"Image Viewer - {image_path}"
+                    f"Image Viewer - {os.path.basename(image_path)}"
                 )
             self.ui.MplWidget.canvas.ax.clear()
             self.ui.MplWidget.canvas.ax.axis(False)
