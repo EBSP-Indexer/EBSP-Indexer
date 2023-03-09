@@ -10,12 +10,14 @@
 
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
+
 import platform
 import multiprocessing
 import sys
 import json
 import os
 import logging
+
 logging.getLogger("pyopencl").setLevel(logging.WARNING)
 logging.getLogger("hyperspy").setLevel(logging.WARNING)
 from contextlib import redirect_stdout, redirect_stderr
@@ -31,9 +33,10 @@ import resources_rc
 from PySide6.QtCore import QDir, Qt, QThreadPool, Slot
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PySide6.QtGui import QIcon
-#try: 
+
+# try:
 #    import pyi_splash
-#except:
+# except:
 #    pass
 # Modules available from start in the console
 import kikuchipy as kp
@@ -101,13 +104,17 @@ class AppWindow(QMainWindow):
         self.importSettings()
         QThreadPool.globalInstance().setMaxThreadCount(1)
         self.updateActiveJobs()
-        #try:
+        # try:
         #    pyi_splash.close()
-        #except Exception as e:
+        # except Exception as e:
         #    pass
 
     def setupConnections(self):
         self.ui.dockWidgetSystemExplorer.setWidget(self.systemExplorer)
+        self.ui.dockWidgetSignalNavigation.setWidget(self.signalNavigationWidget)
+        self.tabifyDockWidget(self.ui.dockWidgetImageViewer, self.ui.dockWidgetSignalNavigation)
+        self.ui.dockWidgetImageViewer.setFocus()
+        
         # self.ui.dockWidgetSystemExplorer.adjustSize()
         self.systemExplorer.pathChanged.connect(
             lambda new_path: self.updateMenuButtons(new_path)
@@ -118,7 +125,7 @@ class AppWindow(QMainWindow):
         self.systemExplorer.requestSignalNavigation.connect(
             lambda signal_path: self.selectSignalNavigation(signal_path)
         )
-        self.ui.dockWidgetSignalNavigation.setWidget(self.signalNavigationWidget)
+        
         self.ui.actionOpen_Workfolder.triggered.connect(
             lambda: self.selectWorkingDirectory()
         )
@@ -142,24 +149,40 @@ class AppWindow(QMainWindow):
         self.ui.actionPattern_Center.triggered.connect(
             lambda: self.selectPatternCenter()
         )
-        self.ui.actionAverage_dot_product.triggered.connect(
-            lambda: sendToWorker(
-                self, save_adp_map, pattern_path=self.getSelectedPath()
+        if platform.system().lower() == "darwin":
+            self.ui.actionAverage_dot_product.triggered.connect(
+                lambda: save_adp_map(pattern_path=self.getSelectedPath())
             )
-        )
-        self.ui.actionImage_quality.triggered.connect(
-            lambda: sendToWorker(self, save_iq_map, pattern_path=self.getSelectedPath())
-        )
-        self.ui.actionMean_intensity.triggered.connect(
-            lambda: sendToWorker(
-                self, save_mean_intensity_map, pattern_path=self.getSelectedPath()
+            self.ui.actionImage_quality.triggered.connect(
+                lambda: save_iq_map(pattern_path=self.getSelectedPath())
             )
-        )
-        self.ui.actionVirtual_backscatter_electron.triggered.connect(
-            lambda: sendToWorker(
-                self, save_rgb_vbse, pattern_path=self.getSelectedPath()
+            self.ui.actionMean_intensity.triggered.connect(
+                lambda: save_mean_intensity_map(pattern_path=self.getSelectedPath())
             )
-        )
+            self.ui.actionVirtual_backscatter_electron.triggered.connect(
+                lambda: save_rgb_vbse(pattern_path=self.getSelectedPath())
+            )
+        
+        else:
+            self.ui.actionAverage_dot_product.triggered.connect(
+                lambda: sendToWorker(
+                    self, save_adp_map, pattern_path=self.getSelectedPath()
+                )
+            )
+            self.ui.actionImage_quality.triggered.connect(
+                lambda: sendToWorker(self, save_iq_map, pattern_path=self.getSelectedPath())
+            )
+            self.ui.actionMean_intensity.triggered.connect(
+                lambda: sendToWorker(
+                    self, save_mean_intensity_map, pattern_path=self.getSelectedPath()
+                )
+            )
+            self.ui.actionVirtual_backscatter_electron.triggered.connect(
+                lambda: sendToWorker(
+                    self, save_rgb_vbse, pattern_path=self.getSelectedPath()
+                )
+            )
+        
 
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
@@ -236,12 +259,8 @@ class AppWindow(QMainWindow):
 
     def selectRefineOrientations(self, file_path: str):
         try:
-            self.refineDialog = RefineSetupDialog(
-                parent=self, file_path=file_path
-            )
-            self.refineDialog.setWindowFlag(
-                Qt.WindowStaysOnTopHint, self.stayOnTopHint
-            )
+            self.refineDialog = RefineSetupDialog(parent=self, file_path=file_path)
+            self.refineDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.refineDialog.exec()
         except Exception as e:
             self.console.errorwrite(
@@ -276,30 +295,6 @@ class AppWindow(QMainWindow):
             self.ROIDialog.exec()
         except Exception as e:
             self.console.errorwrite(f"Could not initialize ROI dialog:\n{str(e)}\n")
-
-    # def onSystemModelChanged(self, new_selected, old_selected):
-    #     if new_selected.empty():
-    #         self.file_selected = ""
-    #     else:
-    #         self.file_selected = self.systemModel.filePath(
-    #             self.ui.systemViewer.currentIndex()
-    #         )
-    #     self.updateMenuButtons(self.file_selected)
-    #     self.showImage(self.file_selected)
-
-    # def doubleClickEvent(self):
-    #     index = self.ui.systemViewer.currentIndex()
-    #     self.file_selected = self.systemModel.filePath(index)
-
-    #     if path.splitext(self.file_selected)[1] in [".txt"]:
-    #         if platform.system().lower() == "darwin":
-    #             subprocess.call(["open", "-a", "TextEdit", self.file_selected])
-    #         if platform.system().lower() == "windows":
-    #             startfile(self.file_selected)
-
-    #     # TODO: more functionality, open dataset for signal navigation
-    #     if splitext(self.file_selected)[1] in [".h5", ".dat"]:
-    #         self.selectSignalNavigation()
 
     def selectSignalNavigation(self, signal_path: str):
         try:
@@ -361,7 +356,9 @@ class AppWindow(QMainWindow):
                 self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer")
             else:
                 image = mpimg.imread(image_path)
-                self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer - {image_path}")
+                self.ui.dockWidgetImageViewer.setWindowTitle(
+                    f"Image Viewer - {image_path}"
+                )
             self.ui.MplWidget.canvas.ax.clear()
             self.ui.MplWidget.canvas.ax.axis(False)
             self.ui.MplWidget.canvas.ax.imshow(image)
@@ -399,7 +396,7 @@ class AppWindow(QMainWindow):
             self.ui.actionSignalNavigation.setEnabled(True)
             self.ui.menuPre_indexing_maps.setEnabled(False)
 
-    #TODO Move removeWorker and updateActiveJobs to a jobmanagerlist class
+    # TODO Move removeWorker and updateActiveJobs to a jobmanagerlist class
     @Slot(int)
     def removeWorker(self, worker_id: int):
         jobList = self.ui.jobList
@@ -421,7 +418,7 @@ if __name__ == "__main__":
     multiprocessing.freeze_support()
 
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon(':/icons/app_icon.ico'))
+    app.setWindowIcon(QIcon(":/icons/app_icon.ico"))
     APP = AppWindow()
     # Redirect stdout to console.write and stderr to console.errorwrite
     with redirect_stdout(APP.console), redirect_stderr(
