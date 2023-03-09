@@ -451,6 +451,7 @@ class DiSetupDialog(QDialog):
             xmaps_ref[f"{ph}"] = pattern.refine_orientation(
                 xmap=xmaps[f"{ph}"],
                 master_pattern=self.mp[f"{ph}"],
+                method="ln_neldermead",
                 trust_region=[1, 1, 1],
                 **ref_kw,
             )
@@ -635,7 +636,7 @@ class DiSetupDialog(QDialog):
         if self.options["n_iter"] != 0:
             self.n_per_iteration = self.options["n_iter"]
         self.di_kwargs["n_per_iteration"] = self.n_per_iteration
-
+        self.convention = self.ui.comboBoxConvention.currentText().upper()
         # Rebinning of signal
         print("Rebinning EBSD signals")
         nav_shape = self.s.axes_manager.navigation_shape
@@ -650,7 +651,7 @@ class DiSetupDialog(QDialog):
             shape=sig_shape,
             sample_tilt=self.sample_tilt,  # Degrees
             pc=self.pc,
-            convention= self.ui.comboBoxConvention.currentText().upper(),  # Default is Bruker
+            convention=self.convention,  # Default is Bruker
         )
         detector.save(path.join(self.results_dir, "detector.txt"))
 
