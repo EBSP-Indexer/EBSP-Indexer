@@ -23,6 +23,7 @@ import qdarktheme
 
 logging.getLogger("pyopencl").setLevel(logging.WARNING)
 logging.getLogger("hyperspy").setLevel(logging.WARNING)
+logging.getLogger("kikuchipy").setLevel(logging.WARNING)
 from contextlib import redirect_stdout, redirect_stderr
 
 try:
@@ -34,7 +35,7 @@ import platform
 from contextlib import redirect_stdout, redirect_stderr
 import resources_rc
 from PySide6.QtCore import QDir, Qt, QThreadPool, Slot
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PySide6.QtGui import QIcon
 
 # try:
