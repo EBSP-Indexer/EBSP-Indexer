@@ -2,8 +2,6 @@ import sys
 import kikuchipy as kp
 from os import path
 
-from scripts.signal_navigation import open_file
-
 from math import floor
 
 from PySide6.QtWidgets import QWidget, QMainWindow
@@ -28,6 +26,7 @@ class SignalNavigationWidget(QWidget):
 
         self.ui = Ui_SignalNavigationWidget()
         self.ui.setupUi(self)
+        
         self.ui.checkBox.setVisible(False)
 
         self.file_selected = ""
@@ -65,15 +64,15 @@ class SignalNavigationWidget(QWidget):
             self.dataset = EBSDDataset(signal, file_path)
 
         if isinstance(signal, orix.crystal_map.crystal_map.CrystalMap):
-            
-            self.dataset = crystalMap(signal, file_path)
+
+            self.dataset = crystalMap(signal, file_path, compute_all = True)
 
         self.plot_navigator(self.dataset, navigator=list(self.dataset.navigator)[0])
         self.ui.comboBoxNavigator.clear()
 
-        for key in self.dataset.navigator.keys():
+        for key, value in self.dataset.navigator.items():
             self.ui.comboBoxNavigator.addItem(key)
-        
+
         self.ui.checkBox.setChecked(False)
 
         if self.dataset.datatype == "crystal map":
@@ -81,8 +80,7 @@ class SignalNavigationWidget(QWidget):
         else:
             show_labels_and_checkbox = False
 
-        
-        self.ui.checkBox.setVisible(show_labels_and_checkbox)            
+        self.ui.checkBox.setVisible(show_labels_and_checkbox)
         self.ui.labelPhaseClick.setVisible(show_labels_and_checkbox)
         self.ui.LabelPhase2.setVisible(show_labels_and_checkbox)
         self.ui.labelPhaseHover.setVisible(show_labels_and_checkbox)
@@ -142,10 +140,17 @@ class SignalNavigationWidget(QWidget):
         self.ui.signalMplWidget.canvas.ax.axis(False)
         self.ui.signalMplWidget.canvas.ax.imshow(signal, cmap="gray")
 
-        if dataset.datatype == "crystal map" and self.add_geosim:
-            hkl_lines = dataset.hkl[dataset.phase_id_array[y_index, x_index]].as_collections(
-                (y_index, x_index), zone_axes_labels=False
-            )
+        if (
+            dataset.datatype == "crystal map"
+            and self.add_geosim
+            and self.dataset.crystal_map.phases[
+                self.dataset.phase_id_array[y_index, x_index]
+            ].name
+            != "not_indexed"
+        ):
+            hkl_lines = dataset.hkl[
+                dataset.phase_id_array[y_index, x_index]
+            ].as_collections((y_index, x_index), zone_axes_labels=False)
             self.ui.signalMplWidget.canvas.ax.add_collection(
                 hkl_lines[0], autolim=False
             )
@@ -200,7 +205,9 @@ class SignalNavigationWidget(QWidget):
             self.ui.navigatorMplWidget.canvas.draw()
             click_annot.remove()
             if self.dataset.datatype == "crystal map":
-                phase_name = self.dataset.crystal_map.phases[self.dataset.phase_id_array[y, x]].name
+                phase_name = self.dataset.crystal_map.phases[
+                    self.dataset.phase_id_array[y, x]
+                ].name
                 self.ui.labelPhaseClick.setText(f"{phase_name}")
 
     def on_hover_navigator(self, event):
@@ -208,7 +215,9 @@ class SignalNavigationWidget(QWidget):
             x_hover, y_hover = floor(event.xdata), floor(event.ydata)
             self.ui.navigatorCoordinates.setText(f"({x_hover}, {y_hover})")
             if self.dataset.datatype == "crystal map":
-                phase_name = self.dataset.crystal_map.phases[self.dataset.phase_id_array[y_hover, x_hover]].name
+                phase_name = self.dataset.crystal_map.phases[
+                    self.dataset.phase_id_array[y_hover, x_hover]
+                ].name
                 self.ui.labelPhaseHover.setText(f"{phase_name}")
         else:
             self.ui.navigatorCoordinates.setText(f"(x, y)")
@@ -222,7 +231,11 @@ class SignalNavigationWidget(QWidget):
         x, y = self.current_x, self.current_y
         fig, ax = plt.subplots(1, 2, figsize=(12, 6))
         ax[0].set_title(self.ui.comboBoxNavigator.currentText())
-        ax[0].imshow(navigator, cmap="gray", extent=(0, self.dataset.nav_shape[0], self.dataset.nav_shape[1], 0))
+        ax[0].imshow(
+            navigator,
+            cmap="gray",
+            extent=(0, self.dataset.nav_shape[0], self.dataset.nav_shape[1], 0),
+        )
         ax[0].add_patch(
             Rectangle(
                 (x, y),
@@ -240,8 +253,10 @@ class SignalNavigationWidget(QWidget):
         ax[1].imshow(signal, cmap="gray")
         ax[1].axis("off")
         if self.ui.checkBox.isChecked():
-            hkl_lines = self.dataset.hkl[self.dataset.phase_id_array[y, x]].as_collections(
-                (y, x), zone_axes_labels=False
-            )
+            hkl_lines = self.dataset.hkl[
+                self.dataset.phase_id_array[y, x]
+            ].as_collections((y, x), zone_axes_labels=False)
             ax[1].add_collection(hkl_lines[0], autolim=False)
-        fig.savefig(image_export_path) #image is saved as .png by default, as of now no other file format is supported
+        fig.savefig(
+            image_export_path
+        )  # image is saved as .png by default, as of now no other file format is supported
