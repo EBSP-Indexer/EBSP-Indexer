@@ -26,7 +26,7 @@ class Ui_RefineSetupDialog(object):
     def setupUi(self, RefineSetupDialog):
         if not RefineSetupDialog.objectName():
             RefineSetupDialog.setObjectName(u"RefineSetupDialog")
-        RefineSetupDialog.resize(825, 684)
+        RefineSetupDialog.resize(825, 703)
         self.gridLayout = QGridLayout(RefineSetupDialog)
         self.gridLayout.setObjectName(u"gridLayout")
         self.frame = QFrame(RefineSetupDialog)
@@ -52,7 +52,7 @@ class Ui_RefineSetupDialog(object):
         self.verticalLayout_7.setObjectName(u"verticalLayout_7")
         self.label_10 = QLabel(self.frame)
         self.label_10.setObjectName(u"label_10")
-        self.label_10.setStyleSheet(u"font: 75 10pt \"MS Shell Dlg 2\";")
+        self.label_10.setStyleSheet(u"font: 75 10pt \"Courier\";")
 
         self.verticalLayout_7.addWidget(self.label_10)
 
@@ -70,7 +70,7 @@ class Ui_RefineSetupDialog(object):
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
         self.labelSignalPath = QLabel(self.frame)
         self.labelSignalPath.setObjectName(u"labelSignalPath")
-        self.labelSignalPath.setStyleSheet(u"font: italic 8pt \"MS Sans Serif\";\n"
+        self.labelSignalPath.setStyleSheet(u"font: italic 8pt \"Courier\";\n"
 "color: rgb(127, 127, 127);")
 
         self.horizontalLayout_12.addWidget(self.labelSignalPath)
@@ -169,7 +169,7 @@ class Ui_RefineSetupDialog(object):
 
         self.label_11 = QLabel(self.frame)
         self.label_11.setObjectName(u"label_11")
-        self.label_11.setStyleSheet(u"font: 75 10pt \"MS Shell Dlg 2\";")
+        self.label_11.setStyleSheet(u"font: 75 10pt \"Courier\";")
 
         self.verticalLayout.addWidget(self.label_11)
 
@@ -248,7 +248,7 @@ class Ui_RefineSetupDialog(object):
 
         self.label_12 = QLabel(self.frame)
         self.label_12.setObjectName(u"label_12")
-        self.label_12.setStyleSheet(u"font: 75 10pt \"MS Shell Dlg 2\";")
+        self.label_12.setStyleSheet(u"font: 75 10pt \"Courier\";")
 
         self.verticalLayout.addWidget(self.label_12)
 
@@ -346,7 +346,7 @@ class Ui_RefineSetupDialog(object):
 
         self.label_16 = QLabel(self.frame)
         self.label_16.setObjectName(u"label_16")
-        self.label_16.setStyleSheet(u"font: 75 10pt \"MS Shell Dlg 2\";")
+        self.label_16.setStyleSheet(u"font: 75 10pt \"Courier\";")
 
         self.verticalLayout_2.addWidget(self.label_16)
 
@@ -361,7 +361,7 @@ class Ui_RefineSetupDialog(object):
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.labelXmapPath = QLabel(self.frame)
         self.labelXmapPath.setObjectName(u"labelXmapPath")
-        self.labelXmapPath.setStyleSheet(u"font: italic 8pt \"MS Sans Serif\";\n"
+        self.labelXmapPath.setStyleSheet(u"font: italic 8pt \"Courier\";\n"
 "color: rgb(127, 127, 127);")
 
         self.horizontalLayout_5.addWidget(self.labelXmapPath)
@@ -418,7 +418,7 @@ class Ui_RefineSetupDialog(object):
 
         self.label_14 = QLabel(self.frame)
         self.label_14.setObjectName(u"label_14")
-        self.label_14.setStyleSheet(u"font: 75 10pt \"MS Shell Dlg 2\";")
+        self.label_14.setStyleSheet(u"font: 75 10pt \"Courier\";")
 
         self.verticalLayout_2.addWidget(self.label_14)
 

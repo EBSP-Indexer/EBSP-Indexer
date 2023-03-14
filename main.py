@@ -19,7 +19,7 @@ import os
 import logging
 
 
-import qdarktheme
+#import qdarktheme
 
 logging.getLogger("pyopencl").setLevel(logging.WARNING)
 logging.getLogger("hyperspy").setLevel(logging.WARNING)
@@ -422,7 +422,7 @@ if __name__ == "__main__":
     multiprocessing.freeze_support()
 
     app = QApplication(sys.argv)
-    qdarktheme.setup_theme("light")
+    #qdarktheme.setup_theme("light")
     app.setWindowIcon(QIcon(":/icons/app_icon.ico"))
     APP = AppWindow()
     # Redirect stdout to console.write and stderr to console.errorwrite

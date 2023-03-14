@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>821</width>
-    <height>586</height>
+    <height>623</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,7 +50,7 @@
           <item>
            <widget class="QLabel" name="label_10">
             <property name="styleSheet">
-             <string notr="true">font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
+             <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
             </property>
             <property name="text">
              <string>Signal</string>
@@ -185,7 +185,7 @@
         <item>
          <widget class="QLabel" name="label_11">
           <property name="styleSheet">
-           <string notr="true">font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
+           <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
           </property>
           <property name="text">
            <string>Hough Transform</string>
@@ -299,7 +299,7 @@
         <item>
          <widget class="QLabel" name="label_12">
           <property name="styleSheet">
-           <string notr="true">font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
+           <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
           </property>
           <property name="text">
            <string>Maps</string>
@@ -455,7 +455,7 @@
         <item>
          <widget class="QLabel" name="label_14">
           <property name="styleSheet">
-           <string notr="true">font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
+           <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
           </property>
           <property name="text">
            <string>Detector</string>
@@ -503,7 +503,6 @@
            <property name="font">
             <font>
              <pointsize>8</pointsize>
-             <weight>50</weight>
              <bold>false</bold>
             </font>
            </property>
@@ -515,7 +514,6 @@
            <property name="font">
             <font>
              <pointsize>8</pointsize>
-             <weight>50</weight>
              <bold>false</bold>
             </font>
            </property>

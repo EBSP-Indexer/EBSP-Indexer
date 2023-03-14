@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>825</width>
-    <height>684</height>
+    <height>703</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,7 +50,7 @@
           <item>
            <widget class="QLabel" name="label_10">
             <property name="styleSheet">
-             <string notr="true">font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
+             <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
             </property>
             <property name="text">
              <string>Signal</string>
@@ -71,7 +71,7 @@
           <item>
            <widget class="QLabel" name="labelSignalPath">
             <property name="styleSheet">
-             <string notr="true">font: italic 8pt &quot;MS Sans Serif&quot;;
+             <string notr="true">font: italic 8pt &quot;Courier&quot;;
 color: rgb(127, 127, 127);</string>
             </property>
             <property name="text">
@@ -260,7 +260,7 @@ color: rgb(127, 127, 127);</string>
         <item>
          <widget class="QLabel" name="label_11">
           <property name="styleSheet">
-           <string notr="true">font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
+           <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
           </property>
           <property name="text">
            <string>Refinement</string>
@@ -402,7 +402,7 @@ color: rgb(127, 127, 127);</string>
         <item>
          <widget class="QLabel" name="label_12">
           <property name="styleSheet">
-           <string notr="true">font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
+           <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
           </property>
           <property name="text">
            <string>Maps</string>
@@ -578,7 +578,7 @@ color: rgb(127, 127, 127);</string>
         <item>
          <widget class="QLabel" name="label_16">
           <property name="styleSheet">
-           <string notr="true">font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
+           <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
           </property>
           <property name="text">
            <string>Crystal Map</string>
@@ -597,7 +597,7 @@ color: rgb(127, 127, 127);</string>
           <item>
            <widget class="QLabel" name="labelXmapPath">
             <property name="styleSheet">
-             <string notr="true">font: italic 8pt &quot;MS Sans Serif&quot;;
+             <string notr="true">font: italic 8pt &quot;Courier&quot;;
 color: rgb(127, 127, 127);</string>
             </property>
             <property name="text">
@@ -706,7 +706,7 @@ color: rgb(127, 127, 127);</string>
         <item>
          <widget class="QLabel" name="label_14">
           <property name="styleSheet">
-           <string notr="true">font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
+           <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
           </property>
           <property name="text">
            <string>Detector</string>
@@ -754,7 +754,6 @@ color: rgb(127, 127, 127);</string>
            <property name="font">
             <font>
              <pointsize>8</pointsize>
-             <weight>50</weight>
              <bold>false</bold>
             </font>
            </property>
@@ -766,7 +765,6 @@ color: rgb(127, 127, 127);</string>
            <property name="font">
             <font>
              <pointsize>8</pointsize>
-             <weight>50</weight>
              <bold>false</bold>
             </font>
            </property>
