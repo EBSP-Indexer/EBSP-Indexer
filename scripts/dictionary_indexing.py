@@ -1,7 +1,7 @@
 import warnings
 import json
 from datetime import date
-from os import mkdir, path
+from os import mkdir, path, getcwd
 
 import kikuchipy as kp
 import matplotlib as mpl
@@ -139,8 +139,31 @@ class DiSetupDialog(QDialog):
 
     # Lookup table for sample rotations
     def generate_rotation_lookup_dict(self):
-        self.sample_rotations = {}
-        with open("resources/sample_rotations.txt", "r") as f:
+        self.sample_rotations = {
+            '3.0': eval("{'4/mmm': 90979, 'm-3m': 30443}"),
+            '2.9': eval("{'4/mmm': 97627, 'm-3m': 32363}"),
+            '2.8': eval("{'4/mmm': 110709, 'm-3m': 36829}"),
+            '2.7': eval("{'4/mmm': 124885, 'm-3m': 41625}"),
+            '2.6': eval("{'4/mmm': 132893, 'm-3m': 44073}"),
+            '2.5': eval("{'4/mmm': 157151, 'm-3m': 52607}"),
+            '2.4': eval("{'4/mmm': 175689, 'm-3m': 58453}"),
+            '2.2': eval("{'4/mmm': 226787, 'm-3m': 75539}"),
+            '2.3': eval("{'4/mmm': 195441, 'm-3m': 65097}"),
+            '2.1': eval("{'4/mmm': 262101, 'm-3m': 87529}"),
+            '2.0': eval("{'4/mmm': 301055, 'm-3m': 100347}"),
+            '1.9': eval("{'4/mmm': 357801, 'm-3m': 119077}"),
+            '1.8': eval("{'4/mmm': 421899, 'm-3m': 141267}"),
+            '1.7': eval("{'4/mmm': 492855, 'm-3m': 164179}"),
+            '1.6': eval("{'4/mmm': 592249, 'm-3m': 197225}"),
+            '1.5': eval("{'4/mmm': 729573, 'm-3m': 243129}"),
+            '1.4': eval("{'4/mmm': 913161, 'm-3m': 304053}"),
+            '1.3': eval("{'4/mmm': 1157317, 'm-3m': 385545}"),
+            '1.2': eval("{'4/mmm': 1481139, 'm-3m': 494039}"),
+            '1.1': eval("{'4/mmm': 1906537, 'm-3m': 635777}"),
+            '1.0': eval("{'4/mmm': 2571073, 'm-3m': 857973}"),
+        }
+        return
+        with open(path.join(getcwd(),"resources/sample_rotations.txt", "r")) as f:
             for line in f:
                 (key, value) = line.strip().split("\t")
                 self.sample_rotations[f"{float(key):.2}"] = eval(value)

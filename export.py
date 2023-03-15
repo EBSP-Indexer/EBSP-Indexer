@@ -27,8 +27,8 @@ args_list = [
 
 if platform.system().lower() == "darwin":
     args_list.append("--console")
-    args_list.append("--target-arch") 
-    args_list.append("universal2") # Valid values are x86_64, arm64, and universal2.
+    #args_list.append("--target-arch") 
+    #args_list.append("x86_64") # Valid values are x86_64, arm64, and universal2.
 else:
     args_list.append("--windowed")
 
