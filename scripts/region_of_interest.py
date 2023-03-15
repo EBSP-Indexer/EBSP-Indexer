@@ -139,7 +139,7 @@ class RegionOfInteresDialog(QDialog):
         self.ui.mplWidget.canvas.draw()
 
         self.rs = RectangleSelector(self.ui.mplWidget.canvas.ax, self.line_select_callback,
-                                                drawtype='box', useblit=True,
+                                                useblit=True,
                                                 button=[1, 3],  # don't use middle button
                                                 minspanx=5, minspany=5,
                                                 spancoords='data',

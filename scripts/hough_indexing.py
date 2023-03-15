@@ -326,7 +326,6 @@ class HiSetupDialog(QDialog):
         if binning is None:
             binning = 1
         else:
-            print(s.axes_manager.navigation_shape + self.binnings[str(binning)])
             s = s.rebin(
                 new_shape=s.axes_manager.navigation_shape + self.binnings[str(binning)]
             )
@@ -502,7 +501,7 @@ def log_hi_parameters(
         "Acceleration voltage",
         f"{signal.metadata.Acquisition_instrument.SEM.beam_energy} kV",
     )
-    log.write("Pattern path", pattern_path)
+    log.write("Pattern name", path.basename(pattern_path))
     log.write("Sample tilt", f"{signal.detector.sample_tilt} degrees")
     log.write("Camera tilt", f"{signal.detector.tilt} degrees")
     log.write(

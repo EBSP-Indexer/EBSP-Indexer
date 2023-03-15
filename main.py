@@ -10,14 +10,21 @@
 
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
+
 import platform
 import multiprocessing
+multiprocessing.freeze_support()
 import sys
 import json
-import os.path as path
+import os
 import logging
+
+
+#import qdarktheme
+
 logging.getLogger("pyopencl").setLevel(logging.WARNING)
 logging.getLogger("hyperspy").setLevel(logging.WARNING)
+logging.getLogger("kikuchipy").setLevel(logging.WARNING)
 from contextlib import redirect_stdout, redirect_stderr
 
 try:
@@ -27,12 +34,14 @@ except:
 import platform
 
 from contextlib import redirect_stdout, redirect_stderr
+import resources_rc
 from PySide6.QtCore import QDir, Qt, QThreadPool, Slot
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
-from PySide6.QtGui import QFont
-#try: 
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PySide6.QtGui import QIcon
+
+# try:
 #    import pyi_splash
-#except:
+# except:
 #    pass
 # Modules available from start in the console
 import kikuchipy as kp
@@ -98,13 +107,19 @@ class AppWindow(QMainWindow):
         self.setupConnections()
         self.showImage(self.getSelectedPath())
         self.importSettings()
-        #try:
+        QThreadPool.globalInstance().setMaxThreadCount(1)
+        self.updateActiveJobs()
+        # try:
         #    pyi_splash.close()
-        #except Exception as e:
+        # except Exception as e:
         #    pass
 
     def setupConnections(self):
         self.ui.dockWidgetSystemExplorer.setWidget(self.systemExplorer)
+        self.ui.dockWidgetSignalNavigation.setWidget(self.signalNavigationWidget)
+        self.tabifyDockWidget(self.ui.dockWidgetImageViewer, self.ui.dockWidgetSignalNavigation)
+        self.ui.dockWidgetImageViewer.setFocus()
+        
         # self.ui.dockWidgetSystemExplorer.adjustSize()
         self.systemExplorer.pathChanged.connect(
             lambda new_path: self.updateMenuButtons(new_path)
@@ -115,7 +130,7 @@ class AppWindow(QMainWindow):
         self.systemExplorer.requestSignalNavigation.connect(
             lambda signal_path: self.selectSignalNavigation(signal_path)
         )
-        self.ui.dockWidgetSignalNavigation.setWidget(self.signalNavigationWidget)
+        
         self.ui.actionOpen_Workfolder.triggered.connect(
             lambda: self.selectWorkingDirectory()
         )
@@ -139,6 +154,21 @@ class AppWindow(QMainWindow):
         self.ui.actionPattern_Center.triggered.connect(
             lambda: self.selectPatternCenter()
         )
+        #if platform.system().lower() != "darwin":
+        # self.ui.actionAverage_dot_product.triggered.connect(
+        #     lambda: save_adp_map(pattern_path=self.getSelectedPath())
+        # )
+        # self.ui.actionImage_quality.triggered.connect(
+        #     lambda: save_iq_map(pattern_path=self.getSelectedPath())
+        # )
+        # self.ui.actionMean_intensity.triggered.connect(
+        #     lambda: save_mean_intensity_map(pattern_path=self.getSelectedPath())
+        # )
+        # self.ui.actionVirtual_backscatter_electron.triggered.connect(
+        #     lambda: save_rgb_vbse(pattern_path=self.getSelectedPath())
+        # )
+        
+        # else:
         self.ui.actionAverage_dot_product.triggered.connect(
             lambda: sendToWorker(
                 self, save_adp_map, pattern_path=self.getSelectedPath()
@@ -157,12 +187,13 @@ class AppWindow(QMainWindow):
                 self, save_rgb_vbse, pattern_path=self.getSelectedPath()
             )
         )
+        
 
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
             self.working_dir = self.fileBrowserOD.getPaths()[0]
             self.fileBrowserOD.setDefaultDir(self.working_dir)
-            if path.exists("advanced_settings.txt"):
+            if os.path.exists("advanced_settings.txt"):
                 setting_file = SettingFile("advanced_settings.txt")
                 try:
                     file_types = json.loads(setting_file.read("File Types"))
@@ -181,7 +212,7 @@ class AppWindow(QMainWindow):
         return self.systemExplorer.selected_path
 
     def importSettings(self):
-        if path.exists("advanced_settings.txt"):
+        if os.path.exists("advanced_settings.txt"):
             setting_file = SettingFile("advanced_settings.txt")
             try:
                 file_types = json.loads(setting_file.read("File Types"))
@@ -196,7 +227,7 @@ class AppWindow(QMainWindow):
                     "*.txt",
                 ]
 
-            if path.exists(setting_file.read("Default Directory")):
+            if os.path.exists(setting_file.read("Default Directory")):
                 self.working_dir = setting_file.read("Default Directory")
                 self.systemExplorer.setSystemViewer(
                     self.working_dir, system_view_filter
@@ -233,12 +264,8 @@ class AppWindow(QMainWindow):
 
     def selectRefineOrientations(self, file_path: str):
         try:
-            self.refineDialog = RefineSetupDialog(
-                parent=self, file_path=file_path
-            )
-            self.refineDialog.setWindowFlag(
-                Qt.WindowStaysOnTopHint, self.stayOnTopHint
-            )
+            self.refineDialog = RefineSetupDialog(parent=self, file_path=file_path)
+            self.refineDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.refineDialog.exec()
         except Exception as e:
             self.console.errorwrite(
@@ -274,34 +301,10 @@ class AppWindow(QMainWindow):
         except Exception as e:
             self.console.errorwrite(f"Could not initialize ROI dialog:\n{str(e)}\n")
 
-    # def onSystemModelChanged(self, new_selected, old_selected):
-    #     if new_selected.empty():
-    #         self.file_selected = ""
-    #     else:
-    #         self.file_selected = self.systemModel.filePath(
-    #             self.ui.systemViewer.currentIndex()
-    #         )
-    #     self.updateMenuButtons(self.file_selected)
-    #     self.showImage(self.file_selected)
-
-    # def doubleClickEvent(self):
-    #     index = self.ui.systemViewer.currentIndex()
-    #     self.file_selected = self.systemModel.filePath(index)
-
-    #     if path.splitext(self.file_selected)[1] in [".txt"]:
-    #         if platform.system().lower() == "darwin":
-    #             subprocess.call(["open", "-a", "TextEdit", self.file_selected])
-    #         if platform.system().lower() == "windows":
-    #             startfile(self.file_selected)
-
-    #     # TODO: more functionality, open dataset for signal navigation
-    #     if splitext(self.file_selected)[1] in [".h5", ".dat"]:
-    #         self.selectSignalNavigation()
-
     def selectSignalNavigation(self, signal_path: str):
         try:
             self.signalNavigationWidget.load_dataset(signal_path)
-
+            self.ui.dockWidgetSignalNavigation.setWindowTitle(f"Signal Navigation - {os.path.basename(signal_path)}")
         except Exception as e:
             if self.getSelectedPath() == "":
                 dlg = QMessageBox(self)
@@ -348,7 +351,7 @@ class AppWindow(QMainWindow):
 
     def showImage(self, image_path):
         try:
-            if image_path == None or not splitext(image_path)[1] in [
+            if image_path == None or not os.path.splitext(image_path)[1] in [
                 ".jpg",
                 ".png",
                 ".gif",
@@ -358,7 +361,9 @@ class AppWindow(QMainWindow):
                 self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer")
             else:
                 image = mpimg.imread(image_path)
-                self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer - {image_path}")
+                self.ui.dockWidgetImageViewer.setWindowTitle(
+                    f"Image Viewer - {os.path.basename(image_path)}"
+                )
             self.ui.MplWidget.canvas.ax.clear()
             self.ui.MplWidget.canvas.ax.axis(False)
             self.ui.MplWidget.canvas.ax.imshow(image)
@@ -382,7 +387,7 @@ class AppWindow(QMainWindow):
         if file_path == "":
             setAvailableMenuActions(False)
             return
-        file_extension = path.splitext(file_path)[1]
+        file_extension = os.path.splitext(file_path)[1]
 
         if file_extension in KP_EXTENSIONS:
             kp_enabled = True
@@ -391,12 +396,12 @@ class AppWindow(QMainWindow):
         setAvailableMenuActions(kp_enabled)
 
         # Special case for plotting calibration patterns from Settings.txt
-        if path.basename(file_path) == "Setting.txt":
+        if os.path.basename(file_path) == "Setting.txt":
             self.ui.menuPatternInspection.setEnabled(True)
             self.ui.actionSignalNavigation.setEnabled(True)
             self.ui.menuPre_indexing_maps.setEnabled(False)
 
-    #TODO Move removeWorker and updateActiveJobs to a jobmanagerlist class
+    # TODO Move removeWorker and updateActiveJobs to a jobmanagerlist class
     @Slot(int)
     def removeWorker(self, worker_id: int):
         jobList = self.ui.jobList
@@ -415,9 +420,10 @@ class AppWindow(QMainWindow):
 
 if __name__ == "__main__":
     # Pyinstaller fix
-    multiprocessing.freeze_support()
 
     app = QApplication(sys.argv)
+    #qdarktheme.setup_theme("light")
+    app.setWindowIcon(QIcon(":/icons/app_icon.ico"))
     APP = AppWindow()
     # Redirect stdout to console.write and stderr to console.errorwrite
     with redirect_stdout(APP.console), redirect_stderr(

@@ -15,7 +15,7 @@ from ui.ui_pattern_center import Ui_PatternCenter
 progressbar_bool = False
 
 def find_hkl(phase):
-    FCC = ["ni", "al", "austenite", "cu", "si"]
+    FCC = ["ni", "al", "austenite", "cu", "si", "ag", "cu"]
     BCC = ["ferrite"]
     #TETRAGONAL = ["steel_sigma"]
     if phase.lower() in FCC:

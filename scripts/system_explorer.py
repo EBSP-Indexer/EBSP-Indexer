@@ -1,6 +1,7 @@
 import platform
 import os.path as path
 import webbrowser
+import gc
 from typing import Optional, Sequence
 try:
     from os import startfile
@@ -84,6 +85,8 @@ class SystemExplorerWidget(QWidget):
                     # Replace these two with signals for more flexible implementation
                     hiAction.triggered.connect(lambda: self.app.selectHoughIndexingSetup(menu_path))
                     diAction.triggered.connect(lambda: self.app.selectDictionaryIndexingSetup(menu_path))
+                del s_prew
+                gc.collect()
             except:
                 try:
                     xmap_prew = io.load(menu_path)

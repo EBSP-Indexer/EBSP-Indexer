@@ -24,6 +24,7 @@ class Ui_WorkerWidget(object):
     def setupUi(self, WorkerWidget):
         if not WorkerWidget.objectName():
             WorkerWidget.setObjectName(u"WorkerWidget")
+        WorkerWidget.resize(418, 314)
         WorkerWidget.setLocale(QLocale(QLocale.English, QLocale.UnitedKingdom))
         self.verticalLayout = QVBoxLayout(WorkerWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -72,7 +73,7 @@ class Ui_WorkerWidget(object):
         sizePolicy1.setHeightForWidth(self.labelTime.sizePolicy().hasHeightForWidth())
         self.labelTime.setSizePolicy(sizePolicy1)
         self.labelTime.setStyleSheet(u"color: rgb(220, 190, 0);\n"
-"font: 75 9pt \"MS Shell Dlg 2\";")
+"font: 75 9pt \"Courier\";")
 
         self.horizontalLayout.addWidget(self.labelTime)
 
@@ -93,6 +94,7 @@ class Ui_WorkerWidget(object):
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.pushButtonRemove.sizePolicy().hasHeightForWidth())
         self.pushButtonRemove.setSizePolicy(sizePolicy2)
+        self.pushButtonRemove.setStyleSheet(u"")
         icon2 = QIcon()
         icon2.addFile(u":/linea_basic/resources/linea_basic_icons/basic_trashcan.svg", QSize(), QIcon.Normal, QIcon.Off)
         self.pushButtonRemove.setIcon(icon2)
@@ -119,7 +121,7 @@ class Ui_WorkerWidget(object):
         self.labelJobName.setObjectName(u"labelJobName")
         sizePolicy1.setHeightForWidth(self.labelJobName.sizePolicy().hasHeightForWidth())
         self.labelJobName.setSizePolicy(sizePolicy1)
-        self.labelJobName.setStyleSheet(u"font: 75 12pt \"MS Shell Dlg 2\";\n"
+        self.labelJobName.setStyleSheet(u"font: 75 12pt \"Courier\";\n"
 "text-decoration: underline;")
 
         self.verticalLayout.addWidget(self.labelJobName)
@@ -128,7 +130,7 @@ class Ui_WorkerWidget(object):
         self.labelOutput.setObjectName(u"labelOutput")
         sizePolicy1.setHeightForWidth(self.labelOutput.sizePolicy().hasHeightForWidth())
         self.labelOutput.setSizePolicy(sizePolicy1)
-        self.labelOutput.setStyleSheet(u"font: italic 8pt \"MS Sans Serif\";\n"
+        self.labelOutput.setStyleSheet(u"font: italic 8pt \"Courier\";\n"
 "color: rgb(120, 120, 120);")
 
         self.verticalLayout.addWidget(self.labelOutput)
@@ -172,8 +174,9 @@ class Ui_WorkerWidget(object):
         self.labelJobName.setText(QCoreApplication.translate("WorkerWidget", u"<html><head/><body><p>job name</p></body></html>", None))
         self.labelOutput.setText(QCoreApplication.translate("WorkerWidget", u"<html><head/><body><p>output_directory</p></body></html>", None))
         self.textBrowserStatus.setHtml(QCoreApplication.translate("WorkerWidget", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
+"hr { height: 1px; border-width: 0; }\n"
 "</style></head><body style=\" font-family:'Cascadia Code'; font-size:8pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
     # retranslateUi

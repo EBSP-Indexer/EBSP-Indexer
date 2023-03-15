@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1233</width>
+    <width>1089</width>
     <height>824</height>
    </rect>
   </property>
@@ -21,6 +21,10 @@
   </property>
   <property name="windowTitle">
    <string>EBSD-GUI</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../resources.qrc">
+    <normaloff>:/icons/app_icon.ico</normaloff>:/icons/app_icon.ico</iconset>
   </property>
   <property name="layoutDirection">
    <enum>Qt::LeftToRight</enum>
@@ -54,7 +58,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1233</width>
+     <width>1089</width>
      <height>26</height>
     </rect>
    </property>
@@ -259,11 +263,17 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidgetJobManager">
+   <property name="floating">
+    <bool>false</bool>
+   </property>
+   <property name="features">
+    <set>QDockWidget::AllDockWidgetFeatures</set>
+   </property>
    <property name="windowTitle">
     <string>Job Manager</string>
    </property>
    <attribute name="dockWidgetArea">
-    <number>4</number>
+    <number>8</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QGridLayout" name="gridLayout_3">
@@ -280,7 +290,7 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="0">
+     <item row="2" column="0">
       <widget class="QLabel" name="threadsLabel">
        <property name="text">
         <string>0 out of 0 active jobs</string>
@@ -310,14 +320,14 @@
     <string>Signal Navigation</string>
    </property>
    <attribute name="dockWidgetArea">
-    <number>8</number>
+    <number>4</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_2"/>
   </widget>
   <action name="actionOpen_Workfolder">
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/linea icons/resources/linea basic icons/basic_folder.svg</normaloff>:/linea icons/resources/linea basic icons/basic_folder.svg</iconset>
+     <normaloff>:/linea_basic/resources/linea_basic_icons/basic_folder.svg</normaloff>:/linea_basic/resources/linea_basic_icons/basic_folder.svg</iconset>
    </property>
    <property name="text">
     <string>Open Workfolder...</string>
@@ -371,7 +381,7 @@
   <action name="actionSettings">
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/linea icons/resources/linea basic icons/basic_gear.svg</normaloff>:/linea icons/resources/linea basic icons/basic_gear.svg</iconset>
+     <normaloff>:/linea_basic/resources/linea_basic_icons/basic_gear.svg</normaloff>:/linea_basic/resources/linea_basic_icons/basic_gear.svg</iconset>
    </property>
    <property name="text">
     <string>Settings</string>

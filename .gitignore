@@ -11,3 +11,6 @@ test.py
 build
 dist
 output
+EBSD-GUI.spec
+dist_backup
+dist_arm64

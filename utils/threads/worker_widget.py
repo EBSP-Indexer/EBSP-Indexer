@@ -101,7 +101,7 @@ class WorkerWidget(QWidget):
 
     def setupConnections(self):
         # UI
-        self.ui.labelJobNumber.setText(f"Job {self.id}: {self.job_title}")
+        self.ui.labelJobNumber.setText(f"Job {self.id} | {self.job_title}")
         self.ui.labelJobName.setText(f"{self.job_title}")
         self.ui.labelOutput.setText(f"{self.output_directory}")
         self.jobItem.setSizeHint(self.sizeHint())

@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>WorkerWidget</class>
  <widget class="QWidget" name="WorkerWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>418</width>
+    <height>314</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -84,7 +92,7 @@ QPushButton:checked {
        </property>
        <property name="styleSheet">
         <string notr="true">color: rgb(220, 190, 0);
-font: 75 9pt &quot;MS Shell Dlg 2&quot;;</string>
+font: 75 9pt &quot;Courier&quot;;</string>
        </property>
        <property name="text">
         <string>In Queue</string>
@@ -125,6 +133,9 @@ font: 75 9pt &quot;MS Shell Dlg 2&quot;;</string>
        <property name="toolTip">
         <string>Remove job from list</string>
        </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <property name="text">
         <string>Remove</string>
        </property>
@@ -164,7 +175,7 @@ font: 75 9pt &quot;MS Shell Dlg 2&quot;;</string>
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">font: 75 12pt &quot;MS Shell Dlg 2&quot;;
+      <string notr="true">font: 75 12pt &quot;Courier&quot;;
 text-decoration: underline;</string>
      </property>
      <property name="text">
@@ -181,7 +192,7 @@ text-decoration: underline;</string>
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">font: italic 8pt &quot;MS Sans Serif&quot;;
+      <string notr="true">font: italic 8pt &quot;Courier&quot;;
 color: rgb(120, 120, 120);</string>
      </property>
      <property name="text">
@@ -209,8 +220,9 @@ color: rgb(0, 0, 255);</string>
      </property>
      <property name="html">
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Cascadia Code'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
