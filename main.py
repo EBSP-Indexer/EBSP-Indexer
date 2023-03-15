@@ -13,6 +13,7 @@
 
 import platform
 import multiprocessing
+multiprocessing.freeze_support()
 import sys
 import json
 import os
@@ -153,39 +154,39 @@ class AppWindow(QMainWindow):
         self.ui.actionPattern_Center.triggered.connect(
             lambda: self.selectPatternCenter()
         )
-        if platform.system().lower() == "darwin":
-            self.ui.actionAverage_dot_product.triggered.connect(
-                lambda: save_adp_map(pattern_path=self.getSelectedPath())
-            )
-            self.ui.actionImage_quality.triggered.connect(
-                lambda: save_iq_map(pattern_path=self.getSelectedPath())
-            )
-            self.ui.actionMean_intensity.triggered.connect(
-                lambda: save_mean_intensity_map(pattern_path=self.getSelectedPath())
-            )
-            self.ui.actionVirtual_backscatter_electron.triggered.connect(
-                lambda: save_rgb_vbse(pattern_path=self.getSelectedPath())
-            )
+        #if platform.system().lower() != "darwin":
+        # self.ui.actionAverage_dot_product.triggered.connect(
+        #     lambda: save_adp_map(pattern_path=self.getSelectedPath())
+        # )
+        # self.ui.actionImage_quality.triggered.connect(
+        #     lambda: save_iq_map(pattern_path=self.getSelectedPath())
+        # )
+        # self.ui.actionMean_intensity.triggered.connect(
+        #     lambda: save_mean_intensity_map(pattern_path=self.getSelectedPath())
+        # )
+        # self.ui.actionVirtual_backscatter_electron.triggered.connect(
+        #     lambda: save_rgb_vbse(pattern_path=self.getSelectedPath())
+        # )
         
-        else:
-            self.ui.actionAverage_dot_product.triggered.connect(
-                lambda: sendToWorker(
-                    self, save_adp_map, pattern_path=self.getSelectedPath()
-                )
+        # else:
+        self.ui.actionAverage_dot_product.triggered.connect(
+            lambda: sendToWorker(
+                self, save_adp_map, pattern_path=self.getSelectedPath()
             )
-            self.ui.actionImage_quality.triggered.connect(
-                lambda: sendToWorker(self, save_iq_map, pattern_path=self.getSelectedPath())
+        )
+        self.ui.actionImage_quality.triggered.connect(
+            lambda: sendToWorker(self, save_iq_map, pattern_path=self.getSelectedPath())
+        )
+        self.ui.actionMean_intensity.triggered.connect(
+            lambda: sendToWorker(
+                self, save_mean_intensity_map, pattern_path=self.getSelectedPath()
             )
-            self.ui.actionMean_intensity.triggered.connect(
-                lambda: sendToWorker(
-                    self, save_mean_intensity_map, pattern_path=self.getSelectedPath()
-                )
+        )
+        self.ui.actionVirtual_backscatter_electron.triggered.connect(
+            lambda: sendToWorker(
+                self, save_rgb_vbse, pattern_path=self.getSelectedPath()
             )
-            self.ui.actionVirtual_backscatter_electron.triggered.connect(
-                lambda: sendToWorker(
-                    self, save_rgb_vbse, pattern_path=self.getSelectedPath()
-                )
-            )
+        )
         
 
     def selectWorkingDirectory(self):
@@ -419,7 +420,6 @@ class AppWindow(QMainWindow):
 
 if __name__ == "__main__":
     # Pyinstaller fix
-    multiprocessing.freeze_support()
 
     app = QApplication(sys.argv)
     #qdarktheme.setup_theme("light")
