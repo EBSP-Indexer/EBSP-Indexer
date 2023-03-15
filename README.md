@@ -84,7 +84,10 @@ In this interface you can edit the name and icon used for the executable, what i
 
 Feel free to edit or add any parameters in the interface. You can also save the configuration by going to "Settings -> Configuration -> Export Config to JSON File".
 
-When you are finished, create the bundle by clicking the bottom button CONVERT .PY TO .EXE. It might take some time for the program to create the bundle. In the end, the bundle/directory is put under your root-directory inside a folder called output. It is recommended to select the folder inside the output and package it into a .zip, so it can easily be shared. 
+When you are finished, create the bundle by clicking the bottom button CONVERT .PY TO .EXE. It might take some time for the program to create the bundle. In the end, the bundle/directory is put under your root-directory inside a folder called output. It is recommended to select the folder inside the output and package it into a .zip, so it can easily be shared.
+
+## Inno Setup Compiler
+Our unique "AppId" is 38A0E626-43E8-4E4A-8AE6-62FA6C9932D5. Use this so windows recognizes the app and updates to the new version instead of installing a seperate new version. 
 
 ## Working with Qt Designer and python tutorial
 The following describes a workflow for designing GUI elements and then add Python code to the elements.
