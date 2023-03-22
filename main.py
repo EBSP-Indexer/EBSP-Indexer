@@ -1,11 +1,11 @@
-# Copyright (c) 2022 EBSD-GUI developers
+# Copyright (c) 2022 EBSP Indexer developers
 #
-# This file is part of EBSD-GUI.
+# This file is part of EBSP Indexer.
 
-# EBSD-GUI is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+# EBSP Indexer is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-# EBSD-GUI is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# EBSP Indexer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
 # of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License along with this program.
@@ -19,8 +19,8 @@ import json
 import os
 import logging
 
-
-#import qdarktheme
+if platform.system().lower() != "darwin":
+    import qdarktheme
 
 logging.getLogger("pyopencl").setLevel(logging.WARNING)
 logging.getLogger("hyperspy").setLevel(logging.WARNING)
@@ -205,8 +205,6 @@ class AppWindow(QMainWindow):
                     self.systemExplorer.setSystemViewer(self.working_dir)
             else:
                 self.systemExplorer.setSystemViewer(self.working_dir)
-
-            self.setWindowTitle(f"EBSD-GUI - {self.working_dir}")
 
     def getSelectedPath(self) -> str:
         return self.systemExplorer.selected_path
@@ -422,7 +420,8 @@ if __name__ == "__main__":
     # Pyinstaller fix
 
     app = QApplication(sys.argv)
-    #qdarktheme.setup_theme("light")
+    if platform.system().lower() != "darwin":
+        qdarktheme.setup_theme("light")
     app.setWindowIcon(QIcon(":/icons/app_icon.ico"))
     APP = AppWindow()
     # Redirect stdout to console.write and stderr to console.errorwrite
@@ -431,7 +430,7 @@ if __name__ == "__main__":
     ):
         APP.show()
         print(
-            """EBSD-GUI  Copyright (C) 2023  EBSD-GUI developers 
+            """EBSP Indexer  Copyright (C) 2023  EBSP Indexer developers 
 This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.txt.
 This is free software, and you are welcome to redistribute it under certain conditions; see COPYING.txt for details.""",
         )

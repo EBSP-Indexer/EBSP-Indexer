@@ -66,6 +66,7 @@ class SystemExplorerWidget(QWidget):
         self.ui.systemViewer.setColumnWidth(0, 250)
         self.ui.systemViewer.hideColumn(2)
         self.ui.folderLabel.setText(path.basename(working_dir))
+        self.app.setWindowTitle(f"EBSP Indexer - {working_dir}")
 
     def contextMenu(self):
         menu = QMenu()

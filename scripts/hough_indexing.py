@@ -342,10 +342,10 @@ class HiSetupDialog(QDialog):
         indexer = det.get_indexer(
             phase_list=self.phases,
             rhoMaskFrac=self.rho_mask,
-            nBands=self.number_bands,
+            nBands=self.number_bands
         )
         print("------- Detector stats -------")
-        print(f"Vendor: {indexer.vendor}")
+        print(f"Indexer Vendor: {indexer.vendor}")
         print(f"Sample tilt: {indexer.sampleTilt}")
         print(f"Camera elevation: {indexer.camElev}")
         print(f"Atomic arrangements: {indexer.phaselist}")
