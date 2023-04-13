@@ -12,26 +12,6 @@ from contextlib import redirect_stdout
 
 import numpy as np
 
-
-def find_hkl(phase):
-    FCC = ["ni", "al", "austenite", "cu", "si"]
-    BCC = ["ferrite"]
-    TETRAGONAL = ["steel_sigma"]
-    if phase.lower() in FCC:
-        return [[1, 1, 1], [2, 0, 0], [2, 2, 0], [3, 1, 1]]
-    elif phase.lower() in BCC:
-        return [[0, 1, 1], [0, 0, 2], [1, 1, 2], [0, 2, 2]]
-    elif phase.lower() in TETRAGONAL:
-        return [
-            [1, 1, 0],
-            [2, 0, 0],
-            [1, 0, 1],
-            [2, 1, 0],
-            [1, 1, 1],
-            [2, 2, 0],
-            [2, 1, 1],
-        ]
-    
 def mean_intensity_map(ebsd):
     return ebsd.mean(axis=(2, 3))
 
@@ -42,6 +22,15 @@ def virtual_bse_map(ebsd):
     vbse_map.change_dtype("uint8")
     vbse_map = vbse_map.data
     return vbse_map
+
+def check_directory(file_path):
+    folder_names = ["unrefined_crystal_maps", "refined_crystal_maps"]
+    if path.basename(path.dirname(file_path)) in folder_names:
+        pattern_dir = path.dirname(path.dirname(file_path))
+    else:
+        pattern_dir = path.dirname(file_path)
+    
+    return pattern_dir
 
 class crystalMap:
     """
@@ -71,40 +60,43 @@ class crystalMap:
 
                 self.hkl = self.hkl_simulation(crystal_map_path)
 
+            self.ebsd_detector = self.detector(crystal_map_path)
+
     def ebsd_signal(self, crystal_map_path):
         try:
             # returns a dictionary with values stored in di_parameters.txt
             parameter_file = SettingFile(
-                path.join(path.dirname(crystal_map_path), "indexing_parameters.txt")
+                path.join(check_directory(crystal_map_path), "indexing_parameters.txt")
             )
         except FileNotFoundError as e:
             raise e
 
         ebsd_signal_name = parameter_file.read("Pattern name")
         ebsd_signal = kp.load(
-            path.join(path.dirname(path.dirname(crystal_map_path)), ebsd_signal_name)
+            path.join(path.dirname(check_directory(crystal_map_path)), ebsd_signal_name)
         )
 
         return ebsd_signal
 
     def hkl_simulation(self, crystal_map_path):
         hkl_simulations = []
-        if self.crystal_map.rotations_per_point > 1:
-            rotations = self.crystal_map.rotations[:, 0]
-        else:
-            rotations = self.crystal_map.rotations
 
         for i, ph in self.crystal_map.phases:
+            phase_lattice = ph.structure.lattice
+            phase_lattice.setLatPar(phase_lattice.a*10, phase_lattice.b*10, phase_lattice.c*10) #diffsim uses ångstrøm and not nm for lattice parameters
+
             if i != -1:
-                rlv = ReciprocalLatticeVector(phase=ph, hkl=find_hkl(ph.name))
+                rlv = ReciprocalLatticeVector.from_min_dspacing(ph, 0.7)
+
+                rlv.sanitise_phase()
+                rlv = rlv.unique(use_symmetry=True)
+                rlv.calculate_structure_factor("lobato")
+
+                structure_factor = abs(rlv.structure_factor)
+                order = np.argsort(structure_factor)[::-1]
+                rlv = rlv[order[0:4]]
                 rlv = rlv.symmetrise()
-                simulator = kp.simulations.KikuchiPatternSimulator(rlv)
-                hkl_simulations.append(
-                    simulator.on_detector(
-                        self.detector(crystal_map_path),
-                        rotations.reshape(*self.crystal_map.shape),
-                    )
-                )
+                hkl_simulations.append(rlv)
 
         return hkl_simulations
 
@@ -142,12 +134,13 @@ class crystalMap:
 
     def detector(self, crystal_map_path):
         detector = kp.detectors.EBSDDetector.load(
-            path.join(path.dirname(crystal_map_path), "detector.txt")
+            path.join(check_directory(crystal_map_path), "detector.txt")
         )
         ebsd_signal = self.ebsd_signal(crystal_map_path)
         detector.shape = ebsd_signal.axes_manager.signal_shape
 
         return detector
+
 
     # def property_map(self, property: str):
     #     if self.crystal_map.rotations_per_point > 1:
