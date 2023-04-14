@@ -126,7 +126,7 @@ class SystemExplorerWidget(QWidget):
     
     def displayDeleteWarning(self, deletion_path):
         msg = QMessageBox(self)
-        msg.setWindowTitle("EBSD-GUI Delete Information")
+        msg.setWindowTitle("Delete Information")
         msg.setIcon(QMessageBox.Information)
         msg.setText(f"Are you sure you want to permentantly delete '{path.basename(deletion_path)}'?")
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)

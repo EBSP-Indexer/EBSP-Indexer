@@ -5,13 +5,14 @@ import json
 import warnings
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog, QDialogButtonBox, QMainWindow, QTableWidgetItem
+from PySide6.QtWidgets import QDialog, QDialogButtonBox, QMainWindow, QTableWidgetItem, QMessageBox
 import kikuchipy as kp
 from kikuchipy.signals.ebsd import EBSD, LazyEBSD
 from kikuchipy.signals.ebsd_master_pattern import (
     LazyEBSDMasterPattern,
 )
 from kikuchipy.indexing._merge_crystal_maps import merge_crystal_maps
+from kikuchipy.signals.util._crystal_map import _equal_phase
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
@@ -43,8 +44,6 @@ class RefineSetupDialog(QDialog):
             file_path, "project_settings.txt", return_dir_path=True
         )
         self.program_settings = SettingFile("advanced_settings.txt")
-        # if self.xmap_dir is None:
-        #     self.xmap_dir = path.dirname(file_path)
         self.pattern_path = ""
         self.xmap_path = ""
         self.ui = Ui_RefineSetupDialog()
@@ -69,7 +68,9 @@ class RefineSetupDialog(QDialog):
                             "No indexing parameters associated with selected crystal map"
                         )
                         raise Exception
-                    self.pattern_path = path.join(self.working_dir,parameter_file.read("Pattern name"))
+                    self.pattern_path = path.join(
+                        self.working_dir, parameter_file.read("Pattern name")
+                    )
                     self.load_crystal_map(self.xmap_path)
                     try:
                         s_prew = kp.load(self.pattern_path)
@@ -178,7 +179,7 @@ class RefineSetupDialog(QDialog):
             except:
                 break
 
-    # TODO Make a refine_parameters text document
+    # TODO Make settings_file better to handle writing to file more convenient
     # def save_parameters(self):
     #     self.setting_file.delete_all_entries()  # Clean up initial dictionary
     #     options = self.getOptions()
@@ -277,6 +278,12 @@ class RefineSetupDialog(QDialog):
                 item.setFlags(item.flags() ^ Qt.ItemIsEditable)
                 xmapTable.setItem(row, col, item)
             row += 1
+        if path.exists(path.join(self.xmap_dir, "index_data.npy")):
+            self.ui.labelIndexDataStatus.setStyleSheet("QLabel { color : green; }")
+            self.ui.labelIndexDataStatus.setText("Index data available")
+        else:
+            self.ui.labelIndexDataStatus.setStyleSheet("QLabel { color : red; }")
+            self.ui.labelIndexDataStatus.setText("No available index data")
         self.setAvailableButtons()
 
     def remove_master_pattern(self):
@@ -317,8 +324,14 @@ class RefineSetupDialog(QDialog):
                 binnings[f"{num}"] = (int(sig_shape[0] / num), int(sig_shape[1] / num))
         return binnings
 
-    def refine_orientations(self, s: EBSD, xmap: CrystalMap, master_patterns: dict, options: dict):
-        options = self.getOptions()
+    def refine_orientations(
+        self,
+        s: EBSD,
+        xmap: CrystalMap,
+        data: np.ndarray,
+        master_patterns: dict,
+        options: dict,
+    ):
         binning = eval(options["binning"])
         pc = options["pc"]
         convention = options["convention"]
@@ -328,18 +341,12 @@ class RefineSetupDialog(QDialog):
             ref_kwargs = eval(options["ref_kwargs"])
         else:
             ref_kwargs = {}
-        # self.save_parameters()
-        # print(f"Loading {self.pattern_path} | lazy = {lazy}")
-        # try:
-        #     s: EBSD = kp.load(self.pattern_path, lazy=lazy)
-        # except Exception as e:
-        #     raise e
-        # try:
-        #     xmap: CrystalMap = io.load(self.xmap_path)
-        # except Exception as e:
-        #     raise e
         energy: int = s.metadata.Acquisition_instrument.SEM.beam_energy
         nav_shape = s.axes_manager.navigation_shape[::-1]
+        step_sizes = (s.axes_manager["x"].scale, s.axes_manager["y"].scale)
+        scan_unit = s.axes_manager[
+            "x"
+        ].units  # Assumes scan unit is the same for y and x
         if binning is None:
             binning = 1
         else:
@@ -361,65 +368,75 @@ class RefineSetupDialog(QDialog):
             signal_mask = None
         print("------- Detector stats -------")
         print(f"Navigation shape: {nav_shape}")
+        print(f"Steps: {step_sizes} {scan_unit}")
         print(f"Signal shape: {sig_shape}")
-        print(f"Signal mask: {mask}")
-        print(f"PC convention: {convention}")
+        print(f"Circular mask: {mask}")
+
         ref_xmaps = {}
         for mp_key, mp in master_patterns.items():
-            mp.phase.color = self.colors[xmap.phases.id_from_name(mp_key)]
+            phase_id = xmap.phases.id_from_name(mp_key)
+            mp.phase.color = self.colors[phase_id]
             print(f"\nRefining with Master Pattern: {mp.phase.name}")
-            nav_mask_phase = ~(xmap.phase_id == xmap.phases.id_from_name(mp_key))
-            nav_mask_phase = nav_mask_phase.reshape(xmap.shape)
-            ref_xmaps[mp_key] = s.refine_orientation(
-                xmap=xmap,
-                detector=det,
-                master_pattern=mp,
-                energy=energy,
-                navigation_mask=nav_mask_phase,
-                signal_mask=signal_mask,
-                trust_region=[1, 1, 1],
-                method=method,
-                method_kwargs=ref_kwargs,
-                compute=True,
-            )
+            if data is not None:
+                xmap_phase: CrystalMap = kp.indexing.xmap_from_hough_indexing_data(
+                    data=data,
+                    phase_list=self.phases,
+                    data_index=phase_id,
+                    navigation_shape=nav_shape,
+                    step_sizes=step_sizes,
+                    scan_unit=scan_unit,
+                )
+                # Not needed as of Kikuchipy 0.8.4
+                # --------------------------------
+                # if not xmap_phase.all_indexed:
+                #     nav_mask_phase = ~(
+                #         xmap_phase.phase_id == xmap.phases.id_from_name(mp_key)
+                #     )
+                #     nav_mask_phase = nav_mask_phase.reshape(xmap.shape)
+                # else:
+                #     nav_mask_phase = None
+                ref_xmaps[mp_key] = s.refine_orientation(
+                    xmap=xmap_phase,
+                    detector=det,
+                    master_pattern=mp,
+                    energy=energy,
+                    navigation_mask=None,
+                    signal_mask=signal_mask,
+                    trust_region=[1, 1, 1],
+                    method=method,
+                    method_kwargs=ref_kwargs,
+                    compute=True,
+                )
+            else:
+                nav_mask_phase = ~np.logical_or(xmap.phase_id == xmap.phases.id_from_name(mp_key), xmap.phase_id == -1)
+                nav_mask_phase = nav_mask_phase.reshape(xmap.shape)
+                ref_xmaps[mp_key] = s.refine_orientation(
+                    xmap=xmap,
+                    detector=det,
+                    master_pattern=mp,
+                    energy=energy,
+                    navigation_mask=nav_mask_phase,
+                    signal_mask=signal_mask,
+                    trust_region=[1, 1, 1],
+                    method=method,
+                    method_kwargs=ref_kwargs,
+                    compute=True,
+                )
         ref_xmaps_list = list(ref_xmaps.values())
-        # nav_mask_list = []
-        # for _ in ref_xmaps_list:
-        #         nav_mask_list.append(None)
-        # if not xmap.all_indexed:
-        #     nav_mask_not_indexed = xmap.is_indexed.reshape(xmap.shape)
-        #     nav_mask_list.append(nav_mask_not_indexed)
-        #     ref_xmaps_list.append(xmap)
-        # print("nav_mask_list len",len(nav_mask_list))
-        # print(ref_xmaps_list)
         if len(ref_xmaps_list) == 1:
             ref_xmap = ref_xmaps_list[0]
         else:
-            ref_xmap = merge_crystal_maps(ref_xmaps_list)
-        # ref_xmap.phases.add_not_indexed()
-        # if not xmap.all_indexed:
-        #     print(xmap.shape)
-        #     for x in range(xmap.shape[0]):
-        #         for y in range(xmap.shape[1]):
-        #             if not xmap[x,y].is_indexed.any():
-        #                 print("Adding not indexed")
-        #                 ref_xmap[x,y].phase_id = -1
-        # print("xmap:",ref_xmap)
-        # print("xmap_phases",ref_xmap.phases)
-        # print("phases_in_data",ref_xmap.phases_in_data)
+            print("Merging crystal maps")
+            ref_xmap = merge_crystal_maps(ref_xmaps_list, scores_prop="scores")
         io.save(
-            path.join(
-                self.xmap_dir, f"refined_{path.splitext(self.xmap_name)[0]}.h5"
-            ),
+            path.join(self.xmap_dir, f"refined_{path.splitext(self.xmap_name)[0]}.h5"),
             ref_xmap,
         )
         io.save(
-            path.join(
-                self.xmap_dir, f"refined_{path.splitext(self.xmap_name)[0]}.ang"
-            ),
+            path.join(self.xmap_dir, f"refined_{path.splitext(self.xmap_name)[0]}.ang"),
             ref_xmap,
         )
-        print("Result was saved as ref_xmap_hi.ang and ref_xmap_hi.h5")
+        print("Result was saved as refined_xmap_hi.ang and refined_xmap_hi.h5")
 
         for key in ["phase", "orientation", "ncc"]:
             optionEnabled, optionExecute = options.get(key)
@@ -433,16 +450,21 @@ class RefineSetupDialog(QDialog):
                     print(f"Could not save {key}_map:\n{e}")
         print(f"Finished refining orientations for {self.xmap_name}")
 
-    def run_refinement(self):
+    def run_refinement(self, override_phases: bool = False):
         options = self.getOptions()
         try:
-            s: EBSD = kp.load(self.pattern_path, lazy=options['lazy'])
+            s: EBSD = kp.load(self.pattern_path, lazy=options["lazy"])
         except Exception as e:
             raise e
         try:
             xmap: CrystalMap = io.load(self.xmap_path)
         except Exception as e:
             raise e
+        data_path = path.join(self.xmap_dir, "index_data.npy")
+        if path.exists(data_path):
+            index_data = np.load(data_path)
+        else:
+            index_data = None
         energy: int = s.metadata.Acquisition_instrument.SEM.beam_energy
         master_patterns = {}
         for mp_key, mp_path in self.mp_paths.items():
@@ -453,9 +475,26 @@ class RefineSetupDialog(QDialog):
                 hemisphere="upper",
                 lazy=options["lazy"],
             )
-            if mp.phase.name == "":  # If the master pattern is missing the name of the phase
+            if (mp.phase.name == ""):  # If the master pattern is missing the name of the phase
                 mp.phase.name = path.dirname(mp_path).split("/").pop()
             master_patterns[mp_key] = mp
+            if not override_phases:
+                if mp_key in xmap.phases_in_data.names:
+                    xmap_phase = xmap.phases_in_data[mp_key]
+                    equal_phases, are_different = _equal_phase(mp.phase, xmap_phase)
+                    if not equal_phases:
+                        if self.promptOverridePhase(
+                            f"Master pattern phase '{mp.phase.name}' and phase of points to refine "
+                            f"in crystal map '{xmap_phase.name}' must be the same, but have "
+                            f"different {are_different}."
+                        ):
+                            xmap_phase.name = mp.phase.name
+                            xmap_phase.space_group = mp.phase.space_group
+                            xmap_phase.color = mp.phase.color
+                            xmap_phase.structure = mp.phase.structure
+                            continue
+                        else:
+                            return
         sendToJobManager(
             job_title=f"Refine orientations {self.xmap_name}",
             output_path=self.xmap_dir,
@@ -465,9 +504,21 @@ class RefineSetupDialog(QDialog):
             allow_logging=False,
             s=s,
             xmap=xmap,
+            data=index_data,
             master_patterns=master_patterns,
-            options=options
+            options=options,
         )
+
+    def promptOverridePhase(self, message) -> bool:
+        msgBox = QMessageBox(self)
+        msgBox.setWindowTitle("Warning Phase conflict")
+        msgBox.setIcon(QMessageBox.Warning)
+        msgBox.setText(f"{message}\nOverride crystal map phase with phase from master pattern'?")
+        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+        if msgBox.exec() == QMessageBox.Yes:
+            return True
+        else:
+            return False
 
     def save_quality_metrics(self, xmap):
         """
@@ -557,7 +608,7 @@ class RefineSetupDialog(QDialog):
                 colorbar_label="NCC",
                 return_figure=True,
                 cmap="gray",
-                remove_padding=True
+                remove_padding=True,
             )
         fig.savefig(
             path.join(self.xmap_dir, "refined_NCC.png"),

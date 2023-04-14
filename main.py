@@ -300,7 +300,7 @@ class AppWindow(QMainWindow):
                 dlg.setIcon(QMessageBox.Warning)
                 dlg.exec()
             self.console.errorwrite(
-                f"Could not initialize signal navigation:\n{str(e)}\n"
+                f"Could not initialize signal navigation:\n{str(e.with_traceback(None))}\n"
             )
 
     def selectDictionaryIndexingSetup(self, pattern_path: str):

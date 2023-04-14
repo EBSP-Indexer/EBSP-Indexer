@@ -49,8 +49,12 @@
          <layout class="QVBoxLayout" name="verticalLayout_7">
           <item>
            <widget class="QLabel" name="label_10">
-            <property name="styleSheet">
-             <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
             </property>
             <property name="text">
              <string>Signal</string>
@@ -259,8 +263,12 @@ color: rgb(127, 127, 127);</string>
         </item>
         <item>
          <widget class="QLabel" name="label_11">
-          <property name="styleSheet">
-           <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
           </property>
           <property name="text">
            <string>Refinement</string>
@@ -401,11 +409,15 @@ color: rgb(127, 127, 127);</string>
         </item>
         <item>
          <widget class="QLabel" name="label_12">
-          <property name="styleSheet">
-           <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
           </property>
           <property name="text">
-           <string>Maps</string>
+           <string>Images</string>
           </property>
          </widget>
         </item>
@@ -424,7 +436,7 @@ color: rgb(127, 127, 127);</string>
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Orientations are given a color based on which crystal direction &amp;lt;&lt;span style=&quot; font-style:italic;&quot;&gt;uvw&lt;/span&gt;&amp;gt; points in a certain sample direction, producing the so-called inverse pole figure (IPF) map&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>Refined Inverse Pole Figure</string>
+             <string>Refined Inverse Pole Figure Map</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -504,7 +516,7 @@ color: rgb(127, 127, 127);</string>
            <string>Map of different phases present</string>
           </property>
           <property name="text">
-           <string>Refined Phases</string>
+           <string>Refined Phase Map</string>
           </property>
          </widget>
         </item>
@@ -514,7 +526,7 @@ color: rgb(127, 127, 127);</string>
            <string>Normalized cross correlation scores plotted on a map</string>
           </property>
           <property name="text">
-           <string>Normalized Cross Correlation</string>
+           <string>Normalized Cross Correlation Map</string>
           </property>
          </widget>
         </item>
@@ -567,7 +579,7 @@ color: rgb(127, 127, 127);</string>
        </widget>
       </item>
       <item row="2" column="3">
-       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1">
+       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1">
         <item>
          <widget class="Line" name="line_4">
           <property name="orientation">
@@ -577,8 +589,12 @@ color: rgb(127, 127, 127);</string>
         </item>
         <item>
          <widget class="QLabel" name="label_16">
-          <property name="styleSheet">
-           <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
           </property>
           <property name="text">
            <string>Crystal Map</string>
@@ -607,6 +623,33 @@ color: rgb(127, 127, 127);</string>
           </item>
           <item>
            <spacer name="horizontalSpacer_11">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="layoutIndexData">
+          <item>
+           <widget class="QLabel" name="labelIndexDataStatus">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(255, 0, 0);</string>
+            </property>
+            <property name="text">
+             <string>No available index data</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_12">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -705,8 +748,12 @@ color: rgb(127, 127, 127);</string>
         </item>
         <item>
          <widget class="QLabel" name="label_14">
-          <property name="styleSheet">
-           <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
           </property>
           <property name="text">
            <string>Detector</string>
@@ -754,6 +801,7 @@ color: rgb(127, 127, 127);</string>
            <property name="font">
             <font>
              <pointsize>8</pointsize>
+             <weight>50</weight>
              <bold>false</bold>
             </font>
            </property>
@@ -765,6 +813,7 @@ color: rgb(127, 127, 127);</string>
            <property name="font">
             <font>
              <pointsize>8</pointsize>
+             <weight>50</weight>
              <bold>false</bold>
             </font>
            </property>
