@@ -95,7 +95,7 @@ jsoncpp=1.9.4=h525c30c_2
 jupyter_client=7.3.4=py310hca03da5_0
 jupyter_core=5.2.0=py310hca03da5_0
 jxrlib=1.1=h1a28f6b_2
-kikuchipy=0.8.1=pypi_0
+kikuchipy=0.8.3=pypi_0
 kiwisolver=1.4.4=py310h313beb8_0
 krb5=1.19.4=h8380606_0
 lame=3.100=h1a28f6b_0
