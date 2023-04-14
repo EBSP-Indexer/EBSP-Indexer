@@ -18,9 +18,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QAbstractButton, QAbstractItemView, QApplication, QCheckBox,
     QComboBox, QDialog, QDialogButtonBox, QDoubleSpinBox,
     QFrame, QGridLayout, QHBoxLayout, QHeaderView,
-    QLabel, QListWidget, QListWidgetItem, QPushButton,
-    QSizePolicy, QSpacerItem, QSpinBox, QTableWidget,
-    QTableWidgetItem, QVBoxLayout, QWidget)
+    QLabel, QPushButton, QSizePolicy, QSpacerItem,
+    QSpinBox, QTableWidget, QTableWidgetItem, QVBoxLayout,
+    QWidget)
 
 class Ui_DiSetupDialog(object):
     def setupUi(self, DiSetupDialog):
@@ -44,8 +44,18 @@ class Ui_DiSetupDialog(object):
 
         self.label_9 = QLabel(self.centralwidget)
         self.label_9.setObjectName(u"label_9")
+        font = QFont()
+        font.setFamilies([u"Courier"])
+        self.label_9.setFont(font)
 
         self.verticalLayout_4.addWidget(self.label_9)
+
+        self.line_9 = QFrame(self.centralwidget)
+        self.line_9.setObjectName(u"line_9")
+        self.line_9.setFrameShape(QFrame.HLine)
+        self.line_9.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout_4.addWidget(self.line_9)
 
         self.tableWidgetPhase = QTableWidget(self.centralwidget)
         if (self.tableWidgetPhase.columnCount() < 5):
@@ -61,17 +71,16 @@ class Ui_DiSetupDialog(object):
         __qtablewidgetitem4 = QTableWidgetItem()
         self.tableWidgetPhase.setHorizontalHeaderItem(4, __qtablewidgetitem4)
         self.tableWidgetPhase.setObjectName(u"tableWidgetPhase")
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.tableWidgetPhase.sizePolicy().hasHeightForWidth())
+        self.tableWidgetPhase.setSizePolicy(sizePolicy)
+        self.tableWidgetPhase.setMinimumSize(QSize(502, 0))
+        self.tableWidgetPhase.setMaximumSize(QSize(16777215, 16777215))
+        self.tableWidgetPhase.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         self.verticalLayout_4.addWidget(self.tableWidgetPhase)
-
-        self.listWidgetPhase = QListWidget(self.centralwidget)
-        self.listWidgetPhase.setObjectName(u"listWidgetPhase")
-        self.listWidgetPhase.setMinimumSize(QSize(30, 50))
-        self.listWidgetPhase.setMaximumSize(QSize(16000000, 1699999))
-        self.listWidgetPhase.setAcceptDrops(False)
-        self.listWidgetPhase.setSelectionMode(QAbstractItemView.MultiSelection)
-
-        self.verticalLayout_4.addWidget(self.listWidgetPhase)
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
@@ -102,6 +111,19 @@ class Ui_DiSetupDialog(object):
         self.line_2.setFrameShadow(QFrame.Sunken)
 
         self.verticalLayout_4.addWidget(self.line_2)
+
+        self.label_16 = QLabel(self.centralwidget)
+        self.label_16.setObjectName(u"label_16")
+        self.label_16.setFont(font)
+
+        self.verticalLayout_4.addWidget(self.label_16)
+
+        self.line_7 = QFrame(self.centralwidget)
+        self.line_7.setObjectName(u"line_7")
+        self.line_7.setFrameShape(QFrame.HLine)
+        self.line_7.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout_4.addWidget(self.line_7)
 
         self.horizontalLayout_6 = QHBoxLayout()
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
@@ -197,17 +219,8 @@ class Ui_DiSetupDialog(object):
 
         self.verticalLayout_3.addItem(self.verticalSpacer_4)
 
-        self.line_7 = QFrame(self.centralwidget)
-        self.line_7.setObjectName(u"line_7")
-        self.line_7.setFrameShape(QFrame.HLine)
-        self.line_7.setFrameShadow(QFrame.Sunken)
-
-        self.verticalLayout_3.addWidget(self.line_7)
-
         self.label = QLabel(self.centralwidget)
         self.label.setObjectName(u"label")
-        font = QFont()
-        font.setFamilies([u"Courier"])
         self.label.setFont(font)
 
         self.verticalLayout_3.addWidget(self.label)
@@ -313,11 +326,11 @@ class Ui_DiSetupDialog(object):
 
         self.doubleSpinBoxStepSize = QDoubleSpinBox(self.centralwidget)
         self.doubleSpinBoxStepSize.setObjectName(u"doubleSpinBoxStepSize")
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.doubleSpinBoxStepSize.sizePolicy().hasHeightForWidth())
-        self.doubleSpinBoxStepSize.setSizePolicy(sizePolicy)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.doubleSpinBoxStepSize.sizePolicy().hasHeightForWidth())
+        self.doubleSpinBoxStepSize.setSizePolicy(sizePolicy1)
         self.doubleSpinBoxStepSize.setMinimumSize(QSize(0, 0))
         self.doubleSpinBoxStepSize.setMaximumSize(QSize(80, 16777215))
         self.doubleSpinBoxStepSize.setMinimum(1.000000000000000)
@@ -334,8 +347,8 @@ class Ui_DiSetupDialog(object):
 
         self.numSimPatterns = QLabel(self.centralwidget)
         self.numSimPatterns.setObjectName(u"numSimPatterns")
-        sizePolicy.setHeightForWidth(self.numSimPatterns.sizePolicy().hasHeightForWidth())
-        self.numSimPatterns.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.numSimPatterns.sizePolicy().hasHeightForWidth())
+        self.numSimPatterns.setSizePolicy(sizePolicy1)
         self.numSimPatterns.setMinimumSize(QSize(70, 0))
         self.numSimPatterns.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
@@ -474,8 +487,7 @@ class Ui_DiSetupDialog(object):
         QWidget.setTabOrder(self.spinBoxNumIter, self.doubleSpinBoxStepSize)
         QWidget.setTabOrder(self.doubleSpinBoxStepSize, self.comboBoxConvention)
         QWidget.setTabOrder(self.comboBoxConvention, self.checkBoxRefine)
-        QWidget.setTabOrder(self.checkBoxRefine, self.listWidgetPhase)
-        QWidget.setTabOrder(self.listWidgetPhase, self.patternCenterX)
+        QWidget.setTabOrder(self.checkBoxRefine, self.patternCenterX)
         QWidget.setTabOrder(self.patternCenterX, self.pushButtonRemovePhase)
         QWidget.setTabOrder(self.pushButtonRemovePhase, self.patternCenterZ)
         QWidget.setTabOrder(self.patternCenterZ, self.patternCenterY)
@@ -492,7 +504,7 @@ class Ui_DiSetupDialog(object):
 
     def retranslateUi(self, DiSetupDialog):
         DiSetupDialog.setWindowTitle(QCoreApplication.translate("DiSetupDialog", u"Dictionary Indexing", None))
-        self.label_9.setText(QCoreApplication.translate("DiSetupDialog", u"Phases:", None))
+        self.label_9.setText(QCoreApplication.translate("DiSetupDialog", u"Phases", None))
         ___qtablewidgetitem = self.tableWidgetPhase.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("DiSetupDialog", u"Name", None));
         ___qtablewidgetitem1 = self.tableWidgetPhase.horizontalHeaderItem(1)
@@ -505,6 +517,7 @@ class Ui_DiSetupDialog(object):
         ___qtablewidgetitem4.setText(QCoreApplication.translate("DiSetupDialog", u"Color", None));
         self.pushButtonAddPhase.setText(QCoreApplication.translate("DiSetupDialog", u"Add Phase", None))
         self.pushButtonRemovePhase.setText(QCoreApplication.translate("DiSetupDialog", u"Remove Phase", None))
+        self.label_16.setText(QCoreApplication.translate("DiSetupDialog", u"Detector", None))
         self.label_5.setText(QCoreApplication.translate("DiSetupDialog", u"Pattern center:", None))
         self.label_2.setText(QCoreApplication.translate("DiSetupDialog", u"X:", None))
         self.label_3.setText(QCoreApplication.translate("DiSetupDialog", u"Y:", None))

@@ -51,11 +51,10 @@ class crystalMap:
                 self.navigator = {
                     "Inverse polefigure": self.inverse_pole_figure(),
                     "Phase map": self.phase_map(),
-                    "Mean intensity map": mean_intensity_map(self.ebsd),
-                    "Virtual BSE map": virtual_bse_map(self.ebsd),
+                    #"Mean intensity map": mean_intensity_map(self.ebsd),
+                    #"Virtual BSE map": virtual_bse_map(self.ebsd),
                     # "NCC": self.property_map("scores"),
                     # "Orientation similarity map": self.orientation_similarity_map(),
-
                 }
 
                 self.hkl = self.hkl_simulation(crystal_map_path)

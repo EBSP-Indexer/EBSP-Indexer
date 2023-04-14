@@ -39,13 +39,46 @@
           </item>
           <item>
            <widget class="QLabel" name="label_9">
+            <property name="font">
+             <font>
+              <family>Courier</family>
+             </font>
+            </property>
             <property name="text">
-             <string>Phases:</string>
+             <string>Phases</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="Line" name="line_9">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QTableWidget" name="tableWidgetPhase">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>502</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
+            </property>
             <column>
              <property name="text">
               <string>Name</string>
@@ -71,28 +104,6 @@
               <string>Color</string>
              </property>
             </column>
-           </widget>
-          </item>
-          <item>
-           <widget class="QListWidget" name="listWidgetPhase">
-            <property name="minimumSize">
-             <size>
-              <width>30</width>
-              <height>50</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16000000</width>
-              <height>1699999</height>
-             </size>
-            </property>
-            <property name="acceptDrops">
-             <bool>false</bool>
-            </property>
-            <property name="selectionMode">
-             <enum>QAbstractItemView::MultiSelection</enum>
-            </property>
            </widget>
           </item>
           <item>
@@ -141,6 +152,25 @@
           </item>
           <item>
            <widget class="Line" name="line_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_16">
+            <property name="font">
+             <font>
+              <family>Courier</family>
+             </font>
+            </property>
+            <property name="text">
+             <string>Detector</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="Line" name="line_7">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -303,13 +333,6 @@
              </size>
             </property>
            </spacer>
-          </item>
-          <item>
-           <widget class="Line" name="line_7">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
           </item>
           <item>
            <widget class="QLabel" name="label">
@@ -728,7 +751,6 @@
   <tabstop>doubleSpinBoxStepSize</tabstop>
   <tabstop>comboBoxConvention</tabstop>
   <tabstop>checkBoxRefine</tabstop>
-  <tabstop>listWidgetPhase</tabstop>
   <tabstop>patternCenterX</tabstop>
   <tabstop>pushButtonRemovePhase</tabstop>
   <tabstop>patternCenterZ</tabstop>
