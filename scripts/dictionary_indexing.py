@@ -260,7 +260,6 @@ class DiSetupDialog(QDialog):
             if phase not in self.mpPaths.keys():
                 self.mpPaths[phase] = mpPath
                 self.phaseList.add(mp.phase)
-        print(self.phaseList)
         
         self.updatePhaseTable()
 
@@ -618,7 +617,7 @@ class DiSetupDialog(QDialog):
                 resolution=self.angular_step_size,
                 point_group=ph.point_group,
             )
-            print(f"Generating simulation dictionary from {ph.name} master pattern")
+            print(f"Generating simulation dictionary from {ph.name} master pattern ...")
             ### Generate dictionary
             sim_dict = self.mp[f"{ph.name}"].get_patterns(
                 rotations=rot,
@@ -630,9 +629,6 @@ class DiSetupDialog(QDialog):
             if self.ui.spinBoxNumIter.isEnabled():
                 n_iteration = self.options["n_iter"]
                 di_kwargs["n_per_iteration"] = sim_dict.axes_manager.navigation_size // n_iteration
-                print(di_kwargs["n_per_iteration"])
-            
-            print(di_kwargs)
             
             xmaps[f"{ph.name}"] = ebsd.dictionary_indexing(
                 dictionary=sim_dict, **di_kwargs
