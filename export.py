@@ -21,7 +21,7 @@ sys.setrecursionlimit(sys.getrecursionlimit() * 5) # Fix needed for some systems
 workdir = os.getcwd()
 
 target_arch = input(
-    "Specify the target arcitecture [auto, x86_64, arm64, universal2]: "
+    "Specify the target architecture [auto, x86_64, arm64, universal2]: "
     ).lower().strip()
 
 # Different seperators between macOS and Windows
