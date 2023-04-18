@@ -1,33 +1,36 @@
-from os import path
-from datetime import date
-from typing import Optional, Sequence
 import json
 import warnings
+from datetime import date
+from os import path
+from typing import Optional, Sequence
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog, QDialogButtonBox, QMainWindow, QTableWidgetItem, QMessageBox
 import kikuchipy as kp
-from kikuchipy.signals.ebsd import EBSD, LazyEBSD
-from kikuchipy.signals.ebsd_master_pattern import (
-    LazyEBSDMasterPattern,
-)
-from kikuchipy.indexing._merge_crystal_maps import merge_crystal_maps
-from kikuchipy.signals.util._crystal_map import _equal_phase
-import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
-
+from kikuchipy.indexing._merge_crystal_maps import merge_crystal_maps
+from kikuchipy.signals.ebsd import EBSD, LazyEBSD
+from kikuchipy.signals.ebsd_master_pattern import LazyEBSDMasterPattern
+from kikuchipy.signals.util._crystal_map import _equal_phase
 from orix import io, plot
 from orix.crystal_map import CrystalMap, PhaseList
 from orix.vector import Vector3d
-
-from utils import (
-    SettingFile,
-    FileBrowser,
-    sendToJobManager,
-    get_setting_file_bottom_top,
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (
+    QDialog,
+    QDialogButtonBox,
+    QMainWindow,
+    QMessageBox,
+    QTableWidgetItem,
 )
+
 from ui.ui_refine_setup import Ui_RefineSetupDialog
+from utils import (
+    FileBrowser,
+    SettingFile,
+    get_setting_file_bottom_top,
+    sendToJobManager,
+)
 
 # Ignore warnings to avoid crash with integrated console
 warnings.filterwarnings("ignore")
@@ -408,7 +411,10 @@ class RefineSetupDialog(QDialog):
                     compute=True,
                 )
             else:
-                nav_mask_phase = ~np.logical_or(xmap.phase_id == xmap.phases.id_from_name(mp_key), xmap.phase_id == -1)
+                nav_mask_phase = ~np.logical_or(
+                    xmap.phase_id == xmap.phases.id_from_name(mp_key),
+                    xmap.phase_id == -1,
+                )
                 nav_mask_phase = nav_mask_phase.reshape(xmap.shape)
                 ref_xmaps[mp_key] = s.refine_orientation(
                     xmap=xmap,
@@ -475,7 +481,9 @@ class RefineSetupDialog(QDialog):
                 hemisphere="upper",
                 lazy=options["lazy"],
             )
-            if (mp.phase.name == ""):  # If the master pattern is missing the name of the phase
+            if (
+                mp.phase.name == ""
+            ):  # If the master pattern is missing the name of the phase
                 mp.phase.name = path.dirname(mp_path).split("/").pop()
             master_patterns[mp_key] = mp
             if not override_phases:
@@ -510,11 +518,13 @@ class RefineSetupDialog(QDialog):
         )
 
     def promptOverridePhase(self, message) -> bool:
-        msgBox = QMessageBox(self)
-        msgBox.setWindowTitle("Warning Phase conflict")
-        msgBox.setIcon(QMessageBox.Warning)
-        msgBox.setText(f"{message}\nOverride crystal map phase with phase from master pattern'?")
-        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+        msgBox = QMessageBox(self).warning(
+            self,
+            "Warning Phase conflict",
+            f"{message}\nOverride phase from crystal map with phase from master pattern'?",
+            QMessageBox.Yes | QMessageBox.Cancel,
+            QMessageBox.Cancel,
+        )
         if msgBox.exec() == QMessageBox.Yes:
             return True
         else:

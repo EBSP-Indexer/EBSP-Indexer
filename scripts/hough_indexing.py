@@ -1,28 +1,25 @@
-from os import path, mkdir
-from datetime import date
-from typing import Optional, Sequence
 import json
 import warnings
+from datetime import date
+from os import mkdir, path
+from typing import Optional, Sequence
 
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import QDialog, QDialogButtonBox, QMainWindow, QTableWidgetItem, QMessageBox
-from PySide6.QtGui import QColor
 import kikuchipy as kp
-from kikuchipy.signals.ebsd import EBSD, LazyEBSD
-import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
-from kikuchipy.signals.ebsd import EBSD
-from orix import io, plot
 from diffpy.structure.structure import Structure
-from diffpy.structure.atom import Atom
-from diffpy.structure.lattice import Lattice
-from orix.crystal_map import CrystalMap, PhaseList, Phase
+from kikuchipy.signals.ebsd import EBSD, LazyEBSD
+from orix import io, plot
+from orix.crystal_map import CrystalMap, Phase, PhaseList
 from orix.vector import Vector3d
-from scripts.create_phase import NewPhaseDialog
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QDialog, QDialogButtonBox, QMainWindow, QTableWidgetItem
 
-from utils import SettingFile, FileBrowser, sendToJobManager
+from scripts.create_phase import NewPhaseDialog
 from ui.ui_hi_setup import Ui_HISetupDialog
+from utils import FileBrowser, SettingFile, sendToJobManager
 
 # Ignore warnings to avoid crash with integrated console
 warnings.filterwarnings("ignore")
@@ -248,7 +245,6 @@ class HiSetupDialog(QDialog):
         except Exception as e:
             raise e
         self.updatePhaseTable()
-        
 
     def create_phase(self):
         newPhaseDialog = NewPhaseDialog(self, self.colors[len(self.phases.ids)])
@@ -276,12 +272,11 @@ class HiSetupDialog(QDialog):
                 sg.crystal_system,
                 phase.color_rgb,
             ]
-            print(entries)
             for col, entry in enumerate(entries):
                 item = QTableWidgetItem(str(entry))
                 item.setFlags(item.flags() ^ Qt.ItemIsEditable)
                 if entry == phase.color_rgb:
-                    item.setBackground(QColor.fromRgbF(*entry)) 
+                    item.setBackground(QColor.fromRgbF(*entry))
                 phasesTable.setItem(row, col, item)
             row += 1
         self.checkCriteria()

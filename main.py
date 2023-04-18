@@ -41,7 +41,7 @@ from kikuchipy import (
     load,
 )  # Import something from kikutchipy to avoid load times during dialog initalizations
 
-import resources_rc
+import resources_rc # Imports resources in a pythonic way from resources.qrc
 from scripts.advanced_settings import AdvancedSettingsDialog
 from scripts.console import Console
 from scripts.dictionary_indexing import DiSetupDialog

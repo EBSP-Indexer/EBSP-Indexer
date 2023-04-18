@@ -1,8 +1,9 @@
-import platform
-import os.path as path
-import webbrowser
 import gc
+import os.path as path
+import platform
+import webbrowser
 from typing import Optional, Sequence
+
 try:
     from os import startfile
 except:
@@ -12,17 +13,15 @@ import kikuchipy as kp
 from kikuchipy.signals.ebsd import EBSD, LazyEBSD
 from orix import io
 from orix.crystal_map import CrystalMap
-from PySide6.QtCore import Qt, Signal, QDir
-from PySide6.QtWidgets import QWidget, QFileSystemModel, QMessageBox, QMenu
+from PySide6.QtCore import QDir, Qt, Signal
 from PySide6.QtGui import QCursor
+from PySide6.QtWidgets import QFileSystemModel, QMenu, QMessageBox, QWidget
 
 from ui.ui_system_explorer_widget import Ui_SystemExplorerWidget
-from scripts.advanced_settings import AdvancedSettingsDialog
 
-#TODO Load this from advanced_settings
 
 class SystemExplorerWidget(QWidget):
-
+    # TODO Load this from advanced_settings
     SYSTEM_VIEW_FILTER = (
         "*.h5",
         "*.dat",
@@ -56,7 +55,9 @@ class SystemExplorerWidget(QWidget):
         self.ui.systemViewer.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.systemViewer.customContextMenuRequested.connect(self.contextMenu)
 
-    def setSystemViewer(self, working_dir: str, filters : Optional[Sequence[str]] = SYSTEM_VIEW_FILTER):
+    def setSystemViewer(
+        self, working_dir: str, filters: Optional[Sequence[str]] = SYSTEM_VIEW_FILTER
+    ):
         self.selected_path = ""
         self.systemModel.setRootPath(working_dir)
         self.systemModel.setNameFilters(filters)
@@ -76,7 +77,9 @@ class SystemExplorerWidget(QWidget):
         # Kikuchipy available actions
         if file and ext in self.KP_EXTENSIONS:
             snAction = menu.addAction("Open in Signal Navigation")
-            snAction.triggered.connect(lambda: self.requestSignalNavigation.emit(menu_path))
+            snAction.triggered.connect(
+                lambda: self.requestSignalNavigation.emit(menu_path)
+            )
             try:
                 s_prew = kp.load(menu_path, lazy=True)
                 if isinstance(s_prew, (EBSD, LazyEBSD)):
@@ -84,8 +87,12 @@ class SystemExplorerWidget(QWidget):
                     hiAction = menu.addAction("Hough Indexing")
                     diAction = menu.addAction("Dictionary Indexing")
                     # Replace these two with signals for more flexible implementation
-                    hiAction.triggered.connect(lambda: self.app.selectHoughIndexingSetup(menu_path))
-                    diAction.triggered.connect(lambda: self.app.selectDictionaryIndexingSetup(menu_path))
+                    hiAction.triggered.connect(
+                        lambda: self.app.selectHoughIndexingSetup(menu_path)
+                    )
+                    diAction.triggered.connect(
+                        lambda: self.app.selectDictionaryIndexingSetup(menu_path)
+                    )
                 del s_prew
                 gc.collect()
             except:
@@ -94,27 +101,33 @@ class SystemExplorerWidget(QWidget):
                     if isinstance(xmap_prew, CrystalMap):
                         menu.addSeparator()
                         refineAction = menu.addAction("Refine Orientations")
-                        refineAction.triggered.connect(lambda: self.app.selectRefineOrientations(menu_path))
+                        refineAction.triggered.connect(
+                            lambda: self.app.selectRefineOrientations(menu_path)
+                        )
                 except Exception as e:
                     pass
         # Misc available actions
         elif file and ext in [".txt"]:
             txtAction = menu.addAction("Open")
             txtAction.triggered.connect(lambda: self.openTxtFile(menu_path))
-            
+
         # Globally available actions
         menu.addSeparator()
         revealAction = menu.addAction("Reveal in File Explorer")
         deleteAction = menu.addAction("Delete")
-        revealAction.triggered.connect(lambda: self.revealInExplorer(self.selected_path))
-        deleteAction.triggered.connect(lambda: self.displayDeleteWarning(self.selected_path))
-        
+        revealAction.triggered.connect(
+            lambda: self.revealInExplorer(self.selected_path)
+        )
+        deleteAction.triggered.connect(
+            lambda: self.displayDeleteWarning(self.selected_path)
+        )
+
         cursor = QCursor()
         menu.exec(cursor.pos())
 
     def openTxtFile(self, txt_path: str):
         if platform.system().lower() == "darwin":
-                subprocess.call(["open", "-a", "TextEdit", txt_path])
+            subprocess.call(["open", "-a", "TextEdit", txt_path])
         if platform.system().lower() == "windows":
             startfile(txt_path)
 
@@ -123,12 +136,14 @@ class SystemExplorerWidget(QWidget):
             webbrowser.open(revealed_path)
         elif path.isfile(revealed_path):
             webbrowser.open(path.dirname(revealed_path))
-    
+
     def displayDeleteWarning(self, deletion_path):
         msg = QMessageBox(self)
         msg.setWindowTitle("Delete Information")
         msg.setIcon(QMessageBox.Information)
-        msg.setText(f"Are you sure you want to permentantly delete '{path.basename(deletion_path)}'?")
+        msg.setText(
+            f"Are you sure you want to permentantly delete '{path.basename(deletion_path)}'?"
+        )
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
         msg.accepted.connect(lambda: self.deleteSelected(deletion_path))
         msg.exec()
