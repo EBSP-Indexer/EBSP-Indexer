@@ -175,6 +175,23 @@ class AppWindow(QMainWindow):
             )
         )
 
+    # Override closeEvent from QMainWindow
+    def closeEvent(self, event):
+        if QThreadPool.globalInstance().activeThreadCount() != 0:
+            reply = QMessageBox.question(
+                self,
+                "Close EBSP Indexer",
+                "Some jobs were not completed.\nAre you sure you want to close EBSP Indexer?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No, # Default button
+            )
+            if reply == QMessageBox.Yes:
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            event.accept()
+
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
             self.working_dir = self.fileBrowserOD.getPaths()[0]
