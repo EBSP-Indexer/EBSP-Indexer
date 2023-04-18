@@ -16,7 +16,7 @@ from orix.crystal_map import PhaseList
 from PySide6.QtWidgets import QDialog, QDialogButtonBox, QTableWidgetItem
 from PySide6.QtCore import QThreadPool
 
-from ui.di_setup_ui import Ui_DiSetupDialog
+from ui.ui_di_setup import Ui_DiSetupDialog
 from utils import SettingFile, FileBrowser, sendToJobManager
 
 import gc
