@@ -128,6 +128,7 @@ class HiSetupDialog(QDialog):
                 ]
             else:    
                 self.pc = np.array([0.5000, 0.5000, 0.5000])
+                
         self.ui.comboBoxConvention.setCurrentText(self.convention)
         try:
             self.colors = json.loads(self.program_settings.read("Colors"))
