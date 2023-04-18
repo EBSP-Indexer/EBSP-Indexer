@@ -22,27 +22,27 @@ from utils import SettingFile, FileBrowser, sendToJobManager
 import gc
 
 SAMPLE_ROTATIONS = {
-    "3.0": {'4/mmm': 90979, 'm-3m': 30443},
-    "2.9": {'4/mmm': 97627, 'm-3m': 32363},
-    "2.8": {'4/mmm': 110709, 'm-3m': 36829},
-    "2.7": {'4/mmm': 124885, 'm-3m': 41625},
-    "2.6": {'4/mmm': 132893, 'm-3m': 44073},
-    "2.5": {'4/mmm': 157151, 'm-3m': 52607},
-    "2.4": {'4/mmm': 175689, 'm-3m': 58453},
-    "2.2": {'4/mmm': 226787, 'm-3m': 75539},
-    "2.3": {'4/mmm': 195441, 'm-3m': 65097},
-    "2.1": {'4/mmm': 262101, 'm-3m': 87529},
-    "2.0": {'4/mmm': 301055, 'm-3m': 100347},
-    "1.9": {'4/mmm': 357801, 'm-3m': 119077},
-    "1.8": {'4/mmm': 421899, 'm-3m': 141267},
-    "1.7": {'4/mmm': 492855, 'm-3m': 164179},
-    "1.6": {'4/mmm': 592249, 'm-3m': 197225},
-    "1.5": {'4/mmm': 729573, 'm-3m': 243129},
-    "1.4": {'4/mmm': 913161, 'm-3m': 304053},
-    "1.3": {'4/mmm': 1157317, 'm-3m': 385545},
-    "1.2": {'4/mmm': 1481139, 'm-3m': 494039},
-    "1.1": {'4/mmm': 1906537, 'm-3m': 635777},
-    "1.0": {'4/mmm': 2571073, 'm-3m': 857973},
+    "3.0": {"4/mmm": 90979, "m-3m": 30443},
+    "2.9": {"4/mmm": 97627, "m-3m": 32363},
+    "2.8": {"4/mmm": 110709, "m-3m": 36829},
+    "2.7": {"4/mmm": 124885, "m-3m": 41625},
+    "2.6": {"4/mmm": 132893, "m-3m": 44073},
+    "2.5": {"4/mmm": 157151, "m-3m": 52607},
+    "2.4": {"4/mmm": 175689, "m-3m": 58453},
+    "2.2": {"4/mmm": 226787, "m-3m": 75539},
+    "2.3": {"4/mmm": 195441, "m-3m": 65097},
+    "2.1": {"4/mmm": 262101, "m-3m": 87529},
+    "2.0": {"4/mmm": 301055, "m-3m": 100347},
+    "1.9": {"4/mmm": 357801, "m-3m": 119077},
+    "1.8": {"4/mmm": 421899, "m-3m": 141267},
+    "1.7": {"4/mmm": 492855, "m-3m": 164179},
+    "1.6": {"4/mmm": 592249, "m-3m": 197225},
+    "1.5": {"4/mmm": 729573, "m-3m": 243129},
+    "1.4": {"4/mmm": 913161, "m-3m": 304053},
+    "1.3": {"4/mmm": 1157317, "m-3m": 385545},
+    "1.2": {"4/mmm": 1481139, "m-3m": 494039},
+    "1.1": {"4/mmm": 1906537, "m-3m": 635777},
+    "1.0": {"4/mmm": 2571073, "m-3m": 857973},
 }
 
 mpl.use("agg")
@@ -74,19 +74,15 @@ class DiSetupDialog(QDialog):
             mode=FileBrowser.OpenFile,
             filter_name="*.h5",
         )
-        
-        
+
         self.setupInitialSettings()
         self.checkConfirmState()
 
         # Setup button connections
         self.setupConnections()
-        
 
         # temporary
         self.keep_unrefined_xmaps = True
-
-        
 
     # Initial setup functions
 
@@ -122,16 +118,16 @@ class DiSetupDialog(QDialog):
         # Update pattern center to be displayed in UI
         try:
             self.pc = eval(self.setting_file.read("Pattern center (x*, y*, z*)"))
-            
+
         except:
             try:
                 self.pc = np.array(
-                [
-                    float(self.setting_file.read("X star")),
-                    float(self.setting_file.read("Y star")),
-                    float(self.setting_file.read("Z star")),
-                ]
-            )
+                    [
+                        float(self.setting_file.read("X star")),
+                        float(self.setting_file.read("Y star")),
+                        float(self.setting_file.read("Z star")),
+                    ]
+                )
             except:
                 self.pc = np.array((0.500, 0.800, 0.500))
 
@@ -170,7 +166,7 @@ class DiSetupDialog(QDialog):
         self.updatePhaseTable()
         self.estimateSimulationSize()
 
-        #TODO: Add N-iter for non-lazy indexing
+        # TODO: Add N-iter for non-lazy indexing
         x_len, y_len = ebsd_signal.axes_manager.navigation_shape
         self.ui.spinBoxNumIter.setMaximum(x_len * y_len)
         self.ui.spinBoxNumIter.setMinimum(1)
@@ -190,13 +186,14 @@ class DiSetupDialog(QDialog):
         self.ui.comboBoxBinning.currentTextChanged.connect(
             lambda: self.ui.labelNewSignalShape.setText(
                 f"{self.binnings[self.ui.comboBoxBinning.currentText()]}"
-            ))
+            )
+        )
 
     def estimateSimulationSize(self):
         angle = float(self.ui.doubleSpinBoxStepSize.value())
         total_sim = 0
         if len(self.phaseList.ids) > 0:
-            try:    
+            try:
                 for i, ph in self.phaseList:
                     total_sim += SAMPLE_ROTATIONS[f"{round(angle, 1)}"][
                         ph.point_group.name
@@ -221,8 +218,6 @@ class DiSetupDialog(QDialog):
                     self.ui.labelNewSignalShape.setText(f"{sig_shape}")
         except Exception as e:
             raise e
-
-    
 
     def setNiterState(self):
         if self.ui.checkBoxLazy.isChecked():
@@ -249,25 +244,24 @@ class DiSetupDialog(QDialog):
     def addPhase(self):
         if self.fileBrowserOD.getFile():
             mpPath = self.fileBrowserOD.getPaths()[0]
-            
+
             self.fileBrowserOD.setDefaultDir(path.dirname(path.dirname(mpPath)))
             mp = kp.load(mpPath, lazy=True)
             if mp.phase.name == "":
-                    mp.phase.name = path.dirname(mpPath).split("/").pop()
-            
+                mp.phase.name = path.dirname(mpPath).split("/").pop()
+
             phase = mp.phase.name
 
             if phase not in self.mpPaths.keys():
                 self.mpPaths[phase] = mpPath
                 self.phaseList.add(mp.phase)
-        
+
         self.updatePhaseTable()
 
         self.estimateSimulationSize()
         self.checkConfirmState()
 
     def removePhase(self):
-
         phaseTable = self.ui.tableWidgetPhase
         indexes = phaseTable.selectionModel().selectedRows()
 
@@ -309,14 +303,13 @@ class DiSetupDialog(QDialog):
                 phaseTable.setItem(row, col, item)
             row += 1
 
-
     # Read options from interactive elements in dialog box
     def getOptions(self) -> dict:
         pc = (
-                self.ui.patternCenterX.value(),
-                self.ui.patternCenterY.value(),
-                self.ui.patternCenterZ.value(),
-            )
+            self.ui.patternCenterX.value(),
+            self.ui.patternCenterY.value(),
+            self.ui.patternCenterZ.value(),
+        )
         return {
             "refine": self.ui.checkBoxRefine.isChecked(),
             "lazy": self.ui.checkBoxLazy.isChecked(),
@@ -346,7 +339,7 @@ class DiSetupDialog(QDialog):
 
         # load pattern
 
-        ebsd_pattern = kp.load(self.pattern_path, lazy = self.ui.checkBoxLazy.isChecked())
+        ebsd_pattern = kp.load(self.pattern_path, lazy=self.ui.checkBoxLazy.isChecked())
 
         # Pass the function to execute
         sendToJobManager(
@@ -356,7 +349,7 @@ class DiSetupDialog(QDialog):
             func=self.dictionary_indexing,
             allow_cleanup=True,
             allow_logging=True,
-            ebsd = ebsd_pattern
+            ebsd=ebsd_pattern,
         )
 
     # Master pattern dictionary
@@ -372,7 +365,7 @@ class DiSetupDialog(QDialog):
                 hemisphere="upper",  # upper, lower
                 lazy=True,
             )
-        
+
         return mp_dict
 
     # Signal mask
@@ -391,7 +384,9 @@ class DiSetupDialog(QDialog):
                 ncc_map = xmap_dict[f"{ph.name}"].get_map_data("scores")
             if xmap_type == "unrefined":
                 ncc_map = (
-                    xmap_dict[f"{ph.name}"].scores[:, 0].reshape(*xmap_dict[f"{ph.name}"].shape)
+                    xmap_dict[f"{ph.name}"]
+                    .scores[:, 0]
+                    .reshape(*xmap_dict[f"{ph.name}"].shape)
                 )
 
             ### Inspect dictionary indexing results for phase
@@ -413,9 +408,7 @@ class DiSetupDialog(QDialog):
             plt.close(fig)
 
     def save_orientation_similairty_map(self, xmap_dict):
-
         for i, ph in self.phaseList:
-
             ### Calculate and save orientation similairty map
 
             osm = kp.indexing.orientation_similarity_map(xmap_dict[f"{ph.name}"])
@@ -438,9 +431,7 @@ class DiSetupDialog(QDialog):
             plt.close(fig)
 
     def save_inverse_pole_figure(self, xmap_dict, xmap_type):
-
         for i, ph in self.phaseList:
-
             ckey = plot.IPFColorKeyTSL(self.mp[f"{ph.name}"].phase.point_group)
 
             fig = ckey.plot(return_figure=True)
@@ -468,7 +459,7 @@ class DiSetupDialog(QDialog):
 
         if self.options["mask"]:
             ref_kw["signal_mask"] = di_kwargs["signal_mask"]
-        
+
         refined_dir = path.join(self.results_dir, "refined_crystal_maps")
         mkdir(refined_dir)
 
@@ -502,11 +493,10 @@ class DiSetupDialog(QDialog):
                     )
             except Exception as e:
                 raise e
-            
+
         return xmaps_ref
 
     def merge_crystal_maps(self, xmap_dict, xmap_type):
-
         cm = [xmap_dict[f"{ph.name}"] for i, ph in self.phaseList]
         merge_kwargs = dict()
 
@@ -557,7 +547,7 @@ class DiSetupDialog(QDialog):
 
     def dictionary_indexing(self, ebsd):
         print("Initializing dictionary indexing ..")
-        #load phases
+        # load phases
         self.mp = self.load_master_pattern()
 
         # get options from input
@@ -577,7 +567,7 @@ class DiSetupDialog(QDialog):
         original_nav_shape = ebsd.axes_manager.signal_shape[::-1]
         if self.binning != "None":
             print("Rebinning EBSD signal...")
-            print(f"Binning: {self.binning}")   
+            print(f"Binning: {self.binning}")
             ebsd.downsample(eval(self.binning), inplace=True, show_progressbar=False)
 
         # Define detector-sample geometry
@@ -610,7 +600,6 @@ class DiSetupDialog(QDialog):
         ### Dictionary indexing
 
         for i, ph in self.phaseList:
-
             ### Sample orientations
             rot = sampling.get_sample_fundamental(
                 method="cubochoric",
@@ -628,8 +617,10 @@ class DiSetupDialog(QDialog):
 
             if self.ui.spinBoxNumIter.isEnabled():
                 n_iteration = self.options["n_iter"]
-                di_kwargs["n_per_iteration"] = sim_dict.axes_manager.navigation_size // n_iteration
-            
+                di_kwargs["n_per_iteration"] = (
+                    sim_dict.axes_manager.navigation_size // n_iteration
+                )
+
             xmaps[f"{ph.name}"] = ebsd.dictionary_indexing(
                 dictionary=sim_dict, **di_kwargs
             )
@@ -637,7 +628,6 @@ class DiSetupDialog(QDialog):
             xmaps[f"{ph.name}"].phases[0].name = ph.name
 
             del sim_dict
-
 
             if not self.refine:
                 try:
@@ -696,9 +686,7 @@ class DiSetupDialog(QDialog):
                 merged = self.merge_crystal_maps(xmaps, type)
 
             if self.options["ipf"]:
-                ckey = plot.IPFColorKeyTSL(
-                    self.phaseList[0].point_group
-                )
+                ckey = plot.IPFColorKeyTSL(self.phaseList[0].point_group)
 
                 fig = ckey.plot(return_figure=True)
                 fig.savefig(
@@ -743,9 +731,9 @@ class DiSetupDialog(QDialog):
         self.setting_file.write("Convention", self.convention)
 
         self.setting_file.write("Pattern center (x*, y*, z*)", f"{self.pc}")
-        #self.setting_file.write("X star", f"{self.pc[0]}")
-        #self.setting_file.write("Y star", f"{self.pc[1]}")
-        #self.setting_file.write("Z star", f"{self.pc[2]}")
+        # self.setting_file.write("X star", f"{self.pc[0]}")
+        # self.setting_file.write("Y star", f"{self.pc[1]}")
+        # self.setting_file.write("Z star", f"{self.pc[2]}")
 
         self.setting_file.write("Binning", f"({self.binning})")
         self.setting_file.write(

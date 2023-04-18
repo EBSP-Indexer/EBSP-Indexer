@@ -12,6 +12,7 @@ from contextlib import redirect_stdout
 
 import numpy as np
 
+
 def mean_intensity_map(ebsd):
     return ebsd.mean(axis=(2, 3))
 
@@ -23,14 +24,16 @@ def virtual_bse_map(ebsd):
     vbse_map = vbse_map.data
     return vbse_map
 
+
 def check_directory(file_path):
     folder_names = ["unrefined_crystal_maps", "refined_crystal_maps"]
     if path.basename(path.dirname(file_path)) in folder_names:
         pattern_dir = path.dirname(path.dirname(file_path))
     else:
         pattern_dir = path.dirname(file_path)
-    
+
     return pattern_dir
+
 
 class crystalMap:
     """
@@ -39,7 +42,6 @@ class crystalMap:
     """
 
     def __init__(self, dataset, crystal_map_path: str, compute_all: bool = False):
-
         self.crystal_map = dataset
         self.datatype = "crystal map"
         if compute_all:
@@ -47,12 +49,12 @@ class crystalMap:
             self.nav_shape = self.crystal_map.shape[::-1]
             self.ebsd = self.ebsd_signal(crystal_map_path)
             thdout = ThreadedOutput()
-            with redirect_stdout(thdout):            
+            with redirect_stdout(thdout):
                 self.navigator = {
                     "Inverse polefigure": self.inverse_pole_figure(),
                     "Phase map": self.phase_map(),
-                    #"Mean intensity map": mean_intensity_map(self.ebsd),
-                    #"Virtual BSE map": virtual_bse_map(self.ebsd),
+                    # "Mean intensity map": mean_intensity_map(self.ebsd),
+                    # "Virtual BSE map": virtual_bse_map(self.ebsd),
                     # "NCC": self.property_map("scores"),
                     # "Orientation similarity map": self.orientation_similarity_map(),
                 }
@@ -82,7 +84,9 @@ class crystalMap:
 
         for i, ph in self.crystal_map.phases:
             phase_lattice = ph.structure.lattice
-            phase_lattice.setLatPar(phase_lattice.a*10, phase_lattice.b*10, phase_lattice.c*10) #diffsim uses ångstrøm and not nm for lattice parameters
+            phase_lattice.setLatPar(
+                phase_lattice.a * 10, phase_lattice.b * 10, phase_lattice.c * 10
+            )  # diffsim uses ångstrøm and not nm for lattice parameters
 
             if i != -1:
                 rlv = ReciprocalLatticeVector.from_min_dspacing(ph, 0.7)
@@ -100,7 +104,6 @@ class crystalMap:
         return hkl_simulations
 
     def inverse_pole_figure(self):
-
         ckey = orix.plot.IPFColorKeyTSL(self.crystal_map.phases[0].point_group)
 
         rgb_all = np.zeros((self.crystal_map.size, 3))
@@ -110,9 +113,9 @@ class crystalMap:
                     self.crystal_map[phase.name].orientations
                 )
                 rgb_all[self.crystal_map.phase_id == i] = rgb_i
-        
+
         rgb_all = rgb_all.reshape(self.crystal_map.shape + (3,))
-        
+
         return rgb_all
 
     def phase_map(self):
@@ -140,7 +143,6 @@ class crystalMap:
 
         return detector
 
-
     # def property_map(self, property: str):
     #     if self.crystal_map.rotations_per_point > 1:
     #         property_map = self.crystal_map.scores[:, 0].reshape(*self.crystal_map.shape)
@@ -148,7 +150,7 @@ class crystalMap:
     #         property_map = self.crystal_map.get_map_data(property)
 
     #     return property_map
-    
+
     # def orientation_similarity_map(self):
     #     try:
     #         osm = kp.indexing.orientation_similarity_map(self.crystal_map)
@@ -156,7 +158,8 @@ class crystalMap:
     #         osm = None
 
     #     return osm
-    
+
+
 class EBSDDataset:
 
     """
@@ -164,7 +167,6 @@ class EBSDDataset:
     """
 
     def __init__(self, dataset, ebsd_pattern_path: str):
-
         self.ebsd = dataset
         self.datatype = "ebsd_dataset"
         self.nav_shape = self.ebsd.axes_manager.navigation_shape
@@ -173,5 +175,3 @@ class EBSDDataset:
             "Image quality map": self.ebsd.get_image_quality().compute(),
             "VBSE map": virtual_bse_map(self.ebsd),
         }
-
-

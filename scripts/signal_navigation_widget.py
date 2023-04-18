@@ -153,7 +153,6 @@ class SignalNavigationWidget(QWidget):
             ].name
             != "not_indexed"
         ):
-            
             phase_id = dataset.phase_id_array[y_index, x_index]
             thdout = ThreadedOutput()
             with redirect_stdout(thdout):
