@@ -41,7 +41,7 @@ from kikuchipy import (
     load,
 )  # Import something from kikutchipy to avoid load times during dialog initalizations
 
-import resources_rc
+import resources_rc # Imports resources in a pythonic way from resources.qrc
 from scripts.advanced_settings import AdvancedSettingsDialog
 from scripts.console import Console
 from scripts.dictionary_indexing import DiSetupDialog
@@ -175,6 +175,23 @@ class AppWindow(QMainWindow):
             )
         )
 
+    # Override closeEvent from QMainWindow
+    def closeEvent(self, event):
+        if QThreadPool.globalInstance().activeThreadCount() != 0:
+            reply = QMessageBox.question(
+                self,
+                "Close EBSP Indexer",
+                "Some jobs were not completed.\nAre you sure you want to close EBSP Indexer?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No, # Default button
+            )
+            if reply == QMessageBox.Yes:
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            event.accept()
+
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
             self.working_dir = self.fileBrowserOD.getPaths()[0]
@@ -300,7 +317,7 @@ class AppWindow(QMainWindow):
                 dlg.setIcon(QMessageBox.Warning)
                 dlg.exec()
             self.console.errorwrite(
-                f"Could not initialize signal navigation:\n{str(e)}\n"
+                f"Could not initialize signal navigation:\n{str(e.with_traceback(None))}\n"
             )
 
     def selectDictionaryIndexingSetup(self, pattern_path: str):

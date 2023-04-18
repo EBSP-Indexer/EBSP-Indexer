@@ -6,9 +6,10 @@ Original code created by deanhystad, sourcecode from https://python-forum.io/thr
 """
 import code
 import re
-import PySide6.QtWidgets as QtWidgets
+
 import PySide6.QtCore as QtCore
 import PySide6.QtGui as QtGui
+import PySide6.QtWidgets as QtWidgets
 
 
 class LineEdit(QtWidgets.QLineEdit):
@@ -120,7 +121,7 @@ class Console(QtWidgets.QWidget):
         self.inpedit = self.parent.ui.consoleInput
         self.inpedit.newline.connect(self.push)
         self.inpedit.setFrame(False)
-        #self.setfont(QtGui.QFont.StyleHint.Monospace)
+        # self.setfont(QtGui.QFont.StyleHint.Monospace)
 
     def setcontext(self, context):
         """Set context for interpreter"""

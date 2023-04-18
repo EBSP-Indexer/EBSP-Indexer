@@ -54,22 +54,39 @@ class SettingFile:
         self.file.close()
 
 
-def get_setting_file_bottom_top(start_path: str, target_file_name: str, return_dir_path: bool = False):
+def get_setting_file_bottom_top(start_path: str, setting_name: str, return_dir_path: bool = False):
+    """
+    Searches for a file named setting_name recursivly by iterating the path hierarchy
+    from bottom to top.
+
+    Returns a SettingFile from the found setting file. If not found returns None.
+    If return_dir_path = True, a tuple is returned where the first element is the SettingFile
+    and the second is the directory path of the setting_name.
+
+    Parameters
+    ----------
+    start_path : str
+        The starting path from where the search is conducted
+    setting_name : str
+        The targeted name of the settings file, e.g. "Setting.txt"
+    return_dir_path : bool
+        Whether the directory path of the found setting file should also be retured.
+    """
     if path.isfile(start_path):
         dir_path = path.dirname(start_path)
     else:
         dir_path = start_path
     while dir_path != path.dirname(dir_path):
-        if path.isfile(path.join(dir_path, target_file_name)):
+        if path.isfile(path.join(dir_path, setting_name)):
             if return_dir_path:
-                return (SettingFile(path.join(dir_path, target_file_name)), dir_path)
+                return (SettingFile(path.join(dir_path, setting_name)), dir_path)
             else:
-                return SettingFile(path.join(dir_path, target_file_name))
+                return SettingFile(path.join(dir_path, setting_name))
         else:
             dir_path = path.dirname(dir_path)
     if return_dir_path:
-        print(f"Could not find {target_file_name}")
+        print(f"Could not find {setting_name}")
         return (None, None)
     else:
-        print(f"Could not find {target_file_name}")
+        print(f"Could not find {setting_name}")
         return None
