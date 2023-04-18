@@ -73,7 +73,14 @@ class PatterCenterDialog(QDialog):
                     float(self.setting_file.read("Z star")),
             ]
         except:
-            self.pc = np.array([0.5000, 0.8000, 0.5000])
+            if self.s_cal.metadata.Acquisition_instrument.SEM.microscope == "ZEISS SUPRA55 VP":
+                self.pc = [
+                    0.5605-0.0017*float(self.working_distance),
+                    1.2056-0.0225*float(self.working_distance),
+                    0.483,
+                ]
+            else:    
+                self.pc = np.array([0.5000, 0.5000, 0.5000])
         
         if self.convention == "TSL":
             #Store TSL convention in BRUKER convention
@@ -93,21 +100,6 @@ class PatterCenterDialog(QDialog):
                 i += 1
             except:
                 break
-
-        """
-        i = 1
-        while True:
-            try:
-                mp_path = self.setting_file.read("Master pattern " + str(i))
-                phase = mp_path.split("/").pop()
-                self.mp_paths[phase] = mp_path
-                self.ui.listPhases.addItem(phase)
-                
-                i += 1
-                self.phase = phase
-            except:
-                break
-        """
 
         if len(list(self.mp_paths.keys())) != 0:
             self.ui.listPhases.setCurrentRow(0)
@@ -138,8 +130,8 @@ class PatterCenterDialog(QDialog):
         self.s_cal.remove_static_background(show_progressbar=progressbar_bool)
         self.s_cal.remove_dynamic_background(show_progressbar=progressbar_bool)
 
-        working_distance = self.s_cal.metadata.Acquisition_instrument.SEM.working_distance
-        self.ui.workingDistanceLabel.setText("Working Distance (mm): "+str(working_distance))
+        self.working_distance = self.s_cal.metadata.Acquisition_instrument.SEM.working_distance
+        self.ui.workingDistanceLabel.setText("Working Distance (mm): "+str(self.working_distance))
 
         self.indexer = ebsd_index.EBSDIndexer(
             phaselist=["FCC", "BCC"],
