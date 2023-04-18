@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>821</width>
-    <height>623</height>
+    <width>814</width>
+    <height>678</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,8 +49,16 @@
          <layout class="QVBoxLayout" name="verticalLayout_7">
           <item>
            <widget class="QLabel" name="label_10">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+              <weight>75</weight>
+              <italic>false</italic>
+              <bold>true</bold>
+             </font>
+            </property>
             <property name="styleSheet">
-             <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string>Signal</string>
@@ -67,26 +75,43 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="checkBoxLazy">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
-          </property>
-          <property name="text">
-           <string>Lazy loading of patterns</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-          <property name="tristate">
-           <bool>false</bool>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_10">
+          <item>
+           <widget class="QCheckBox" name="checkBoxLazy">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="text">
+             <string>Lazy loading of patterns</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <property name="tristate">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_13">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
         </item>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -184,8 +209,15 @@
         </item>
         <item>
          <widget class="QLabel" name="label_11">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
           <property name="styleSheet">
-           <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string>Hough Transform</string>
@@ -290,6 +322,80 @@
          </spacer>
         </item>
         <item>
+         <widget class="Line" name="line_17">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_20">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string>Crystal map</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line_18">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <item>
+           <widget class="QCheckBox" name="checkBoxIndexData">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Whether to save the index data array as *.npy in addition to the resulting crystal map, can be used to refine orientations later&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Save Index Data</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_10">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_11">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
          <widget class="Line" name="line_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -298,11 +404,18 @@
         </item>
         <item>
          <widget class="QLabel" name="label_12">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
           <property name="styleSheet">
-           <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
+           <string notr="true"/>
           </property>
           <property name="text">
-           <string>Maps</string>
+           <string>Images</string>
           </property>
          </widget>
         </item>
@@ -316,17 +429,34 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_8">
           <item>
-           <widget class="QCheckBox" name="checkBoxOrientation">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Orientations are given a color based on which crystal direction &amp;lt;&lt;span style=&quot; font-style:italic;&quot;&gt;uvw&lt;/span&gt;&amp;gt; points in a certain sample direction, producing the so-called inverse pole figure (IPF) map&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Inverse Pole Figure</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <item>
+             <widget class="QCheckBox" name="checkBoxOrientation">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Orientations are given a color based on which crystal direction &amp;lt;&lt;span style=&quot; font-style:italic;&quot;&gt;uvw&lt;/span&gt;&amp;gt; points in a certain sample direction, producing the so-called inverse pole figure (IPF) map&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Inverse Pole Figure Map</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_12">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </item>
           <item>
            <layout class="QHBoxLayout" name="IPFExtraOptionsLayout">
@@ -396,24 +526,58 @@
          </layout>
         </item>
         <item>
-         <widget class="QCheckBox" name="checkBoxPhase">
-          <property name="toolTip">
-           <string>Generate map of different phases present</string>
-          </property>
-          <property name="text">
-           <string>Phases</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <item>
+           <widget class="QCheckBox" name="checkBoxPhase">
+            <property name="toolTip">
+             <string>Generate map of different phases present</string>
+            </property>
+            <property name="text">
+             <string>Phase Map</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_11">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
         </item>
         <item>
-         <widget class="QCheckBox" name="checkBoxQuality">
-          <property name="toolTip">
-           <string>Generate quality metrics for combined maps</string>
-          </property>
-          <property name="text">
-           <string>Quality Metrics</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QCheckBox" name="checkBoxQuality">
+            <property name="toolTip">
+             <string>Generate quality metrics for combined maps</string>
+            </property>
+            <property name="text">
+             <string>Quality Metric Maps</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_9">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
         </item>
         <item>
          <spacer name="verticalSpacer_3">
@@ -431,7 +595,7 @@
        </layout>
       </item>
       <item row="2" column="3">
-       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0,0,0,5,0,0,0,0,1">
+       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0,0,0,5,0,0,0,0,1,0">
         <item>
          <spacer name="verticalSpacer_6">
           <property name="orientation">
@@ -454,8 +618,15 @@
         </item>
         <item>
          <widget class="QLabel" name="label_14">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
           <property name="styleSheet">
-           <string notr="true">font: 75 10pt &quot;Courier&quot;;</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string>Detector</string>
@@ -503,6 +674,7 @@
            <property name="font">
             <font>
              <pointsize>8</pointsize>
+             <weight>50</weight>
              <bold>false</bold>
             </font>
            </property>
@@ -514,6 +686,7 @@
            <property name="font">
             <font>
              <pointsize>8</pointsize>
+             <weight>50</weight>
              <bold>false</bold>
             </font>
            </property>
@@ -569,7 +742,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButtonAddPhase">
+           <widget class="QPushButton" name="pushButtonCreatePhase">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -577,7 +750,7 @@
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create and add a custom phase&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>Add</string>
+             <string>Create</string>
             </property>
            </widget>
           </item>
@@ -772,6 +945,33 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_11">
+          <item>
+           <spacer name="horizontalSpacer_14">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelMessage">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(255, 0, 0);</string>
+            </property>
+            <property name="text">
+             <string>*Message</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
        </layout>
       </item>
       <item row="2" column="1">
@@ -813,16 +1013,12 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>checkBoxLazy</tabstop>
   <tabstop>comboBoxBinning</tabstop>
   <tabstop>spinBoxBands</tabstop>
   <tabstop>horizontalSliderRho</tabstop>
-  <tabstop>checkBoxOrientation</tabstop>
   <tabstop>lineEditColorKey</tabstop>
-  <tabstop>checkBoxPhase</tabstop>
-  <tabstop>checkBoxQuality</tabstop>
   <tabstop>tableWidgetPhase</tabstop>
-  <tabstop>pushButtonAddPhase</tabstop>
+  <tabstop>pushButtonCreatePhase</tabstop>
   <tabstop>pushButtonLoadPhase</tabstop>
   <tabstop>pushButtonRemovePhase</tabstop>
   <tabstop>patternCenterX</tabstop>

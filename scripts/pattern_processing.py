@@ -106,7 +106,6 @@ class PatternProcessingDialog(QDialog):
         )
 
     def showImage(self, dataset):
-
         self.ui.previewWidget.vbl.setContentsMargins(0, 0, 0, 0)
         self.ui.previewWidget.canvas.ax.clear()
         self.ui.previewWidget.canvas.ax.axis(False)

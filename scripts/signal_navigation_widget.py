@@ -8,6 +8,9 @@ from PySide6.QtWidgets import QWidget, QMainWindow
 
 from ui.ui_signal_navigation_widget import Ui_SignalNavigationWidget
 
+from utils.threads.thdout import ThreadedOutput
+from contextlib import redirect_stdout
+
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from matplotlib.widgets import Cursor
@@ -16,6 +19,10 @@ from utils import FileBrowser
 
 import kikuchipy as kp
 import orix
+
+from diffsims.crystallography import ReciprocalLatticeVector
+
+from numpy import argsort
 
 from scripts.signal_loader import crystalMap, EBSDDataset
 
@@ -26,7 +33,7 @@ class SignalNavigationWidget(QWidget):
 
         self.ui = Ui_SignalNavigationWidget()
         self.ui.setupUi(self)
-        
+
         self.ui.checkBox.setVisible(False)
 
         self.file_selected = ""
@@ -35,7 +42,6 @@ class SignalNavigationWidget(QWidget):
         self.changetype = True
 
     def setupConnection(self):
-
         self.ui.comboBoxNavigator.currentTextChanged.connect(
             lambda: self.plot_navigator(
                 self.dataset, self.ui.comboBoxNavigator.currentText()
@@ -64,8 +70,7 @@ class SignalNavigationWidget(QWidget):
             self.dataset = EBSDDataset(signal, file_path)
 
         if isinstance(signal, orix.crystal_map.crystal_map.CrystalMap):
-
-            self.dataset = crystalMap(signal, file_path, compute_all = True)
+            self.dataset = crystalMap(signal, file_path, compute_all=True)
 
         self.plot_navigator(self.dataset, navigator=list(self.dataset.navigator)[0])
         self.ui.comboBoxNavigator.clear()
@@ -148,9 +153,18 @@ class SignalNavigationWidget(QWidget):
             ].name
             != "not_indexed"
         ):
-            hkl_lines = dataset.hkl[
-                dataset.phase_id_array[y_index, x_index]
-            ].as_collections((y_index, x_index), zone_axes_labels=False)
+            phase_id = dataset.phase_id_array[y_index, x_index]
+            thdout = ThreadedOutput()
+            with redirect_stdout(thdout):
+                simulator = kp.simulations.KikuchiPatternSimulator(
+                    dataset.hkl[phase_id]
+                )
+
+                hkl_lines = simulator.on_detector(
+                    dataset.ebsd_detector,
+                    dataset.crystal_map[y_index, x_index].rotations,
+                ).as_collections(zone_axes_labels=False)
+
             self.ui.signalMplWidget.canvas.ax.add_collection(
                 hkl_lines[0], autolim=False
             )

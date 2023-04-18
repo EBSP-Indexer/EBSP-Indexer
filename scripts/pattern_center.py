@@ -1,6 +1,7 @@
 import sys
 from os import path, devnull
 import kikuchipy as kp
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDialog, QDialogButtonBox
 import numpy as np
 
@@ -8,15 +9,15 @@ from diffsims.crystallography import ReciprocalLatticeVector
 from pyebsdindex import ebsd_index, pcopt
 from orix.quaternion import Rotation
 
-from utils.filebrowser import FileBrowser
-from utils.setting_file import SettingFile
+from utils import FileBrowser, SettingFile, get_setting_file_bottom_top
 from ui.ui_pattern_center import Ui_PatternCenter
 
 progressbar_bool = False
 
+FCC = ["ni", "al", "austenite", "cu", "si", "ag", "cu"]
+BCC = ["ferrite"]
+
 def find_hkl(phase):
-    FCC = ["ni", "al", "austenite", "cu", "si", "ag", "cu"]
-    BCC = ["ferrite"]
     #TETRAGONAL = ["steel_sigma"]
     if phase.lower() in FCC:
         return [[1, 1, 1], [2, 0, 0], [2, 2, 0], [3, 1, 1]]
@@ -31,7 +32,14 @@ class PatterCenterDialog(QDialog):
     def __init__(self, parent=None, file_selected=None):
         super().__init__(parent)
         self.file_selected = file_selected
-        self.setting_path = self.findSettingsFile()
+        self.setting_path = path.join(
+            get_setting_file_bottom_top(
+                file_selected, 
+                'Setting.txt', 
+                return_dir_path=True
+            )[1], 
+            "Setting.txt"
+        )
         self.ui = Ui_PatternCenter()
         self.ui.setupUi(self)
         self.setupConnections()
@@ -44,18 +52,19 @@ class PatterCenterDialog(QDialog):
             filter_name="*.h5"
         )
 
-    def findSettingsFile(self):
-        if self.file_selected[-11:] == "Setting.txt":
-            setting_path = self.file_selected
-            return setting_path
+    # Should not be needed anymore
+    # def findSettingsFile(self):
+    #     if self.file_selected[-11:] == "Setting.txt":
+    #         setting_path = self.file_selected
+    #         return setting_path
 
-        if path.exists(path.join(self.file_selected, "Setting.txt")):
-            setting_path = path.join(self.file_selected, "Setting.txt")
-            return setting_path
+    #     if path.exists(path.join(self.file_selected, "Setting.txt")):
+    #         setting_path = path.join(self.file_selected, "Setting.txt")
+    #         return setting_path
 
-        if path.exists(path.join(path.dirname(self.file_selected), "Setting.txt")):
-            setting_path = path.join(path.dirname(self.file_selected), "Setting.txt")
-            return setting_path
+    #     if path.exists(path.join(path.dirname(self.file_selected), "Setting.txt")):
+    #         setting_path = path.join(path.dirname(self.file_selected), "Setting.txt")
+    #         return setting_path
 
     def setupInitialSettings(self):
         self.setting_file = SettingFile(path.join(path.dirname(self.setting_path),"project_settings.txt"))
@@ -94,9 +103,17 @@ class PatterCenterDialog(QDialog):
         while True:
             try:
                 mp_path = self.setting_file.read(f"Master pattern {i}")
-                phase = path.dirname(mp_path).split("/").pop()
-                self.mp_paths[phase] = mp_path
-                self.ui.listPhases.addItem(phase)
+                try:
+                    mp = kp.load(mp_path, lazy=True)
+                except Exception as e:
+                    print(e.with_traceback(None))
+                    continue
+                if not len(mp.phase.name):
+                    mp.phase.name = path.dirname(mp_path).split("/").pop()
+                self.mp_paths[mp.phase.name] = mp_path
+                self.ui.listPhases.addItem(mp.phase.name)
+                if mp.phase.name not in FCC + BCC:
+                    self.ui.listPhases.item(i-1).setFlags(Qt.NoItemFlags)
                 i += 1
             except:
                 break
@@ -123,7 +140,7 @@ class PatterCenterDialog(QDialog):
 
     def setupCalibrationPatterns(self):
         self.pattern_index = 0
-        self.s_cal = kp.load(self.setting_path)
+        self.s_cal = kp.load(self.setting_path, lazy=True)
         sig_shape = self.s_cal.axes_manager.signal_shape[::-1]
         self.nav_size = self.s_cal.axes_manager.navigation_size
 
@@ -211,14 +228,24 @@ class PatterCenterDialog(QDialog):
     def addPhase(self):
         if self.fileBrowserOD.getFile():
             mp_path = self.fileBrowserOD.getPaths()[0]
-            phase = path.basename(path.dirname(mp_path)) #.split("/").pop()
-            self.fileBrowserOD.setDefaultDir(path.dirname(mp_path))
-            if phase not in self.mp_paths.keys():
-                self.mp_paths[phase] = mp_path
-                self.ui.listPhases.addItem(phase)
+            try:
+                mp = kp.load(mp_path, lazy=True)
+                if not len(mp.phase.name):
+                    mp.phase.name = path.basename(path.dirname(mp_path)) #.split("/").pop()
+                phase_name = mp.phase.name
+            except Exception as e:
+                raise e
+            if phase_name not in self.mp_paths.keys():
+                self.mp_paths[phase_name] = mp_path
+                self.ui.listPhases.addItem(phase_name)
                 self.is_mp_paths_updated = True
-            self.phase = phase
-            self.ui.listPhases.setCurrentRow(len(self.mp_paths.keys())-1)
+            
+            self.fileBrowserOD.setDefaultDir(path.dirname(mp_path))
+            if phase_name not in FCC + BCC:
+                self.ui.listPhases.item(len(self.mp_paths.keys())-1).setFlags(Qt.NoItemFlags)
+            else:
+                self.phase = phase_name
+                self.ui.listPhases.setCurrentRow(len(self.mp_paths.keys())-1)
         self.changeStateOfButtons()
 
     def removePhase(self):
@@ -294,6 +321,8 @@ class PatterCenterDialog(QDialog):
 
         ref_dict = {}
         for name in self.mp_paths.keys():
+            if name not in FCC + BCC:
+                continue
             ref_i = ReciprocalLatticeVector(
                 phase=mp_dict[name].phase, hkl=find_hkl(name)
             )
@@ -302,6 +331,8 @@ class PatterCenterDialog(QDialog):
 
         self.simulator_dict = {}
         for name in self.mp_paths.keys():
+            if name not in FCC + BCC:
+                continue
             self.simulator_dict[name] = kp.simulations.KikuchiPatternSimulator(
                 ref_dict[name]
             )
@@ -332,6 +363,8 @@ class PatterCenterDialog(QDialog):
 
         sys.stdout = open(devnull, 'w')
         for name in self.mp_paths.keys():
+            if name not in FCC + BCC:
+                continue
             geosim_dict[name] = self.simulator_dict[name].on_detector(detector, rot)
 
         sys.stdout = sys.__stdout__
