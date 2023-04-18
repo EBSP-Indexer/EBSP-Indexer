@@ -129,7 +129,15 @@ class DiSetupDialog(QDialog):
                     ]
                 )
             except:
-                self.pc = np.array((0.500, 0.800, 0.500))
+                if self.s_cal.metadata.Acquisition_instrument.SEM.microscope == "ZEISS SUPRA55 VP":
+                    self.pc =
+                    [
+                        0.5605-0.0017*float(self.working_distance),
+                        1.2056-0.0225*float(self.working_distance),
+                        0.483,
+                    ]
+                else:    
+                    self.pc = np.array([0.5000, 0.5000, 0.5000])
 
         self.ui.patternCenterX.setValue(self.pc[0])
         self.ui.patternCenterY.setValue(self.pc[1])

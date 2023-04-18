@@ -120,7 +120,14 @@ class HiSetupDialog(QDialog):
             self.ui.patternCenterY.setValue(float(self.setting_file.read("Y star")))
             self.ui.patternCenterZ.setValue(float(self.setting_file.read("Z star")))
         except:
-            self.pc = np.array([0.500, 0.200, 0.500])
+            if self.s_cal.metadata.Acquisition_instrument.SEM.microscope == "ZEISS SUPRA55 VP":
+                self.pc = [
+                    0.5605-0.0017*float(self.working_distance),
+                    1.2056-0.0225*float(self.working_distance),
+                    0.483,
+                ]
+            else:    
+                self.pc = np.array([0.5000, 0.5000, 0.5000])
         self.ui.comboBoxConvention.setCurrentText(self.convention)
         try:
             self.colors = json.loads(self.program_settings.read("Colors"))
