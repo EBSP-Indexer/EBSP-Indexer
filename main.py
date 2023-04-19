@@ -11,67 +11,57 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
 
-import platform
 import multiprocessing
-multiprocessing.freeze_support()
-import sys
+
+multiprocessing.freeze_support()  # Pyinstaller fix for MacOS
+
 import json
-import os
 import logging
+import os
+import platform
+import sys
+from contextlib import redirect_stderr, redirect_stdout
+
+from PySide6.QtCore import QDir, Qt, QThreadPool, Slot
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 if platform.system().lower() != "darwin":
     import qdarktheme
-
 logging.getLogger("pyopencl").setLevel(logging.WARNING)
 logging.getLogger("hyperspy").setLevel(logging.WARNING)
 logging.getLogger("kikuchipy").setLevel(logging.WARNING)
-from contextlib import redirect_stdout, redirect_stderr
 
-try:
-    import pyopencl.tools
-except:
-    print("PyOpenCL could not be imported")
-import platform
-
-from contextlib import redirect_stdout, redirect_stderr
-import resources_rc
-from PySide6.QtCore import QDir, Qt, QThreadPool, Slot
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
-from PySide6.QtGui import QIcon
-
-# try:
-#    import pyi_splash
-# except:
-#    pass
 # Modules available from start in the console
+import hyperspy as hs
 import kikuchipy as kp
-import hyperspy.api as hs
-
-# Import something from kikutchipy to avoid load times during dialog initalizations
-from kikuchipy import load
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
+from kikuchipy import (
+    load,
+)  # Import something from kikutchipy to avoid load times during dialog initalizations
 
-from ui.ui_main_window import Ui_MainWindow
-from scripts.system_explorer import SystemExplorerWidget
-from scripts.hough_indexing import HiSetupDialog
-from scripts.pattern_processing import PatternProcessingDialog
-from scripts.dictionary_indexing import DiSetupDialog
-from scripts.refinement import RefineSetupDialog
-from scripts.pre_indexing_maps import (
-    save_adp_map,
-    save_mean_intensity_map,
-    save_rgb_vbse,
-    save_iq_map,
-)
+import resources_rc # Imports resources in a pythonic way from resources.qrc
 from scripts.advanced_settings import AdvancedSettingsDialog
 from scripts.console import Console
-from utils import Redirect, SettingFile, FileBrowser, sendToWorker
+from scripts.dictionary_indexing import DiSetupDialog
+from scripts.hough_indexing import HiSetupDialog
 from scripts.pattern_center import PatterCenterDialog
+from scripts.pattern_processing import PatternProcessingDialog
+from scripts.pre_indexing_maps import (
+    save_adp_map,
+    save_iq_map,
+    save_mean_intensity_map,
+    save_rgb_vbse,
+)
+from scripts.refinement import RefineSetupDialog
 from scripts.region_of_interest import RegionOfInteresDialog
 from scripts.signal_navigation_widget import SignalNavigationWidget
+from scripts.system_explorer import SystemExplorerWidget
+from ui.ui_main_window import Ui_MainWindow
+from utils import FileBrowser, Redirect, SettingFile, sendToWorker
 
-hs.set_log_level("CRITICAL")
+NUM_OF_THREADS = 1
 
 KP_EXTENSIONS = (".h5", ".dat")
 IMAGE_EXTENSIONS = ()
@@ -107,19 +97,16 @@ class AppWindow(QMainWindow):
         self.setupConnections()
         self.showImage(self.getSelectedPath())
         self.importSettings()
-        QThreadPool.globalInstance().setMaxThreadCount(1)
         self.updateActiveJobs()
-        # try:
-        #    pyi_splash.close()
-        # except Exception as e:
-        #    pass
 
     def setupConnections(self):
         self.ui.dockWidgetSystemExplorer.setWidget(self.systemExplorer)
         self.ui.dockWidgetSignalNavigation.setWidget(self.signalNavigationWidget)
-        self.tabifyDockWidget(self.ui.dockWidgetImageViewer, self.ui.dockWidgetSignalNavigation)
+        self.tabifyDockWidget(
+            self.ui.dockWidgetImageViewer, self.ui.dockWidgetSignalNavigation
+        )
         self.ui.dockWidgetImageViewer.setFocus()
-        
+
         # self.ui.dockWidgetSystemExplorer.adjustSize()
         self.systemExplorer.pathChanged.connect(
             lambda new_path: self.updateMenuButtons(new_path)
@@ -130,7 +117,7 @@ class AppWindow(QMainWindow):
         self.systemExplorer.requestSignalNavigation.connect(
             lambda signal_path: self.selectSignalNavigation(signal_path)
         )
-        
+
         self.ui.actionOpen_Workfolder.triggered.connect(
             lambda: self.selectWorkingDirectory()
         )
@@ -154,7 +141,7 @@ class AppWindow(QMainWindow):
         self.ui.actionPattern_Center.triggered.connect(
             lambda: self.selectPatternCenter()
         )
-        #if platform.system().lower() != "darwin":
+        # if platform.system().lower() != "darwin":
         # self.ui.actionAverage_dot_product.triggered.connect(
         #     lambda: save_adp_map(pattern_path=self.getSelectedPath())
         # )
@@ -167,7 +154,7 @@ class AppWindow(QMainWindow):
         # self.ui.actionVirtual_backscatter_electron.triggered.connect(
         #     lambda: save_rgb_vbse(pattern_path=self.getSelectedPath())
         # )
-        
+
         # else:
         self.ui.actionAverage_dot_product.triggered.connect(
             lambda: sendToWorker(
@@ -187,7 +174,23 @@ class AppWindow(QMainWindow):
                 self, save_rgb_vbse, pattern_path=self.getSelectedPath()
             )
         )
-        
+
+    # Override closeEvent from QMainWindow
+    def closeEvent(self, event):
+        if QThreadPool.globalInstance().activeThreadCount() != 0:
+            reply = QMessageBox.question(
+                self,
+                "Close EBSP Indexer",
+                "Some jobs were not completed.\nAre you sure you want to close EBSP Indexer?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No, # Default button
+            )
+            if reply == QMessageBox.Yes:
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            event.accept()
 
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
@@ -302,7 +305,9 @@ class AppWindow(QMainWindow):
     def selectSignalNavigation(self, signal_path: str):
         try:
             self.signalNavigationWidget.load_dataset(signal_path)
-            self.ui.dockWidgetSignalNavigation.setWindowTitle(f"Signal Navigation - {os.path.basename(signal_path)}")
+            self.ui.dockWidgetSignalNavigation.setWindowTitle(
+                f"Signal Navigation - {os.path.basename(signal_path)}"
+            )
         except Exception as e:
             if self.getSelectedPath() == "":
                 dlg = QMessageBox(self)
@@ -312,7 +317,7 @@ class AppWindow(QMainWindow):
                 dlg.setIcon(QMessageBox.Warning)
                 dlg.exec()
             self.console.errorwrite(
-                f"Could not initialize signal navigation:\n{str(e)}\n"
+                f"Could not initialize signal navigation:\n{str(e.with_traceback(None))}\n"
             )
 
     def selectDictionaryIndexingSetup(self, pattern_path: str):
@@ -417,9 +422,8 @@ class AppWindow(QMainWindow):
 
 
 if __name__ == "__main__":
-    # Pyinstaller fix
-
     app = QApplication(sys.argv)
+    QThreadPool.globalInstance().setMaxThreadCount(NUM_OF_THREADS)
     if platform.system().lower() != "darwin":
         qdarktheme.setup_theme("light")
     app.setWindowIcon(QIcon(":/icons/app_icon.ico"))

@@ -52,7 +52,10 @@ class Ui_RefineSetupDialog(object):
         self.verticalLayout_7.setObjectName(u"verticalLayout_7")
         self.label_10 = QLabel(self.frame)
         self.label_10.setObjectName(u"label_10")
-        self.label_10.setStyleSheet(u"font: 75 10pt \"Courier\";")
+        font = QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        self.label_10.setFont(font)
 
         self.verticalLayout_7.addWidget(self.label_10)
 
@@ -169,7 +172,7 @@ class Ui_RefineSetupDialog(object):
 
         self.label_11 = QLabel(self.frame)
         self.label_11.setObjectName(u"label_11")
-        self.label_11.setStyleSheet(u"font: 75 10pt \"Courier\";")
+        self.label_11.setFont(font)
 
         self.verticalLayout.addWidget(self.label_11)
 
@@ -248,7 +251,7 @@ class Ui_RefineSetupDialog(object):
 
         self.label_12 = QLabel(self.frame)
         self.label_12.setObjectName(u"label_12")
-        self.label_12.setStyleSheet(u"font: 75 10pt \"Courier\";")
+        self.label_12.setFont(font)
 
         self.verticalLayout.addWidget(self.label_12)
 
@@ -346,7 +349,7 @@ class Ui_RefineSetupDialog(object):
 
         self.label_16 = QLabel(self.frame)
         self.label_16.setObjectName(u"label_16")
-        self.label_16.setStyleSheet(u"font: 75 10pt \"Courier\";")
+        self.label_16.setFont(font)
 
         self.verticalLayout_2.addWidget(self.label_16)
 
@@ -372,6 +375,21 @@ class Ui_RefineSetupDialog(object):
 
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_5)
+
+        self.layoutIndexData = QHBoxLayout()
+        self.layoutIndexData.setObjectName(u"layoutIndexData")
+        self.labelIndexDataStatus = QLabel(self.frame)
+        self.labelIndexDataStatus.setObjectName(u"labelIndexDataStatus")
+        self.labelIndexDataStatus.setStyleSheet(u"color: rgb(255, 0, 0);")
+
+        self.layoutIndexData.addWidget(self.labelIndexDataStatus)
+
+        self.horizontalSpacer_12 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.layoutIndexData.addItem(self.horizontalSpacer_12)
+
+
+        self.verticalLayout_2.addLayout(self.layoutIndexData)
 
         self.tableWidgetXmap = QTableWidget(self.frame)
         if (self.tableWidgetXmap.columnCount() < 2):
@@ -418,7 +436,7 @@ class Ui_RefineSetupDialog(object):
 
         self.label_14 = QLabel(self.frame)
         self.label_14.setObjectName(u"label_14")
-        self.label_14.setStyleSheet(u"font: 75 10pt \"Courier\";")
+        self.label_14.setFont(font)
 
         self.verticalLayout_2.addWidget(self.label_14)
 
@@ -437,29 +455,29 @@ class Ui_RefineSetupDialog(object):
         self.tableWidgetPhase = QTableWidget(self.frame)
         if (self.tableWidgetPhase.columnCount() < 5):
             self.tableWidgetPhase.setColumnCount(5)
-        font = QFont()
-        font.setPointSize(8)
-        font.setBold(False)
+        font1 = QFont()
+        font1.setPointSize(8)
+        font1.setBold(False)
         __qtablewidgetitem2 = QTableWidgetItem()
-        __qtablewidgetitem2.setFont(font);
+        __qtablewidgetitem2.setFont(font1);
         self.tableWidgetPhase.setHorizontalHeaderItem(0, __qtablewidgetitem2)
         __qtablewidgetitem3 = QTableWidgetItem()
-        __qtablewidgetitem3.setFont(font);
+        __qtablewidgetitem3.setFont(font1);
         self.tableWidgetPhase.setHorizontalHeaderItem(1, __qtablewidgetitem3)
-        font1 = QFont()
-        font1.setPointSize(9)
-        __qtablewidgetitem4 = QTableWidgetItem()
-        __qtablewidgetitem4.setFont(font1);
-        self.tableWidgetPhase.setHorizontalHeaderItem(2, __qtablewidgetitem4)
         font2 = QFont()
-        font2.setPointSize(7)
-        __qtablewidgetitem5 = QTableWidgetItem()
-        __qtablewidgetitem5.setFont(font2);
-        self.tableWidgetPhase.setHorizontalHeaderItem(3, __qtablewidgetitem5)
+        font2.setPointSize(9)
+        __qtablewidgetitem4 = QTableWidgetItem()
+        __qtablewidgetitem4.setFont(font2);
+        self.tableWidgetPhase.setHorizontalHeaderItem(2, __qtablewidgetitem4)
         font3 = QFont()
-        font3.setPointSize(8)
+        font3.setPointSize(7)
+        __qtablewidgetitem5 = QTableWidgetItem()
+        __qtablewidgetitem5.setFont(font3);
+        self.tableWidgetPhase.setHorizontalHeaderItem(3, __qtablewidgetitem5)
+        font4 = QFont()
+        font4.setPointSize(8)
         __qtablewidgetitem6 = QTableWidgetItem()
-        __qtablewidgetitem6.setFont(font3);
+        __qtablewidgetitem6.setFont(font4);
         self.tableWidgetPhase.setHorizontalHeaderItem(4, __qtablewidgetitem6)
         self.tableWidgetPhase.setObjectName(u"tableWidgetPhase")
         self.tableWidgetPhase.setMinimumSize(QSize(250, 50))
@@ -581,7 +599,7 @@ class Ui_RefineSetupDialog(object):
 
         self.verticalLayout_2.addItem(self.verticalSpacer)
 
-        self.verticalLayout_2.setStretch(16, 1)
+        self.verticalLayout_2.setStretch(17, 1)
 
         self.gridLayout_3.addLayout(self.verticalLayout_2, 2, 3, 1, 1)
 
@@ -642,11 +660,11 @@ class Ui_RefineSetupDialog(object):
 
         self.label_8.setText(QCoreApplication.translate("RefineSetupDialog", u"(Optional) kwargs.", None))
         self.lineEditRefKwargs.setPlaceholderText(QCoreApplication.translate("RefineSetupDialog", u"e.g. method=\"Powell\", tol=1e-4", None))
-        self.label_12.setText(QCoreApplication.translate("RefineSetupDialog", u"Maps", None))
+        self.label_12.setText(QCoreApplication.translate("RefineSetupDialog", u"Images", None))
 #if QT_CONFIG(tooltip)
         self.checkBoxOrientation.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Orientations are given a color based on which crystal direction &lt;<span style=\" font-style:italic;\">uvw</span>&gt; points in a certain sample direction, producing the so-called inverse pole figure (IPF) map</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBoxOrientation.setText(QCoreApplication.translate("RefineSetupDialog", u"Refined Inverse Pole Figure", None))
+        self.checkBoxOrientation.setText(QCoreApplication.translate("RefineSetupDialog", u"Refined Inverse Pole Figure Map", None))
         self.labelColorKey.setText(QCoreApplication.translate("RefineSetupDialog", u"Color Key Direction", None))
         self.lineEditColorKey.setInputMask(QCoreApplication.translate("RefineSetupDialog", u"[0,0,0]", None))
         self.lineEditColorKey.setText(QCoreApplication.translate("RefineSetupDialog", u"0,0,1", None))
@@ -654,13 +672,14 @@ class Ui_RefineSetupDialog(object):
 #if QT_CONFIG(tooltip)
         self.checkBoxPhase.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"Map of different phases present", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBoxPhase.setText(QCoreApplication.translate("RefineSetupDialog", u"Refined Phases", None))
+        self.checkBoxPhase.setText(QCoreApplication.translate("RefineSetupDialog", u"Refined Phase Map", None))
 #if QT_CONFIG(tooltip)
         self.checkBoxNCC.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"Normalized cross correlation scores plotted on a map", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBoxNCC.setText(QCoreApplication.translate("RefineSetupDialog", u"Normalized Cross Correlation", None))
+        self.checkBoxNCC.setText(QCoreApplication.translate("RefineSetupDialog", u"Normalized Cross Correlation Map", None))
         self.label_16.setText(QCoreApplication.translate("RefineSetupDialog", u"Crystal Map", None))
         self.labelXmapPath.setText(QCoreApplication.translate("RefineSetupDialog", u"No crystal map loaded", None))
+        self.labelIndexDataStatus.setText(QCoreApplication.translate("RefineSetupDialog", u"No available index data", None))
         ___qtablewidgetitem = self.tableWidgetXmap.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("RefineSetupDialog", u"Name", None));
         ___qtablewidgetitem1 = self.tableWidgetXmap.horizontalHeaderItem(1)
