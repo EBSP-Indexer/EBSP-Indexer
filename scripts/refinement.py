@@ -1,28 +1,36 @@
-from os import path, mkdir
-from datetime import date
-from typing import Optional, Sequence
 import json
 import warnings
+from datetime import date
+from os import path
+from typing import Optional, Sequence
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog, QDialogButtonBox, QMainWindow, QTableWidgetItem
 import kikuchipy as kp
-from kikuchipy.signals.ebsd import EBSD, LazyEBSD
-from kikuchipy.signals.ebsd_master_pattern import (
-    EBSDMasterPattern,
-    LazyEBSDMasterPattern,
-)
-from kikuchipy.indexing._merge_crystal_maps import merge_crystal_maps
-import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
-
+from kikuchipy.indexing._merge_crystal_maps import merge_crystal_maps
+from kikuchipy.signals.ebsd import EBSD, LazyEBSD
+from kikuchipy.signals.ebsd_master_pattern import LazyEBSDMasterPattern
+from kikuchipy.signals.util._crystal_map import _equal_phase
 from orix import io, plot
 from orix.crystal_map import CrystalMap, PhaseList
 from orix.vector import Vector3d
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (
+    QDialog,
+    QDialogButtonBox,
+    QMainWindow,
+    QMessageBox,
+    QTableWidgetItem,
+)
 
-from utils import SettingFile, FileBrowser, sendToJobManager
 from ui.ui_refine_setup import Ui_RefineSetupDialog
+from utils import (
+    FileBrowser,
+    SettingFile,
+    get_setting_file_bottom_top,
+    sendToJobManager,
+)
 
 # Ignore warnings to avoid crash with integrated console
 warnings.filterwarnings("ignore")
@@ -31,19 +39,14 @@ warnings.filterwarnings("ignore")
 class RefineSetupDialog(QDialog):
     def __init__(self, parent: QMainWindow, file_path: Optional[str] = ""):
         super().__init__(parent)
-        self.working_dir = path.dirname(file_path)
-        parameter_file_dir = path.dirname(file_path)
-        parameter_file = None
-        while parameter_file_dir != path.dirname(parameter_file_dir):
-            print(
-                f"Just searched for {path.join(parameter_file_dir,'indexing_parameters.txt')}"
-            )
-            if path.isfile(path.join(parameter_file_dir,'indexing_parameters.txt')):
-                parameter_file = SettingFile(
-                    path.join(parameter_file_dir, "indexing_parameters.txt"))
-                break
-            else:
-                self.parameter_file_dir = path.dirname(parameter_file_dir)
+
+        parameter_file, self.xmap_dir = get_setting_file_bottom_top(
+            file_path, "indexing_parameters.txt", return_dir_path=True
+        )
+        self.setting_file, self.working_dir = get_setting_file_bottom_top(
+            file_path, "project_settings.txt", return_dir_path=True
+        )
+        self.program_settings = SettingFile("advanced_settings.txt")
         self.pattern_path = ""
         self.xmap_path = ""
         self.ui = Ui_RefineSetupDialog()
@@ -64,9 +67,13 @@ class RefineSetupDialog(QDialog):
                 if isinstance(xmap, (CrystalMap)):
                     self.xmap_path = file_path
                     if parameter_file is None:
-                        print("No indexing parameters associated with selected crystal map")
+                        print(
+                            "No indexing parameters associated with selected crystal map"
+                        )
                         raise Exception
-                    self.pattern_path = parameter_file.read("Pattern path")
+                    self.pattern_path = path.join(
+                        self.working_dir, parameter_file.read("Pattern name")
+                    )
                     self.load_crystal_map(self.xmap_path)
                     try:
                         s_prew = kp.load(self.pattern_path)
@@ -75,7 +82,9 @@ class RefineSetupDialog(QDialog):
                         raise e
         except Exception as e:
             raise e
-        self.ui.labelNavigationShape.setText(f"Navigation shape: {str(s_prew.axes_manager.navigation_shape[::-1])}")
+        self.ui.labelNavigationShape.setText(
+            f"Navigation shape: {str(s_prew.axes_manager.navigation_shape[::-1])}"
+        )
         self.binnings = self.getBinningShapes(s_prew)
         self.mp_paths = {}
         self.phases = PhaseList()
@@ -114,14 +123,10 @@ class RefineSetupDialog(QDialog):
             "mask": self.ui.checkBoxMask.isChecked(),
             "binning": self.ui.comboBoxBinning.currentText(),
             "lazy": self.ui.checkBoxLazy.isChecked(),
-            "NCC": [
+            "ncc": [
                 self.ui.checkBoxNCC.isChecked(),
-                1,  # TODO Create method
+                self.save_ncc_map,
             ],
-            "evaluations": [
-                self.ui.checkBoxEvaluations.isChecked(),
-                1,
-            ],  # TODO Create method
             "phase": [self.ui.checkBoxPhase.isChecked(), self.save_phase_map],
             "orientation": [
                 self.ui.checkBoxOrientation.isChecked(),
@@ -140,10 +145,6 @@ class RefineSetupDialog(QDialog):
 
     def load_parameters(self):
         # read current setting from project_settings.txt, advanced_settings.txt
-        self.setting_file = SettingFile(
-            path.join(self.working_dir, "project_settings.txt")
-        )
-        self.program_settings = SettingFile("advanced_settings.txt")
         try:
             convention = self.setting_file.read("Convention")
         except:
@@ -181,7 +182,7 @@ class RefineSetupDialog(QDialog):
             except:
                 break
 
-    # TODO Make a refine_parameters text document
+    # TODO Make settings_file better to handle writing to file more convenient
     # def save_parameters(self):
     #     self.setting_file.delete_all_entries()  # Clean up initial dictionary
     #     options = self.getOptions()
@@ -201,11 +202,13 @@ class RefineSetupDialog(QDialog):
         if xmap_path is not None:
             self.xmap_path = xmap_path
             self.xmap_name = path.basename(self.xmap_path)
+            self.xmap_dir = path.dirname(self.xmap_path)
             xmap = io.load(xmap_path)
             self.updateCrystalMapTable(xmap)
         elif self.fileBrowserOF.getFile():
             self.xmap_path = self.fileBrowserOF.getPaths()[0]
             self.xmap_name = path.basename(self.xmap_path)
+            self.xmap_dir = path.dirname(self.xmap_path)
             xmap = io.load(self.xmap_path)
             self.updateCrystalMapTable(xmap)
 
@@ -278,6 +281,12 @@ class RefineSetupDialog(QDialog):
                 item.setFlags(item.flags() ^ Qt.ItemIsEditable)
                 xmapTable.setItem(row, col, item)
             row += 1
+        if path.exists(path.join(self.xmap_dir, "index_data.npy")):
+            self.ui.labelIndexDataStatus.setStyleSheet("QLabel { color : green; }")
+            self.ui.labelIndexDataStatus.setText("Index data available")
+        else:
+            self.ui.labelIndexDataStatus.setStyleSheet("QLabel { color : red; }")
+            self.ui.labelIndexDataStatus.setText("No available index data")
         self.setAvailableButtons()
 
     def remove_master_pattern(self):
@@ -301,9 +310,8 @@ class RefineSetupDialog(QDialog):
         n_xmap = self.ui.tableWidgetXmap.rowCount()
         if n_phases:
             ok_flag = True
-            if n_phases == 2:
+            if n_phases > 1:
                 phase_map_flag = True
-                add_phase_flag = False
         if n_xmap:
             xmap_flag = True
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(ok_flag and xmap_flag)
@@ -319,31 +327,29 @@ class RefineSetupDialog(QDialog):
                 binnings[f"{num}"] = (int(sig_shape[0] / num), int(sig_shape[1] / num))
         return binnings
 
-    def refine_orientations(self):
-        options = self.getOptions()
+    def refine_orientations(
+        self,
+        s: EBSD,
+        xmap: CrystalMap,
+        data: np.ndarray,
+        master_patterns: dict,
+        options: dict,
+    ):
         binning = eval(options["binning"])
         pc = options["pc"]
         convention = options["convention"]
-        lazy = options["lazy"]
         mask = options["mask"]
         method = options["method"]
         if len(options["ref_kwargs"]):
             ref_kwargs = eval(options["ref_kwargs"])
         else:
             ref_kwargs = {}
-        print(f"Kwargs: {ref_kwargs}")
-        # self.save_parameters()
-        print(f"Loading {self.pattern_path} | lazy = {lazy}")
-        try:
-            s: EBSD = kp.load(self.pattern_path, lazy=lazy)
-        except Exception as e:
-            raise e
-        try:
-            xmap: CrystalMap = io.load(self.xmap_path)
-        except Exception as e:
-            raise e
         energy: int = s.metadata.Acquisition_instrument.SEM.beam_energy
         nav_shape = s.axes_manager.navigation_shape[::-1]
+        step_sizes = (s.axes_manager["x"].scale, s.axes_manager["y"].scale)
+        scan_unit = s.axes_manager[
+            "x"
+        ].units  # Assumes scan unit is the same for y and x
         if binning is None:
             binning = 1
         else:
@@ -365,44 +371,80 @@ class RefineSetupDialog(QDialog):
             signal_mask = None
         print("------- Detector stats -------")
         print(f"Navigation shape: {nav_shape}")
+        print(f"Steps: {step_sizes} {scan_unit}")
         print(f"Signal shape: {sig_shape}")
-        print(f"Signal mask: {mask}")
-        print(f"PC convention: {convention}")
-        ref_xmaps = {}
-        print(self.mp_paths)
-        for mp_key, mp_path in self.mp_paths.items():
-            mp: LazyEBSDMasterPattern = kp.load(
-                mp_path,
-                energy=energy,  # single energies like 10, 11, 12 etc. or a range like (10, 20)
-                projection="lambert",  # stereographic, lambert
-                hemisphere="upper",  # upper, lower
-                lazy=lazy,
-            )
-            if mp.phase.name == "": # If the master pattern is missing the name of the phase
-                    mp.phase.name = path.dirname(mp_path).split("/").pop()
-            print("")
-            ref_xmaps[mp_key] = s.refine_orientation(
-                xmap=xmap[mp_key],
-                detector=det,
-                master_pattern=mp,
-                energy=energy,
-                signal_mask=signal_mask,
-                trust_region=[1, 1, 1],
-                method=method,
-                method_kwargs=ref_kwargs,
-            )
-        if len(ref_xmaps.values()) == 1:
-            print(list(ref_xmaps.values())[0])
-            ref_xmap = list(ref_xmaps.values())[0]
-        else:
-            ref_xmap = merge_crystal_maps(
-                list(ref_xmaps.values()), #simulation_indices_prop="simulation_indices"
-            )
-        io.save(path.join(self.working_dir, "ref_xmap.h5"), ref_xmap)
-        io.save(path.join(self.working_dir, "ref_xmap.ang"), ref_xmap)
-        print("Result was saved as ref_xmap_hi.ang and ref_xmap_hi.h5")
+        print(f"Circular mask: {mask}")
 
-        for key in ["phase", "orientation"]:
+        ref_xmaps = {}
+        for mp_key, mp in master_patterns.items():
+            phase_id = xmap.phases.id_from_name(mp_key)
+            mp.phase.color = self.colors[phase_id]
+            print(f"\nRefining with Master Pattern: {mp.phase.name}")
+            if data is not None:
+                xmap_phase: CrystalMap = kp.indexing.xmap_from_hough_indexing_data(
+                    data=data,
+                    phase_list=self.phases,
+                    data_index=phase_id,
+                    navigation_shape=nav_shape,
+                    step_sizes=step_sizes,
+                    scan_unit=scan_unit,
+                )
+                # Not needed as of Kikuchipy 0.8.4
+                # --------------------------------
+                # if not xmap_phase.all_indexed:
+                #     nav_mask_phase = ~(
+                #         xmap_phase.phase_id == xmap.phases.id_from_name(mp_key)
+                #     )
+                #     nav_mask_phase = nav_mask_phase.reshape(xmap.shape)
+                # else:
+                #     nav_mask_phase = None
+                ref_xmaps[mp_key] = s.refine_orientation(
+                    xmap=xmap_phase,
+                    detector=det,
+                    master_pattern=mp,
+                    energy=energy,
+                    navigation_mask=None,
+                    signal_mask=signal_mask,
+                    trust_region=[1, 1, 1],
+                    method=method,
+                    method_kwargs=ref_kwargs,
+                    compute=True,
+                )
+            else:
+                nav_mask_phase = ~np.logical_or(
+                    xmap.phase_id == xmap.phases.id_from_name(mp_key),
+                    xmap.phase_id == -1,
+                )
+                nav_mask_phase = nav_mask_phase.reshape(xmap.shape)
+                ref_xmaps[mp_key] = s.refine_orientation(
+                    xmap=xmap,
+                    detector=det,
+                    master_pattern=mp,
+                    energy=energy,
+                    navigation_mask=nav_mask_phase,
+                    signal_mask=signal_mask,
+                    trust_region=[1, 1, 1],
+                    method=method,
+                    method_kwargs=ref_kwargs,
+                    compute=True,
+                )
+        ref_xmaps_list = list(ref_xmaps.values())
+        if len(ref_xmaps_list) == 1:
+            ref_xmap = ref_xmaps_list[0]
+        else:
+            print("Merging crystal maps")
+            ref_xmap = merge_crystal_maps(ref_xmaps_list, scores_prop="scores")
+        io.save(
+            path.join(self.xmap_dir, f"refined_{path.splitext(self.xmap_name)[0]}.h5"),
+            ref_xmap,
+        )
+        io.save(
+            path.join(self.xmap_dir, f"refined_{path.splitext(self.xmap_name)[0]}.ang"),
+            ref_xmap,
+        )
+        print("Result was saved as refined_xmap_hi.ang and refined_xmap_hi.h5")
+
+        for key in ["phase", "orientation", "ncc"]:
             optionEnabled, optionExecute = options.get(key)
             if optionEnabled:
                 try:
@@ -412,27 +454,81 @@ class RefineSetupDialog(QDialog):
                         optionExecute(ref_xmap)
                 except Exception as e:
                     print(f"Could not save {key}_map:\n{e}")
-        # print("Logging results ...")
-        # log_hi_parameters(
-        #     self.working_dir,
-        #     s,
-        #     xmap,
-        #     self.mp_paths,
-        #     convention=options["convention"],
-        #     binning=binning,
-        #     pattern_center=pc,
-        # )
         print(f"Finished refining orientations for {self.xmap_name}")
 
-    def run_refinement(self):
+    def run_refinement(self, override_phases: bool = False):
+        options = self.getOptions()
+        try:
+            s: EBSD = kp.load(self.pattern_path, lazy=options["lazy"])
+        except Exception as e:
+            raise e
+        try:
+            xmap: CrystalMap = io.load(self.xmap_path)
+        except Exception as e:
+            raise e
+        data_path = path.join(self.xmap_dir, "index_data.npy")
+        if path.exists(data_path):
+            index_data = np.load(data_path)
+        else:
+            index_data = None
+        energy: int = s.metadata.Acquisition_instrument.SEM.beam_energy
+        master_patterns = {}
+        for mp_key, mp_path in self.mp_paths.items():
+            mp = kp.load(
+                mp_path,
+                energy=energy,
+                projection="lambert",
+                hemisphere="upper",
+                lazy=options["lazy"],
+            )
+            if (
+                mp.phase.name == ""
+            ):  # If the master pattern is missing the name of the phase
+                mp.phase.name = path.dirname(mp_path).split("/").pop()
+            master_patterns[mp_key] = mp
+            if not override_phases:
+                if mp_key in xmap.phases_in_data.names:
+                    xmap_phase = xmap.phases_in_data[mp_key]
+                    equal_phases, are_different = _equal_phase(mp.phase, xmap_phase)
+                    if not equal_phases:
+                        if self.promptOverridePhase(
+                            f"Master pattern phase '{mp.phase.name}' and phase of points to refine "
+                            f"in crystal map '{xmap_phase.name}' must be the same, but have "
+                            f"different {are_different}."
+                        ):
+                            xmap_phase.name = mp.phase.name
+                            xmap_phase.space_group = mp.phase.space_group
+                            xmap_phase.color = mp.phase.color
+                            xmap_phase.structure = mp.phase.structure
+                            continue
+                        else:
+                            return
         sendToJobManager(
             job_title=f"Refine orientations {self.xmap_name}",
-            output_path=self.working_dir,
+            output_path=self.xmap_dir,
             listview=self.parentWidget().ui.jobList,
             func=self.refine_orientations,
-            allow_cleanup=True,
-            allow_logging=True,
+            allow_cleanup=False,
+            allow_logging=False,
+            s=s,
+            xmap=xmap,
+            data=index_data,
+            master_patterns=master_patterns,
+            options=options,
         )
+
+    def promptOverridePhase(self, message) -> bool:
+        msgBox = QMessageBox(self).warning(
+            self,
+            "Warning Phase conflict",
+            f"{message}\nOverride phase from crystal map with phase from master pattern'?",
+            QMessageBox.Yes | QMessageBox.Cancel,
+            QMessageBox.Cancel,
+        )
+        if msgBox.exec() == QMessageBox.Yes:
+            return True
+        else:
+            return False
 
     def save_quality_metrics(self, xmap):
         """
@@ -448,12 +544,12 @@ class RefineSetupDialog(QDialog):
             fig.colorbar(im, ax=a, label=to_plot)
             a.axis("off")
             plt.imsave(
-                path.join(self.working_dir, f"quality_metrics_{to_plot}.png"),
+                path.join(self.xmap_dir, f"quality_metrics_{to_plot}.png"),
                 arr,
             )
         fig.subplots_adjust(wspace=0, hspace=0.05)
         fig.savefig(
-            path.join(self.working_dir, "quality_metrics_all.png"), **self.savefig_kwds
+            path.join(self.xmap_dir, "quality_metrics_all.png"), **self.savefig_kwds
         )
 
     def save_phase_map(self, xmap):
@@ -461,10 +557,10 @@ class RefineSetupDialog(QDialog):
         Plot phase map
         """
         print("Saving phase map ...")
-        # for i, ph in enumerate(self.phases):
-        #     xmap.phases[ph].color = self.colors[i]
         fig = xmap.plot(return_figure=True, remove_padding=True)
-        fig.savefig(path.join(self.working_dir, "refined_phase_map.png"), **self.savefig_kwds)
+        fig.savefig(
+            path.join(self.xmap_dir, "refined_phase_map.png"), **self.savefig_kwds
+        )
 
     def save_ipf_map(
         self,
@@ -500,10 +596,34 @@ class RefineSetupDialog(QDialog):
             ax_ckey.patch.set_facecolor("None")
         else:
             fig_ckey.savefig(
-                path.join(self.working_dir, "orientation_colour_key.png"),
+                path.join(self.xmap_dir, "orientation_colour_key.png"),
                 **self.savefig_kwds,
             )
-        fig.savefig(path.join(self.working_dir, "refined_IPF.png"), **self.savefig_kwds)
+        fig.savefig(path.join(self.xmap_dir, "refined_IPF.png"), **self.savefig_kwds)
+
+    def save_ncc_map(self, xmap: CrystalMap):
+        if len(xmap.phases.ids) == 1:
+            fig = xmap.plot(
+                "scores",
+                return_figure=True,
+                colorbar=True,
+                colorbar_label="NCC",
+                cmap="gray",
+                remove_padding=True,
+            )
+        else:
+            fig = xmap.plot(
+                value=xmap.merged_scores[:, 0],
+                colorbar=True,
+                colorbar_label="NCC",
+                return_figure=True,
+                cmap="gray",
+                remove_padding=True,
+            )
+        fig.savefig(
+            path.join(self.xmap_dir, "refined_NCC.png"),
+            **self.savefig_kwds,
+        )
 
 
 # TODO Add more Hough related properties, better way to sort?

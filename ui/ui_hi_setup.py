@@ -26,7 +26,7 @@ class Ui_HISetupDialog(object):
     def setupUi(self, HISetupDialog):
         if not HISetupDialog.objectName():
             HISetupDialog.setObjectName(u"HISetupDialog")
-        HISetupDialog.resize(802, 656)
+        HISetupDialog.resize(814, 678)
         self.gridLayout = QGridLayout(HISetupDialog)
         self.gridLayout.setObjectName(u"gridLayout")
         self.frame = QFrame(HISetupDialog)
@@ -52,7 +52,12 @@ class Ui_HISetupDialog(object):
         self.verticalLayout_7.setObjectName(u"verticalLayout_7")
         self.label_10 = QLabel(self.frame)
         self.label_10.setObjectName(u"label_10")
-        self.label_10.setStyleSheet(u"font: 75 10pt \"MS Shell Dlg 2\";")
+        font = QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setItalic(False)
+        self.label_10.setFont(font)
+        self.label_10.setStyleSheet(u"")
 
         self.verticalLayout_7.addWidget(self.label_10)
 
@@ -66,6 +71,8 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout.addWidget(self.line_6)
 
+        self.horizontalLayout_10 = QHBoxLayout()
+        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
         self.checkBoxLazy = QCheckBox(self.frame)
         self.checkBoxLazy.setObjectName(u"checkBoxLazy")
         self.checkBoxLazy.setEnabled(True)
@@ -74,7 +81,14 @@ class Ui_HISetupDialog(object):
         self.checkBoxLazy.setChecked(True)
         self.checkBoxLazy.setTristate(False)
 
-        self.verticalLayout.addWidget(self.checkBoxLazy)
+        self.horizontalLayout_10.addWidget(self.checkBoxLazy)
+
+        self.horizontalSpacer_13 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_10.addItem(self.horizontalSpacer_13)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_10)
 
         self.verticalLayout_6 = QVBoxLayout()
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
@@ -130,7 +144,11 @@ class Ui_HISetupDialog(object):
 
         self.label_11 = QLabel(self.frame)
         self.label_11.setObjectName(u"label_11")
-        self.label_11.setStyleSheet(u"font: 75 10pt \"MS Shell Dlg 2\";")
+        font1 = QFont()
+        font1.setPointSize(10)
+        font1.setBold(True)
+        self.label_11.setFont(font1)
+        self.label_11.setStyleSheet(u"")
 
         self.verticalLayout.addWidget(self.label_11)
 
@@ -194,6 +212,46 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout.addItem(self.verticalSpacer_5)
 
+        self.line_17 = QFrame(self.frame)
+        self.line_17.setObjectName(u"line_17")
+        self.line_17.setFrameShape(QFrame.HLine)
+        self.line_17.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout.addWidget(self.line_17)
+
+        self.label_20 = QLabel(self.frame)
+        self.label_20.setObjectName(u"label_20")
+        self.label_20.setFont(font1)
+        self.label_20.setStyleSheet(u"")
+
+        self.verticalLayout.addWidget(self.label_20)
+
+        self.line_18 = QFrame(self.frame)
+        self.line_18.setObjectName(u"line_18")
+        self.line_18.setFrameShape(QFrame.HLine)
+        self.line_18.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout.addWidget(self.line_18)
+
+        self.horizontalLayout_7 = QHBoxLayout()
+        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
+        self.checkBoxIndexData = QCheckBox(self.frame)
+        self.checkBoxIndexData.setObjectName(u"checkBoxIndexData")
+        self.checkBoxIndexData.setChecked(True)
+
+        self.horizontalLayout_7.addWidget(self.checkBoxIndexData)
+
+        self.horizontalSpacer_10 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_7.addItem(self.horizontalSpacer_10)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_7)
+
+        self.verticalSpacer_11 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout.addItem(self.verticalSpacer_11)
+
         self.line_2 = QFrame(self.frame)
         self.line_2.setObjectName(u"line_2")
         self.line_2.setFrameShape(QFrame.HLine)
@@ -203,7 +261,8 @@ class Ui_HISetupDialog(object):
 
         self.label_12 = QLabel(self.frame)
         self.label_12.setObjectName(u"label_12")
-        self.label_12.setStyleSheet(u"font: 75 10pt \"MS Shell Dlg 2\";")
+        self.label_12.setFont(font1)
+        self.label_12.setStyleSheet(u"")
 
         self.verticalLayout.addWidget(self.label_12)
 
@@ -216,11 +275,20 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout_8 = QVBoxLayout()
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
+        self.horizontalLayout_9 = QHBoxLayout()
+        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
         self.checkBoxOrientation = QCheckBox(self.frame)
         self.checkBoxOrientation.setObjectName(u"checkBoxOrientation")
         self.checkBoxOrientation.setChecked(True)
 
-        self.verticalLayout_8.addWidget(self.checkBoxOrientation)
+        self.horizontalLayout_9.addWidget(self.checkBoxOrientation)
+
+        self.horizontalSpacer_12 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_9.addItem(self.horizontalSpacer_12)
+
+
+        self.verticalLayout_8.addLayout(self.horizontalLayout_9)
 
         self.IPFExtraOptionsLayout = QHBoxLayout()
         self.IPFExtraOptionsLayout.setObjectName(u"IPFExtraOptionsLayout")
@@ -254,15 +322,33 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout.addLayout(self.verticalLayout_8)
 
+        self.horizontalLayout_8 = QHBoxLayout()
+        self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
         self.checkBoxPhase = QCheckBox(self.frame)
         self.checkBoxPhase.setObjectName(u"checkBoxPhase")
 
-        self.verticalLayout.addWidget(self.checkBoxPhase)
+        self.horizontalLayout_8.addWidget(self.checkBoxPhase)
 
+        self.horizontalSpacer_11 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_8.addItem(self.horizontalSpacer_11)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_8)
+
+        self.horizontalLayout_6 = QHBoxLayout()
+        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
         self.checkBoxQuality = QCheckBox(self.frame)
         self.checkBoxQuality.setObjectName(u"checkBoxQuality")
 
-        self.verticalLayout.addWidget(self.checkBoxQuality)
+        self.horizontalLayout_6.addWidget(self.checkBoxQuality)
+
+        self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_6.addItem(self.horizontalSpacer_9)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_6)
 
         self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -273,6 +359,10 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout_2 = QVBoxLayout()
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalSpacer_6 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_2.addItem(self.verticalSpacer_6)
+
         self.line_4 = QFrame(self.frame)
         self.line_4.setObjectName(u"line_4")
         self.line_4.setFrameShape(QFrame.HLine)
@@ -282,7 +372,8 @@ class Ui_HISetupDialog(object):
 
         self.label_14 = QLabel(self.frame)
         self.label_14.setObjectName(u"label_14")
-        self.label_14.setStyleSheet(u"font: 75 10pt \"MS Shell Dlg 2\";")
+        self.label_14.setFont(font1)
+        self.label_14.setStyleSheet(u"")
 
         self.verticalLayout_2.addWidget(self.label_14)
 
@@ -301,29 +392,29 @@ class Ui_HISetupDialog(object):
         self.tableWidgetPhase = QTableWidget(self.frame)
         if (self.tableWidgetPhase.columnCount() < 5):
             self.tableWidgetPhase.setColumnCount(5)
-        font = QFont()
-        font.setPointSize(8)
-        font.setBold(False)
+        font2 = QFont()
+        font2.setPointSize(8)
+        font2.setBold(False)
         __qtablewidgetitem = QTableWidgetItem()
-        __qtablewidgetitem.setFont(font);
+        __qtablewidgetitem.setFont(font2);
         self.tableWidgetPhase.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
-        __qtablewidgetitem1.setFont(font);
+        __qtablewidgetitem1.setFont(font2);
         self.tableWidgetPhase.setHorizontalHeaderItem(1, __qtablewidgetitem1)
-        font1 = QFont()
-        font1.setPointSize(9)
-        __qtablewidgetitem2 = QTableWidgetItem()
-        __qtablewidgetitem2.setFont(font1);
-        self.tableWidgetPhase.setHorizontalHeaderItem(2, __qtablewidgetitem2)
-        font2 = QFont()
-        font2.setPointSize(7)
-        __qtablewidgetitem3 = QTableWidgetItem()
-        __qtablewidgetitem3.setFont(font2);
-        self.tableWidgetPhase.setHorizontalHeaderItem(3, __qtablewidgetitem3)
         font3 = QFont()
-        font3.setPointSize(8)
+        font3.setPointSize(9)
+        __qtablewidgetitem2 = QTableWidgetItem()
+        __qtablewidgetitem2.setFont(font3);
+        self.tableWidgetPhase.setHorizontalHeaderItem(2, __qtablewidgetitem2)
+        font4 = QFont()
+        font4.setPointSize(7)
+        __qtablewidgetitem3 = QTableWidgetItem()
+        __qtablewidgetitem3.setFont(font4);
+        self.tableWidgetPhase.setHorizontalHeaderItem(3, __qtablewidgetitem3)
+        font5 = QFont()
+        font5.setPointSize(8)
         __qtablewidgetitem4 = QTableWidgetItem()
-        __qtablewidgetitem4.setFont(font3);
+        __qtablewidgetitem4.setFont(font5);
         self.tableWidgetPhase.setHorizontalHeaderItem(4, __qtablewidgetitem4)
         self.tableWidgetPhase.setObjectName(u"tableWidgetPhase")
         self.tableWidgetPhase.setMinimumSize(QSize(250, 50))
@@ -340,11 +431,11 @@ class Ui_HISetupDialog(object):
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer_3)
 
-        self.pushButtonAddPhase = QPushButton(self.frame)
-        self.pushButtonAddPhase.setObjectName(u"pushButtonAddPhase")
-        self.pushButtonAddPhase.setEnabled(True)
+        self.pushButtonCreatePhase = QPushButton(self.frame)
+        self.pushButtonCreatePhase.setObjectName(u"pushButtonCreatePhase")
+        self.pushButtonCreatePhase.setEnabled(True)
 
-        self.horizontalLayout_3.addWidget(self.pushButtonAddPhase)
+        self.horizontalLayout_3.addWidget(self.pushButtonCreatePhase)
 
         self.pushButtonLoadPhase = QPushButton(self.frame)
         self.pushButtonLoadPhase.setObjectName(u"pushButtonLoadPhase")
@@ -370,15 +461,40 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout_2.addWidget(self.line)
 
-        self.gridLayout_2 = QGridLayout()
-        self.gridLayout_2.setObjectName(u"gridLayout_2")
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setSpacing(10)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.label_2 = QLabel(self.frame)
+        self.label_2.setObjectName(u"label_2")
+        self.label_2.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+
+        self.horizontalLayout_4.addWidget(self.label_2)
+
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_4)
+
+        self.label_3 = QLabel(self.frame)
+        self.label_3.setObjectName(u"label_3")
+        self.label_3.setMaximumSize(QSize(16777215, 20))
+        self.label_3.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.horizontalLayout_4.addWidget(self.label_3)
+
         self.patternCenterX = QDoubleSpinBox(self.frame)
         self.patternCenterX.setObjectName(u"patternCenterX")
         self.patternCenterX.setDecimals(3)
         self.patternCenterX.setMaximum(1.000000000000000)
         self.patternCenterX.setSingleStep(0.001000000000000)
 
-        self.gridLayout_2.addWidget(self.patternCenterX, 0, 3, 1, 1)
+        self.horizontalLayout_4.addWidget(self.patternCenterX)
+
+        self.label_4 = QLabel(self.frame)
+        self.label_4.setObjectName(u"label_4")
+        self.label_4.setLayoutDirection(Qt.LeftToRight)
+        self.label_4.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.horizontalLayout_4.addWidget(self.label_4)
 
         self.patternCenterY = QDoubleSpinBox(self.frame)
         self.patternCenterY.setObjectName(u"patternCenterY")
@@ -386,7 +502,13 @@ class Ui_HISetupDialog(object):
         self.patternCenterY.setMaximum(1.000000000000000)
         self.patternCenterY.setSingleStep(0.001000000000000)
 
-        self.gridLayout_2.addWidget(self.patternCenterY, 1, 3, 1, 1)
+        self.horizontalLayout_4.addWidget(self.patternCenterY)
+
+        self.label_5 = QLabel(self.frame)
+        self.label_5.setObjectName(u"label_5")
+        self.label_5.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.horizontalLayout_4.addWidget(self.label_5)
 
         self.patternCenterZ = QDoubleSpinBox(self.frame)
         self.patternCenterZ.setObjectName(u"patternCenterZ")
@@ -394,40 +516,10 @@ class Ui_HISetupDialog(object):
         self.patternCenterZ.setMaximum(3.000000000000000)
         self.patternCenterZ.setSingleStep(0.001000000000000)
 
-        self.gridLayout_2.addWidget(self.patternCenterZ, 2, 3, 1, 1)
-
-        self.label_4 = QLabel(self.frame)
-        self.label_4.setObjectName(u"label_4")
-        self.label_4.setLayoutDirection(Qt.LeftToRight)
-        self.label_4.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.gridLayout_2.addWidget(self.label_4, 1, 2, 1, 1)
-
-        self.label_5 = QLabel(self.frame)
-        self.label_5.setObjectName(u"label_5")
-        self.label_5.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.gridLayout_2.addWidget(self.label_5, 2, 2, 1, 1)
-
-        self.label_3 = QLabel(self.frame)
-        self.label_3.setObjectName(u"label_3")
-        self.label_3.setMaximumSize(QSize(16777215, 20))
-        self.label_3.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.gridLayout_2.addWidget(self.label_3, 0, 2, 1, 1)
-
-        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.gridLayout_2.addItem(self.horizontalSpacer_4, 1, 1, 1, 1)
-
-        self.label_2 = QLabel(self.frame)
-        self.label_2.setObjectName(u"label_2")
-        self.label_2.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
-
-        self.gridLayout_2.addWidget(self.label_2, 1, 0, 1, 1)
+        self.horizontalLayout_4.addWidget(self.patternCenterZ)
 
 
-        self.verticalLayout_2.addLayout(self.gridLayout_2)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_4)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -450,8 +542,24 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout_2.addItem(self.verticalSpacer)
 
-        self.verticalLayout_2.setStretch(4, 5)
-        self.verticalLayout_2.setStretch(9, 1)
+        self.horizontalLayout_11 = QHBoxLayout()
+        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
+        self.horizontalSpacer_14 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_11.addItem(self.horizontalSpacer_14)
+
+        self.labelMessage = QLabel(self.frame)
+        self.labelMessage.setObjectName(u"labelMessage")
+        self.labelMessage.setStyleSheet(u"color: rgb(255, 0, 0);")
+
+        self.horizontalLayout_11.addWidget(self.labelMessage)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_11)
+
+        self.verticalLayout_2.setStretch(0, 1)
+        self.verticalLayout_2.setStretch(5, 5)
+        self.verticalLayout_2.setStretch(10, 1)
 
         self.gridLayout_3.addLayout(self.verticalLayout_2, 2, 3, 1, 1)
 
@@ -479,12 +587,17 @@ class Ui_HISetupDialog(object):
 
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
 
-        QWidget.setTabOrder(self.checkBoxPhase, self.checkBoxQuality)
-        QWidget.setTabOrder(self.checkBoxQuality, self.pushButtonLoadPhase)
+        QWidget.setTabOrder(self.comboBoxBinning, self.spinBoxBands)
+        QWidget.setTabOrder(self.spinBoxBands, self.horizontalSliderRho)
+        QWidget.setTabOrder(self.horizontalSliderRho, self.lineEditColorKey)
+        QWidget.setTabOrder(self.lineEditColorKey, self.tableWidgetPhase)
+        QWidget.setTabOrder(self.tableWidgetPhase, self.pushButtonCreatePhase)
+        QWidget.setTabOrder(self.pushButtonCreatePhase, self.pushButtonLoadPhase)
         QWidget.setTabOrder(self.pushButtonLoadPhase, self.pushButtonRemovePhase)
         QWidget.setTabOrder(self.pushButtonRemovePhase, self.patternCenterX)
         QWidget.setTabOrder(self.patternCenterX, self.patternCenterY)
         QWidget.setTabOrder(self.patternCenterY, self.patternCenterZ)
+        QWidget.setTabOrder(self.patternCenterZ, self.comboBoxConvention)
 
         self.retranslateUi(HISetupDialog)
         self.buttonBox.rejected.connect(HISetupDialog.reject)
@@ -514,11 +627,16 @@ class Ui_HISetupDialog(object):
         self.horizontalSliderRho.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>The fraction of the pattern to be considered when detecting bands, default is 85%. </p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.labelRho.setText(QCoreApplication.translate("HISetupDialog", u"85%", None))
-        self.label_12.setText(QCoreApplication.translate("HISetupDialog", u"Maps", None))
+        self.label_20.setText(QCoreApplication.translate("HISetupDialog", u"Crystal map", None))
+#if QT_CONFIG(tooltip)
+        self.checkBoxIndexData.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Whether to save the index data array\u00a0as *.npy in addition to the resulting crystal map, can be used to refine orientations later</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBoxIndexData.setText(QCoreApplication.translate("HISetupDialog", u"Save Index Data", None))
+        self.label_12.setText(QCoreApplication.translate("HISetupDialog", u"Images", None))
 #if QT_CONFIG(tooltip)
         self.checkBoxOrientation.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Orientations are given a color based on which crystal direction &lt;<span style=\" font-style:italic;\">uvw</span>&gt; points in a certain sample direction, producing the so-called inverse pole figure (IPF) map</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBoxOrientation.setText(QCoreApplication.translate("HISetupDialog", u"Inverse Pole Figure", None))
+        self.checkBoxOrientation.setText(QCoreApplication.translate("HISetupDialog", u"Inverse Pole Figure Map", None))
         self.labelColorKey.setText(QCoreApplication.translate("HISetupDialog", u"Color Key Direction", None))
         self.lineEditColorKey.setInputMask(QCoreApplication.translate("HISetupDialog", u"[0,0,0]", None))
         self.lineEditColorKey.setText(QCoreApplication.translate("HISetupDialog", u"0,0,1", None))
@@ -526,11 +644,11 @@ class Ui_HISetupDialog(object):
 #if QT_CONFIG(tooltip)
         self.checkBoxPhase.setToolTip(QCoreApplication.translate("HISetupDialog", u"Generate map of different phases present", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBoxPhase.setText(QCoreApplication.translate("HISetupDialog", u"Phases", None))
+        self.checkBoxPhase.setText(QCoreApplication.translate("HISetupDialog", u"Phase Map", None))
 #if QT_CONFIG(tooltip)
         self.checkBoxQuality.setToolTip(QCoreApplication.translate("HISetupDialog", u"Generate quality metrics for combined maps", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBoxQuality.setText(QCoreApplication.translate("HISetupDialog", u"Quality Metrics", None))
+        self.checkBoxQuality.setText(QCoreApplication.translate("HISetupDialog", u"Quality Metric Maps", None))
         self.label_14.setText(QCoreApplication.translate("HISetupDialog", u"Detector", None))
         self.label.setText(QCoreApplication.translate("HISetupDialog", u"Phases", None))
         ___qtablewidgetitem = self.tableWidgetPhase.horizontalHeaderItem(0)
@@ -547,9 +665,9 @@ class Ui_HISetupDialog(object):
         ___qtablewidgetitem4 = self.tableWidgetPhase.horizontalHeaderItem(4)
         ___qtablewidgetitem4.setText(QCoreApplication.translate("HISetupDialog", u"Color", None));
 #if QT_CONFIG(tooltip)
-        self.pushButtonAddPhase.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Create and add a custom phase</p></body></html>", None))
+        self.pushButtonCreatePhase.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Create and add a custom phase</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
-        self.pushButtonAddPhase.setText(QCoreApplication.translate("HISetupDialog", u"Add", None))
+        self.pushButtonCreatePhase.setText(QCoreApplication.translate("HISetupDialog", u"Create", None))
 #if QT_CONFIG(tooltip)
         self.pushButtonLoadPhase.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Add phase from master pattern (*.h5)</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
@@ -558,14 +676,15 @@ class Ui_HISetupDialog(object):
         self.pushButtonRemovePhase.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Remove the selected phase</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.pushButtonRemovePhase.setText(QCoreApplication.translate("HISetupDialog", u"Remove", None))
-        self.patternCenterZ.setPrefix("")
+        self.label_2.setText(QCoreApplication.translate("HISetupDialog", u"Pattern Center", None))
+        self.label_3.setText(QCoreApplication.translate("HISetupDialog", u"X:", None))
         self.label_4.setText(QCoreApplication.translate("HISetupDialog", u"Y:", None))
         self.label_5.setText(QCoreApplication.translate("HISetupDialog", u"Z:", None))
-        self.label_3.setText(QCoreApplication.translate("HISetupDialog", u"X:", None))
-        self.label_2.setText(QCoreApplication.translate("HISetupDialog", u"Pattern Center", None))
+        self.patternCenterZ.setPrefix("")
         self.label_6.setText(QCoreApplication.translate("HISetupDialog", u"Convention", None))
         self.comboBoxConvention.setItemText(0, QCoreApplication.translate("HISetupDialog", u"BRUKER", None))
         self.comboBoxConvention.setItemText(1, QCoreApplication.translate("HISetupDialog", u"TSL", None))
 
+        self.labelMessage.setText(QCoreApplication.translate("HISetupDialog", u"*Message", None))
     # retranslateUi
 

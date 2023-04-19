@@ -1,7 +1,7 @@
 import warnings
 import json
 from datetime import date
-from os import mkdir, path
+from os import mkdir, path, getcwd
 
 import kikuchipy as kp
 import matplotlib as mpl
@@ -104,7 +104,14 @@ class DiSetupDialog(QDialog):
             self.ui.patternCenterZ.setValue(self.pc[2])
         
         except:
-            self.pc = np.array([0.500, 0.500, 0.500])
+            if self.s_cal.metadata.Acquisition_instrument.SEM.microscope == "ZEISS SUPRA55 VP":
+                self.pc = [
+                    0.5605-0.0017*float(self.working_distance),
+                    1.2056-0.0225*float(self.working_distance),
+                    0.483,
+                ]
+            else:    
+                self.pc = np.array([0.5000, 0.5000, 0.5000])
         # Setup colors from program settings
         try:
             self.colors = json.loads(self.program_settings.read("Colors"))
@@ -139,8 +146,31 @@ class DiSetupDialog(QDialog):
 
     # Lookup table for sample rotations
     def generate_rotation_lookup_dict(self):
-        self.sample_rotations = {}
-        with open("resources/sample_rotations.txt", "r") as f:
+        self.sample_rotations = {
+            '3.0': eval("{'4/mmm': 90979, 'm-3m': 30443}"),
+            '2.9': eval("{'4/mmm': 97627, 'm-3m': 32363}"),
+            '2.8': eval("{'4/mmm': 110709, 'm-3m': 36829}"),
+            '2.7': eval("{'4/mmm': 124885, 'm-3m': 41625}"),
+            '2.6': eval("{'4/mmm': 132893, 'm-3m': 44073}"),
+            '2.5': eval("{'4/mmm': 157151, 'm-3m': 52607}"),
+            '2.4': eval("{'4/mmm': 175689, 'm-3m': 58453}"),
+            '2.2': eval("{'4/mmm': 226787, 'm-3m': 75539}"),
+            '2.3': eval("{'4/mmm': 195441, 'm-3m': 65097}"),
+            '2.1': eval("{'4/mmm': 262101, 'm-3m': 87529}"),
+            '2.0': eval("{'4/mmm': 301055, 'm-3m': 100347}"),
+            '1.9': eval("{'4/mmm': 357801, 'm-3m': 119077}"),
+            '1.8': eval("{'4/mmm': 421899, 'm-3m': 141267}"),
+            '1.7': eval("{'4/mmm': 492855, 'm-3m': 164179}"),
+            '1.6': eval("{'4/mmm': 592249, 'm-3m': 197225}"),
+            '1.5': eval("{'4/mmm': 729573, 'm-3m': 243129}"),
+            '1.4': eval("{'4/mmm': 913161, 'm-3m': 304053}"),
+            '1.3': eval("{'4/mmm': 1157317, 'm-3m': 385545}"),
+            '1.2': eval("{'4/mmm': 1481139, 'm-3m': 494039}"),
+            '1.1': eval("{'4/mmm': 1906537, 'm-3m': 635777}"),
+            '1.0': eval("{'4/mmm': 2571073, 'm-3m': 857973}"),
+        }
+        return
+        with open(path.join(getcwd(),"resources/sample_rotations.txt", "r")) as f:
             for line in f:
                 (key, value) = line.strip().split("\t")
                 self.sample_rotations[f"{float(key):.2}"] = eval(value)
@@ -305,7 +335,7 @@ class DiSetupDialog(QDialog):
         #load pattern
 
         self.load_pattern(lazy_load=self.ui.checkBoxLazy.isChecked())
-        
+
         # Pass the function to execute
         sendToJobManager(
             job_title=f"DI {self.pattern_name}",
@@ -451,6 +481,7 @@ class DiSetupDialog(QDialog):
             xmaps_ref[f"{ph}"] = pattern.refine_orientation(
                 xmap=xmaps[f"{ph}"],
                 master_pattern=self.mp[f"{ph}"],
+                method="ln_neldermead",
                 trust_region=[1, 1, 1],
                 **ref_kw,
             )
@@ -612,7 +643,7 @@ class DiSetupDialog(QDialog):
         for i, mp_path in enumerate(self.mpPaths.values(), 1):
             self.di_setting_file.write(f"Master pattern path {i}", mp_path)
 
-        self.di_setting_file.write("Dataset name", self.pattern_path)
+        self.di_setting_file.write("Pattern name", path.basename(self.pattern_path))
         
         self.di_setting_file.save()
 
@@ -635,7 +666,7 @@ class DiSetupDialog(QDialog):
         if self.options["n_iter"] != 0:
             self.n_per_iteration = self.options["n_iter"]
         self.di_kwargs["n_per_iteration"] = self.n_per_iteration
-
+        self.convention = self.ui.comboBoxConvention.currentText().upper()
         # Rebinning of signal
         print("Rebinning EBSD signals")
         nav_shape = self.s.axes_manager.navigation_shape
@@ -650,7 +681,7 @@ class DiSetupDialog(QDialog):
             shape=sig_shape,
             sample_tilt=self.sample_tilt,  # Degrees
             pc=self.pc,
-            convention= self.ui.comboBoxConvention.currentText().upper(),  # Default is Bruker
+            convention=self.convention,  # Default is Bruker
         )
         detector.save(path.join(self.results_dir, "detector.txt"))
 
