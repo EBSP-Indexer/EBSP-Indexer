@@ -418,7 +418,7 @@ class HiSetupDialog(QDialog):
     def run_hough_indexing(self):
         for i in range(1, 100):
             try:
-                self.dir_out = path.join(self.working_dir, "hi_results" + str(i))
+                self.dir_out = path.join(self.working_dir, "hi_results_" + str(i))
                 mkdir(self.dir_out)
                 break
             except FileExistsError:
