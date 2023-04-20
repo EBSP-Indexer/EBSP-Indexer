@@ -1,11 +1,11 @@
-from PySide6.QtCore import QDir
-from PySide6.QtWidgets import QWidget, QFileDialog
-
+import os
 import sys
+
+from PySide6.QtCore import QDir
+from PySide6.QtWidgets import QFileDialog, QWidget
 
 
 class FileBrowser(QWidget):
-
     OpenFile = 0
     OpenFiles = 1
     OpenDirectory = 2
@@ -16,7 +16,10 @@ class FileBrowser(QWidget):
     ):
         QWidget.__init__(self)
         self.browser_mode = mode
-        self.dirpath = dirpath
+        if os.path.exists(dirpath):
+            self.dirpath = dirpath
+        else:
+            self.dirpath = QDir.currentPath()
         self.filter_name = filter_name
 
     def setMode(self, browser_mode):
@@ -26,7 +29,8 @@ class FileBrowser(QWidget):
         self.filter_name = text
 
     def setDefaultDir(self, path):
-        self.dirpath = path
+        if os.path.exists(path):
+            self.dirpath = path
 
     def getFile(self) -> int:
         """
