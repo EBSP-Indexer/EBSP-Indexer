@@ -115,13 +115,17 @@ class HiSetupDialog(QDialog):
             self.convention = self.setting_file.read("Convention")
         except:
             self.convention = self.program_settings.read("Convention")
-        pc_params = (self.ui.patternCenterX, self.ui.patternCenterY, self.ui.patternCenterZ)
+        pc_params = (
+            self.ui.patternCenterX,
+            self.ui.patternCenterY,
+            self.ui.patternCenterZ,
+        )
         try:
             pc = eval(self.setting_file.read("PC"))
-            for i, param in enumerate(pc_params): 
+            for i, param in enumerate(pc_params):
                 param.setValue(float(pc[i]))
         except:
-            for param in pc_params: 
+            for param in pc_params:
                 param.setValue(0.5)
             # if self.s_cal.metadata.Acquisition_instrument.SEM.microscope == "ZEISS SUPRA55 VP":
             #     self.pc = [
@@ -129,9 +133,9 @@ class HiSetupDialog(QDialog):
             #         1.2056-0.0225*float(self.working_distance),
             #         0.483,
             #     ]
-            # else:    
+            # else:
             #     self.pc = np.array([0.5000, 0.5000, 0.5000])
-                
+
         self.ui.comboBoxConvention.setCurrentText(self.convention)
         try:
             self.colors = json.loads(self.program_settings.read("Colors"))
@@ -333,7 +337,7 @@ class HiSetupDialog(QDialog):
 
     def getBinningShapes(self, signal: LazyEBSD) -> dict:
         sig_shape = signal.axes_manager.signal_shape[::-1]
-        self.ui.labelOriginalSigShape.setText(f"{sig_shape} px")
+        self.ui.labelOriginalSignalShape.setText(f"{sig_shape} px")
         binnings: dict = {"None": sig_shape}
         for num in range(2, 17):
             if sig_shape[0] % num == 0 and sig_shape[1] % num == 0:
