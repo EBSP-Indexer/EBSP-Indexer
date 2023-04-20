@@ -74,7 +74,7 @@ class FileBrowser(QWidget):
                     options=options,
                 )[0]
             )
-        if self.filepaths[0] == "":
+        if False in (len(path) for path in self.filepaths):
             return 0
         return 1
 
