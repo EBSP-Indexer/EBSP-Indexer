@@ -41,12 +41,10 @@ class crystalMap:
                     self.navigator = {
                         "Inverse polefigure": 0,
                         "Phase map": 1,
-                        "Normalized cross correlation": 2,
                     }
                 else:
                     self.navigator = {
                         "Inverse pole figure": 0,
-                        "Normalized cross correlation": 2,
                     }
 
                 self.hkl = self.hkl_simulation()
@@ -110,7 +108,6 @@ class crystalMap:
         """
         0 = inverse pole figure
         1 = phase map
-        2 = normalized cross correlation
         """
 
         if nav_num == 0:
@@ -119,10 +116,6 @@ class crystalMap:
 
         if nav_num == 1:
             navigator = self.phase_map
-            return navigator
-        
-        if nav_num == 2:
-            navigator = self.property_map
             return navigator
 
     @functools.cached_property
