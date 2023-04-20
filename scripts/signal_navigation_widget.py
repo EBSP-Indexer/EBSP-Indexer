@@ -72,7 +72,7 @@ class SignalNavigationWidget(QWidget):
         if isinstance(signal, orix.crystal_map.crystal_map.CrystalMap):
             self.dataset = crystalMap(signal, file_path, compute_all=True)
 
-        self.plot_navigator(self.dataset, navigator=list(self.dataset.navigator)[0])
+        self.plot_navigator(self.dataset, nav_type=list(self.dataset.navigator)[0])
         self.ui.comboBoxNavigator.clear()
 
         for key, value in self.dataset.navigator.items():
@@ -91,8 +91,8 @@ class SignalNavigationWidget(QWidget):
         self.ui.labelPhaseHover.setVisible(show_labels_and_checkbox)
         self.ui.labelPhase1.setVisible(show_labels_and_checkbox)
 
-    def plot_navigator(self, dataset, navigator: str, x=0, y=0):
-        if navigator == "":
+    def plot_navigator(self, dataset, nav_type: str, x=0, y=0):
+        if nav_type == "":
             return
 
         try:
@@ -100,7 +100,9 @@ class SignalNavigationWidget(QWidget):
             self.ui.navigatorMplWidget.canvas.mpl_disconnect(self.hover_id)
         except:
             pass
-        navigator = dataset.navigator[navigator]
+        
+        navigator = dataset.compute_navigator(dataset.navigator[nav_type])
+        
 
         # plot to MplCanvas
         self.ui.navigatorMplWidget.vbl.setContentsMargins(0, 0, 0, 0)
