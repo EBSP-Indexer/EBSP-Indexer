@@ -59,7 +59,7 @@ class PatternProcessingDialog(QDialog):
         self.ui.averageBox.stateChanged.connect(lambda: self.preview_processing())
 
     def close_dialog(self):
-        del self.s
+        del self.s_preview
         gc.collect()
         self.reject()
 

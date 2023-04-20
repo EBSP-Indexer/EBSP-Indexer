@@ -117,19 +117,18 @@ class DiSetupDialog(QDialog):
 
         # Update pattern center to be displayed in UI
         try:
-            self.pc = eval(self.setting_file.read("Pattern center (x*, y*, z*)"))
-
+            self.pc = np.array(eval(self.setting_file.read("PC")))
         except:
-            try:
-                self.pc = np.array(
-                    [
-                        float(self.setting_file.read("X star")),
-                        float(self.setting_file.read("Y star")),
-                        float(self.setting_file.read("Z star")),
-                    ]
-                )
-            except:
-                self.pc = np.array((0.500, 0.800, 0.500))
+            # try:
+            #     self.pc = np.array(
+            #         [
+            #             float(self.setting_file.read("X star")),
+            #             float(self.setting_file.read("Y star")),
+            #             float(self.setting_file.read("Z star")),
+            #         ]
+            #     )
+            # except:
+            self.pc = np.array((0.500, 0.800, 0.500))
 
         self.ui.patternCenterX.setValue(self.pc[0])
         self.ui.patternCenterY.setValue(self.pc[1])
@@ -633,8 +632,8 @@ class DiSetupDialog(QDialog):
                 try:
                     for filetype in self.di_result_filetypes:  # [".ang", ".h5"]
                         io.save(
-                            path.join(unrefined_dir, f"{ph}.{filetype}"),
-                            xmaps[f"{ph}"],
+                            path.join(unrefined_dir, f"{ph.name}.{filetype}"),
+                            xmaps[f"{ph.name}"],
                         )
                 except Exception as e:
                     raise e
@@ -730,7 +729,7 @@ class DiSetupDialog(QDialog):
 
         self.setting_file.write("Convention", self.convention)
 
-        self.setting_file.write("Pattern center (x*, y*, z*)", f"{self.pc}")
+        self.setting_file.write("PC", f"{self.pc}")
         # self.setting_file.write("X star", f"{self.pc[0]}")
         # self.setting_file.write("Y star", f"{self.pc[1]}")
         # self.setting_file.write("Z star", f"{self.pc[2]}")

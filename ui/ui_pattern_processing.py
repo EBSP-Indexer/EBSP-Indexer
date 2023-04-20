@@ -26,7 +26,7 @@ class Ui_PatternProcessingDialog(object):
     def setupUi(self, PatternProcessingDialog):
         if not PatternProcessingDialog.objectName():
             PatternProcessingDialog.setObjectName(u"PatternProcessingDialog")
-        PatternProcessingDialog.resize(756, 472)
+        PatternProcessingDialog.resize(963, 472)
         PatternProcessingDialog.setLocale(QLocale(QLocale.English, QLocale.UnitedKingdom))
         self.gridLayout = QGridLayout(PatternProcessingDialog)
         self.gridLayout.setObjectName(u"gridLayout")
@@ -167,6 +167,7 @@ class Ui_PatternProcessingDialog(object):
 
         self.gridLayout_2.addWidget(self.buttonBox, 2, 1, 1, 1)
 
+        self.gridLayout_2.setColumnStretch(1, 1)
 
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
 

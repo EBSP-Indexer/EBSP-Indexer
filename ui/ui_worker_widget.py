@@ -24,23 +24,13 @@ class Ui_WorkerWidget(object):
     def setupUi(self, WorkerWidget):
         if not WorkerWidget.objectName():
             WorkerWidget.setObjectName(u"WorkerWidget")
-        WorkerWidget.resize(415, 230)
+        WorkerWidget.resize(423, 230)
         WorkerWidget.setLocale(QLocale(QLocale.English, QLocale.UnitedKingdom))
         self.verticalLayout = QVBoxLayout(WorkerWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setSizeConstraint(QLayout.SetDefaultConstraint)
-        self.labelJobNumber = QLabel(WorkerWidget)
-        self.labelJobNumber.setObjectName(u"labelJobNumber")
-        sizePolicy = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.labelJobNumber.sizePolicy().hasHeightForWidth())
-        self.labelJobNumber.setSizePolicy(sizePolicy)
-
-        self.horizontalLayout.addWidget(self.labelJobNumber)
-
         self.pushButtonShow = QPushButton(WorkerWidget)
         self.pushButtonShow.setObjectName(u"pushButtonShow")
         self.pushButtonShow.setStyleSheet(u"QPushButton:focus {\n"
@@ -61,6 +51,16 @@ class Ui_WorkerWidget(object):
 
         self.horizontalLayout.addWidget(self.pushButtonShow)
 
+        self.labelJobNumber = QLabel(WorkerWidget)
+        self.labelJobNumber.setObjectName(u"labelJobNumber")
+        sizePolicy = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.labelJobNumber.sizePolicy().hasHeightForWidth())
+        self.labelJobNumber.setSizePolicy(sizePolicy)
+
+        self.horizontalLayout.addWidget(self.labelJobNumber)
+
         self.horizontalSpacer = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
@@ -72,16 +72,17 @@ class Ui_WorkerWidget(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.labelTime.sizePolicy().hasHeightForWidth())
         self.labelTime.setSizePolicy(sizePolicy1)
-        self.labelTime.setStyleSheet(u"color: rgb(220, 190, 0);\n"
-"font: 75 9pt \"Courier\";")
+        font = QFont()
+        font.setPointSize(8)
+        font.setBold(False)
+        font.setItalic(False)
+        self.labelTime.setFont(font)
+        self.labelTime.setStyleSheet(u"color: rgb(220, 190, 0);")
 
         self.horizontalLayout.addWidget(self.labelTime)
 
         self.pushButtonCancel = QPushButton(WorkerWidget)
         self.pushButtonCancel.setObjectName(u"pushButtonCancel")
-        icon1 = QIcon()
-        icon1.addFile(u":/linea_arrows/resources/linea_arrows_icons/arrows_remove.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.pushButtonCancel.setIcon(icon1)
         self.pushButtonCancel.setIconSize(QSize(20, 20))
 
         self.horizontalLayout.addWidget(self.pushButtonCancel)
@@ -95,9 +96,9 @@ class Ui_WorkerWidget(object):
         sizePolicy2.setHeightForWidth(self.pushButtonRemove.sizePolicy().hasHeightForWidth())
         self.pushButtonRemove.setSizePolicy(sizePolicy2)
         self.pushButtonRemove.setStyleSheet(u"")
-        icon2 = QIcon()
-        icon2.addFile(u":/linea_basic/resources/linea_basic_icons/basic_trashcan.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.pushButtonRemove.setIcon(icon2)
+        icon1 = QIcon()
+        icon1.addFile(u":/linea_basic/resources/linea_basic_icons/basic_trashcan.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.pushButtonRemove.setIcon(icon1)
         self.pushButtonRemove.setIconSize(QSize(20, 20))
 
         self.horizontalLayout.addWidget(self.pushButtonRemove)
@@ -121,8 +122,10 @@ class Ui_WorkerWidget(object):
         self.labelJobName.setObjectName(u"labelJobName")
         sizePolicy1.setHeightForWidth(self.labelJobName.sizePolicy().hasHeightForWidth())
         self.labelJobName.setSizePolicy(sizePolicy1)
-        self.labelJobName.setStyleSheet(u"font: 75 12pt \"Courier\";\n"
-"text-decoration: underline;")
+        font1 = QFont()
+        font1.setPointSize(10)
+        font1.setBold(True)
+        self.labelJobName.setFont(font1)
 
         self.verticalLayout.addWidget(self.labelJobName)
 
@@ -130,8 +133,11 @@ class Ui_WorkerWidget(object):
         self.labelOutput.setObjectName(u"labelOutput")
         sizePolicy1.setHeightForWidth(self.labelOutput.sizePolicy().hasHeightForWidth())
         self.labelOutput.setSizePolicy(sizePolicy1)
-        self.labelOutput.setStyleSheet(u"font: italic 8pt \"Courier\";\n"
-"color: rgb(120, 120, 120);")
+        font2 = QFont()
+        font2.setItalic(True)
+        font2.setUnderline(True)
+        self.labelOutput.setFont(font2)
+        self.labelOutput.setStyleSheet(u"color: rgb(100, 100, 100);")
 
         self.verticalLayout.addWidget(self.labelOutput)
 
@@ -148,29 +154,39 @@ class Ui_WorkerWidget(object):
 
         self.verticalLayout.addWidget(self.textBrowserStatus)
 
+        self.lineBrowser = QFrame(WorkerWidget)
+        self.lineBrowser.setObjectName(u"lineBrowser")
+        sizePolicy3.setHeightForWidth(self.lineBrowser.sizePolicy().hasHeightForWidth())
+        self.lineBrowser.setSizePolicy(sizePolicy3)
+        self.lineBrowser.setFrameShape(QFrame.HLine)
+        self.lineBrowser.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout.addWidget(self.lineBrowser)
+
         self.verticalLayout.setStretch(4, 1)
 
         self.retranslateUi(WorkerWidget)
         self.pushButtonShow.toggled.connect(self.textBrowserStatus.setVisible)
         self.pushButtonShow.toggled.connect(self.labelJobName.setVisible)
         self.pushButtonShow.toggled.connect(self.labelOutput.setVisible)
+        self.pushButtonShow.toggled.connect(self.lineBrowser.setVisible)
 
         QMetaObject.connectSlotsByName(WorkerWidget)
     # setupUi
 
     def retranslateUi(self, WorkerWidget):
         WorkerWidget.setWindowTitle(QCoreApplication.translate("WorkerWidget", u"Form", None))
-        self.labelJobNumber.setText(QCoreApplication.translate("WorkerWidget", u"job number", None))
         self.pushButtonShow.setText("")
+        self.labelJobNumber.setText(QCoreApplication.translate("WorkerWidget", u"job number", None))
         self.labelTime.setText(QCoreApplication.translate("WorkerWidget", u"In Queue", None))
 #if QT_CONFIG(tooltip)
         self.pushButtonCancel.setToolTip(QCoreApplication.translate("WorkerWidget", u"Cancel job", None))
 #endif // QT_CONFIG(tooltip)
         self.pushButtonCancel.setText(QCoreApplication.translate("WorkerWidget", u"Cancel", None))
 #if QT_CONFIG(tooltip)
-        self.pushButtonRemove.setToolTip(QCoreApplication.translate("WorkerWidget", u"Remove job from list", None))
+        self.pushButtonRemove.setToolTip(QCoreApplication.translate("WorkerWidget", u"<html><head/><body><p>Visibly remove job from manager</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
-        self.pushButtonRemove.setText(QCoreApplication.translate("WorkerWidget", u"Remove", None))
+        self.pushButtonRemove.setText("")
         self.labelJobName.setText(QCoreApplication.translate("WorkerWidget", u"<html><head/><body><p>job name</p></body></html>", None))
         self.labelOutput.setText(QCoreApplication.translate("WorkerWidget", u"<html><head/><body><p>output_directory</p></body></html>", None))
         self.textBrowserStatus.setHtml(QCoreApplication.translate("WorkerWidget", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
