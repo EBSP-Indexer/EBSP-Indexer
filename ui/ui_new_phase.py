@@ -25,7 +25,7 @@ class Ui_NewPhaseDialog(object):
     def setupUi(self, NewPhaseDialog):
         if not NewPhaseDialog.objectName():
             NewPhaseDialog.setObjectName(u"NewPhaseDialog")
-        NewPhaseDialog.resize(764, 427)
+        NewPhaseDialog.resize(861, 445)
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -132,8 +132,8 @@ class Ui_NewPhaseDialog(object):
         self.horizontalLayout.addLayout(self.verticalLayout_3)
 
         self.tableWidgetAtoms = QTableWidget(NewPhaseDialog)
-        if (self.tableWidgetAtoms.columnCount() < 4):
-            self.tableWidgetAtoms.setColumnCount(4)
+        if (self.tableWidgetAtoms.columnCount() < 5):
+            self.tableWidgetAtoms.setColumnCount(5)
         __qtablewidgetitem = QTableWidgetItem()
         self.tableWidgetAtoms.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
@@ -142,18 +142,22 @@ class Ui_NewPhaseDialog(object):
         self.tableWidgetAtoms.setHorizontalHeaderItem(2, __qtablewidgetitem2)
         __qtablewidgetitem3 = QTableWidgetItem()
         self.tableWidgetAtoms.setHorizontalHeaderItem(3, __qtablewidgetitem3)
+        __qtablewidgetitem4 = QTableWidgetItem()
+        self.tableWidgetAtoms.setHorizontalHeaderItem(4, __qtablewidgetitem4)
         if (self.tableWidgetAtoms.rowCount() < 1):
             self.tableWidgetAtoms.setRowCount(1)
-        __qtablewidgetitem4 = QTableWidgetItem()
-        self.tableWidgetAtoms.setVerticalHeaderItem(0, __qtablewidgetitem4)
         __qtablewidgetitem5 = QTableWidgetItem()
-        self.tableWidgetAtoms.setItem(0, 0, __qtablewidgetitem5)
+        self.tableWidgetAtoms.setVerticalHeaderItem(0, __qtablewidgetitem5)
         __qtablewidgetitem6 = QTableWidgetItem()
-        self.tableWidgetAtoms.setItem(0, 1, __qtablewidgetitem6)
+        self.tableWidgetAtoms.setItem(0, 0, __qtablewidgetitem6)
         __qtablewidgetitem7 = QTableWidgetItem()
-        self.tableWidgetAtoms.setItem(0, 2, __qtablewidgetitem7)
+        self.tableWidgetAtoms.setItem(0, 1, __qtablewidgetitem7)
         __qtablewidgetitem8 = QTableWidgetItem()
-        self.tableWidgetAtoms.setItem(0, 3, __qtablewidgetitem8)
+        self.tableWidgetAtoms.setItem(0, 2, __qtablewidgetitem8)
+        __qtablewidgetitem9 = QTableWidgetItem()
+        self.tableWidgetAtoms.setItem(0, 3, __qtablewidgetitem9)
+        __qtablewidgetitem10 = QTableWidgetItem()
+        self.tableWidgetAtoms.setItem(0, 4, __qtablewidgetitem10)
         self.tableWidgetAtoms.setObjectName(u"tableWidgetAtoms")
         self.tableWidgetAtoms.setEnabled(False)
         self.tableWidgetAtoms.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -177,30 +181,40 @@ class Ui_NewPhaseDialog(object):
         self.tableWidgetLattice = QTableWidget(NewPhaseDialog)
         if (self.tableWidgetLattice.columnCount() < 6):
             self.tableWidgetLattice.setColumnCount(6)
-        __qtablewidgetitem9 = QTableWidgetItem()
-        self.tableWidgetLattice.setHorizontalHeaderItem(0, __qtablewidgetitem9)
-        __qtablewidgetitem10 = QTableWidgetItem()
-        self.tableWidgetLattice.setHorizontalHeaderItem(1, __qtablewidgetitem10)
         __qtablewidgetitem11 = QTableWidgetItem()
-        self.tableWidgetLattice.setHorizontalHeaderItem(2, __qtablewidgetitem11)
+        self.tableWidgetLattice.setHorizontalHeaderItem(0, __qtablewidgetitem11)
         __qtablewidgetitem12 = QTableWidgetItem()
-        self.tableWidgetLattice.setHorizontalHeaderItem(3, __qtablewidgetitem12)
+        self.tableWidgetLattice.setHorizontalHeaderItem(1, __qtablewidgetitem12)
         __qtablewidgetitem13 = QTableWidgetItem()
-        self.tableWidgetLattice.setHorizontalHeaderItem(4, __qtablewidgetitem13)
+        self.tableWidgetLattice.setHorizontalHeaderItem(2, __qtablewidgetitem13)
         __qtablewidgetitem14 = QTableWidgetItem()
-        self.tableWidgetLattice.setHorizontalHeaderItem(5, __qtablewidgetitem14)
+        self.tableWidgetLattice.setHorizontalHeaderItem(3, __qtablewidgetitem14)
+        __qtablewidgetitem15 = QTableWidgetItem()
+        self.tableWidgetLattice.setHorizontalHeaderItem(4, __qtablewidgetitem15)
+        __qtablewidgetitem16 = QTableWidgetItem()
+        self.tableWidgetLattice.setHorizontalHeaderItem(5, __qtablewidgetitem16)
         if (self.tableWidgetLattice.rowCount() < 1):
             self.tableWidgetLattice.setRowCount(1)
-        __qtablewidgetitem15 = QTableWidgetItem()
-        self.tableWidgetLattice.setVerticalHeaderItem(0, __qtablewidgetitem15)
-        __qtablewidgetitem16 = QTableWidgetItem()
-        self.tableWidgetLattice.setItem(0, 0, __qtablewidgetitem16)
+        __qtablewidgetitem17 = QTableWidgetItem()
+        self.tableWidgetLattice.setVerticalHeaderItem(0, __qtablewidgetitem17)
+        __qtablewidgetitem18 = QTableWidgetItem()
+        self.tableWidgetLattice.setItem(0, 0, __qtablewidgetitem18)
+        __qtablewidgetitem19 = QTableWidgetItem()
+        self.tableWidgetLattice.setItem(0, 1, __qtablewidgetitem19)
+        __qtablewidgetitem20 = QTableWidgetItem()
+        self.tableWidgetLattice.setItem(0, 2, __qtablewidgetitem20)
+        __qtablewidgetitem21 = QTableWidgetItem()
+        self.tableWidgetLattice.setItem(0, 3, __qtablewidgetitem21)
+        __qtablewidgetitem22 = QTableWidgetItem()
+        self.tableWidgetLattice.setItem(0, 4, __qtablewidgetitem22)
+        __qtablewidgetitem23 = QTableWidgetItem()
+        self.tableWidgetLattice.setItem(0, 5, __qtablewidgetitem23)
         self.tableWidgetLattice.setObjectName(u"tableWidgetLattice")
         self.tableWidgetLattice.setEnabled(False)
         self.tableWidgetLattice.setMaximumSize(QSize(16777215, 70))
         self.tableWidgetLattice.setSelectionMode(QAbstractItemView.NoSelection)
         self.tableWidgetLattice.horizontalHeader().setDefaultSectionSize(90)
-        self.tableWidgetLattice.horizontalHeader().setStretchLastSection(True)
+        self.tableWidgetLattice.horizontalHeader().setStretchLastSection(False)
         self.tableWidgetLattice.verticalHeader().setVisible(False)
         self.tableWidgetLattice.verticalHeader().setStretchLastSection(True)
 
@@ -282,38 +296,54 @@ class Ui_NewPhaseDialog(object):
         ___qtablewidgetitem2.setText(QCoreApplication.translate("NewPhaseDialog", u"Y", None));
         ___qtablewidgetitem3 = self.tableWidgetAtoms.horizontalHeaderItem(3)
         ___qtablewidgetitem3.setText(QCoreApplication.translate("NewPhaseDialog", u"Z", None));
-        ___qtablewidgetitem4 = self.tableWidgetAtoms.verticalHeaderItem(0)
-        ___qtablewidgetitem4.setText(QCoreApplication.translate("NewPhaseDialog", u"Atom 1", None));
+        ___qtablewidgetitem4 = self.tableWidgetAtoms.horizontalHeaderItem(4)
+        ___qtablewidgetitem4.setText(QCoreApplication.translate("NewPhaseDialog", u"Occupancy", None));
+        ___qtablewidgetitem5 = self.tableWidgetAtoms.verticalHeaderItem(0)
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("NewPhaseDialog", u"Atom 1", None));
 
         __sortingEnabled = self.tableWidgetAtoms.isSortingEnabled()
         self.tableWidgetAtoms.setSortingEnabled(False)
-        ___qtablewidgetitem5 = self.tableWidgetAtoms.item(0, 1)
-        ___qtablewidgetitem5.setText(QCoreApplication.translate("NewPhaseDialog", u"0", None));
-        ___qtablewidgetitem6 = self.tableWidgetAtoms.item(0, 2)
+        ___qtablewidgetitem6 = self.tableWidgetAtoms.item(0, 1)
         ___qtablewidgetitem6.setText(QCoreApplication.translate("NewPhaseDialog", u"0", None));
-        ___qtablewidgetitem7 = self.tableWidgetAtoms.item(0, 3)
+        ___qtablewidgetitem7 = self.tableWidgetAtoms.item(0, 2)
         ___qtablewidgetitem7.setText(QCoreApplication.translate("NewPhaseDialog", u"0", None));
+        ___qtablewidgetitem8 = self.tableWidgetAtoms.item(0, 3)
+        ___qtablewidgetitem8.setText(QCoreApplication.translate("NewPhaseDialog", u"0", None));
+        ___qtablewidgetitem9 = self.tableWidgetAtoms.item(0, 4)
+        ___qtablewidgetitem9.setText(QCoreApplication.translate("NewPhaseDialog", u"1", None));
         self.tableWidgetAtoms.setSortingEnabled(__sortingEnabled)
 
 #if QT_CONFIG(tooltip)
         self.labelLattice.setToolTip(QCoreApplication.translate("NewPhaseDialog", u"<html><head/><body><p>Create coordinate system with the cell lengths a, b, c and cell angles alpha, beta, gamma in degrees</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.labelLattice.setText(QCoreApplication.translate("NewPhaseDialog", u"Lattice*", None))
-        ___qtablewidgetitem8 = self.tableWidgetLattice.horizontalHeaderItem(0)
-        ___qtablewidgetitem8.setText(QCoreApplication.translate("NewPhaseDialog", u"a", None));
-        ___qtablewidgetitem9 = self.tableWidgetLattice.horizontalHeaderItem(1)
-        ___qtablewidgetitem9.setText(QCoreApplication.translate("NewPhaseDialog", u"b", None));
-        ___qtablewidgetitem10 = self.tableWidgetLattice.horizontalHeaderItem(2)
-        ___qtablewidgetitem10.setText(QCoreApplication.translate("NewPhaseDialog", u"c", None));
-        ___qtablewidgetitem11 = self.tableWidgetLattice.horizontalHeaderItem(3)
-        ___qtablewidgetitem11.setText(QCoreApplication.translate("NewPhaseDialog", u"\u03b1", None));
-        ___qtablewidgetitem12 = self.tableWidgetLattice.horizontalHeaderItem(4)
-        ___qtablewidgetitem12.setText(QCoreApplication.translate("NewPhaseDialog", u"\u03b2", None));
-        ___qtablewidgetitem13 = self.tableWidgetLattice.horizontalHeaderItem(5)
-        ___qtablewidgetitem13.setText(QCoreApplication.translate("NewPhaseDialog", u"\u03b3", None));
+        ___qtablewidgetitem10 = self.tableWidgetLattice.horizontalHeaderItem(0)
+        ___qtablewidgetitem10.setText(QCoreApplication.translate("NewPhaseDialog", u"a", None));
+        ___qtablewidgetitem11 = self.tableWidgetLattice.horizontalHeaderItem(1)
+        ___qtablewidgetitem11.setText(QCoreApplication.translate("NewPhaseDialog", u"b", None));
+        ___qtablewidgetitem12 = self.tableWidgetLattice.horizontalHeaderItem(2)
+        ___qtablewidgetitem12.setText(QCoreApplication.translate("NewPhaseDialog", u"c", None));
+        ___qtablewidgetitem13 = self.tableWidgetLattice.horizontalHeaderItem(3)
+        ___qtablewidgetitem13.setText(QCoreApplication.translate("NewPhaseDialog", u"\u03b1", None));
+        ___qtablewidgetitem14 = self.tableWidgetLattice.horizontalHeaderItem(4)
+        ___qtablewidgetitem14.setText(QCoreApplication.translate("NewPhaseDialog", u"\u03b2", None));
+        ___qtablewidgetitem15 = self.tableWidgetLattice.horizontalHeaderItem(5)
+        ___qtablewidgetitem15.setText(QCoreApplication.translate("NewPhaseDialog", u"\u03b3", None));
 
         __sortingEnabled1 = self.tableWidgetLattice.isSortingEnabled()
         self.tableWidgetLattice.setSortingEnabled(False)
+        ___qtablewidgetitem16 = self.tableWidgetLattice.item(0, 0)
+        ___qtablewidgetitem16.setText(QCoreApplication.translate("NewPhaseDialog", u"1", None));
+        ___qtablewidgetitem17 = self.tableWidgetLattice.item(0, 1)
+        ___qtablewidgetitem17.setText(QCoreApplication.translate("NewPhaseDialog", u"1", None));
+        ___qtablewidgetitem18 = self.tableWidgetLattice.item(0, 2)
+        ___qtablewidgetitem18.setText(QCoreApplication.translate("NewPhaseDialog", u"1", None));
+        ___qtablewidgetitem19 = self.tableWidgetLattice.item(0, 3)
+        ___qtablewidgetitem19.setText(QCoreApplication.translate("NewPhaseDialog", u"90", None));
+        ___qtablewidgetitem20 = self.tableWidgetLattice.item(0, 4)
+        ___qtablewidgetitem20.setText(QCoreApplication.translate("NewPhaseDialog", u"90", None));
+        ___qtablewidgetitem21 = self.tableWidgetLattice.item(0, 5)
+        ___qtablewidgetitem21.setText(QCoreApplication.translate("NewPhaseDialog", u"90", None));
         self.tableWidgetLattice.setSortingEnabled(__sortingEnabled1)
 
 #if QT_CONFIG(tooltip)

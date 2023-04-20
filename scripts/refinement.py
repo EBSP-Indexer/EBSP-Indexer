@@ -150,12 +150,14 @@ class RefineSetupDialog(QDialog):
         except:
             convention = self.program_settings.read("Convention")
         self.ui.comboBoxConvention.setCurrentText(convention)
+        pc_params = (self.ui.patternCenterX, self.ui.patternCenterY, self.ui.patternCenterZ)
         try:
-            self.ui.patternCenterX.setValue(float(self.setting_file.read("X star")))
-            self.ui.patternCenterY.setValue(float(self.setting_file.read("Y star")))
-            self.ui.patternCenterZ.setValue(float(self.setting_file.read("Z star")))
+            pc = eval(self.setting_file.read("PC"))
+            for i, param in enumerate(pc_params): 
+                param.setValue(float(pc[i]))
         except:
-            self.pc = np.array([0.500, 0.200, 0.500])
+            for param in pc_params: 
+                param.setValue(0.5)
         try:
             self.colors = json.loads(self.program_settings.read("Colors"))
         except:
@@ -518,14 +520,14 @@ class RefineSetupDialog(QDialog):
         )
 
     def promptOverridePhase(self, message) -> bool:
-        msgBox = QMessageBox(self).warning(
+        reply = QMessageBox(self).information(
             self,
             "Warning Phase conflict",
             f"{message}\nOverride phase from crystal map with phase from master pattern'?",
             QMessageBox.Yes | QMessageBox.Cancel,
             QMessageBox.Cancel,
         )
-        if msgBox.exec() == QMessageBox.Yes:
+        if reply == QMessageBox.Yes:
             return True
         else:
             return False

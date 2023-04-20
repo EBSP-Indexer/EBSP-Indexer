@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>825</width>
-    <height>703</height>
+    <height>657</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -74,9 +74,13 @@
          <layout class="QHBoxLayout" name="horizontalLayout_12">
           <item>
            <widget class="QLabel" name="labelSignalPath">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
             <property name="styleSheet">
-             <string notr="true">font: italic 8pt &quot;Courier&quot;;
-color: rgb(127, 127, 127);</string>
+             <string notr="true">color: rgb(127, 127, 127);</string>
             </property>
             <property name="text">
              <string>Signal path</string>
@@ -612,9 +616,15 @@ color: rgb(127, 127, 127);</string>
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
            <widget class="QLabel" name="labelXmapPath">
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <italic>true</italic>
+              <bold>false</bold>
+             </font>
+            </property>
             <property name="styleSheet">
-             <string notr="true">font: italic 8pt &quot;Courier&quot;;
-color: rgb(127, 127, 127);</string>
+             <string notr="true">color: rgb(127, 127, 127);</string>
             </property>
             <property name="text">
              <string>No crystal map loaded</string>

@@ -49,7 +49,7 @@ class DiSetupDialog(QDialog):
         )
 
         self.load_pattern()
-        self.ui.sliderBinning.setInvertedAppearance(True)
+        #self.ui.sliderBinning.setInvertedAppearance(True)
         self.setupInitialSettings()
         self.checkConfirmState()
         self.setupBinningShapes()
@@ -92,26 +92,23 @@ class DiSetupDialog(QDialog):
 
         # Update pattern center to be displayed in UI
         try:
-            self.pc = np.array(
-                [
-                    float(self.setting_file.read("X star")),
-                    float(self.setting_file.read("Y star")),
-                    float(self.setting_file.read("Z star")),
-                ]
-            )
+            self.pc = np.array(eval(self.setting_file.read("PC")))
             self.ui.patternCenterX.setValue(self.pc[0])
             self.ui.patternCenterY.setValue(self.pc[1])
             self.ui.patternCenterZ.setValue(self.pc[2])
         
         except:
-            if self.s_cal.metadata.Acquisition_instrument.SEM.microscope == "ZEISS SUPRA55 VP":
-                self.pc = [
-                    0.5605-0.0017*float(self.working_distance),
-                    1.2056-0.0225*float(self.working_distance),
-                    0.483,
-                ]
-            else:    
-                self.pc = np.array([0.5000, 0.5000, 0.5000])
+            self.ui.patternCenterX.setValue(0.5)
+            self.ui.patternCenterY.setValue(0.5)
+            self.ui.patternCenterZ.setValue(0.5)
+            # if self.s_cal.metadata.Acquisition_instrument.SEM.microscope == "ZEISS SUPRA55 VP":
+            #     self.pc = [
+            #         0.5605-0.0017*float(self.working_distance),
+            #         1.2056-0.0225*float(self.working_distance),
+            #         0.483,
+            #     ]
+            # else:    
+            #     self.pc = np.array([0.5000, 0.5000, 0.5000])
         # Setup colors from program settings
         try:
             self.colors = json.loads(self.program_settings.read("Colors"))
@@ -218,7 +215,7 @@ class DiSetupDialog(QDialog):
                     bin_shapes = np.append(bin_shapes, f"({num}, {num})")
 
             self.ui.comboBoxBinning.addItems(bin_shapes[::-1])
-            self.ui.sliderBinning.setMaximum(len(bin_shapes) - 1)
+            #self.ui.sliderBinning.setMaximum(len(bin_shapes) - 1)
 
             # Define pixel-scale globally
             self.scale = self.s.axes_manager["x"].scale
@@ -237,16 +234,16 @@ class DiSetupDialog(QDialog):
             lambda: self.estimateSimulationSize()
         )
         
-        self.ui.sliderBinning.valueChanged.connect(
-            lambda: self.ui.comboBoxBinning.setCurrentIndex(
-                self.ui.sliderBinning.value()
-            )
-        )
-        self.ui.comboBoxBinning.currentIndexChanged.connect(
-            lambda: self.ui.sliderBinning.setValue(
-                self.ui.comboBoxBinning.currentIndex()
-            )
-        )
+        # self.ui.sliderBinning.valueChanged.connect(
+        #     lambda: self.ui.comboBoxBinning.setCurrentIndex(
+        #         self.ui.sliderBinning.value()
+        #     )
+        # )
+        # self.ui.comboBoxBinning.currentIndexChanged.connect(
+        #     lambda: self.ui.sliderBinning.setValue(
+        #         self.ui.comboBoxBinning.currentIndex()
+        #     )
+        # )
 
     def setNiterState(self):
         if self.ui.checkBoxLazy.isChecked():
@@ -561,10 +558,10 @@ class DiSetupDialog(QDialog):
 
         self.setting_file.write("Convention", self.convention)
 
-        self.setting_file.write("Pattern center (x*, y*, z*)", f"{self.pc}")
-        self.setting_file.write("X star", f"{self.pc[0]}")
-        self.setting_file.write("Y star", f"{self.pc[1]}")
-        self.setting_file.write("Z star", f"{self.pc[2]}")
+        self.setting_file.write("PC", tuple(map(tuple, self.pc)))
+        # self.setting_file.write("X star", f"{self.pc[0]}")
+        # self.setting_file.write("Y star", f"{self.pc[1]}")
+        # self.setting_file.write("Z star", f"{self.pc[2]}")
 
         self.setting_file.write("Binning", f"({self.new_signal_shape})")
         self.setting_file.write(

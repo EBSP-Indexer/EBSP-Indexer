@@ -2,13 +2,7 @@ import os
 from typing import Callable
 from datetime import timedelta
 
-from PySide6.QtCore import (
-    QThreadPool,
-    Slot,
-    Signal,
-    QElapsedTimer,
-    QTimer,
-)
+from PySide6.QtCore import QThreadPool, Slot, Signal, QElapsedTimer, QTimer, QSize
 from PySide6.QtWidgets import QMainWindow, QWidget, QListWidget, QListWidgetItem
 from PySide6.QtGui import QTextCharFormat, QBrush, QColor
 
@@ -104,7 +98,7 @@ class WorkerWidget(QWidget):
         self.ui.labelJobNumber.setText(f"Job {self.id} | {self.job_title}")
         self.ui.labelJobName.setText(f"{self.job_title}")
         self.ui.labelOutput.setText(f"{self.output_directory}")
-        self.jobItem.setSizeHint(self.sizeHint())
+        self.adjustSize(show=True)
         self.inpfmt = self.ui.textBrowserStatus.currentCharFormat()
         self.outfmt = QTextCharFormat(self.inpfmt)
         self.outfmt.setForeground(QBrush(QColor(0, 0, 255)))
@@ -114,13 +108,17 @@ class WorkerWidget(QWidget):
         # Signals
         self.ui.pushButtonRemove.clicked.connect(self.sendRemoveItem)
         self.ui.pushButtonCancel.clicked.connect(self.sendCancelWorker)
-        self.ui.pushButtonShow.clicked.connect(self.adjustSize)
+        self.ui.pushButtonShow.toggled.connect(lambda show: self.adjustSize(show))
         self.removeMeSignal.connect(self.window().removeWorker)
         self.timer.timeout.connect(self.updateTimerDisplay)
         self.worker.isStarted.connect(self.time_worker)
-        self.worker.isFinished.connect(lambda id: self.finalize(id, logging=self.allow_logging))
+        self.worker.isFinished.connect(
+            lambda id: self.finalize(id, logging=self.allow_logging)
+        )
         self.worker.isError.connect(
-            lambda id: self.finalize(id, failed=True, cleanup=False, logging=self.allow_logging)
+            lambda id: self.finalize(
+                id, failed=True, cleanup=False, logging=self.allow_logging
+            )
         )
 
     def updateActiveJobs(self):
@@ -137,9 +135,12 @@ class WorkerWidget(QWidget):
             self.ui.pushButtonCancel.setHidden(True)
 
     # TODO resize jobItem in a job manager class instead so it can be removed from this class
-    def adjustSize(self):
+    def adjustSize(self, show):
         super().adjustSize()
-        self.jobItem.setSizeHint(self.sizeHint())
+        if show:
+            self.jobItem.setSizeHint(self.sizeHint() - QSize(100, 100))
+        else:
+            self.jobItem.setSizeHint(self.sizeHint() - QSize(100, 0))
 
     @Slot(int)
     def time_worker(self, id):
@@ -158,7 +159,7 @@ class WorkerWidget(QWidget):
         failed: bool = False,
         cancelled: bool = False,
         cleanup: bool = False,
-        logging: bool = False
+        logging: bool = False,
     ):
         """
         #TODO Description here

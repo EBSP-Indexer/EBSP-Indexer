@@ -76,11 +76,12 @@ class PatterCenterDialog(QDialog):
             self.convention = self.program_settings.read("Convention")
         
         try:
-            self.pc = [
-                    float(self.setting_file.read("X star")),
-                    float(self.setting_file.read("Y star")),
-                    float(self.setting_file.read("Z star")),
-            ]
+            self.pc = np.array(eval(self.setting_file.read("PC")))
+            # self.pc = [
+            #         float(self.setting_file.read("X star")),
+            #         float(self.setting_file.read("Y star")),
+            #         float(self.setting_file.read("Z star")),
+            # ]
         except:
             if self.s_cal.metadata.Acquisition_instrument.SEM.microscope == "ZEISS SUPRA55 VP":
                 self.pc = [
@@ -442,15 +443,13 @@ class PatterCenterDialog(QDialog):
         y_average = y_sum/n
         z_average = z_sum/n
 
-        self.setting_file.write("Convention", self.convention)
-        self.setting_file.write("X star", f"{x_average:.4}")
-        
+        self.setting_file.write("Convention", self.convention)       
+        # self.setting_file.write("X star", f"{x_average:.4}")
         if self.convention == "BRUKER":
-            self.setting_file.write("Y star", f"{y_average:.4}")
+            self.setting_file.write("PC", (x_average, y_average, z_average))
         elif self.convention == "TSL":
-            self.setting_file.write("Y star", f"{1-y_average:.4}")
-
-        self.setting_file.write("Z star", f"{z_average:.4}")
+            self.setting_file.write("PC", (x_average, 1-y_average, z_average))
+        # self.setting_file.write("Z star", f"{z_average:.4}")
         
         self.setting_file.save()
         self.close()

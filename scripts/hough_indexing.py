@@ -69,13 +69,13 @@ class HiSetupDialog(QDialog):
             lambda: self.load_master_pattern_phase()
         )
         self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.remove_phase())
-        self.ui.comboBoxBinning.currentTextChanged.connect(
-            lambda: self.ui.labelSignalShape.setText(
-                f"Signal Shape: {self.binnings[self.ui.comboBoxBinning.currentText()]}"
-            )
-        )
         self.ui.horizontalSliderRho.valueChanged.connect(
             lambda: self.ui.labelRho.setText(f"{self.ui.horizontalSliderRho.value()}%")
+        )
+        self.ui.comboBoxBinning.currentTextChanged.connect(
+            lambda: self.ui.labelNewSignalShape.setText(
+                f"{self.binnings[self.ui.comboBoxBinning.currentText()]} px"
+            )
         )
         self.ui.comboBoxBinning.addItems(self.binnings.keys())
 
@@ -105,7 +105,7 @@ class HiSetupDialog(QDialog):
         }
 
     def load_parameters(self):
-        # read current setting from project_settings.txt, advanced_settings.txt
+        # Read current setting from project_settings.txt, advanced_settings.txt
         self.setting_file = SettingFile(
             path.join(self.working_dir, "project_settings.txt")
         )
@@ -115,19 +115,22 @@ class HiSetupDialog(QDialog):
             self.convention = self.setting_file.read("Convention")
         except:
             self.convention = self.program_settings.read("Convention")
+        pc_params = (self.ui.patternCenterX, self.ui.patternCenterY, self.ui.patternCenterZ)
         try:
-            self.ui.patternCenterX.setValue(float(self.setting_file.read("X star")))
-            self.ui.patternCenterY.setValue(float(self.setting_file.read("Y star")))
-            self.ui.patternCenterZ.setValue(float(self.setting_file.read("Z star")))
+            pc = eval(self.setting_file.read("PC"))
+            for i, param in enumerate(pc_params): 
+                param.setValue(float(pc[i]))
         except:
-            if self.s_cal.metadata.Acquisition_instrument.SEM.microscope == "ZEISS SUPRA55 VP":
-                self.pc = [
-                    0.5605-0.0017*float(self.working_distance),
-                    1.2056-0.0225*float(self.working_distance),
-                    0.483,
-                ]
-            else:    
-                self.pc = np.array([0.5000, 0.5000, 0.5000])
+            for param in pc_params: 
+                param.setValue(0.5)
+            # if self.s_cal.metadata.Acquisition_instrument.SEM.microscope == "ZEISS SUPRA55 VP":
+            #     self.pc = [
+            #         0.5605-0.0017*float(self.working_distance),
+            #         1.2056-0.0225*float(self.working_distance),
+            #         0.483,
+            #     ]
+            # else:    
+            #     self.pc = np.array([0.5000, 0.5000, 0.5000])
                 
         self.ui.comboBoxConvention.setCurrentText(self.convention)
         try:
@@ -196,10 +199,10 @@ class HiSetupDialog(QDialog):
                 self.setting_file.write(f"Phase {phase_idx}", phase_settings)
                 phase_idx += 1
         self.setting_file.write("Convention", options["convention"].upper())
-        pc = options["pc"]
-        self.setting_file.write("X star", pc[0])
-        self.setting_file.write("Y star", pc[1])
-        self.setting_file.write("Z star", pc[2])
+        self.setting_file.write("PC", options["pc"])
+        # self.setting_file.write("X star", pc[0])
+        # self.setting_file.write("Y star", pc[1])
+        # self.setting_file.write("Z star", pc[2])
         self.setting_file.write("Binning", options["binning"])
         self.setting_file.save()
 
@@ -330,6 +333,7 @@ class HiSetupDialog(QDialog):
 
     def getBinningShapes(self, signal: LazyEBSD) -> dict:
         sig_shape = signal.axes_manager.signal_shape[::-1]
+        self.ui.labelOriginalSigShape.setText(f"{sig_shape} px")
         binnings: dict = {"None": sig_shape}
         for num in range(2, 17):
             if sig_shape[0] % num == 0 and sig_shape[1] % num == 0:
