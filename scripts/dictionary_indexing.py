@@ -440,7 +440,7 @@ class DiSetupDialog(QDialog):
             )
 
             fig = xmap_dict[f"{ph.name}"].plot(
-                ckey.orientation2color(xmap_dict[f"{ph.namr}"].orientations),
+                ckey.orientation2color(xmap_dict[f"{ph.name}"].orientations),
                 remove_padding=True,
                 return_figure=True,
             )
@@ -685,7 +685,8 @@ class DiSetupDialog(QDialog):
                 merged = self.merge_crystal_maps(xmaps, type)
 
             if self.options["ipf"]:
-                ckey = plot.IPFColorKeyTSL(self.phaseList[0].point_group)
+                phase_id = merged.phases.ids[0]
+                ckey = plot.IPFColorKeyTSL(merged.phases[phase_id].point_group)
 
                 fig = ckey.plot(return_figure=True)
                 fig.savefig(
