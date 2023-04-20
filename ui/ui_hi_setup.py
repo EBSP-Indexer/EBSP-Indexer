@@ -26,7 +26,7 @@ class Ui_HISetupDialog(object):
     def setupUi(self, HISetupDialog):
         if not HISetupDialog.objectName():
             HISetupDialog.setObjectName(u"HISetupDialog")
-        HISetupDialog.resize(814, 678)
+        HISetupDialog.resize(905, 624)
         self.gridLayout = QGridLayout(HISetupDialog)
         self.gridLayout.setObjectName(u"gridLayout")
         self.frame = QFrame(HISetupDialog)
@@ -90,46 +90,51 @@ class Ui_HISetupDialog(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout_10)
 
-        self.verticalLayout_6 = QVBoxLayout()
-        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.verticalLayout_4 = QVBoxLayout()
-        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-        self.label_7 = QLabel(self.frame)
-        self.label_7.setObjectName(u"label_7")
-        self.label_7.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+        self.horizontalLayout_13 = QHBoxLayout()
+        self.horizontalLayout_13.setSpacing(6)
+        self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
+        self.label_15 = QLabel(self.frame)
+        self.label_15.setObjectName(u"label_15")
 
-        self.verticalLayout_4.addWidget(self.label_7)
+        self.horizontalLayout_13.addWidget(self.label_15)
 
         self.comboBoxBinning = QComboBox(self.frame)
         self.comboBoxBinning.setObjectName(u"comboBoxBinning")
-        self.comboBoxBinning.setMaximumSize(QSize(80, 16777215))
-        self.comboBoxBinning.setLayoutDirection(Qt.LeftToRight)
 
-        self.verticalLayout_4.addWidget(self.comboBoxBinning)
+        self.horizontalLayout_13.addWidget(self.comboBoxBinning)
 
-        self.horizontalLayout_2 = QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+        self.horizontalSpacer_16 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.horizontalLayout_2.addItem(self.horizontalSpacer_8)
+        self.horizontalLayout_13.addItem(self.horizontalSpacer_16)
 
-        self.labelSignalShape = QLabel(self.frame)
-        self.labelSignalShape.setObjectName(u"labelSignalShape")
+        self.line_13 = QFrame(self.frame)
+        self.line_13.setObjectName(u"line_13")
+        self.line_13.setFrameShape(QFrame.VLine)
+        self.line_13.setFrameShadow(QFrame.Sunken)
 
-        self.horizontalLayout_2.addWidget(self.labelSignalShape)
+        self.horizontalLayout_13.addWidget(self.line_13)
 
-        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.labelOriginalSigShape = QLabel(self.frame)
+        self.labelOriginalSigShape.setObjectName(u"labelOriginalSigShape")
 
-        self.horizontalLayout_2.addItem(self.horizontalSpacer_5)
+        self.horizontalLayout_13.addWidget(self.labelOriginalSigShape)
 
+        self.label_18 = QLabel(self.frame)
+        self.label_18.setObjectName(u"label_18")
 
-        self.verticalLayout_4.addLayout(self.horizontalLayout_2)
+        self.horizontalLayout_13.addWidget(self.label_18)
 
+        self.labelNewSignalShape = QLabel(self.frame)
+        self.labelNewSignalShape.setObjectName(u"labelNewSignalShape")
 
-        self.verticalLayout_6.addLayout(self.verticalLayout_4)
+        self.horizontalLayout_13.addWidget(self.labelNewSignalShape)
 
+        self.horizontalLayout_13.setStretch(0, 1)
+        self.horizontalLayout_13.setStretch(1, 2)
+        self.horizontalLayout_13.setStretch(4, 1)
+        self.horizontalLayout_13.setStretch(6, 1)
 
-        self.verticalLayout.addLayout(self.verticalLayout_6)
+        self.verticalLayout.addLayout(self.horizontalLayout_13)
 
         self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -587,7 +592,6 @@ class Ui_HISetupDialog(object):
 
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
 
-        QWidget.setTabOrder(self.comboBoxBinning, self.spinBoxBands)
         QWidget.setTabOrder(self.spinBoxBands, self.horizontalSliderRho)
         QWidget.setTabOrder(self.horizontalSliderRho, self.lineEditColorKey)
         QWidget.setTabOrder(self.lineEditColorKey, self.tableWidgetPhase)
@@ -612,11 +616,10 @@ class Ui_HISetupDialog(object):
         HISetupDialog.setWindowTitle(QCoreApplication.translate("HISetupDialog", u"Hough Indexing", None))
         self.label_10.setText(QCoreApplication.translate("HISetupDialog", u"Signal", None))
         self.checkBoxLazy.setText(QCoreApplication.translate("HISetupDialog", u"Lazy loading of patterns", None))
-        self.label_7.setText(QCoreApplication.translate("HISetupDialog", u"Binning", None))
-#if QT_CONFIG(tooltip)
-        self.comboBoxBinning.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Detector binning, i.e. how many pixels are binned into one, default is no binning</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.labelSignalShape.setText(QCoreApplication.translate("HISetupDialog", u"Signal shape: (00x00)", None))
+        self.label_15.setText(QCoreApplication.translate("HISetupDialog", u"Binning", None))
+        self.labelOriginalSigShape.setText(QCoreApplication.translate("HISetupDialog", u"(x, y)", None))
+        self.label_18.setText(QCoreApplication.translate("HISetupDialog", u"<p> &rarr; </p>", None))
+        self.labelNewSignalShape.setText(QCoreApplication.translate("HISetupDialog", u"(x, y)", None))
         self.label_11.setText(QCoreApplication.translate("HISetupDialog", u"Hough Transform", None))
         self.label_9.setText(QCoreApplication.translate("HISetupDialog", u"Number of bands", None))
 #if QT_CONFIG(tooltip)

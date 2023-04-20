@@ -26,7 +26,7 @@ class Ui_RefineSetupDialog(object):
     def setupUi(self, RefineSetupDialog):
         if not RefineSetupDialog.objectName():
             RefineSetupDialog.setObjectName(u"RefineSetupDialog")
-        RefineSetupDialog.resize(825, 703)
+        RefineSetupDialog.resize(825, 657)
         self.gridLayout = QGridLayout(RefineSetupDialog)
         self.gridLayout.setObjectName(u"gridLayout")
         self.frame = QFrame(RefineSetupDialog)
@@ -73,8 +73,10 @@ class Ui_RefineSetupDialog(object):
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
         self.labelSignalPath = QLabel(self.frame)
         self.labelSignalPath.setObjectName(u"labelSignalPath")
-        self.labelSignalPath.setStyleSheet(u"font: italic 8pt \"Courier\";\n"
-"color: rgb(127, 127, 127);")
+        font1 = QFont()
+        font1.setItalic(True)
+        self.labelSignalPath.setFont(font1)
+        self.labelSignalPath.setStyleSheet(u"color: rgb(127, 127, 127);")
 
         self.horizontalLayout_12.addWidget(self.labelSignalPath)
 
@@ -364,8 +366,11 @@ class Ui_RefineSetupDialog(object):
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.labelXmapPath = QLabel(self.frame)
         self.labelXmapPath.setObjectName(u"labelXmapPath")
-        self.labelXmapPath.setStyleSheet(u"font: italic 8pt \"Courier\";\n"
-"color: rgb(127, 127, 127);")
+        font2 = QFont()
+        font2.setBold(False)
+        font2.setItalic(True)
+        self.labelXmapPath.setFont(font2)
+        self.labelXmapPath.setStyleSheet(u"color: rgb(127, 127, 127);")
 
         self.horizontalLayout_5.addWidget(self.labelXmapPath)
 
@@ -455,29 +460,29 @@ class Ui_RefineSetupDialog(object):
         self.tableWidgetPhase = QTableWidget(self.frame)
         if (self.tableWidgetPhase.columnCount() < 5):
             self.tableWidgetPhase.setColumnCount(5)
-        font1 = QFont()
-        font1.setPointSize(8)
-        font1.setBold(False)
+        font3 = QFont()
+        font3.setPointSize(8)
+        font3.setBold(False)
         __qtablewidgetitem2 = QTableWidgetItem()
-        __qtablewidgetitem2.setFont(font1);
+        __qtablewidgetitem2.setFont(font3);
         self.tableWidgetPhase.setHorizontalHeaderItem(0, __qtablewidgetitem2)
         __qtablewidgetitem3 = QTableWidgetItem()
-        __qtablewidgetitem3.setFont(font1);
+        __qtablewidgetitem3.setFont(font3);
         self.tableWidgetPhase.setHorizontalHeaderItem(1, __qtablewidgetitem3)
-        font2 = QFont()
-        font2.setPointSize(9)
-        __qtablewidgetitem4 = QTableWidgetItem()
-        __qtablewidgetitem4.setFont(font2);
-        self.tableWidgetPhase.setHorizontalHeaderItem(2, __qtablewidgetitem4)
-        font3 = QFont()
-        font3.setPointSize(7)
-        __qtablewidgetitem5 = QTableWidgetItem()
-        __qtablewidgetitem5.setFont(font3);
-        self.tableWidgetPhase.setHorizontalHeaderItem(3, __qtablewidgetitem5)
         font4 = QFont()
-        font4.setPointSize(8)
+        font4.setPointSize(9)
+        __qtablewidgetitem4 = QTableWidgetItem()
+        __qtablewidgetitem4.setFont(font4);
+        self.tableWidgetPhase.setHorizontalHeaderItem(2, __qtablewidgetitem4)
+        font5 = QFont()
+        font5.setPointSize(7)
+        __qtablewidgetitem5 = QTableWidgetItem()
+        __qtablewidgetitem5.setFont(font5);
+        self.tableWidgetPhase.setHorizontalHeaderItem(3, __qtablewidgetitem5)
+        font6 = QFont()
+        font6.setPointSize(8)
         __qtablewidgetitem6 = QTableWidgetItem()
-        __qtablewidgetitem6.setFont(font4);
+        __qtablewidgetitem6.setFont(font6);
         self.tableWidgetPhase.setHorizontalHeaderItem(4, __qtablewidgetitem6)
         self.tableWidgetPhase.setObjectName(u"tableWidgetPhase")
         self.tableWidgetPhase.setMinimumSize(QSize(250, 50))

@@ -247,9 +247,7 @@ class AppWindow(QMainWindow):
             )
             self.settingsDialog.exec()
         except Exception as e:
-            self.console.errorwrite(
-                f"Could not initialize settings dialog:\n{str(e)}\n"
-            )
+            raise e
 
         # TODO: This whole thing should be changed to inside AdvancedSettingsDialog, and should only be executed when ok is pressed
         # updates file browser to changes:
@@ -269,9 +267,7 @@ class AppWindow(QMainWindow):
             self.refineDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.refineDialog.exec()
         except Exception as e:
-            self.console.errorwrite(
-                f"Could not initialize refinement dialog:\n{str(e)}\n"
-            )
+            raise e
 
     def selectProcessing(self):
         try:
@@ -283,16 +279,13 @@ class AppWindow(QMainWindow):
             )
             self.processingDialog.exec()
         except Exception as e:
-            self.console.errorwrite(
-                f"Could not initialize processing dialog:\n{str(e)}\n"
-            )
+            raise e
 
     def selectROI(self):
         try:
             plt.close("all")
         except Exception as e:
-            print(e)
-            pass
+            self.console.errorwrite(e)
         try:
             self.ROIDialog = RegionOfInteresDialog(
                 parent=self, pattern_path=self.getSelectedPath()
@@ -300,7 +293,7 @@ class AppWindow(QMainWindow):
             self.ROIDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.ROIDialog.exec()
         except Exception as e:
-            self.console.errorwrite(f"Could not initialize ROI dialog:\n{str(e)}\n")
+            raise e
 
     def selectSignalNavigation(self, signal_path: str):
         try:
@@ -316,9 +309,7 @@ class AppWindow(QMainWindow):
                 dlg.setStandardButtons(QMessageBox.Ok)
                 dlg.setIcon(QMessageBox.Warning)
                 dlg.exec()
-            self.console.errorwrite(
-                f"Could not initialize signal navigation:\n{str(e.with_traceback(None))}\n"
-            )
+            raise e
 
     def selectDictionaryIndexingSetup(self, pattern_path: str):
         try:
@@ -326,9 +317,7 @@ class AppWindow(QMainWindow):
             self.diSetup.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.diSetup.show()
         except Exception as e:
-            self.console.errorwrite(
-                f"Could not initialize dictionary indexing:\n{str(e)}\n"
-            )
+            raise e
 
     def selectHoughIndexingSetup(self, pattern_path: str):
         try:
@@ -336,7 +325,7 @@ class AppWindow(QMainWindow):
             self.hiSetup.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.hiSetup.show()
         except Exception as e:
-            self.console.errorwrite(f"Could not initialize hough indexing:\n{str(e)}\n")
+            raise e
 
     def selectPatternCenter(self):
         try:
@@ -348,9 +337,7 @@ class AppWindow(QMainWindow):
             )
             self.patternCenter.show()
         except Exception as e:
-            self.console.errorwrite(
-                f"Could not initialize pattern center refinement:\n{str(e)}\n"
-            )
+            raise e
 
     def showImage(self, image_path):
         try:
