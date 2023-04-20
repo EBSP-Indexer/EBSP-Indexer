@@ -26,7 +26,7 @@ class Ui_DiSetupDialog(object):
     def setupUi(self, DiSetupDialog):
         if not DiSetupDialog.objectName():
             DiSetupDialog.setObjectName(u"DiSetupDialog")
-        DiSetupDialog.resize(918, 501)
+        DiSetupDialog.resize(950, 501)
         self.gridLayout_4 = QGridLayout(DiSetupDialog)
         self.gridLayout_4.setObjectName(u"gridLayout_4")
         self.centralwidget = QFrame(DiSetupDialog)
@@ -45,7 +45,8 @@ class Ui_DiSetupDialog(object):
         self.label_9 = QLabel(self.centralwidget)
         self.label_9.setObjectName(u"label_9")
         font = QFont()
-        font.setFamilies([u"Courier"])
+        font.setPointSize(10)
+        font.setBold(True)
         self.label_9.setFont(font)
 
         self.verticalLayout_4.addWidget(self.label_9)

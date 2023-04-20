@@ -131,22 +131,22 @@ class SystemExplorerWidget(QWidget):
         if platform.system().lower() == "windows":
             startfile(txt_path)
 
-    def revealInExplorer(self, revealed_path):
+    def revealInExplorer(revealed_path):
         if path.isdir(revealed_path):
             webbrowser.open(revealed_path)
         elif path.isfile(revealed_path):
             webbrowser.open(path.dirname(revealed_path))
 
     def displayDeleteWarning(self, deletion_path):
-        msg = QMessageBox(self)
-        msg.setWindowTitle("Delete Information")
-        msg.setIcon(QMessageBox.Information)
-        msg.setText(
-            f"Are you sure you want to permentantly delete '{path.basename(deletion_path)}'?"
+        reply = QMessageBox.question(
+            self,
+            f"Delete {path.basename(deletion_path)}",
+            f"Are you sure you want to permentantly delete '{path.basename(deletion_path)}'?",
+            QMessageBox.Yes | QMessageBox.Cancel,
+            QMessageBox.No,  # Default button
         )
-        msg.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
-        msg.accepted.connect(lambda: self.deleteSelected(deletion_path))
-        msg.exec()
+        if reply == QMessageBox.Yes:
+            self.deleteSelected(deletion_path)
 
     def deleteSelected(self, deletion_path):
         if path.isdir(deletion_path):

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>764</width>
-    <height>427</height>
+    <width>861</width>
+    <height>445</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -221,6 +221,11 @@
              <string>Z</string>
             </property>
            </column>
+           <column>
+            <property name="text">
+             <string>Occupancy</string>
+            </property>
+           </column>
            <item row="0" column="0">
             <property name="text">
              <string/>
@@ -239,6 +244,11 @@
            <item row="0" column="3">
             <property name="text">
              <string>0</string>
+            </property>
+           </item>
+           <item row="0" column="4">
+            <property name="text">
+             <string>1</string>
             </property>
            </item>
           </widget>
@@ -279,7 +289,7 @@
           <number>90</number>
          </attribute>
          <attribute name="horizontalHeaderStretchLastSection">
-          <bool>true</bool>
+          <bool>false</bool>
          </attribute>
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
@@ -324,7 +334,32 @@
          </column>
          <item row="0" column="0">
           <property name="text">
-           <string/>
+           <string>1</string>
+          </property>
+         </item>
+         <item row="0" column="1">
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item row="0" column="2">
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item row="0" column="3">
+          <property name="text">
+           <string>90</string>
+          </property>
+         </item>
+         <item row="0" column="4">
+          <property name="text">
+           <string>90</string>
+          </property>
+         </item>
+         <item row="0" column="5">
+          <property name="text">
+           <string>90</string>
           </property>
          </item>
         </widget>
