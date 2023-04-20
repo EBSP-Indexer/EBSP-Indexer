@@ -439,9 +439,9 @@ class PatterCenterDialog(QDialog):
                 if self.program_settings.read("Individual PC data") == "True":
                     self.setting_file.write("Calibration PC"+str(i), str([round(x, 4),round(y, 4), round(z, 4)]))
 
-        x_average = x_sum/n
-        y_average = y_sum/n
-        z_average = z_sum/n
+        x_average = round(x_sum/n, 4)
+        y_average = round(y_sum/n, 4)
+        z_average = round(z_sum/n, 4)
 
         self.setting_file.write("Convention", self.convention)       
         # self.setting_file.write("X star", f"{x_average:.4}")
