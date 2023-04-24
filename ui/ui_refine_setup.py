@@ -18,15 +18,15 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QAbstractButton, QAbstractItemView, QApplication, QCheckBox,
     QComboBox, QDialog, QDialogButtonBox, QDoubleSpinBox,
     QFrame, QGridLayout, QHBoxLayout, QHeaderView,
-    QLabel, QLineEdit, QPushButton, QSizePolicy,
-    QSpacerItem, QTableWidget, QTableWidgetItem, QVBoxLayout,
-    QWidget)
+    QLabel, QLineEdit, QPushButton, QRadioButton,
+    QSizePolicy, QSpacerItem, QTableWidget, QTableWidgetItem,
+    QVBoxLayout, QWidget)
 
 class Ui_RefineSetupDialog(object):
     def setupUi(self, RefineSetupDialog):
         if not RefineSetupDialog.objectName():
             RefineSetupDialog.setObjectName(u"RefineSetupDialog")
-        RefineSetupDialog.resize(825, 657)
+        RefineSetupDialog.resize(848, 641)
         self.gridLayout = QGridLayout(RefineSetupDialog)
         self.gridLayout.setObjectName(u"gridLayout")
         self.frame = QFrame(RefineSetupDialog)
@@ -124,42 +124,57 @@ class Ui_RefineSetupDialog(object):
 
         self.verticalLayout_4.addWidget(self.checkBoxMask)
 
-        self.label_7 = QLabel(self.frame)
-        self.label_7.setObjectName(u"label_7")
-        self.label_7.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
-
-        self.verticalLayout_4.addWidget(self.label_7)
-
-        self.comboBoxBinning = QComboBox(self.frame)
-        self.comboBoxBinning.setObjectName(u"comboBoxBinning")
-        self.comboBoxBinning.setMaximumSize(QSize(80, 16777215))
-        self.comboBoxBinning.setLayoutDirection(Qt.LeftToRight)
-
-        self.verticalLayout_4.addWidget(self.comboBoxBinning)
-
-        self.horizontalLayout_2 = QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
-
-        self.horizontalLayout_2.addItem(self.horizontalSpacer_9)
-
-        self.labelSignalShape = QLabel(self.frame)
-        self.labelSignalShape.setObjectName(u"labelSignalShape")
-
-        self.horizontalLayout_2.addWidget(self.labelSignalShape)
-
-        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_2.addItem(self.horizontalSpacer_5)
-
-
-        self.verticalLayout_4.addLayout(self.horizontalLayout_2)
-
 
         self.verticalLayout_6.addLayout(self.verticalLayout_4)
 
 
         self.verticalLayout.addLayout(self.verticalLayout_6)
+
+        self.horizontalLayout_14 = QHBoxLayout()
+        self.horizontalLayout_14.setSpacing(6)
+        self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
+        self.label_15 = QLabel(self.frame)
+        self.label_15.setObjectName(u"label_15")
+
+        self.horizontalLayout_14.addWidget(self.label_15)
+
+        self.comboBoxBinning = QComboBox(self.frame)
+        self.comboBoxBinning.setObjectName(u"comboBoxBinning")
+
+        self.horizontalLayout_14.addWidget(self.comboBoxBinning)
+
+        self.horizontalSpacer_16 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_14.addItem(self.horizontalSpacer_16)
+
+        self.line_13 = QFrame(self.frame)
+        self.line_13.setObjectName(u"line_13")
+        self.line_13.setFrameShape(QFrame.VLine)
+        self.line_13.setFrameShadow(QFrame.Sunken)
+
+        self.horizontalLayout_14.addWidget(self.line_13)
+
+        self.labelOriginalSignalShape = QLabel(self.frame)
+        self.labelOriginalSignalShape.setObjectName(u"labelOriginalSignalShape")
+
+        self.horizontalLayout_14.addWidget(self.labelOriginalSignalShape)
+
+        self.label_18 = QLabel(self.frame)
+        self.label_18.setObjectName(u"label_18")
+
+        self.horizontalLayout_14.addWidget(self.label_18)
+
+        self.labelNewSignalShape = QLabel(self.frame)
+        self.labelNewSignalShape.setObjectName(u"labelNewSignalShape")
+
+        self.horizontalLayout_14.addWidget(self.labelNewSignalShape)
+
+        self.horizontalLayout_14.setStretch(0, 1)
+        self.horizontalLayout_14.setStretch(1, 2)
+        self.horizontalLayout_14.setStretch(4, 1)
+        self.horizontalLayout_14.setStretch(6, 1)
+
+        self.verticalLayout.addLayout(self.horizontalLayout_14)
 
         self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -374,63 +389,127 @@ class Ui_RefineSetupDialog(object):
 
         self.horizontalLayout_5.addWidget(self.labelXmapPath)
 
-        self.horizontalSpacer_11 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_5.addItem(self.horizontalSpacer_11)
-
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_5)
 
-        self.layoutIndexData = QHBoxLayout()
-        self.layoutIndexData.setObjectName(u"layoutIndexData")
         self.labelIndexDataStatus = QLabel(self.frame)
         self.labelIndexDataStatus.setObjectName(u"labelIndexDataStatus")
         self.labelIndexDataStatus.setStyleSheet(u"color: rgb(255, 0, 0);")
 
-        self.layoutIndexData.addWidget(self.labelIndexDataStatus)
+        self.verticalLayout_2.addWidget(self.labelIndexDataStatus)
 
-        self.horizontalSpacer_12 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.layoutIndexData.addItem(self.horizontalSpacer_12)
-
+        self.layoutIndexData = QHBoxLayout()
+        self.layoutIndexData.setObjectName(u"layoutIndexData")
 
         self.verticalLayout_2.addLayout(self.layoutIndexData)
 
+        self.horizontalLayout_7 = QHBoxLayout()
+        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
+        self.verticalLayout_9 = QVBoxLayout()
+        self.verticalLayout_9.setSpacing(2)
+        self.verticalLayout_9.setObjectName(u"verticalLayout_9")
+        self.pushButtonLoadXmap = QPushButton(self.frame)
+        self.pushButtonLoadXmap.setObjectName(u"pushButtonLoadXmap")
+        self.pushButtonLoadXmap.setEnabled(True)
+
+        self.verticalLayout_9.addWidget(self.pushButtonLoadXmap)
+
+        self.pushButtonAddXmap = QPushButton(self.frame)
+        self.pushButtonAddXmap.setObjectName(u"pushButtonAddXmap")
+        self.pushButtonAddXmap.setEnabled(False)
+
+        self.verticalLayout_9.addWidget(self.pushButtonAddXmap)
+
+        self.pushButtonRemoveXmap = QPushButton(self.frame)
+        self.pushButtonRemoveXmap.setObjectName(u"pushButtonRemoveXmap")
+        self.pushButtonRemoveXmap.setEnabled(False)
+
+        self.verticalLayout_9.addWidget(self.pushButtonRemoveXmap)
+
+        self.verticalSpacer_19 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_9.addItem(self.verticalSpacer_19)
+
+        self.verticalLayout_9.setStretch(3, 1)
+
+        self.horizontalLayout_7.addLayout(self.verticalLayout_9)
+
         self.tableWidgetXmap = QTableWidget(self.frame)
-        if (self.tableWidgetXmap.columnCount() < 2):
-            self.tableWidgetXmap.setColumnCount(2)
+        if (self.tableWidgetXmap.columnCount() < 3):
+            self.tableWidgetXmap.setColumnCount(3)
         __qtablewidgetitem = QTableWidgetItem()
         self.tableWidgetXmap.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
         self.tableWidgetXmap.setHorizontalHeaderItem(1, __qtablewidgetitem1)
+        __qtablewidgetitem2 = QTableWidgetItem()
+        self.tableWidgetXmap.setHorizontalHeaderItem(2, __qtablewidgetitem2)
         self.tableWidgetXmap.setObjectName(u"tableWidgetXmap")
-        self.tableWidgetXmap.setSelectionMode(QAbstractItemView.NoSelection)
+        self.tableWidgetXmap.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidgetXmap.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidgetXmap.horizontalHeader().setDefaultSectionSize(100)
         self.tableWidgetXmap.horizontalHeader().setStretchLastSection(True)
+        self.tableWidgetXmap.verticalHeader().setVisible(False)
         self.tableWidgetXmap.verticalHeader().setStretchLastSection(True)
 
-        self.verticalLayout_2.addWidget(self.tableWidgetXmap)
+        self.horizontalLayout_7.addWidget(self.tableWidgetXmap)
 
-        self.horizontalLayout_9 = QHBoxLayout()
-        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
-        self.horizontalSpacer_19 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalLayout_7.setStretch(1, 1)
 
-        self.horizontalLayout_9.addItem(self.horizontalSpacer_19)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_7)
 
-        self.pushButtonLoadXmap = QPushButton(self.frame)
-        self.pushButtonLoadXmap.setObjectName(u"pushButtonLoadXmap")
+        self.horizontalLayout_6 = QHBoxLayout()
+        self.horizontalLayout_6.setSpacing(14)
+        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
+        self.label_13 = QLabel(self.frame)
+        self.label_13.setObjectName(u"label_13")
 
-        self.horizontalLayout_9.addWidget(self.pushButtonLoadXmap)
+        self.horizontalLayout_6.addWidget(self.label_13)
 
-        self.horizontalSpacer_20 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.radioButtonSingleXmap = QRadioButton(self.frame)
+        self.radioButtonSingleXmap.setObjectName(u"radioButtonSingleXmap")
+        self.radioButtonSingleXmap.setEnabled(True)
+        self.radioButtonSingleXmap.setCheckable(True)
+        self.radioButtonSingleXmap.setChecked(True)
 
-        self.horizontalLayout_9.addItem(self.horizontalSpacer_20)
+        self.horizontalLayout_6.addWidget(self.radioButtonSingleXmap)
+
+        self.radioButtonMultipleXmap = QRadioButton(self.frame)
+        self.radioButtonMultipleXmap.setObjectName(u"radioButtonMultipleXmap")
+        self.radioButtonMultipleXmap.setEnabled(True)
+        self.radioButtonMultipleXmap.setCheckable(True)
+
+        self.horizontalLayout_6.addWidget(self.radioButtonMultipleXmap)
+
+        self.horizontalSpacer_13 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_6.addItem(self.horizontalSpacer_13)
 
 
-        self.verticalLayout_2.addLayout(self.horizontalLayout_9)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_6)
 
         self.verticalSpacer_10 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_2.addItem(self.verticalSpacer_10)
+
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalSpacer_9 = QSpacerItem(120, 0, QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_9)
+
+        self.checkBoxData = QCheckBox(self.frame)
+        self.checkBoxData.setObjectName(u"checkBoxData")
+        self.checkBoxData.setEnabled(True)
+        self.checkBoxData.setChecked(False)
+
+        self.horizontalLayout_2.addWidget(self.checkBoxData)
+
+        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_5)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_2)
 
         self.line_19 = QFrame(self.frame)
         self.line_19.setObjectName(u"line_19")
@@ -457,41 +536,41 @@ class Ui_RefineSetupDialog(object):
 
         self.verticalLayout_2.addWidget(self.label)
 
-        self.tableWidgetPhase = QTableWidget(self.frame)
-        if (self.tableWidgetPhase.columnCount() < 5):
-            self.tableWidgetPhase.setColumnCount(5)
+        self.tableWidgetMP = QTableWidget(self.frame)
+        if (self.tableWidgetMP.columnCount() < 5):
+            self.tableWidgetMP.setColumnCount(5)
         font3 = QFont()
         font3.setPointSize(8)
         font3.setBold(False)
-        __qtablewidgetitem2 = QTableWidgetItem()
-        __qtablewidgetitem2.setFont(font3);
-        self.tableWidgetPhase.setHorizontalHeaderItem(0, __qtablewidgetitem2)
         __qtablewidgetitem3 = QTableWidgetItem()
         __qtablewidgetitem3.setFont(font3);
-        self.tableWidgetPhase.setHorizontalHeaderItem(1, __qtablewidgetitem3)
+        self.tableWidgetMP.setHorizontalHeaderItem(0, __qtablewidgetitem3)
+        __qtablewidgetitem4 = QTableWidgetItem()
+        __qtablewidgetitem4.setFont(font3);
+        self.tableWidgetMP.setHorizontalHeaderItem(1, __qtablewidgetitem4)
         font4 = QFont()
         font4.setPointSize(9)
-        __qtablewidgetitem4 = QTableWidgetItem()
-        __qtablewidgetitem4.setFont(font4);
-        self.tableWidgetPhase.setHorizontalHeaderItem(2, __qtablewidgetitem4)
+        __qtablewidgetitem5 = QTableWidgetItem()
+        __qtablewidgetitem5.setFont(font4);
+        self.tableWidgetMP.setHorizontalHeaderItem(2, __qtablewidgetitem5)
         font5 = QFont()
         font5.setPointSize(7)
-        __qtablewidgetitem5 = QTableWidgetItem()
-        __qtablewidgetitem5.setFont(font5);
-        self.tableWidgetPhase.setHorizontalHeaderItem(3, __qtablewidgetitem5)
+        __qtablewidgetitem6 = QTableWidgetItem()
+        __qtablewidgetitem6.setFont(font5);
+        self.tableWidgetMP.setHorizontalHeaderItem(3, __qtablewidgetitem6)
         font6 = QFont()
         font6.setPointSize(8)
-        __qtablewidgetitem6 = QTableWidgetItem()
-        __qtablewidgetitem6.setFont(font6);
-        self.tableWidgetPhase.setHorizontalHeaderItem(4, __qtablewidgetitem6)
-        self.tableWidgetPhase.setObjectName(u"tableWidgetPhase")
-        self.tableWidgetPhase.setMinimumSize(QSize(250, 50))
-        self.tableWidgetPhase.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.tableWidgetPhase.horizontalHeader().setDefaultSectionSize(90)
-        self.tableWidgetPhase.horizontalHeader().setStretchLastSection(True)
-        self.tableWidgetPhase.verticalHeader().setStretchLastSection(False)
+        __qtablewidgetitem7 = QTableWidgetItem()
+        __qtablewidgetitem7.setFont(font6);
+        self.tableWidgetMP.setHorizontalHeaderItem(4, __qtablewidgetitem7)
+        self.tableWidgetMP.setObjectName(u"tableWidgetMP")
+        self.tableWidgetMP.setMinimumSize(QSize(250, 100))
+        self.tableWidgetMP.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidgetMP.horizontalHeader().setDefaultSectionSize(90)
+        self.tableWidgetMP.horizontalHeader().setStretchLastSection(True)
+        self.tableWidgetMP.verticalHeader().setStretchLastSection(False)
 
-        self.verticalLayout_2.addWidget(self.tableWidgetPhase)
+        self.verticalLayout_2.addWidget(self.tableWidgetMP)
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
@@ -604,29 +683,27 @@ class Ui_RefineSetupDialog(object):
 
         self.verticalLayout_2.addItem(self.verticalSpacer)
 
-        self.verticalLayout_2.setStretch(17, 1)
+        self.verticalLayout_2.setStretch(19, 1)
 
         self.gridLayout_3.addLayout(self.verticalLayout_2, 2, 3, 1, 1)
 
         self.gridLayout_3.setRowStretch(0, 2)
         self.gridLayout_3.setRowStretch(3, 2)
         self.gridLayout_3.setColumnStretch(0, 2)
-        self.gridLayout_3.setColumnStretch(3, 2)
+        self.gridLayout_3.setColumnStretch(3, 3)
 
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
 
         QWidget.setTabOrder(self.checkBoxLazy, self.checkBoxMask)
-        QWidget.setTabOrder(self.checkBoxMask, self.comboBoxBinning)
-        QWidget.setTabOrder(self.comboBoxBinning, self.comboBoxMethod)
+        QWidget.setTabOrder(self.checkBoxMask, self.comboBoxMethod)
         QWidget.setTabOrder(self.comboBoxMethod, self.lineEditRefKwargs)
         QWidget.setTabOrder(self.lineEditRefKwargs, self.checkBoxOrientation)
         QWidget.setTabOrder(self.checkBoxOrientation, self.lineEditColorKey)
         QWidget.setTabOrder(self.lineEditColorKey, self.checkBoxPhase)
         QWidget.setTabOrder(self.checkBoxPhase, self.checkBoxNCC)
-        QWidget.setTabOrder(self.checkBoxNCC, self.tableWidgetXmap)
-        QWidget.setTabOrder(self.tableWidgetXmap, self.pushButtonLoadXmap)
-        QWidget.setTabOrder(self.pushButtonLoadXmap, self.tableWidgetPhase)
-        QWidget.setTabOrder(self.tableWidgetPhase, self.pushButtonLoadMP)
+        QWidget.setTabOrder(self.checkBoxNCC, self.pushButtonLoadXmap)
+        QWidget.setTabOrder(self.pushButtonLoadXmap, self.tableWidgetMP)
+        QWidget.setTabOrder(self.tableWidgetMP, self.pushButtonLoadMP)
         QWidget.setTabOrder(self.pushButtonLoadMP, self.pushButtonRemoveMP)
         QWidget.setTabOrder(self.pushButtonRemoveMP, self.patternCenterX)
         QWidget.setTabOrder(self.patternCenterX, self.patternCenterY)
@@ -638,22 +715,24 @@ class Ui_RefineSetupDialog(object):
         self.buttonBox.accepted.connect(RefineSetupDialog.accept)
         self.checkBoxOrientation.toggled.connect(self.lineEditColorKey.setVisible)
         self.checkBoxOrientation.toggled.connect(self.labelColorKey.setVisible)
+        self.radioButtonMultipleXmap.toggled.connect(self.pushButtonRemoveXmap.setEnabled)
+        self.radioButtonMultipleXmap.toggled.connect(self.checkBoxData.setDisabled)
+        self.radioButtonMultipleXmap.toggled.connect(self.pushButtonAddXmap.setEnabled)
 
         QMetaObject.connectSlotsByName(RefineSetupDialog)
     # setupUi
 
     def retranslateUi(self, RefineSetupDialog):
-        RefineSetupDialog.setWindowTitle(QCoreApplication.translate("RefineSetupDialog", u"Refine Crystal Map", None))
+        RefineSetupDialog.setWindowTitle(QCoreApplication.translate("RefineSetupDialog", u"Refine Crystal Map Orientations", None))
         self.label_10.setText(QCoreApplication.translate("RefineSetupDialog", u"Signal", None))
         self.labelSignalPath.setText(QCoreApplication.translate("RefineSetupDialog", u"Signal path", None))
         self.labelNavigationShape.setText(QCoreApplication.translate("RefineSetupDialog", u"Navigation shape: (00x00)", None))
         self.checkBoxLazy.setText(QCoreApplication.translate("RefineSetupDialog", u"Lazy loading of patterns", None))
         self.checkBoxMask.setText(QCoreApplication.translate("RefineSetupDialog", u"Apply circular mask to patterns ", None))
-        self.label_7.setText(QCoreApplication.translate("RefineSetupDialog", u"Binning", None))
-#if QT_CONFIG(tooltip)
-        self.comboBoxBinning.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Detector binning, i.e. how many pixels are binned into one, default is no binning</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.labelSignalShape.setText(QCoreApplication.translate("RefineSetupDialog", u"Signal shape: (00x00)", None))
+        self.label_15.setText(QCoreApplication.translate("RefineSetupDialog", u"Binning", None))
+        self.labelOriginalSignalShape.setText(QCoreApplication.translate("RefineSetupDialog", u"(x, y)", None))
+        self.label_18.setText(QCoreApplication.translate("RefineSetupDialog", u"<p> &rarr; </p>", None))
+        self.labelNewSignalShape.setText(QCoreApplication.translate("RefineSetupDialog", u"(x, y)", None))
         self.label_11.setText(QCoreApplication.translate("RefineSetupDialog", u"Refinement", None))
         self.label_9.setText(QCoreApplication.translate("RefineSetupDialog", u"Method", None))
         self.comboBoxMethod.setItemText(0, QCoreApplication.translate("RefineSetupDialog", u"ln_neldermead", None))
@@ -685,33 +764,47 @@ class Ui_RefineSetupDialog(object):
         self.label_16.setText(QCoreApplication.translate("RefineSetupDialog", u"Crystal Map", None))
         self.labelXmapPath.setText(QCoreApplication.translate("RefineSetupDialog", u"No crystal map loaded", None))
         self.labelIndexDataStatus.setText(QCoreApplication.translate("RefineSetupDialog", u"No available index data", None))
-        ___qtablewidgetitem = self.tableWidgetXmap.horizontalHeaderItem(0)
-        ___qtablewidgetitem.setText(QCoreApplication.translate("RefineSetupDialog", u"Name", None));
-        ___qtablewidgetitem1 = self.tableWidgetXmap.horizontalHeaderItem(1)
-        ___qtablewidgetitem1.setText(QCoreApplication.translate("RefineSetupDialog", u"Orientations", None));
 #if QT_CONFIG(tooltip)
         self.pushButtonLoadXmap.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Add phase from master pattern (*.h5)</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.pushButtonLoadXmap.setText(QCoreApplication.translate("RefineSetupDialog", u"Load", None))
+#if QT_CONFIG(tooltip)
+        self.pushButtonAddXmap.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Add phase from master pattern (*.h5)</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.pushButtonAddXmap.setText(QCoreApplication.translate("RefineSetupDialog", u"Add", None))
+#if QT_CONFIG(tooltip)
+        self.pushButtonRemoveXmap.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Add phase from master pattern (*.h5)</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.pushButtonRemoveXmap.setText(QCoreApplication.translate("RefineSetupDialog", u"Remove", None))
+        ___qtablewidgetitem = self.tableWidgetXmap.horizontalHeaderItem(0)
+        ___qtablewidgetitem.setText(QCoreApplication.translate("RefineSetupDialog", u"Map Name", None));
+        ___qtablewidgetitem1 = self.tableWidgetXmap.horizontalHeaderItem(1)
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("RefineSetupDialog", u"Phase", None));
+        ___qtablewidgetitem2 = self.tableWidgetXmap.horizontalHeaderItem(2)
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("RefineSetupDialog", u"Orientations", None));
+        self.label_13.setText(QCoreApplication.translate("RefineSetupDialog", u"Orientations from:", None))
+        self.radioButtonSingleXmap.setText(QCoreApplication.translate("RefineSetupDialog", u"Single Crystal Map", None))
+        self.radioButtonMultipleXmap.setText(QCoreApplication.translate("RefineSetupDialog", u"Multiple Crystal Maps", None))
+        self.checkBoxData.setText(QCoreApplication.translate("RefineSetupDialog", u"Use Index Data", None))
         self.label_14.setText(QCoreApplication.translate("RefineSetupDialog", u"Detector", None))
         self.label.setText(QCoreApplication.translate("RefineSetupDialog", u"Master Patterns", None))
-        ___qtablewidgetitem2 = self.tableWidgetPhase.horizontalHeaderItem(0)
-        ___qtablewidgetitem2.setText(QCoreApplication.translate("RefineSetupDialog", u"Name", None));
-        ___qtablewidgetitem3 = self.tableWidgetPhase.horizontalHeaderItem(1)
-        ___qtablewidgetitem3.setText(QCoreApplication.translate("RefineSetupDialog", u"Number", None));
-        ___qtablewidgetitem4 = self.tableWidgetPhase.horizontalHeaderItem(2)
-        ___qtablewidgetitem4.setText(QCoreApplication.translate("RefineSetupDialog", u"ISS", None));
+        ___qtablewidgetitem3 = self.tableWidgetMP.horizontalHeaderItem(0)
+        ___qtablewidgetitem3.setText(QCoreApplication.translate("RefineSetupDialog", u"Name", None));
+        ___qtablewidgetitem4 = self.tableWidgetMP.horizontalHeaderItem(1)
+        ___qtablewidgetitem4.setText(QCoreApplication.translate("RefineSetupDialog", u"Number", None));
+        ___qtablewidgetitem5 = self.tableWidgetMP.horizontalHeaderItem(2)
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("RefineSetupDialog", u"ISS", None));
 #if QT_CONFIG(tooltip)
-        ___qtablewidgetitem4.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"International short symbol", None));
+        ___qtablewidgetitem5.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"International short symbol", None));
 #endif // QT_CONFIG(tooltip)
-        ___qtablewidgetitem5 = self.tableWidgetPhase.horizontalHeaderItem(3)
-        ___qtablewidgetitem5.setText(QCoreApplication.translate("RefineSetupDialog", u"Crystal System", None));
-        ___qtablewidgetitem6 = self.tableWidgetPhase.horizontalHeaderItem(4)
-        ___qtablewidgetitem6.setText(QCoreApplication.translate("RefineSetupDialog", u"Color", None));
+        ___qtablewidgetitem6 = self.tableWidgetMP.horizontalHeaderItem(3)
+        ___qtablewidgetitem6.setText(QCoreApplication.translate("RefineSetupDialog", u"Crystal System", None));
+        ___qtablewidgetitem7 = self.tableWidgetMP.horizontalHeaderItem(4)
+        ___qtablewidgetitem7.setText(QCoreApplication.translate("RefineSetupDialog", u"Color", None));
 #if QT_CONFIG(tooltip)
         self.pushButtonLoadMP.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Add phase from master pattern (*.h5)</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
-        self.pushButtonLoadMP.setText(QCoreApplication.translate("RefineSetupDialog", u"Load", None))
+        self.pushButtonLoadMP.setText(QCoreApplication.translate("RefineSetupDialog", u"Add", None))
 #if QT_CONFIG(tooltip)
         self.pushButtonRemoveMP.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Remove the selected phase</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)

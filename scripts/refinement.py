@@ -2,7 +2,7 @@ import json
 import warnings
 from datetime import date
 from os import path
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Tuple
 
 import kikuchipy as kp
 import matplotlib as mpl
@@ -48,46 +48,63 @@ class RefineSetupDialog(QDialog):
         )
         self.program_settings = SettingFile("advanced_settings.txt")
         self.pattern_path = ""
-        self.xmap_path = ""
+        self.s_energy = 20  # kV
+        self.data_path = ""
+        self.xmaps = {}
+        self.master_patterns = {}
+        self.mp_paths = {}
+        self.phases = PhaseList()
         self.ui = Ui_RefineSetupDialog()
         self.ui.setupUi(self)
         self.setWindowTitle(f"{self.windowTitle()} - {file_path}")
         self.fileBrowserOF = FileBrowser(
-            mode=FileBrowser.OpenFile, filter_name="Hierarchical Data Format (*.h5);"
+            mode=FileBrowser.OpenFile,
+            dirpath=self.working_dir,
+            filter_name="Hierarchical Data Format (*.h5);",
         )
-        self.fileBrowserOF.setDefaultDir(self.working_dir)
-        # Load file
+        # Try loading file as EBSD or LazyEBSD
         try:
             try:
                 s_prew = kp.load(file_path, lazy=True)
                 if isinstance(s_prew, (EBSD, LazyEBSD)):
                     self.pattern_path = file_path
-            except:
-                xmap = io.load(file_path)
-                if isinstance(xmap, (CrystalMap)):
-                    self.xmap_path = file_path
+                    self.s_energy = (
+                        s_prew.metadata.Acquisition_instrument.SEM.beam_energy
+                    )
+                else:
+                    raise ValueError("File selected does not contain a siganl")
+            except Exception as e:
+                raise e
+        # Try loading file as CrystalMap
+        except:
+            try:
+                xmap_prew = io.load(file_path)
+                if isinstance(xmap_prew, (CrystalMap)):
+                    self.load_crystal_maps(file_path)
                     if parameter_file is None:
-                        print(
+                        raise Exception(
                             "No indexing parameters associated with selected crystal map"
                         )
-                        raise Exception
                     self.pattern_path = path.join(
                         self.working_dir, parameter_file.read("Pattern name")
                     )
-                    self.load_crystal_map(self.xmap_path)
+                    # Try loading signal from path found in parameter file
                     try:
                         s_prew = kp.load(self.pattern_path)
+                        self.s_energy = (
+                            s_prew.metadata.Acquisition_instrument.SEM.beam_energy
+                        )
                     except Exception as e:
                         print("Could not load patterns associated with crystal map")
                         raise e
-        except Exception as e:
-            raise e
+                else:
+                    raise ValueError("File does not contain a Crystal Map")
+            except Exception as e:
+                raise e
         self.ui.labelNavigationShape.setText(
             f"Navigation shape: {str(s_prew.axes_manager.navigation_shape[::-1])}"
         )
         self.binnings = self.getBinningShapes(s_prew)
-        self.mp_paths = {}
-        self.phases = PhaseList()
         self.colors = [
             "blue",
             "orange",
@@ -97,7 +114,6 @@ class RefineSetupDialog(QDialog):
 
         self.setupConnections()
         self.load_parameters()
-        self.setAvailableButtons()
 
         # Matplotlib configuration
         mpl.use("agg")
@@ -106,17 +122,26 @@ class RefineSetupDialog(QDialog):
 
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_refinement())
-        self.ui.buttonBox.rejected.connect(lambda: self.reject())
         self.ui.pushButtonLoadMP.clicked.connect(lambda: self.load_master_pattern())
         self.ui.pushButtonRemoveMP.clicked.connect(lambda: self.remove_master_pattern())
-        self.ui.pushButtonLoadXmap.clicked.connect(lambda: self.load_crystal_map())
+        self.ui.pushButtonLoadXmap.clicked.connect(lambda: self.load_crystal_maps())
+        self.ui.pushButtonAddXmap.clicked.connect(
+            lambda: self.load_crystal_maps(clear_first=False)
+        )
+        self.ui.pushButtonRemoveXmap.clicked.connect(lambda: self.remove_crystal_maps())
         self.ui.comboBoxBinning.currentTextChanged.connect(
-            lambda: self.ui.labelSignalShape.setText(
-                f"Signal Shape: {self.binnings[self.ui.comboBoxBinning.currentText()]}"
+            lambda: self.ui.labelNewSignalShape.setText(
+                f"{self.binnings[self.ui.comboBoxBinning.currentText()]} px"
             )
         )
         self.ui.comboBoxBinning.addItems(self.binnings.keys())
         self.ui.labelSignalPath.setText(self.pattern_path)
+        self.ui.radioButtonMultipleXmap.toggled.connect(
+            lambda: self.setAvailableButtons()
+        )
+        self.ui.radioButtonMultipleXmap.toggled.connect(
+            lambda: self.clear_crystal_maps()
+        )
 
     def getOptions(self) -> dict:
         return {
@@ -133,6 +158,9 @@ class RefineSetupDialog(QDialog):
                 self.save_ipf_map,
             ],
             "ckey_direction": self.ui.lineEditColorKey.text(),
+            "data": self.ui.checkBoxData.isChecked(),
+            "multiple": self.ui.radioButtonMultipleXmap.isChecked(),
+            "single": self.ui.radioButtonSingleXmap.isChecked(),
             "convention": self.ui.comboBoxConvention.currentText().lower(),
             "pc": (
                 self.ui.patternCenterX.value(),
@@ -150,13 +178,17 @@ class RefineSetupDialog(QDialog):
         except:
             convention = self.program_settings.read("Convention")
         self.ui.comboBoxConvention.setCurrentText(convention)
-        pc_params = (self.ui.patternCenterX, self.ui.patternCenterY, self.ui.patternCenterZ)
+        pc_params = (
+            self.ui.patternCenterX,
+            self.ui.patternCenterY,
+            self.ui.patternCenterZ,
+        )
         try:
             pc = eval(self.setting_file.read("PC"))
-            for i, param in enumerate(pc_params): 
+            for i, param in enumerate(pc_params):
                 param.setValue(float(pc[i]))
         except:
-            for param in pc_params: 
+            for param in pc_params:
                 param.setValue(0.5)
         try:
             self.colors = json.loads(self.program_settings.read("Colors"))
@@ -200,47 +232,130 @@ class RefineSetupDialog(QDialog):
     #     self.setting_file.write("Binning", options["binning"])
     #     self.setting_file.save()
 
-    def load_crystal_map(self, xmap_path: Optional[str] = None):
+    def available_index_data(path: str) -> str:
+        """
+        Returns the path of the available index data.
+        If no path is found, retuns an empty string.
+        """
+        parameter_file: SettingFile = get_setting_file_bottom_top(
+            path, "indexing_parameters.txt"
+        )
+        if parameter_file is not None:
+            try:
+                return parameter_file.read("data_path")
+            except:
+                pass
+        return ""
+
+    def clear_crystal_maps(self):
+        self.xmaps = {}
+        self.xmap_path = "No crystal map loaded"
+        self.data_path = ""
+        self.updateCrystalMapTable()
+
+    def load_crystal_maps(self, xmap_path: Optional[str] = None, clear_first=True):
         if xmap_path is not None:
-            self.xmap_path = xmap_path
-            self.xmap_name = path.basename(self.xmap_path)
-            self.xmap_dir = path.dirname(self.xmap_path)
-            xmap = io.load(xmap_path)
-            self.updateCrystalMapTable(xmap)
-        elif self.fileBrowserOF.getFile():
-            self.xmap_path = self.fileBrowserOF.getPaths()[0]
-            self.xmap_name = path.basename(self.xmap_path)
-            self.xmap_dir = path.dirname(self.xmap_path)
-            xmap = io.load(self.xmap_path)
-            self.updateCrystalMapTable(xmap)
+            try:
+                xmap_name = path.basename(xmap_path)
+                self.xmaps[f"{xmap_name}"] = io.load(xmap_path)
+                self.xmap_dir = path.dirname(xmap_path)
+                self.xmap_path = xmap_path
+                self.data_path = RefineSetupDialog.available_index_data(xmap_path)
+            except Exception as e:
+                raise e
+            self.updateCrystalMapTable()
+            return
+        if self.ui.radioButtonMultipleXmap.isChecked():
+            self.fileBrowserOF.setMode(FileBrowser.OpenFiles)
+        else:
+            self.fileBrowserOF.setMode(FileBrowser.OpenFile)
+        if self.fileBrowserOF.getFile():
+            if clear_first:
+                self.clear_crystal_maps()
+            for temp_path in self.fileBrowserOF.getPaths():
+                try:
+                    xmap_name = path.basename(temp_path)
+                    self.xmaps[f"{xmap_name}"] = io.load(temp_path)
+                    self.xmap_dir = path.dirname(self.xmap_path)
+                    self.xmap_path = temp_path
+                    self.data_path = RefineSetupDialog.available_index_data(
+                        self.xmap_path
+                    )
+                except Exception as e:
+                    raise e
+            self.updateCrystalMapTable()
+            return
+
+    def remove_crystal_maps(self):
+        xmapTable = self.ui.tableWidgetXmap
+        indexes = xmapTable.selectionModel().selectedRows()
+        # countRow = len(indexes)
+        def getRow(qIndex):
+            return qIndex.row()
+        indexes.sort(key=getRow, reverse=True)
+        for modelIndex in indexes:
+            print(modelIndex.row())
+            xmap_name = xmapTable.item(modelIndex.row(), 0).text()
+            xmapTable.removeRow(modelIndex.row())
+            self.xmaps.pop(xmap_name)
+            for row in range(xmapTable.rowCount()):
+                if xmapTable.itemAt(row, 0).text() == xmap_name:
+                    xmapTable.removeRow(row)
+        # for i in range(countRow, 0, -1):
+        #     xmap_name = xmapTable.item(indexes[i - 1].row(), 0).text()
+        #     xmapTable.removeRow(indexes[i - 1].row())
+        #     self.xmaps.pop(xmap_name)
+        #     # Delete additional rows which include the xmap name
+        #     for row in range(xmapTable.rowCount()):
+        #         if xmapTable.itemAt(row, 0).text() == xmap_name:
+        #             xmapTable.removeRow(row)
+        self.updateCrystalMapTable()
+        self.setAvailableButtons()
 
     def load_master_pattern(self, mp_path: Optional[str] = None):
         if mp_path is not None:
             try:
-                mp: LazyEBSDMasterPattern = kp.load(mp_path, lazy=True)
+                mp: LazyEBSDMasterPattern = kp.load(
+                    mp_path,
+                    energy=self.s_energy,
+                    projection="lambert",
+                    hemisphere="upper",
+                    lazy=True,
+                )
                 if mp.phase.name == "":
                     mp.phase.name = path.dirname(mp_path).split("/").pop()
-                self.phases.add(mp.phase)
-                mp.phase.color = self.colors[len(self.phases.ids) - 1]
-                self.mp_paths[mp.phase.name] = mp_path
+                # self.phases.add(mp.phase)
+                mp.phase.color = self.colors[len(self.master_patterns.keys())]
+                self.master_patterns[mp.phase.name] = mp
+                # self.mp_paths[mp.phase.name] = mp_path
             except Exception as e:
-                print("Phase could not be loaded from master pattern", e)
-            self.updatePhaseTable()
-        elif self.fileBrowserOF.getFile():
+                raise e
+            self.updateMasterPatternTable()
+            return
+        self.fileBrowserOF.setMode(FileBrowser.OpenFiles)
+        if self.fileBrowserOF.getFile():
             mp_paths = self.fileBrowserOF.getPaths()
             for mp_path in mp_paths:
                 try:
-                    mp: LazyEBSDMasterPattern = kp.load(mp_path, lazy=True)
+                    mp: LazyEBSDMasterPattern = kp.load(
+                        mp_path,
+                        energy=self.s_energy,
+                        projection="lambert",
+                        hemisphere="upper",
+                        lazy=True,
+                    )
                     if mp.phase.name == "":
                         mp.phase.name = path.dirname(mp_path).split("/").pop()
-                    self.phases.add(mp.phase)
-                    mp.phase.color = self.colors[len(self.phases.ids) - 1]
-                    self.mp_paths[mp.phase.name] = mp_path
+                    # self.phases.add(mp.phase)
+                    mp.phase.color = self.colors[len(self.master_patterns.keys())]
+                    self.master_patterns[mp.phase.name] = mp
+                    # self.mp_paths[mp.phase.name] = mp_path
                 except Exception as e:
-                    print("Phase could not be loaded from master pattern", e)
-            self.updatePhaseTable()
+                    raise e
+            self.updateMasterPatternTable()
+            return
 
-    def updatePhaseTable(self):
+    def updateMasterPatternTable(self):
         """
         NAME_COL = 0
         NUMBER_COL = 1
@@ -248,42 +363,51 @@ class RefineSetupDialog(QDialog):
         CRYSTAL_COL = 3
         COLOR_COL = 4
         """
-        phasesTable = self.ui.tableWidgetPhase
-        phasesTable.setRowCount(len(self.phases.ids))
+        tableMP = self.ui.tableWidgetMP
+        tableMP.setRowCount(len(self.master_patterns.keys()))
         row = 0
-        for _, phase in self.phases:
-            sg = phase.space_group
+        for mp in self.master_patterns.values():
+            sg = mp.phase.space_group
             entries = [
-                phase.name,
+                mp.phase.name,
                 sg.number,
                 sg.short_name,
                 sg.crystal_system,
-                phase.color,
+                mp.phase.color,
             ]
             for col, entry in enumerate(entries):
                 item = QTableWidgetItem(str(entry))
                 item.setFlags(item.flags() ^ Qt.ItemIsEditable)
-                phasesTable.setItem(row, col, item)
+                tableMP.setItem(row, col, item)
             row += 1
         self.setAvailableButtons()
 
-    def updateCrystalMapTable(self, xmap: CrystalMap):
-        self.ui.labelXmapPath.setText(self.xmap_path)
+    def updateCrystalMapTable(self):
+        if self.ui.radioButtonMultipleXmap.isChecked():
+            self.ui.labelXmapPath.setText("Multiple crystal maps")
+        else:
+            self.ui.labelXmapPath.setText(self.xmap_path)
         xmapTable = self.ui.tableWidgetXmap
-        xmapTable.setRowCount(len(xmap.phases.ids))
-        xmapTable.setVerticalHeaderLabels(
-            [f"P{i}" for i in range(len(xmap.phases.ids))]
-        )
+        row_count = 0
+        for xmap in self.xmaps.values():
+            row_count += len(xmap.phases.ids)
+        xmapTable.setRowCount(row_count)
         row = 0
-        for _, phase in xmap.phases:
-            phase_amount = xmap[f"{phase.name}"].size / xmap.size
-            entries = [phase.name, f"{xmap[f'{phase.name}'].size} ({phase_amount:.1%})"]
-            for col, entry in enumerate(entries):
-                item = QTableWidgetItem(str(entry))
-                item.setFlags(item.flags() ^ Qt.ItemIsEditable)
-                xmapTable.setItem(row, col, item)
-            row += 1
-        if path.exists(path.join(self.xmap_dir, "index_data.npy")):
+        for xmap_name, xmap in self.xmaps.items():
+            for _, phase in xmap.phases:
+                phase_amount = xmap[f"{phase.name}"].size / xmap.size
+                entries = [
+                    xmap_name,
+                    phase.name,
+                    f"{xmap[f'{phase.name}'].size} ({phase_amount:.1%})",
+                ]
+                print(entries)
+                for col, entry in enumerate(entries):
+                    item = QTableWidgetItem(str(entry))
+                    item.setFlags(item.flags() ^ Qt.ItemIsEditable)
+                    xmapTable.setItem(row, col, item)
+                row += 1
+        if len(self.data_path):
             self.ui.labelIndexDataStatus.setStyleSheet("QLabel { color : green; }")
             self.ui.labelIndexDataStatus.setText("Index data available")
         else:
@@ -292,15 +416,28 @@ class RefineSetupDialog(QDialog):
         self.setAvailableButtons()
 
     def remove_master_pattern(self):
-        phaseTable = self.ui.tableWidgetPhase
-        indexes = phaseTable.selectionModel().selectedRows()
+        tableMP = self.ui.tableWidgetMP
+        indexes = tableMP.selectionModel().selectedRows()
         countRow = len(indexes)
-        for i in range(countRow, 0, -1):
-            phase_key = phaseTable.item(indexes[i - 1].row(), 0).text()
-            self.phases.__delitem__(phase_key)
-            if phase_key in self.mp_paths.keys():
-                self.mp_paths.pop(phase_key)
-            phaseTable.removeRow(indexes[i - 1].row())
+        def getRow(qIndex):
+            return qIndex.row()
+        indexes.sort(key=getRow, reverse=True)
+        for model_index in indexes:
+            print(model_index.row())
+            mp_phase_name = tableMP.item(model_index.row(), 0).text()
+            # self.phases.__delitem__(mp_phase_name)
+            if mp_phase_name in self.master_patterns.keys():
+                self.master_patterns.pop(mp_phase_name)
+                # self.mp_paths.pop(mp_phase_name)
+            tableMP.removeRow(model_index.row())
+        # for i in range(countRow, 0, -1):
+        #     mp_phase_name = tableMP.item(indexes[i - 1].row(), 0).text()
+        #     print(mp_phase_name)
+        #     # self.phases.__delitem__(mp_phase_name)
+        #     if mp_phase_name in self.master_patterns.keys():
+        #         self.master_patterns.pop(mp_phase_name)
+        #         # self.mp_paths.pop(mp_phase_name)
+        #     tableMP.removeRow(indexes[i - 1].row())
         self.setAvailableButtons()
 
     def setAvailableButtons(self):
@@ -308,21 +445,27 @@ class RefineSetupDialog(QDialog):
         phase_map_flag = False
         add_phase_flag = True
         xmap_flag = False
-        n_phases = self.ui.tableWidgetPhase.rowCount()
-        n_xmap = self.ui.tableWidgetXmap.rowCount()
-        if n_phases:
+        index_data = False
+        count_mp = self.ui.tableWidgetMP.rowCount()
+        count_xmap = self.ui.tableWidgetXmap.rowCount()
+        if count_mp:
             ok_flag = True
-            if n_phases > 1:
+            if count_mp > 1:
                 phase_map_flag = True
-        if n_xmap:
+        if count_xmap:
             xmap_flag = True
+        if self.ui.radioButtonSingleXmap.isChecked() and len(self.data_path):
+            index_data = True
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(ok_flag and xmap_flag)
         self.ui.checkBoxPhase.setEnabled(phase_map_flag)
         self.ui.checkBoxPhase.setChecked(phase_map_flag)
         self.ui.pushButtonLoadMP.setEnabled(add_phase_flag)
+        self.ui.checkBoxData.setEnabled(index_data)
+        self.ui.checkBoxData.setChecked(index_data)
 
     def getBinningShapes(self, signal: LazyEBSD) -> dict:
         sig_shape = signal.axes_manager.signal_shape[::-1]
+        self.ui.labelOriginalSignalShape.setText(f"{sig_shape} px")
         binnings: dict = {"None": sig_shape}
         for num in range(2, 17):
             if sig_shape[0] % num == 0 and sig_shape[1] % num == 0:
@@ -332,9 +475,8 @@ class RefineSetupDialog(QDialog):
     def refine_orientations(
         self,
         s: EBSD,
-        xmap: CrystalMap,
-        data: np.ndarray,
-        master_patterns: dict,
+        xmaps: dict[CrystalMap],
+        master_patterns: dict[LazyEBSDMasterPattern],
         options: dict,
     ):
         binning = eval(options["binning"])
@@ -349,9 +491,7 @@ class RefineSetupDialog(QDialog):
         energy: int = s.metadata.Acquisition_instrument.SEM.beam_energy
         nav_shape = s.axes_manager.navigation_shape[::-1]
         step_sizes = (s.axes_manager["x"].scale, s.axes_manager["y"].scale)
-        scan_unit = s.axes_manager[
-            "x"
-        ].units  # Assumes scan unit is the same for y and x
+        scan_unit = s.axes_manager["x"].units  # Assumes same for y and x
         if binning is None:
             binning = 1
         else:
@@ -377,120 +517,171 @@ class RefineSetupDialog(QDialog):
         print(f"Signal shape: {sig_shape}")
         print(f"Circular mask: {mask}")
 
-        ref_xmaps = {}
-        for mp_key, mp in master_patterns.items():
-            phase_id = xmap.phases.id_from_name(mp_key)
-            mp.phase.color = self.colors[phase_id]
+        ref_xmaps = []
+        ref_xmaps_navs = []
+        for mp_phase_name, mp in master_patterns.items():
+            # phase_id = xmap.phases.id_from_name(mp_key)
+            # mp.phase.color = self.colors[phase_id]
             print(f"\nRefining with Master Pattern: {mp.phase.name}")
-            if data is not None:
-                xmap_phase: CrystalMap = kp.indexing.xmap_from_hough_indexing_data(
-                    data=data,
-                    phase_list=self.phases,
-                    data_index=phase_id,
-                    navigation_shape=nav_shape,
-                    step_sizes=step_sizes,
-                    scan_unit=scan_unit,
-                )
-                # Not needed as of Kikuchipy 0.8.4
-                # --------------------------------
-                # if not xmap_phase.all_indexed:
-                #     nav_mask_phase = ~(
-                #         xmap_phase.phase_id == xmap.phases.id_from_name(mp_key)
-                #     )
-                #     nav_mask_phase = nav_mask_phase.reshape(xmap.shape)
-                # else:
-                #     nav_mask_phase = None
-                ref_xmaps[mp_key] = s.refine_orientation(
-                    xmap=xmap_phase,
-                    detector=det,
-                    master_pattern=mp,
-                    energy=energy,
-                    navigation_mask=None,
-                    signal_mask=signal_mask,
-                    trust_region=[1, 1, 1],
-                    method=method,
-                    method_kwargs=ref_kwargs,
-                    compute=True,
-                )
-            else:
-                nav_mask_phase = ~np.logical_or(
-                    xmap.phase_id == xmap.phases.id_from_name(mp_key),
-                    xmap.phase_id == -1,
-                )
-                nav_mask_phase = nav_mask_phase.reshape(xmap.shape)
-                ref_xmaps[mp_key] = s.refine_orientation(
-                    xmap=xmap,
-                    detector=det,
-                    master_pattern=mp,
-                    energy=energy,
-                    navigation_mask=nav_mask_phase,
-                    signal_mask=signal_mask,
-                    trust_region=[1, 1, 1],
-                    method=method,
-                    method_kwargs=ref_kwargs,
-                    compute=True,
-                )
-        ref_xmaps_list = list(ref_xmaps.values())
-        if len(ref_xmaps_list) == 1:
-            ref_xmap = ref_xmaps_list[0]
+            # if options["data"] or options["multiple"]:
+            for xmap in xmaps.values():
+                for phase_id, phase in xmap.phases:
+                    # xmap_phase: CrystalMap = kp.indexing.xmap_from_hough_indexing_data(
+                    #     data=data,
+                    #     phase_list=self.phases,
+                    #     data_index=phase_id,
+                    #     navigation_shape=nav_shape,
+                    #     step_sizes=step_sizes,
+                    #     scan_unit=scan_unit,
+                    # )
+                    # Not needed as of Kikuchipy 0.8.4
+                    # --------------------------------
+                    # if not xmap_phase.all_indexed:
+                    #     nav_mask_phase = ~(
+                    #         xmap_phase.phase_id == xmap.phases.id_from_name(mp_key)
+                    #     )
+                    #     nav_mask_phase = nav_mask_phase.reshape(xmap.shape)
+                    # else:
+                    #     nav_mask_phase = None
+                    if phase.name == mp_phase_name:
+                        nav_mask_phase = ~np.logical_or(
+                            xmap.phase_id == phase_id,
+                            xmap.phase_id == -1,
+                        )
+                        nav_mask_phase = nav_mask_phase.reshape(xmap.shape)
+                        refined_xmap = s.refine_orientation(
+                            xmap=xmap,
+                            detector=det,
+                            master_pattern=mp,
+                            energy=energy,
+                            navigation_mask=nav_mask_phase,
+                            signal_mask=signal_mask,
+                            trust_region=[1, 1, 1],
+                            method=method,
+                            method_kwargs=ref_kwargs,
+                            compute=True,
+                        )
+                        ref_xmaps.append(refined_xmap)
+                        ref_xmaps_navs.append(nav_mask_phase)
+            # else:
+
+            #     ref_xmaps[mp_key] = s.refine_orientation(
+            #         xmap=xmap,
+            #         detector=det,
+            #         master_pattern=mp,
+            #         energy=energy,
+            #         navigation_mask=nav_mask_phase,
+            #         signal_mask=signal_mask,
+            #         trust_region=[1, 1, 1],
+            #         method=method,
+            #         method_kwargs=ref_kwargs,
+            #         compute=True,
+            #     )
+        print("FINISHED REFINED XMAPS:", ref_xmaps)
+        if ref_xmaps[0].rotations_per_point > 1:
+            merge_kwargs = dict(simulation_indices_prop="simulation_indices")
         else:
-            print("Merging crystal maps")
-            ref_xmap = merge_crystal_maps(ref_xmaps_list, scores_prop="scores")
+            merge_kwargs = dict()
+        if len(ref_xmaps) == 1:
+            refined_xmap = ref_xmaps[0]
+        else:
+            refined_xmap = merge_crystal_maps(
+                ref_xmaps,
+                scores_prop="scores",
+                navigation_masks=ref_xmaps_navs,
+                **merge_kwargs,
+            )
+        name = "refined"
+        for _, phase in refined_xmap.phases_in_data:
+            name += f"_{phase.name}"
         io.save(
-            path.join(self.xmap_dir, f"refined_{path.splitext(self.xmap_name)[0]}.h5"),
-            ref_xmap,
+            path.join(self.xmap_dir, f"{name}.h5"),
+            refined_xmap,
         )
         io.save(
-            path.join(self.xmap_dir, f"refined_{path.splitext(self.xmap_name)[0]}.ang"),
-            ref_xmap,
+            path.join(self.xmap_dir, f"{name}.ang"),
+            refined_xmap,
         )
-        print("Result was saved as refined_xmap_hi.ang and refined_xmap_hi.h5")
+        print(f"Result was saved as {name}.ang and {name}.h5")
 
         for key in ["phase", "orientation", "ncc"]:
             optionEnabled, optionExecute = options.get(key)
             if optionEnabled:
                 try:
                     if key == "orientation":
-                        optionExecute(ref_xmap, eval(f"[{options['ckey_direction']}]"))
+                        optionExecute(
+                            refined_xmap, eval(f"[{options['ckey_direction']}]")
+                        )
                     else:
-                        optionExecute(ref_xmap)
+                        optionExecute(refined_xmap)
                 except Exception as e:
                     print(f"Could not save {key}_map:\n{e}")
-        print(f"Finished refining orientations for {self.xmap_name}")
+        print(f"Finished refining orientations")
 
-    def run_refinement(self, override_phases: bool = False):
+    def run_refinement(self):
         options = self.getOptions()
         try:
             s: EBSD = kp.load(self.pattern_path, lazy=options["lazy"])
+            nav_shape = s.axes_manager.navigation_shape[::-1]
+            step_sizes = (s.axes_manager["x"].scale, s.axes_manager["y"].scale)
+            scan_unit = s.axes_manager["x"].units  # Assumes y and x are same
         except Exception as e:
             raise e
-        try:
-            xmap: CrystalMap = io.load(self.xmap_path)
-        except Exception as e:
-            raise e
-        data_path = path.join(self.xmap_dir, "index_data.npy")
-        if path.exists(data_path):
-            index_data = np.load(data_path)
-        else:
-            index_data = None
-        energy: int = s.metadata.Acquisition_instrument.SEM.beam_energy
-        master_patterns = {}
-        for mp_key, mp_path in self.mp_paths.items():
-            mp = kp.load(
-                mp_path,
-                energy=energy,
-                projection="lambert",
-                hemisphere="upper",
-                lazy=options["lazy"],
+
+        # Load the crystal map(s)
+        # if options["data"] or options["single"]:
+        #     try:
+        #         xmap: CrystalMap = io.load(self.xmap_path)
+        #     except Exception as e:
+        #         raise e
+        # elif options["multiple"]:
+        #     try:
+        #         for xmap in self.xmaps:  # TODO xmaps
+        #             pass
+        #     except Exception as e:
+        #         raise e
+
+        # If index data selected, load index_data as multiple xmaps
+        print(options["data"], self.data_path)
+        if options["data"] and path.exists(self.data_path):
+            print("VALUES:",self.xmaps.values())
+            phases = PhaseList(
+                [phase for _, phase in list(self.xmaps.values())[0].phases]
             )
-            if (
-                mp.phase.name == ""
-            ):  # If the master pattern is missing the name of the phase
-                mp.phase.name = path.dirname(mp_path).split("/").pop()
-            master_patterns[mp_key] = mp
-            if not override_phases:
-                if mp_key in xmap.phases_in_data.names:
-                    xmap_phase = xmap.phases_in_data[mp_key]
+            print("PHASES",phases)
+            data = np.load(self.data_path)
+            try:
+                self.xmaps = {}
+                for phase_id, phase in phases:
+                    if phase_id != -1:
+                        xmap: CrystalMap = kp.indexing.xmap_from_hough_indexing_data(
+                            data=data,
+                            phase_list=phases,
+                            data_index=phase_id,
+                            navigation_shape=nav_shape,
+                            step_sizes=step_sizes,
+                            scan_unit=scan_unit,
+                        )
+                        self.xmaps[f"data_{phase.name}"] = xmap
+            except Exception as e:
+                raise e
+        print("XMAPS:",self.xmaps)
+        # energy: int = s.metadata.Acquisition_instrument.SEM.beam_energy
+        # master_patterns = {}
+        for mp_phase_name, mp in self.master_patterns.items():
+            # mp = kp.load(
+            #     mp_path,
+            #     energy=energy,
+            #     projection="lambert",
+            #     hemisphere="upper",
+            #     lazy=options["lazy"],
+            # )
+            # if mp.phase.name == "":
+            #     mp.phase.name = path.dirname(mp_path).split("/").pop()
+            # master_patterns[mp_key] = mp
+            for xmap in self.xmaps.values():
+                if mp_phase_name in xmap.phases_in_data.names:
+                    xmap_phase = xmap.phases_in_data[mp_phase_name]
                     equal_phases, are_different = _equal_phase(mp.phase, xmap_phase)
                     if not equal_phases:
                         if self.promptOverridePhase(
@@ -505,17 +696,21 @@ class RefineSetupDialog(QDialog):
                             continue
                         else:
                             return
+        job_title = "Refine orientations "
+        for xmap in self.xmaps.values():
+            for name in xmap._phases.names:
+                job_title += f"{name}, "
+
         sendToJobManager(
-            job_title=f"Refine orientations {self.xmap_name}",
+            job_title=job_title,
             output_path=self.xmap_dir,
             listview=self.parentWidget().ui.jobList,
             func=self.refine_orientations,
             allow_cleanup=False,
             allow_logging=False,
             s=s,
-            xmap=xmap,
-            data=index_data,
-            master_patterns=master_patterns,
+            xmaps=self.xmaps,
+            master_patterns=self.master_patterns,
             options=options,
         )
 
@@ -525,7 +720,7 @@ class RefineSetupDialog(QDialog):
             "Warning Phase conflict",
             f"{message}\nOverride phase from crystal map with phase from master pattern'?",
             QMessageBox.Yes | QMessageBox.Cancel,
-            QMessageBox.Cancel,
+            QMessageBox.Yes,
         )
         if reply == QMessageBox.Yes:
             return True
