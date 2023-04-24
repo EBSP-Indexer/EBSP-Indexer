@@ -26,7 +26,7 @@ class Ui_HISetupDialog(object):
     def setupUi(self, HISetupDialog):
         if not HISetupDialog.objectName():
             HISetupDialog.setObjectName(u"HISetupDialog")
-        HISetupDialog.resize(905, 624)
+        HISetupDialog.resize(673, 624)
         self.gridLayout = QGridLayout(HISetupDialog)
         self.gridLayout.setObjectName(u"gridLayout")
         self.frame = QFrame(HISetupDialog)
@@ -114,10 +114,10 @@ class Ui_HISetupDialog(object):
 
         self.horizontalLayout_13.addWidget(self.line_13)
 
-        self.labelOriginalSigShape = QLabel(self.frame)
-        self.labelOriginalSigShape.setObjectName(u"labelOriginalSigShape")
+        self.labelOriginalSignalShape = QLabel(self.frame)
+        self.labelOriginalSignalShape.setObjectName(u"labelOriginalSignalShape")
 
-        self.horizontalLayout_13.addWidget(self.labelOriginalSigShape)
+        self.horizontalLayout_13.addWidget(self.labelOriginalSignalShape)
 
         self.label_18 = QLabel(self.frame)
         self.label_18.setObjectName(u"label_18")
@@ -617,7 +617,7 @@ class Ui_HISetupDialog(object):
         self.label_10.setText(QCoreApplication.translate("HISetupDialog", u"Signal", None))
         self.checkBoxLazy.setText(QCoreApplication.translate("HISetupDialog", u"Lazy loading of patterns", None))
         self.label_15.setText(QCoreApplication.translate("HISetupDialog", u"Binning", None))
-        self.labelOriginalSigShape.setText(QCoreApplication.translate("HISetupDialog", u"(x, y)", None))
+        self.labelOriginalSignalShape.setText(QCoreApplication.translate("HISetupDialog", u"(x, y)", None))
         self.label_18.setText(QCoreApplication.translate("HISetupDialog", u"<p> &rarr; </p>", None))
         self.labelNewSignalShape.setText(QCoreApplication.translate("HISetupDialog", u"(x, y)", None))
         self.label_11.setText(QCoreApplication.translate("HISetupDialog", u"Hough Transform", None))
@@ -634,7 +634,7 @@ class Ui_HISetupDialog(object):
 #if QT_CONFIG(tooltip)
         self.checkBoxIndexData.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Whether to save the index data array\u00a0as *.npy in addition to the resulting crystal map, can be used to refine orientations later</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBoxIndexData.setText(QCoreApplication.translate("HISetupDialog", u"Save Index Data", None))
+        self.checkBoxIndexData.setText(QCoreApplication.translate("HISetupDialog", u"Save Index Data as .npy", None))
         self.label_12.setText(QCoreApplication.translate("HISetupDialog", u"Images", None))
 #if QT_CONFIG(tooltip)
         self.checkBoxOrientation.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Orientations are given a color based on which crystal direction &lt;<span style=\" font-style:italic;\">uvw</span>&gt; points in a certain sample direction, producing the so-called inverse pole figure (IPF) map</p></body></html>", None))
