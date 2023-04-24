@@ -54,7 +54,7 @@ class HiSetupDialog(QDialog):
 
         self.setupConnections()
         self.load_parameters()
-        self.checkCriteria()
+        self.setAvailableButtons()
 
         # Matplotlib configuration
         mpl.use("agg")
@@ -294,23 +294,24 @@ class HiSetupDialog(QDialog):
                     item.setBackground(QColor.fromRgbF(*entry))
                 phasesTable.setItem(row, col, item)
             row += 1
-        self.checkCriteria()
+        self.setAvailableButtons()
 
     def remove_phase(self):
         """
-        Removes selected rows from tableWidgetPhase
+        Removes selected rows of phases from tableWidgetPhase
         """
         phaseTable = self.ui.tableWidgetPhase
         indexes = phaseTable.selectionModel().selectedRows()
-        for i in range(len(indexes), 0, -1):
-            phase_key = phaseTable.item(indexes[i - 1].row(), 0).text()
+        indexes.sort(key=lambda qIndex: qIndex.row(), reverse=True)
+        for modelIndex in indexes:
+            phase_key = phaseTable.item(modelIndex.row(), 0).text()
+            phaseTable.removeRow(modelIndex.row())
             self.phases.__delitem__(phase_key)
             if phase_key in self.mp_paths.keys():
                 self.mp_paths.pop(phase_key)
-            phaseTable.removeRow(indexes[i - 1].row())
-        self.checkCriteria()
+        self.updatePhaseTable()
 
-    def checkCriteria(self):
+    def setAvailableButtons(self):
         display_message = False
         message = ""
         ok_flag = False
@@ -389,10 +390,13 @@ class HiSetupDialog(QDialog):
             phase_list=self.phases, indexer=indexer, verbose=0, return_index_data=True
         )
         if options["data"]:
-            np.save(path.join(self.dir_out, "index_data.npy"), data)
+            index_data_path = path.join(self.dir_out, "index_data.npy")
+            np.save(index_data_path, data)
             print(
-                f"Saved index data array to {path.join(self.dir_out, 'index_data.npy')}"
+                f"Saved index data array to {index_data_path}"
             )
+        else:
+            index_data_path = None
         io.save(path.join(self.dir_out, "xmap_hi.h5"), xmap)
         io.save(path.join(self.dir_out, "xmap_hi.ang"), xmap)
         print("Result was saved as xmap_hi.ang and xmap_hi.h5")
@@ -416,6 +420,7 @@ class HiSetupDialog(QDialog):
             convention=options["convention"],
             binning=binning,
             pattern_center=pc,
+            index_data_path=index_data_path
         )
         print(f"Finished indexing {self.pattern_name}")
 
@@ -525,6 +530,7 @@ def log_hi_parameters(
     pattern_center: np.ndarray = None,
     convention: str = "BRUKER",
     binning: int = 1,
+    index_data_path = None
 ):
     """
     Assumes convention is BRUKER for pattern center if none is given
@@ -553,17 +559,16 @@ def log_hi_parameters(
         "Navigation shape (rows, columns)",
         signal.axes_manager.navigation_shape[::-1],
     )
-    if binning == 1:
-        log.write("Binning", None)
-    else:
-        log.write("Binning", binning)
+    binning = None if binning == 1 else binning
+    log.write("Binning", binning)
     log.write("Signal shape (rows, columns)", signal.axes_manager.signal_shape[::-1])
     log.write("Step size", f"{signal.axes_manager[0].scale} um\n")
 
     ### HI parameteres
 
     log.write("kikuchipy version", kp.__version__)
-
+    if index_data_path is not None:
+        log.write("data_path", index_data_path)
     if mp_paths is not None:
         for i, mp_path in enumerate(mp_paths.values(), 1):
             log.write(f"Master pattern path {i}", mp_path)

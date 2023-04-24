@@ -93,7 +93,7 @@ QPushButton:checked {
        <property name="font">
         <font>
          <pointsize>8</pointsize>
-         <weight>9</weight>
+         <weight>50</weight>
          <italic>false</italic>
          <bold>false</bold>
         </font>
@@ -108,6 +108,12 @@ QPushButton:checked {
      </item>
      <item>
       <widget class="QPushButton" name="pushButtonCancel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="toolTip">
         <string>Cancel job</string>
        </property>
@@ -253,6 +259,12 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>pushButtonShow</tabstop>
+  <tabstop>pushButtonCancel</tabstop>
+  <tabstop>pushButtonRemove</tabstop>
+  <tabstop>textBrowserStatus</tabstop>
+ </tabstops>
  <resources>
   <include location="../resources.qrc"/>
  </resources>
