@@ -130,8 +130,8 @@ class SystemExplorerWidget(QWidget):
             self,
             f"Delete {path.basename(deletion_path)}",
             f"Are you sure you want to permentantly delete '{path.basename(deletion_path)}'?",
-            QMessageBox.Yes | QMessageBox.Cancel,
-            QMessageBox.No,  # Default button
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes,  # Default button
         )
         if reply == QMessageBox.Yes:
             self.deleteSelected(deletion_path)
