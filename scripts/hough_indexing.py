@@ -389,10 +389,13 @@ class HiSetupDialog(QDialog):
             phase_list=self.phases, indexer=indexer, verbose=0, return_index_data=True
         )
         if options["data"]:
-            np.save(path.join(self.dir_out, "index_data.npy"), data)
+            index_data_path = path.join(self.dir_out, "index_data.npy")
+            np.save(index_data_path, data)
             print(
-                f"Saved index data array to {path.join(self.dir_out, 'index_data.npy')}"
+                f"Saved index data array to {index_data_path}"
             )
+        else:
+            index_data_path = None
         io.save(path.join(self.dir_out, "xmap_hi.h5"), xmap)
         io.save(path.join(self.dir_out, "xmap_hi.ang"), xmap)
         print("Result was saved as xmap_hi.ang and xmap_hi.h5")
@@ -416,6 +419,7 @@ class HiSetupDialog(QDialog):
             convention=options["convention"],
             binning=binning,
             pattern_center=pc,
+            index_data_path=index_data_path
         )
         print(f"Finished indexing {self.pattern_name}")
 
@@ -525,6 +529,7 @@ def log_hi_parameters(
     pattern_center: np.ndarray = None,
     convention: str = "BRUKER",
     binning: int = 1,
+    index_data_path = None
 ):
     """
     Assumes convention is BRUKER for pattern center if none is given
@@ -553,17 +558,16 @@ def log_hi_parameters(
         "Navigation shape (rows, columns)",
         signal.axes_manager.navigation_shape[::-1],
     )
-    if binning == 1:
-        log.write("Binning", None)
-    else:
-        log.write("Binning", binning)
+    binning = None if binning == 1 else binning
+    log.write("Binning", binning)
     log.write("Signal shape (rows, columns)", signal.axes_manager.signal_shape[::-1])
     log.write("Step size", f"{signal.axes_manager[0].scale} um\n")
 
     ### HI parameteres
 
     log.write("kikuchipy version", kp.__version__)
-
+    if index_data_path is not None:
+        log.write("data_path", index_data_path)
     if mp_paths is not None:
         for i, mp_path in enumerate(mp_paths.values(), 1):
             log.write(f"Master pattern path {i}", mp_path)
