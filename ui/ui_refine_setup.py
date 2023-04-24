@@ -26,7 +26,7 @@ class Ui_RefineSetupDialog(object):
     def setupUi(self, RefineSetupDialog):
         if not RefineSetupDialog.objectName():
             RefineSetupDialog.setObjectName(u"RefineSetupDialog")
-        RefineSetupDialog.resize(848, 641)
+        RefineSetupDialog.resize(842, 641)
         self.gridLayout = QGridLayout(RefineSetupDialog)
         self.gridLayout.setObjectName(u"gridLayout")
         self.frame = QFrame(RefineSetupDialog)
@@ -377,6 +377,62 @@ class Ui_RefineSetupDialog(object):
 
         self.verticalLayout_2.addWidget(self.line_17)
 
+        self.labelIndexDataStatus = QLabel(self.frame)
+        self.labelIndexDataStatus.setObjectName(u"labelIndexDataStatus")
+        self.labelIndexDataStatus.setStyleSheet(u"color: rgb(255, 0, 0);")
+
+        self.verticalLayout_2.addWidget(self.labelIndexDataStatus)
+
+        self.horizontalLayout_6 = QHBoxLayout()
+        self.horizontalLayout_6.setSpacing(14)
+        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
+        self.label_13 = QLabel(self.frame)
+        self.label_13.setObjectName(u"label_13")
+
+        self.horizontalLayout_6.addWidget(self.label_13)
+
+        self.radioButtonSingleXmap = QRadioButton(self.frame)
+        self.radioButtonSingleXmap.setObjectName(u"radioButtonSingleXmap")
+        self.radioButtonSingleXmap.setEnabled(True)
+        self.radioButtonSingleXmap.setCheckable(True)
+        self.radioButtonSingleXmap.setChecked(True)
+
+        self.horizontalLayout_6.addWidget(self.radioButtonSingleXmap)
+
+        self.radioButtonMultipleXmap = QRadioButton(self.frame)
+        self.radioButtonMultipleXmap.setObjectName(u"radioButtonMultipleXmap")
+        self.radioButtonMultipleXmap.setEnabled(True)
+        self.radioButtonMultipleXmap.setCheckable(True)
+
+        self.horizontalLayout_6.addWidget(self.radioButtonMultipleXmap)
+
+        self.horizontalSpacer_13 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_6.addItem(self.horizontalSpacer_13)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_6)
+
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalSpacer_9 = QSpacerItem(190, 0, QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_9)
+
+        self.checkBoxData = QCheckBox(self.frame)
+        self.checkBoxData.setObjectName(u"checkBoxData")
+        self.checkBoxData.setEnabled(True)
+        self.checkBoxData.setChecked(False)
+
+        self.horizontalLayout_2.addWidget(self.checkBoxData)
+
+        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_5)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_2)
+
         self.horizontalLayout_5 = QHBoxLayout()
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.labelXmapPath = QLabel(self.frame)
@@ -391,12 +447,6 @@ class Ui_RefineSetupDialog(object):
 
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_5)
-
-        self.labelIndexDataStatus = QLabel(self.frame)
-        self.labelIndexDataStatus.setObjectName(u"labelIndexDataStatus")
-        self.labelIndexDataStatus.setStyleSheet(u"color: rgb(255, 0, 0);")
-
-        self.verticalLayout_2.addWidget(self.labelIndexDataStatus)
 
         self.layoutIndexData = QHBoxLayout()
         self.layoutIndexData.setObjectName(u"layoutIndexData")
@@ -457,59 +507,9 @@ class Ui_RefineSetupDialog(object):
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_7)
 
-        self.horizontalLayout_6 = QHBoxLayout()
-        self.horizontalLayout_6.setSpacing(14)
-        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
-        self.label_13 = QLabel(self.frame)
-        self.label_13.setObjectName(u"label_13")
-
-        self.horizontalLayout_6.addWidget(self.label_13)
-
-        self.radioButtonSingleXmap = QRadioButton(self.frame)
-        self.radioButtonSingleXmap.setObjectName(u"radioButtonSingleXmap")
-        self.radioButtonSingleXmap.setEnabled(True)
-        self.radioButtonSingleXmap.setCheckable(True)
-        self.radioButtonSingleXmap.setChecked(True)
-
-        self.horizontalLayout_6.addWidget(self.radioButtonSingleXmap)
-
-        self.radioButtonMultipleXmap = QRadioButton(self.frame)
-        self.radioButtonMultipleXmap.setObjectName(u"radioButtonMultipleXmap")
-        self.radioButtonMultipleXmap.setEnabled(True)
-        self.radioButtonMultipleXmap.setCheckable(True)
-
-        self.horizontalLayout_6.addWidget(self.radioButtonMultipleXmap)
-
-        self.horizontalSpacer_13 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_6.addItem(self.horizontalSpacer_13)
-
-
-        self.verticalLayout_2.addLayout(self.horizontalLayout_6)
-
         self.verticalSpacer_10 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_2.addItem(self.verticalSpacer_10)
-
-        self.horizontalLayout_2 = QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalSpacer_9 = QSpacerItem(120, 0, QSizePolicy.Fixed, QSizePolicy.Minimum)
-
-        self.horizontalLayout_2.addItem(self.horizontalSpacer_9)
-
-        self.checkBoxData = QCheckBox(self.frame)
-        self.checkBoxData.setObjectName(u"checkBoxData")
-        self.checkBoxData.setEnabled(True)
-        self.checkBoxData.setChecked(False)
-
-        self.horizontalLayout_2.addWidget(self.checkBoxData)
-
-        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_2.addItem(self.horizontalSpacer_5)
-
-
-        self.verticalLayout_2.addLayout(self.horizontalLayout_2)
 
         self.line_19 = QFrame(self.frame)
         self.line_19.setObjectName(u"line_19")
@@ -535,6 +535,28 @@ class Ui_RefineSetupDialog(object):
         self.label.setObjectName(u"label")
 
         self.verticalLayout_2.addWidget(self.label)
+
+        self.horizontalLayout_8 = QHBoxLayout()
+        self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
+        self.verticalLayout_10 = QVBoxLayout()
+        self.verticalLayout_10.setSpacing(2)
+        self.verticalLayout_10.setObjectName(u"verticalLayout_10")
+        self.pushButtonLoadMP = QPushButton(self.frame)
+        self.pushButtonLoadMP.setObjectName(u"pushButtonLoadMP")
+
+        self.verticalLayout_10.addWidget(self.pushButtonLoadMP)
+
+        self.pushButtonRemoveMP = QPushButton(self.frame)
+        self.pushButtonRemoveMP.setObjectName(u"pushButtonRemoveMP")
+
+        self.verticalLayout_10.addWidget(self.pushButtonRemoveMP)
+
+        self.horizontalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_10.addItem(self.horizontalSpacer_3)
+
+
+        self.horizontalLayout_8.addLayout(self.verticalLayout_10)
 
         self.tableWidgetMP = QTableWidget(self.frame)
         if (self.tableWidgetMP.columnCount() < 5):
@@ -568,39 +590,13 @@ class Ui_RefineSetupDialog(object):
         self.tableWidgetMP.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tableWidgetMP.horizontalHeader().setDefaultSectionSize(90)
         self.tableWidgetMP.horizontalHeader().setStretchLastSection(True)
+        self.tableWidgetMP.verticalHeader().setVisible(False)
         self.tableWidgetMP.verticalHeader().setStretchLastSection(False)
 
-        self.verticalLayout_2.addWidget(self.tableWidgetMP)
-
-        self.horizontalLayout_3 = QHBoxLayout()
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_3.addItem(self.horizontalSpacer_3)
-
-        self.pushButtonLoadMP = QPushButton(self.frame)
-        self.pushButtonLoadMP.setObjectName(u"pushButtonLoadMP")
-
-        self.horizontalLayout_3.addWidget(self.pushButtonLoadMP)
-
-        self.pushButtonRemoveMP = QPushButton(self.frame)
-        self.pushButtonRemoveMP.setObjectName(u"pushButtonRemoveMP")
-
-        self.horizontalLayout_3.addWidget(self.pushButtonRemoveMP)
-
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_3.addItem(self.horizontalSpacer_2)
+        self.horizontalLayout_8.addWidget(self.tableWidgetMP)
 
 
-        self.verticalLayout_2.addLayout(self.horizontalLayout_3)
-
-        self.line = QFrame(self.frame)
-        self.line.setObjectName(u"line")
-        self.line.setFrameShape(QFrame.HLine)
-        self.line.setFrameShadow(QFrame.Sunken)
-
-        self.verticalLayout_2.addWidget(self.line)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_8)
 
         self.horizontalLayout_13 = QHBoxLayout()
         self.horizontalLayout_13.setSpacing(10)
@@ -683,7 +679,7 @@ class Ui_RefineSetupDialog(object):
 
         self.verticalLayout_2.addItem(self.verticalSpacer)
 
-        self.verticalLayout_2.setStretch(19, 1)
+        self.verticalLayout_2.setStretch(17, 1)
 
         self.gridLayout_3.addLayout(self.verticalLayout_2, 2, 3, 1, 1)
 
@@ -695,17 +691,24 @@ class Ui_RefineSetupDialog(object):
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
 
         QWidget.setTabOrder(self.checkBoxLazy, self.checkBoxMask)
-        QWidget.setTabOrder(self.checkBoxMask, self.comboBoxMethod)
+        QWidget.setTabOrder(self.checkBoxMask, self.comboBoxBinning)
+        QWidget.setTabOrder(self.comboBoxBinning, self.comboBoxMethod)
         QWidget.setTabOrder(self.comboBoxMethod, self.lineEditRefKwargs)
         QWidget.setTabOrder(self.lineEditRefKwargs, self.checkBoxOrientation)
         QWidget.setTabOrder(self.checkBoxOrientation, self.lineEditColorKey)
         QWidget.setTabOrder(self.lineEditColorKey, self.checkBoxPhase)
         QWidget.setTabOrder(self.checkBoxPhase, self.checkBoxNCC)
-        QWidget.setTabOrder(self.checkBoxNCC, self.pushButtonLoadXmap)
-        QWidget.setTabOrder(self.pushButtonLoadXmap, self.tableWidgetMP)
-        QWidget.setTabOrder(self.tableWidgetMP, self.pushButtonLoadMP)
+        QWidget.setTabOrder(self.checkBoxNCC, self.radioButtonSingleXmap)
+        QWidget.setTabOrder(self.radioButtonSingleXmap, self.radioButtonMultipleXmap)
+        QWidget.setTabOrder(self.radioButtonMultipleXmap, self.checkBoxData)
+        QWidget.setTabOrder(self.checkBoxData, self.pushButtonLoadXmap)
+        QWidget.setTabOrder(self.pushButtonLoadXmap, self.pushButtonAddXmap)
+        QWidget.setTabOrder(self.pushButtonAddXmap, self.pushButtonRemoveXmap)
+        QWidget.setTabOrder(self.pushButtonRemoveXmap, self.tableWidgetXmap)
+        QWidget.setTabOrder(self.tableWidgetXmap, self.pushButtonLoadMP)
         QWidget.setTabOrder(self.pushButtonLoadMP, self.pushButtonRemoveMP)
-        QWidget.setTabOrder(self.pushButtonRemoveMP, self.patternCenterX)
+        QWidget.setTabOrder(self.pushButtonRemoveMP, self.tableWidgetMP)
+        QWidget.setTabOrder(self.tableWidgetMP, self.patternCenterX)
         QWidget.setTabOrder(self.patternCenterX, self.patternCenterY)
         QWidget.setTabOrder(self.patternCenterY, self.patternCenterZ)
         QWidget.setTabOrder(self.patternCenterZ, self.comboBoxConvention)
@@ -762,8 +765,21 @@ class Ui_RefineSetupDialog(object):
 #endif // QT_CONFIG(tooltip)
         self.checkBoxNCC.setText(QCoreApplication.translate("RefineSetupDialog", u"Normalized Cross Correlation Map", None))
         self.label_16.setText(QCoreApplication.translate("RefineSetupDialog", u"Crystal Map", None))
-        self.labelXmapPath.setText(QCoreApplication.translate("RefineSetupDialog", u"No crystal map loaded", None))
         self.labelIndexDataStatus.setText(QCoreApplication.translate("RefineSetupDialog", u"No available index data", None))
+        self.label_13.setText(QCoreApplication.translate("RefineSetupDialog", u"Crystal Map Orientations from:", None))
+#if QT_CONFIG(tooltip)
+        self.radioButtonSingleXmap.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Refine orientations from a single crystal map. Should be used on Crystal Maps with only one phase. </p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.radioButtonSingleXmap.setText(QCoreApplication.translate("RefineSetupDialog", u"Single File", None))
+#if QT_CONFIG(tooltip)
+        self.radioButtonMultipleXmap.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Refine orientations from multiple crystal maps to achieve a better merged results. Recommended when there are multiple phases present. </p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.radioButtonMultipleXmap.setText(QCoreApplication.translate("RefineSetupDialog", u"Multiple Files", None))
+#if QT_CONFIG(tooltip)
+        self.checkBoxData.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Use saved indexing data (*.npy) to include more orientations which will be refined, should be used with multiple phases.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBoxData.setText(QCoreApplication.translate("RefineSetupDialog", u"Use Index Data (Recommended)", None))
+        self.labelXmapPath.setText(QCoreApplication.translate("RefineSetupDialog", u"No crystal map loaded", None))
 #if QT_CONFIG(tooltip)
         self.pushButtonLoadXmap.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Add phase from master pattern (*.h5)</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
@@ -782,12 +798,16 @@ class Ui_RefineSetupDialog(object):
         ___qtablewidgetitem1.setText(QCoreApplication.translate("RefineSetupDialog", u"Phase", None));
         ___qtablewidgetitem2 = self.tableWidgetXmap.horizontalHeaderItem(2)
         ___qtablewidgetitem2.setText(QCoreApplication.translate("RefineSetupDialog", u"Orientations", None));
-        self.label_13.setText(QCoreApplication.translate("RefineSetupDialog", u"Orientations from:", None))
-        self.radioButtonSingleXmap.setText(QCoreApplication.translate("RefineSetupDialog", u"Single Crystal Map", None))
-        self.radioButtonMultipleXmap.setText(QCoreApplication.translate("RefineSetupDialog", u"Multiple Crystal Maps", None))
-        self.checkBoxData.setText(QCoreApplication.translate("RefineSetupDialog", u"Use Index Data", None))
         self.label_14.setText(QCoreApplication.translate("RefineSetupDialog", u"Detector", None))
         self.label.setText(QCoreApplication.translate("RefineSetupDialog", u"Master Patterns", None))
+#if QT_CONFIG(tooltip)
+        self.pushButtonLoadMP.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Add phase from master pattern (*.h5)</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.pushButtonLoadMP.setText(QCoreApplication.translate("RefineSetupDialog", u"Add", None))
+#if QT_CONFIG(tooltip)
+        self.pushButtonRemoveMP.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Remove the selected phase</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.pushButtonRemoveMP.setText(QCoreApplication.translate("RefineSetupDialog", u"Remove", None))
         ___qtablewidgetitem3 = self.tableWidgetMP.horizontalHeaderItem(0)
         ___qtablewidgetitem3.setText(QCoreApplication.translate("RefineSetupDialog", u"Name", None));
         ___qtablewidgetitem4 = self.tableWidgetMP.horizontalHeaderItem(1)
@@ -801,14 +821,6 @@ class Ui_RefineSetupDialog(object):
         ___qtablewidgetitem6.setText(QCoreApplication.translate("RefineSetupDialog", u"Crystal System", None));
         ___qtablewidgetitem7 = self.tableWidgetMP.horizontalHeaderItem(4)
         ___qtablewidgetitem7.setText(QCoreApplication.translate("RefineSetupDialog", u"Color", None));
-#if QT_CONFIG(tooltip)
-        self.pushButtonLoadMP.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Add phase from master pattern (*.h5)</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.pushButtonLoadMP.setText(QCoreApplication.translate("RefineSetupDialog", u"Add", None))
-#if QT_CONFIG(tooltip)
-        self.pushButtonRemoveMP.setToolTip(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Remove the selected phase</p></body></html>", None))
-#endif // QT_CONFIG(tooltip)
-        self.pushButtonRemoveMP.setText(QCoreApplication.translate("RefineSetupDialog", u"Remove", None))
         self.label_2.setText(QCoreApplication.translate("RefineSetupDialog", u"Pattern Center", None))
         self.label_3.setText(QCoreApplication.translate("RefineSetupDialog", u"X:", None))
         self.label_4.setText(QCoreApplication.translate("RefineSetupDialog", u"Y:", None))

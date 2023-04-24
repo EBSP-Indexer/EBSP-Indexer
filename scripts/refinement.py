@@ -172,7 +172,9 @@ class RefineSetupDialog(QDialog):
         }
 
     def load_parameters(self):
-        # read current setting from project_settings.txt, advanced_settings.txt
+        """
+        Read current settings from project_settings.txt, advanced_settings.txt
+        """
         try:
             convention = self.setting_file.read("Convention")
         except:
@@ -287,30 +289,20 @@ class RefineSetupDialog(QDialog):
             return
 
     def remove_crystal_maps(self):
+        """
+        Removes selected rows from tableWidgetXmap
+        """
         xmapTable = self.ui.tableWidgetXmap
         indexes = xmapTable.selectionModel().selectedRows()
-        # countRow = len(indexes)
-        def getRow(qIndex):
-            return qIndex.row()
-        indexes.sort(key=getRow, reverse=True)
+        indexes.sort(key=lambda qIndex: qIndex.row(), reverse=True)
         for modelIndex in indexes:
-            print(modelIndex.row())
             xmap_name = xmapTable.item(modelIndex.row(), 0).text()
             xmapTable.removeRow(modelIndex.row())
             self.xmaps.pop(xmap_name)
             for row in range(xmapTable.rowCount()):
                 if xmapTable.itemAt(row, 0).text() == xmap_name:
                     xmapTable.removeRow(row)
-        # for i in range(countRow, 0, -1):
-        #     xmap_name = xmapTable.item(indexes[i - 1].row(), 0).text()
-        #     xmapTable.removeRow(indexes[i - 1].row())
-        #     self.xmaps.pop(xmap_name)
-        #     # Delete additional rows which include the xmap name
-        #     for row in range(xmapTable.rowCount()):
-        #         if xmapTable.itemAt(row, 0).text() == xmap_name:
-        #             xmapTable.removeRow(row)
         self.updateCrystalMapTable()
-        self.setAvailableButtons()
 
     def load_master_pattern(self, mp_path: Optional[str] = None):
         if mp_path is not None:
@@ -401,7 +393,6 @@ class RefineSetupDialog(QDialog):
                     phase.name,
                     f"{xmap[f'{phase.name}'].size} ({phase_amount:.1%})",
                 ]
-                print(entries)
                 for col, entry in enumerate(entries):
                     item = QTableWidgetItem(str(entry))
                     item.setFlags(item.flags() ^ Qt.ItemIsEditable)
@@ -416,28 +407,17 @@ class RefineSetupDialog(QDialog):
         self.setAvailableButtons()
 
     def remove_master_pattern(self):
+        """
+        Removes selected rows of master patterns from tableWidgetMP
+        """
         tableMP = self.ui.tableWidgetMP
         indexes = tableMP.selectionModel().selectedRows()
-        countRow = len(indexes)
-        def getRow(qIndex):
-            return qIndex.row()
-        indexes.sort(key=getRow, reverse=True)
+        indexes.sort(key = lambda qIndex: qIndex.row(), reverse=True)
         for model_index in indexes:
-            print(model_index.row())
             mp_phase_name = tableMP.item(model_index.row(), 0).text()
-            # self.phases.__delitem__(mp_phase_name)
+            tableMP.removeRow(model_index.row())
             if mp_phase_name in self.master_patterns.keys():
                 self.master_patterns.pop(mp_phase_name)
-                # self.mp_paths.pop(mp_phase_name)
-            tableMP.removeRow(model_index.row())
-        # for i in range(countRow, 0, -1):
-        #     mp_phase_name = tableMP.item(indexes[i - 1].row(), 0).text()
-        #     print(mp_phase_name)
-        #     # self.phases.__delitem__(mp_phase_name)
-        #     if mp_phase_name in self.master_patterns.keys():
-        #         self.master_patterns.pop(mp_phase_name)
-        #         # self.mp_paths.pop(mp_phase_name)
-        #     tableMP.removeRow(indexes[i - 1].row())
         self.setAvailableButtons()
 
     def setAvailableButtons(self):
@@ -448,7 +428,7 @@ class RefineSetupDialog(QDialog):
         index_data = False
         count_mp = self.ui.tableWidgetMP.rowCount()
         count_xmap = self.ui.tableWidgetXmap.rowCount()
-        if count_mp:
+        if count_mp and count_mp + 1 >= count_xmap: # + 1 to account for not_indexed
             ok_flag = True
             if count_mp > 1:
                 phase_map_flag = True
@@ -520,29 +500,9 @@ class RefineSetupDialog(QDialog):
         ref_xmaps = []
         ref_xmaps_navs = []
         for mp_phase_name, mp in master_patterns.items():
-            # phase_id = xmap.phases.id_from_name(mp_key)
-            # mp.phase.color = self.colors[phase_id]
             print(f"\nRefining with Master Pattern: {mp.phase.name}")
-            # if options["data"] or options["multiple"]:
             for xmap in xmaps.values():
                 for phase_id, phase in xmap.phases:
-                    # xmap_phase: CrystalMap = kp.indexing.xmap_from_hough_indexing_data(
-                    #     data=data,
-                    #     phase_list=self.phases,
-                    #     data_index=phase_id,
-                    #     navigation_shape=nav_shape,
-                    #     step_sizes=step_sizes,
-                    #     scan_unit=scan_unit,
-                    # )
-                    # Not needed as of Kikuchipy 0.8.4
-                    # --------------------------------
-                    # if not xmap_phase.all_indexed:
-                    #     nav_mask_phase = ~(
-                    #         xmap_phase.phase_id == xmap.phases.id_from_name(mp_key)
-                    #     )
-                    #     nav_mask_phase = nav_mask_phase.reshape(xmap.shape)
-                    # else:
-                    #     nav_mask_phase = None
                     if phase.name == mp_phase_name:
                         nav_mask_phase = ~np.logical_or(
                             xmap.phase_id == phase_id,
@@ -563,21 +523,6 @@ class RefineSetupDialog(QDialog):
                         )
                         ref_xmaps.append(refined_xmap)
                         ref_xmaps_navs.append(nav_mask_phase)
-            # else:
-
-            #     ref_xmaps[mp_key] = s.refine_orientation(
-            #         xmap=xmap,
-            #         detector=det,
-            #         master_pattern=mp,
-            #         energy=energy,
-            #         navigation_mask=nav_mask_phase,
-            #         signal_mask=signal_mask,
-            #         trust_region=[1, 1, 1],
-            #         method=method,
-            #         method_kwargs=ref_kwargs,
-            #         compute=True,
-            #     )
-        print("FINISHED REFINED XMAPS:", ref_xmaps)
         if ref_xmaps[0].rotations_per_point > 1:
             merge_kwargs = dict(simulation_indices_prop="simulation_indices")
         else:
@@ -627,28 +572,10 @@ class RefineSetupDialog(QDialog):
             scan_unit = s.axes_manager["x"].units  # Assumes y and x are same
         except Exception as e:
             raise e
-
-        # Load the crystal map(s)
-        # if options["data"] or options["single"]:
-        #     try:
-        #         xmap: CrystalMap = io.load(self.xmap_path)
-        #     except Exception as e:
-        #         raise e
-        # elif options["multiple"]:
-        #     try:
-        #         for xmap in self.xmaps:  # TODO xmaps
-        #             pass
-        #     except Exception as e:
-        #         raise e
-
-        # If index data selected, load index_data as multiple xmaps
-        print(options["data"], self.data_path)
         if options["data"] and path.exists(self.data_path):
-            print("VALUES:",self.xmaps.values())
             phases = PhaseList(
                 [phase for _, phase in list(self.xmaps.values())[0].phases]
             )
-            print("PHASES",phases)
             data = np.load(self.data_path)
             try:
                 self.xmaps = {}
@@ -665,20 +592,7 @@ class RefineSetupDialog(QDialog):
                         self.xmaps[f"data_{phase.name}"] = xmap
             except Exception as e:
                 raise e
-        print("XMAPS:",self.xmaps)
-        # energy: int = s.metadata.Acquisition_instrument.SEM.beam_energy
-        # master_patterns = {}
         for mp_phase_name, mp in self.master_patterns.items():
-            # mp = kp.load(
-            #     mp_path,
-            #     energy=energy,
-            #     projection="lambert",
-            #     hemisphere="upper",
-            #     lazy=options["lazy"],
-            # )
-            # if mp.phase.name == "":
-            #     mp.phase.name = path.dirname(mp_path).split("/").pop()
-            # master_patterns[mp_key] = mp
             for xmap in self.xmaps.values():
                 if mp_phase_name in xmap.phases_in_data.names:
                     xmap_phase = xmap.phases_in_data[mp_phase_name]
@@ -700,7 +614,6 @@ class RefineSetupDialog(QDialog):
         for xmap in self.xmaps.values():
             for name in xmap._phases.names:
                 job_title += f"{name}, "
-
         sendToJobManager(
             job_title=job_title,
             output_path=self.xmap_dir,
@@ -888,5 +801,4 @@ def log_hi_parameters(
         log.write(
             "Not indexed", f"{xmap['not_indexed'].size} ({not_indexed_percent:.1%})"
         )
-
     log.save()

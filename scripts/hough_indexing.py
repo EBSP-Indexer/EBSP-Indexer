@@ -54,7 +54,7 @@ class HiSetupDialog(QDialog):
 
         self.setupConnections()
         self.load_parameters()
-        self.checkCriteria()
+        self.setAvailableButtons()
 
         # Matplotlib configuration
         mpl.use("agg")
@@ -294,23 +294,24 @@ class HiSetupDialog(QDialog):
                     item.setBackground(QColor.fromRgbF(*entry))
                 phasesTable.setItem(row, col, item)
             row += 1
-        self.checkCriteria()
+        self.setAvailableButtons()
 
     def remove_phase(self):
         """
-        Removes selected rows from tableWidgetPhase
+        Removes selected rows of phases from tableWidgetPhase
         """
         phaseTable = self.ui.tableWidgetPhase
         indexes = phaseTable.selectionModel().selectedRows()
-        for i in range(len(indexes), 0, -1):
-            phase_key = phaseTable.item(indexes[i - 1].row(), 0).text()
+        indexes.sort(key=lambda qIndex: qIndex.row(), reverse=True)
+        for modelIndex in indexes:
+            phase_key = phaseTable.item(modelIndex.row(), 0).text()
+            phaseTable.removeRow(modelIndex.row())
             self.phases.__delitem__(phase_key)
             if phase_key in self.mp_paths.keys():
                 self.mp_paths.pop(phase_key)
-            phaseTable.removeRow(indexes[i - 1].row())
-        self.checkCriteria()
+        self.updatePhaseTable()
 
-    def checkCriteria(self):
+    def setAvailableButtons(self):
         display_message = False
         message = ""
         ok_flag = False
