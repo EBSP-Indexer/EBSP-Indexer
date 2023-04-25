@@ -41,7 +41,7 @@ from kikuchipy import (
     load,
 )  # Import something from kikutchipy to avoid load times during dialog initalizations
 
-import resources_rc # Imports resources in a pythonic way from resources.qrc
+import resources_rc  # Imports resources in a pythonic way from resources.qrc
 from scripts.advanced_settings import AdvancedSettingsDialog
 from scripts.console import Console
 from scripts.dictionary_indexing import DiSetupDialog
@@ -96,7 +96,7 @@ class AppWindow(QMainWindow):
             self.stayOnTopHint = False
 
         self.setupConnections()
-        self.showImage(self.getSelectedPath())
+        self.showImage()
         self.importSettings()
         self.updateActiveJobs()
 
@@ -111,8 +111,11 @@ class AppWindow(QMainWindow):
         self.systemExplorer.pathChanged.connect(
             lambda new_path: self.updateMenuButtons(new_path)
         )
-        self.systemExplorer.pathChanged.connect(
-            lambda new_path: self.showImage(new_path)
+        # self.systemExplorer.pathChanged.connect(
+        #     lambda new_path: self.showImage(new_path)
+        # )
+        self.systemExplorer.requestImageViewer.connect(
+            lambda image_path: self.showImage(image_path)
         )
         self.systemExplorer.requestSignalNavigation.connect(
             lambda signal_path: self.selectSignalNavigation(signal_path)
@@ -186,7 +189,7 @@ class AppWindow(QMainWindow):
                 "Close EBSP Indexer",
                 "Some jobs were not completed.\nAre ydou sure you want to close EBSP Indexer?",
                 QMessageBox.Yes | QMessageBox.No,
-                QMessageBox.No, # Default button
+                QMessageBox.No,  # Default button
             )
             if reply == QMessageBox.Yes:
                 event.accept()
@@ -302,9 +305,7 @@ class AppWindow(QMainWindow):
         try:
             self.signalNavigationWidget.load_dataset(signal_path)
             dw = self.ui.dockWidgetSignalNavigation
-            dw.setWindowTitle(
-                f"Signal Navigation - {os.path.basename(signal_path)}"
-            )
+            dw.setWindowTitle(f"Signal Navigation - {os.path.basename(signal_path)}")
             if dw.isHidden():
                 dw.setVisible(True)
             dw.raise_()
@@ -345,32 +346,29 @@ class AppWindow(QMainWindow):
             self.patternCenter.show()
         except Exception as e:
             raise e
-            
+
     def openPCSelection(self, pattern_path: str):
         try:
             self.PCSelection = PCSelectionDialog(self, pattern_path)
-            self.PCSelection.setWindowFlag(
-                Qt.WindowStaysOnTopHint, self.stayOnTopHint
-            )
+            self.PCSelection.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.PCSelection.show()
         except Exception as e:
             raise e
-    
-    def showImage(self, image_path):
+
+    def showImage(self, image_path: str = ""):
+        imageViewer = self.ui.dockWidgetImageViewer
+        if imageViewer.isHidden():
+            imageViewer.setVisible(True)
+        imageViewer.raise_()
         try:
-            if image_path == None or not os.path.splitext(image_path)[1] in [
-                ".jpg",
-                ".png",
-                ".gif",
-                ".bmp",
-            ]:
-                image = mpimg.imread(resource_path("resources/ebsd_gui.png"))
-                self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer")
-            else:
+            if len(image_path):
                 image = mpimg.imread(resource_path(image_path))
-                self.ui.dockWidgetImageViewer.setWindowTitle(
+                imageViewer.setWindowTitle(
                     f"Image Viewer - {os.path.basename(image_path)}"
                 )
+            else:
+                image = mpimg.imread(resource_path("resources/ebsd_gui.png"))
+                imageViewer.setWindowTitle(f"Image Viewer") 
             self.ui.MplWidget.canvas.ax.clear()
             self.ui.MplWidget.canvas.ax.axis(False)
             self.ui.MplWidget.canvas.ax.imshow(image)
@@ -402,11 +400,11 @@ class AppWindow(QMainWindow):
             kp_enabled = False
         setAvailableMenuActions(kp_enabled)
 
-        # Special case for plotting calibration patterns from Settings.txt
-        if os.path.basename(file_path) == "Setting.txt":
-            self.ui.menuPatternInspection.setEnabled(True)
-            self.ui.actionSignalNavigation.setEnabled(True)
-            self.ui.menuPre_indexing_maps.setEnabled(False)
+        # Special case for plotting calibration patterns from Settings.txt, currently not avaiable
+        # if os.path.basename(file_path) == "Setting.txt":
+        #     self.ui.menuPatternInspection.setEnabled(True)
+        #     self.ui.actionSignalNavigation.setEnabled(True)
+        #     self.ui.menuPre_indexing_maps.setEnabled(False)
 
     # TODO Move removeWorker and updateActiveJobs to a jobmanagerlist class
     @Slot(int)
