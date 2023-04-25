@@ -60,7 +60,7 @@ from scripts.region_of_interest import RegionOfInteresDialog
 from scripts.signal_navigation_widget import SignalNavigationWidget
 from scripts.system_explorer import SystemExplorerWidget
 from ui.ui_main_window import Ui_MainWindow
-from utils import FileBrowser, Redirect, SettingFile, sendToWorker
+from utils import FileBrowser, Redirect, SettingFile, sendToWorker, resource_path
 
 NUM_OF_THREADS = 1
 
@@ -107,8 +107,7 @@ class AppWindow(QMainWindow):
             self.ui.dockWidgetImageViewer, self.ui.dockWidgetSignalNavigation
         )
         self.ui.dockWidgetImageViewer.setFocus()
-
-        # self.ui.dockWidgetSystemExplorer.adjustSize()
+        self.ui.statusbar.addPermanentWidget(self.ui.threadsLabel)
         self.systemExplorer.pathChanged.connect(
             lambda new_path: self.updateMenuButtons(new_path)
         )
@@ -365,10 +364,10 @@ class AppWindow(QMainWindow):
                 ".gif",
                 ".bmp",
             ]:
-                image = mpimg.imread("resources/ebsd_gui.png")
+                image = mpimg.imread(resource_path("resources/ebsd_gui.png"))
                 self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer")
             else:
-                image = mpimg.imread(image_path)
+                image = mpimg.imread(resource_path(image_path))
                 self.ui.dockWidgetImageViewer.setWindowTitle(
                     f"Image Viewer - {os.path.basename(image_path)}"
                 )
