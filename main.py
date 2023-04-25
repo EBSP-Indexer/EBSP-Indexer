@@ -107,6 +107,7 @@ class AppWindow(QMainWindow):
             self.ui.dockWidgetImageViewer, self.ui.dockWidgetSignalNavigation
         )
         self.ui.dockWidgetImageViewer.setFocus()
+        self.ui.dockWidgetJobManager.setHidden(True)
         self.ui.statusbar.addPermanentWidget(self.ui.threadsLabel)
         self.systemExplorer.pathChanged.connect(
             lambda new_path: self.updateMenuButtons(new_path)
@@ -372,7 +373,7 @@ class AppWindow(QMainWindow):
                 )
             else:
                 image = mpimg.imread(resource_path("resources/ebsd_gui.png"))
-                imageViewer.setWindowTitle(f"Image Viewer") 
+                imageViewer.setWindowTitle(f"Image Viewer")
             self.ui.MplWidget.canvas.ax.clear()
             self.ui.MplWidget.canvas.ax.axis(False)
             self.ui.MplWidget.canvas.ax.imshow(image)
@@ -422,9 +423,8 @@ class AppWindow(QMainWindow):
 
     @Slot()
     def updateActiveJobs(self):
-        self.ui.threadsLabel.setText(
-            f"{QThreadPool.globalInstance().activeThreadCount()} out of {QThreadPool.globalInstance().maxThreadCount()} active jobs"
-        )
+        msg = f"{QThreadPool.globalInstance().activeThreadCount()} out of {QThreadPool.globalInstance().maxThreadCount()} active jobs"
+        self.ui.threadsLabel.setText(msg)
 
 
 if __name__ == "__main__":
