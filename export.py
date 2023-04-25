@@ -33,6 +33,7 @@ else:
 args_list = [
     '--noconfirm',
     '--onedir',
+    '--windowed',
     '--icon', os.path.join(workdir, "resources/ebsd_gui.ico"),
     '--name', "EBSP Indexer",
     '--add-data', os.path.join(workdir, f"resources{sep}resources/"),
