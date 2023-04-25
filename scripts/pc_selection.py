@@ -4,12 +4,12 @@ import kikuchipy as kp
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDialog, QDialogButtonBox
 import numpy as np
-from math import floor, ceil
+from math import floor, ceil, isnan
 
 from diffsims.crystallography import ReciprocalLatticeVector
 from pyebsdindex import ebsd_index, pcopt
 from orix.quaternion import Rotation
-from orix.crystal_map import PhaseList
+from orix.crystal_map import PhaseList, Phase
 import hyperspy.api as hs
 import dask as da
 
@@ -20,6 +20,7 @@ from matplotlib.widgets import Cursor
 from utils import SettingFile, FileBrowser, sendToJobManager
 from ui.ui_pc_selection import Ui_PCSelection
 from scripts.signal_loader import crystalMap, EBSDDataset
+from scripts.pc_from_wd import pc_from_wd
 
 progressbar_bool = False
 
@@ -80,19 +81,9 @@ class PCSelectionDialog(QDialog):
             self.pc = eval(self.setting_file.read("PC"))
 
         except:
-            if self.s.metadata.Acquisition_instrument.SEM.microscope == "ZEISS SUPRA55 VP":
-                self.pc = [
-                    0.5605-0.0017*float(working_distance),
-                    1.2056-0.0225*float(working_distance),
-                    0.483,
-                ]
-            else:    
-                self.pc = np.array([0.5000, 0.5000, 0.5000])
+            microscope = self.s.metadata.Acquisition_instrument.SEM.microscope
+            self.pc = pc_from_wd(microscope, working_distance, self.convention)
         
-        if self.convention == "TSL":
-            #Store TSL convention in BRUKER convention
-            self.pc[1] = 1 - self.pc[1]
-            self.ui.conventionBox.setCurrentIndex(1)
         self.updatePCSpinBox()
         
         self.mp_paths = {}
@@ -245,23 +236,16 @@ class PCSelectionDialog(QDialog):
 
     def updatePCSpinBox(self):
         self.ui.spinBoxX.setValue(self.pc[0])
+        self.ui.spinBoxY.setValue(self.pc[1])
         self.ui.spinBoxZ.setValue(self.pc[2])
-        if self.convention == "BRUKER":
-            self.ui.spinBoxY.setValue(self.pc[1])
-        elif self.convention == "TSL":
-            self.ui.spinBoxY.setValue(1-self.pc[1])
 
     def updatePCArrayFromSpinBox(self):
         self.pc[0] = self.ui.spinBoxX.value()
+        self.pc[1] = self.ui.spinBoxY.value()
         self.pc[2] = self.ui.spinBoxZ.value()
-        if self.convention == "BRUKER":
-            self.pc[1] = self.ui.spinBoxY.value()
-        elif self.convention == "TSL":
-            self.pc[1] = 1 - self.ui.spinBoxY.value()
-    
+
     def updatePCConvention(self):
-        self.convention = self.ui.conventionBox.currentText()
-        self.updatePCSpinBox()      
+        self.convention = self.ui.conventionBox.currentText()    
     
 
 ### INTERACTION WITH NAVIGATOR ###
@@ -382,7 +366,8 @@ class PCSelectionDialog(QDialog):
 
     def runPatternCenterOpimization(self):
         basename, extension = path.basename(self.pattern_path).split(".")
-        save_dir = path.join(self.working_dir, f"{basename}_{extension}")    
+        save_dir = path.join(self.working_dir, f"{basename}_{extension}")
+        self.inlier_limit = float(self.ui.spinBoxInlier.value())
 
         sendToJobManager(
             job_title=f"Pattern center optimization {self.pattern_name}",
@@ -394,6 +379,7 @@ class PCSelectionDialog(QDialog):
         )
 
     def patternCenterOpimization(self):
+        print("Initializing pattern center optimization...\n\n")
         basename, extension = path.basename(self.pattern_path).split(".")
         save_dir = path.join(self.working_dir, f"{basename}_{extension}")       
 
@@ -410,30 +396,49 @@ class PCSelectionDialog(QDialog):
         #draw positions on map
         self.drawPCs(save_dir=save_dir)
 
-        #Optimize PC, refine PC
+        #Optimize PC, refine PC, create figures
         self.optimizePC(simulator_dict, save_dir)
         
-        #Figures: Grid, scatter(mark outliers), patterns with lines
-
-
         #Overwite project settings file
+        self.save_project_settings()
+
         self.close()
+
+        print("\nPattern center optimization complete.")
+
+    def loadMP(self, name, mppath):
+        mp_i = kp.load(
+            path.join(mppath),
+            projection="lambert",
+            energy=self.energy,
+        )
+        mp_i.name = name
+        mp_i.phase.name = name
+        lat_i = mp_i.phase.structure.lattice
+        lat_i.setLatPar(10 * lat_i.a, 10 * lat_i.b, 10 * lat_i.c)
+        return mp_i
 
     def retrieveMPData(self):
         self.energy = self.s.metadata.Acquisition_instrument.SEM.beam_energy
 
         self.mp_dict = {}
+
+        FCCavailable, BCCavailable = True, True
         for name, h5path in self.mp_paths.items():
-            if name in FCC + BCC:
-                mp_i = kp.load(
-                    path.join(h5path),
-                    projection="lambert",
-                    energy=self.energy,
-                )
-                mp_i.name = name
-                lat_i = mp_i.phase.structure.lattice
-                lat_i.setLatPar(10 * lat_i.a, 10 * lat_i.b, 10 * lat_i.c)
-                self.mp_dict[name] = mp_i
+            if name in FCC and FCCavailable:
+                self.mp_dict[name] = self.loadMP(name, h5path)
+                FCCavailable = False
+            elif name in BCC and BCCavailable:
+                self.mp_dict[name] = self.loadMP(name, h5path)
+                BCCavailable = False
+            elif name in FCC:
+                FCCavailable = False
+                print("Hough indexing only supports one FCC/BCC phase. Using the first FCC phase for patter center optimization.")
+            elif name in BCC:
+                BCCavailable = False
+                print("Hough indexing only supports one FCC/BCC phase. Using the first BCC phase for patter center optimization.")
+            else:
+                print("Phase "+name+" is not supported with pattern center optimization.")
             
         ref_dict = {}
         for name in self.mp_dict.keys():
@@ -477,35 +482,55 @@ class PCSelectionDialog(QDialog):
         fig.savefig(path.join(save_dir, "maps_pc_cal_patterns.png"), **self.savefig_kw)
 
     def optimizePC(self, simulator_dict, save_dir):
-        print("Initializing pattern center optimization...")
-        phase_list = PhaseList(list(self.mp_dict.values())[0].phase) # only one phase supported, the first FCC/BCC phase
-
-        det_cal0 = self.s_cal.detector
-        indexer_cal = det_cal0.get_indexer(phase_list, nBands=12)
+        phase_list = PhaseList()
+        for mp in self.mp_dict.values():
+            phase_list.add(mp.phase)
+        print(phase_list)
+            
+        det_cal0 = kp.detectors.EBSDDetector(
+            shape=self.s_cal.axes_manager.signal_shape[::-1],
+            sample_tilt=self.s_cal.detector.sample_tilt,  # Degrees
+            pc=self.pc,
+            convention=self.convention,
+        )
+        indexer_cal0 = det_cal0.get_indexer(phase_list, nBands=9)
         det_cal = self.s_cal.hough_indexing_optimize_pc(
             self.pc,
-            indexer=indexer_cal,
+            indexer=indexer_cal0,
             batch=True,
         )
-        indexer_cal2 = det_cal.get_indexer(phase_list, nBands=indexer_cal.bandDetectPlan.nBands)
-        xmap_cal = self.s_cal.hough_indexing(phase_list, indexer_cal2)
-        self.s_cal.axes_manager[0].name = "x"
+        
+        xmap_cal_ref_list, det_cal_ref_list = [], []
 
-        xmap_cal_ref, det_cal_ref = self.s_cal.refine_orientation_projection_center(
-            xmap_cal,
-            det_cal,
-            master_pattern=list(self.mp_dict.values())[0],
-            energy=self.energy,
-            method="LN_NELDERMEAD",
-            trust_region=[10, 10, 10, 0.2, 0.2, 0.2],
-            rtol=1e-7,
+        for mp_i in self.mp_dict.values():
+            indexer_cal = det_cal.get_indexer(PhaseList(mp_i.phase), nBands=indexer_cal0.bandDetectPlan.nBands)
+            xmap_cal = self.s_cal.hough_indexing(PhaseList(mp_i.phase), indexer_cal)
+            
+            xmap_cal_ref, det_cal_ref = self.s_cal.refine_orientation_projection_center(
+                xmap_cal,
+                det_cal,
+                master_pattern = mp_i,
+                energy=self.energy,
+                method="LN_NELDERMEAD",
+                trust_region=[10, 10, 10, 0.2, 0.2, 0.2],
+                rtol=1e-4,
+                    )
+            xmap_cal_ref_list.append(xmap_cal_ref)
+            det_cal_ref_list.append(det_cal_ref)
+
+        refined_xmap = kp.indexing.merge_crystal_maps(
+            xmap_cal_ref_list,
+            scores_prop="scores",
         )
-
             
         # generate figures
-        sim_i = list(simulator_dict.values())[0]
-        sim_cal_ref = sim_i.on_detector(det_cal_ref, xmap_cal_ref.rotations.reshape(*xmap_cal_ref.shape))
-
+        sim_i = simulator_dict.values()
+        #sim_cal_ref = sim_i.on_detector(det_cal_ref, xmap_cal_ref.rotations.reshape(*xmap_cal_ref.shape))
+        sim_cal_ref_dict = {}
+        for phase, sim_i in simulator_dict.items():
+            sim_cal_ref = sim_i.on_detector(det_cal_ref, refined_xmap.rotations.reshape(*refined_xmap.shape))
+            sim_cal_ref_dict[phase] = sim_cal_ref
+            
         # geometrical simulations
         fig, axes = plt.subplots(nrows=ceil(1*np.sqrt(len(self.coordinates)/2)), ncols=ceil(2*np.sqrt(len(self.coordinates)/2)), figsize=(10 * det_cal.aspect_ratio, 6))
         for i, ax in enumerate(axes.ravel()):
@@ -513,7 +538,8 @@ class PCSelectionDialog(QDialog):
                 ax.axis("off")
                 continue
             ax.imshow(self.s_cal.data[i], cmap="gray")
-            lines = sim_cal_ref.as_collections(i)[0]
+            phase = refined_xmap.phases[refined_xmap.phase_id[i]].name
+            lines = sim_cal_ref_dict[phase].as_collections(i)[0]
             ax.add_collection(lines)
             ax.axis("off")
         fig.tight_layout()
@@ -524,18 +550,27 @@ class PCSelectionDialog(QDialog):
         fig.savefig(path.join(save_dir, "pc_scatter_plot.png"), **self.savefig_kw)
 
         # remove outliers
-        is_inlier = xmap_cal_ref.scores > 0.4
+        is_inlier = xmap_cal_ref.scores > self.inlier_limit
         det_cal_ref.pc = det_cal_ref.pc[is_inlier]
 
         # update pattern center
-        self.pc = np.array(det_cal_ref.pc_average.round(4))
+        if not np.isnan(det_cal_ref.pc_average[0]):
+            self.pc = np.array(det_cal_ref.pc_average.round(4))
 
         # Write to file
         det_cal_ref.save(path.join(save_dir, "pc_optimization.txt"))
 
+        inliers, outliers = {}, {}
+        for i, coord in enumerate(self.coordinates):
+            if is_inlier[i]:
+                inliers[i] = coord
+            else:
+                outliers[i] = coord
+
         f = open(path.join(save_dir, "pc_optimization.txt"), "a")
         f.write("\n# Calibration patterns: "+str(self.coordinates))
-        f.write("\n# Inliers: "+str(is_inlier))
+        f.write("\n# Inliers: "+str(inliers))
+        f.write("\n# Outliers: "+str(outliers))
         f.write("\n# Mean pattern center: "+str(det_cal_ref.pc_average.round(4)))
         f.write("\n# Standard deviation: "+str(abs(det_cal_ref.pc_flattened.std(0))))
         f.close()
@@ -549,6 +584,6 @@ class PCSelectionDialog(QDialog):
 
         self.setting_file.write("Convention", self.convention)
 
-        self.setting_file.write("PC", f"{self.pc}")
+        self.setting_file.write("PC", f"{tuple(self.pc)}")
 
         self.setting_file.save()
