@@ -170,13 +170,15 @@ class PCSelectionDialog(QDialog):
     
     def removePattern(self):
         index = self.ui.listCoordinates.currentRow()
-        self.ui.listCoordinates.takeItem(self.ui.listCoordinates.currentRow())
-        del self.coordinates[index]
 
         try:
             self.click_rect.remove()
         except:
             pass
+
+        self.ui.listCoordinates.takeItem(self.ui.listCoordinates.currentRow())
+        del self.coordinates[index]
+
         self.update_rectangles()
         self.ui.MplWidget.canvas.draw()
 
@@ -189,13 +191,16 @@ class PCSelectionDialog(QDialog):
             x, y = int(coords[0].strip("()")), int(coords[1].strip("()"))
             self.plot_signal(x, y)
         except:
-            pass
+            x = -1
 
         try:
             self.click_rect.remove()
         except:
             pass
-        self.current_rectangle(x,y)
+        
+        if x >= 0:
+            self.current_rectangle(x,y)
+
         self.ui.MplWidget.canvas.draw()
         
         self.ui.buttonRemovePattern.setEnabled(True)
@@ -207,8 +212,10 @@ class PCSelectionDialog(QDialog):
             grid_shape = [int(self.ui.spinBoxGridX.value()), int(self.ui.spinBoxGridY.value())]
             self.updateGridButtons(enable=True)
             s_grid, coords = self.s.extract_grid(grid_shape, return_indices=True)
-            coords_converted = self.convertGridList(grid_shape, coords)
-
+            try:
+                coords_converted = self.convertGridList(grid_shape, coords)
+            except:
+                print("Grid shape not supported for this dataset.")
             for coord in coords_converted:
                 self.addPattern(coord[0], coord[1])
 
@@ -455,14 +462,14 @@ class PCSelectionDialog(QDialog):
     def drawPCs(self, save_dir):
         # Get the right format for coordinates
         cr = np.array(self.coordinates).T
-        rc = cr[::-1]
-        self.s_cal = kp.signals.LazyEBSD(self.s.data.vindex[tuple(rc)])
+        self.rc = cr[::-1]
+        self.s_cal = kp.signals.LazyEBSD(self.s.data.vindex[tuple(self.rc)])
         self.s_cal.compute()
 
         out = da.compute(self.iq)
         iq2 = out[0]
         fig = kp.draw.plot_pattern_positions_in_map(
-            rc.T+0.5,
+            self.rc.T+0.5,
             roi_shape = iq2.shape,
             roi_image = iq2,
             return_figure = True,
@@ -470,6 +477,7 @@ class PCSelectionDialog(QDialog):
         fig.savefig(path.join(save_dir, "maps_pc_cal_patterns.png"), **self.savefig_kw)
 
     def optimizePC(self, simulator_dict, save_dir):
+        print("Initializing pattern center optimization...")
         phase_list = PhaseList(list(self.mp_dict.values())[0].phase) # only one phase supported, the first FCC/BCC phase
 
         det_cal0 = self.s_cal.detector
@@ -492,7 +500,8 @@ class PCSelectionDialog(QDialog):
             trust_region=[10, 10, 10, 0.2, 0.2, 0.2],
             rtol=1e-7,
         )
-        
+
+            
         # generate figures
         sim_i = list(simulator_dict.values())[0]
         sim_cal_ref = sim_i.on_detector(det_cal_ref, xmap_cal_ref.rotations.reshape(*xmap_cal_ref.shape))
@@ -525,6 +534,8 @@ class PCSelectionDialog(QDialog):
         det_cal_ref.save(path.join(save_dir, "pc_optimization.txt"))
 
         f = open(path.join(save_dir, "pc_optimization.txt"), "a")
+        f.write("\n# Calibration patterns: "+str(self.coordinates))
+        f.write("\n# Inliers: "+str(is_inlier))
         f.write("\n# Mean pattern center: "+str(det_cal_ref.pc_average.round(4)))
         f.write("\n# Standard deviation: "+str(abs(det_cal_ref.pc_flattened.std(0))))
         f.close()
