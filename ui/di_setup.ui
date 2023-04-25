@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>918</width>
+    <width>950</width>
     <height>501</height>
    </rect>
   </property>
@@ -41,7 +41,9 @@
            <widget class="QLabel" name="label_9">
             <property name="font">
              <font>
-              <family>Courier</family>
+              <pointsize>10</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
              </font>
             </property>
             <property name="text">
@@ -161,7 +163,9 @@
            <widget class="QLabel" name="label_16">
             <property name="font">
              <font>
-              <family>Courier</family>
+              <pointsize>10</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
              </font>
             </property>
             <property name="text">
@@ -338,7 +342,9 @@
            <widget class="QLabel" name="label">
             <property name="font">
              <font>
-              <family>Courier</family>
+              <pointsize>10</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
              </font>
             </property>
             <property name="text">
@@ -446,7 +452,9 @@
            <widget class="QLabel" name="label_6">
             <property name="font">
              <font>
-              <family>Courier</family>
+              <pointsize>10</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
              </font>
             </property>
             <property name="text">
@@ -589,7 +597,9 @@
            <widget class="QLabel" name="label_15">
             <property name="font">
              <font>
-              <family>Courier</family>
+              <pointsize>10</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
              </font>
             </property>
             <property name="text">
@@ -747,17 +757,24 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>spinBoxNumIter</tabstop>
+  <tabstop>checkBoxLazy</tabstop>
+  <tabstop>checkBoxMask</tabstop>
+  <tabstop>comboBoxBinning</tabstop>
   <tabstop>doubleSpinBoxStepSize</tabstop>
-  <tabstop>comboBoxConvention</tabstop>
+  <tabstop>spinBoxNumIter</tabstop>
   <tabstop>checkBoxRefine</tabstop>
-  <tabstop>patternCenterX</tabstop>
-  <tabstop>pushButtonRemovePhase</tabstop>
-  <tabstop>patternCenterZ</tabstop>
-  <tabstop>patternCenterY</tabstop>
-  <tabstop>pushButtonAddPhase</tabstop>
+  <tabstop>checkBoxIPF</tabstop>
   <tabstop>checkBoxPM</tabstop>
+  <tabstop>checkBoxOSM</tabstop>
+  <tabstop>checkBoxNCC</tabstop>
   <tabstop>comboBoxFiletype</tabstop>
+  <tabstop>tableWidgetPhase</tabstop>
+  <tabstop>pushButtonAddPhase</tabstop>
+  <tabstop>pushButtonRemovePhase</tabstop>
+  <tabstop>patternCenterX</tabstop>
+  <tabstop>patternCenterY</tabstop>
+  <tabstop>patternCenterZ</tabstop>
+  <tabstop>comboBoxConvention</tabstop>
  </tabstops>
  <resources/>
  <connections>

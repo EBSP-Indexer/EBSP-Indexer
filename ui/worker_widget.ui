@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>415</width>
+    <width>423</width>
     <height>230</height>
    </rect>
   </property>
@@ -16,25 +16,12 @@
   <property name="locale">
    <locale language="English" country="UnitedKingdom"/>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,1">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,1,0">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <property name="sizeConstraint">
       <enum>QLayout::SetDefaultConstraint</enum>
      </property>
-     <item>
-      <widget class="QLabel" name="labelJobNumber">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>job number</string>
-       </property>
-      </widget>
-     </item>
      <item>
       <widget class="QPushButton" name="pushButtonShow">
        <property name="styleSheet">
@@ -67,6 +54,19 @@ QPushButton:checked {
       </widget>
      </item>
      <item>
+      <widget class="QLabel" name="labelJobNumber">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>job number</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -90,9 +90,16 @@ QPushButton:checked {
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
+        </font>
+       </property>
        <property name="styleSheet">
-        <string notr="true">color: rgb(220, 190, 0);
-font: 75 9pt &quot;Courier&quot;;</string>
+        <string notr="true">color: rgb(220, 190, 0);</string>
        </property>
        <property name="text">
         <string>In Queue</string>
@@ -101,15 +108,17 @@ font: 75 9pt &quot;Courier&quot;;</string>
      </item>
      <item>
       <widget class="QPushButton" name="pushButtonCancel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="toolTip">
         <string>Cancel job</string>
        </property>
        <property name="text">
         <string>Cancel</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources.qrc">
-         <normaloff>:/linea_arrows/resources/linea_arrows_icons/arrows_remove.svg</normaloff>:/linea_arrows/resources/linea_arrows_icons/arrows_remove.svg</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -131,13 +140,13 @@ font: 75 9pt &quot;Courier&quot;;</string>
         </sizepolicy>
        </property>
        <property name="toolTip">
-        <string>Remove job from list</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Visibly remove job from manager&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="styleSheet">
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Remove</string>
+        <string/>
        </property>
        <property name="icon">
         <iconset resource="../resources.qrc">
@@ -174,9 +183,12 @@ font: 75 9pt &quot;Courier&quot;;</string>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="styleSheet">
-      <string notr="true">font: 75 12pt &quot;Courier&quot;;
-text-decoration: underline;</string>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
      </property>
      <property name="text">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;job name&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -191,9 +203,14 @@ text-decoration: underline;</string>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="font">
+      <font>
+       <italic>true</italic>
+       <underline>true</underline>
+      </font>
+     </property>
      <property name="styleSheet">
-      <string notr="true">font: italic 8pt &quot;Courier&quot;;
-color: rgb(120, 120, 120);</string>
+      <string notr="true">color: rgb(100, 100, 100);</string>
      </property>
      <property name="text">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;output_directory&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -227,8 +244,27 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
+   <item>
+    <widget class="Line" name="lineBrowser">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>pushButtonShow</tabstop>
+  <tabstop>pushButtonCancel</tabstop>
+  <tabstop>pushButtonRemove</tabstop>
+  <tabstop>textBrowserStatus</tabstop>
+ </tabstops>
  <resources>
   <include location="../resources.qrc"/>
  </resources>
@@ -278,6 +314,22 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>245</x>
      <y>153</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButtonShow</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lineBrowser</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>23</x>
+     <y>25</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>211</x>
+     <y>217</y>
     </hint>
    </hints>
   </connection>

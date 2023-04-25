@@ -1,6 +1,9 @@
 from utils import SettingFile
+from utils.setting_file import get_setting_file_bottom_top
 
 from os import path
+
+import functools
 
 import kikuchipy as kp
 import orix
@@ -17,27 +20,10 @@ def mean_intensity_map(ebsd):
     return ebsd.mean(axis=(2, 3))
 
 
-def virtual_bse_map(ebsd):
-    vbse_gen = kp.generators.VirtualBSEGenerator(ebsd)
-    vbse_map = vbse_gen.get_rgb_image(r=(3, 1), b=(3, 2), g=(3, 3))
-    vbse_map.change_dtype("uint8")
-    vbse_map = vbse_map.data
-    return vbse_map
-
-
-def check_directory(file_path):
-    folder_names = ["unrefined_crystal_maps", "refined_crystal_maps"]
-    if path.basename(path.dirname(file_path)) in folder_names:
-        pattern_dir = path.dirname(path.dirname(file_path))
-    else:
-        pattern_dir = path.dirname(file_path)
-
-    return pattern_dir
-
-
 class crystalMap:
     """
-    Loads a crystal map
+    crystal map for signal navigation
+
 
     """
 
@@ -50,36 +36,37 @@ class crystalMap:
             self.ebsd = self.ebsd_signal(crystal_map_path)
             thdout = ThreadedOutput()
             with redirect_stdout(thdout):
-                self.navigator = {
-                    "Inverse polefigure": self.inverse_pole_figure(),
-                    "Phase map": self.phase_map(),
-                    # "Mean intensity map": mean_intensity_map(self.ebsd),
-                    # "Virtual BSE map": virtual_bse_map(self.ebsd),
-                    # "NCC": self.property_map("scores"),
-                    # "Orientation similarity map": self.orientation_similarity_map(),
-                }
+                if len(self.crystal_map.phases.ids) > 1:
 
-                self.hkl = self.hkl_simulation(crystal_map_path)
+                    self.navigator = {
+                        "Inverse pole figure": 0,
+                        "Phase map": 1,
+                    }
+                else:
+                    self.navigator = {
+                        "Inverse pole figure": 0,
+                    }
+
+                self.hkl = self.hkl_simulation()
 
             self.ebsd_detector = self.detector(crystal_map_path)
 
     def ebsd_signal(self, crystal_map_path):
         try:
-            # returns a dictionary with values stored in di_parameters.txt
-            parameter_file = SettingFile(
-                path.join(check_directory(crystal_map_path), "indexing_parameters.txt")
+            parameter_file, parameter_file_path = get_setting_file_bottom_top(
+                crystal_map_path, "indexing_parameters.txt", return_dir_path=True
             )
         except FileNotFoundError as e:
             raise e
 
         ebsd_signal_name = parameter_file.read("Pattern name")
         ebsd_signal = kp.load(
-            path.join(path.dirname(check_directory(crystal_map_path)), ebsd_signal_name)
+            path.join(path.dirname(parameter_file_path), ebsd_signal_name)
         )
 
         return ebsd_signal
 
-    def hkl_simulation(self, crystal_map_path):
+    def hkl_simulation(self):
         hkl_simulations = []
 
         for i, ph in self.crystal_map.phases:
@@ -103,9 +90,42 @@ class crystalMap:
 
         return hkl_simulations
 
-    def inverse_pole_figure(self):
-        ckey = orix.plot.IPFColorKeyTSL(self.crystal_map.phases[0].point_group)
+    def detector(self, crystal_map_path):
+        detector = kp.detectors.EBSDDetector.load(
+            path.join(
+                get_setting_file_bottom_top(
+                    crystal_map_path, "detector.txt", return_dir_path=True
+                )[-1],
+                "detector.txt",
+            )
+        )
+        ebsd_signal = self.ebsd_signal(crystal_map_path)
+        detector.shape = ebsd_signal.axes_manager.signal_shape
 
+        return detector
+    
+    def compute_navigator(self, nav_num: int = 0):
+        """
+        0 = inverse pole figure
+        1 = phase map
+        """
+
+        if nav_num == 0:
+            navigator = self.inverse_pole_figure
+            return navigator
+
+        if nav_num == 1:
+            navigator = self.phase_map
+            return navigator
+
+    @functools.cached_property
+    def inverse_pole_figure(self):
+        if self.crystal_map.phases.ids[0] == -1:
+            phase_id = self.crystal_map.phases.ids[1]
+        else:
+            phase_id = self.crystal_map.phases.ids[0]
+        
+        ckey = orix.plot.IPFColorKeyTSL(self.crystal_map.phases[phase_id].point_group)
         rgb_all = np.zeros((self.crystal_map.size, 3))
         for i, phase in self.crystal_map.phases:
             if i != -1:
@@ -118,6 +138,7 @@ class crystalMap:
 
         return rgb_all
 
+    @functools.cached_property
     def phase_map(self):
         thdout = ThreadedOutput()
         with redirect_stdout(thdout):
@@ -133,45 +154,65 @@ class crystalMap:
             phase_map = np.squeeze(phase_map)
 
         return phase_map
+    
+    @functools.cached_property
+    def property_map(self):
+        if self.crystal_map.rotations_per_point > 1:
+            property_map = self.crystal_map.scores[:, 0].reshape(*self.crystal_map.shape)
+        else:
+            property_map = self.crystal_map.get_map_data("scores")
 
-    def detector(self, crystal_map_path):
-        detector = kp.detectors.EBSDDetector.load(
-            path.join(check_directory(crystal_map_path), "detector.txt")
-        )
-        ebsd_signal = self.ebsd_signal(crystal_map_path)
-        detector.shape = ebsd_signal.axes_manager.signal_shape
-
-        return detector
-
-    # def property_map(self, property: str):
-    #     if self.crystal_map.rotations_per_point > 1:
-    #         property_map = self.crystal_map.scores[:, 0].reshape(*self.crystal_map.shape)
-    #     else:
-    #         property_map = self.crystal_map.get_map_data(property)
-
-    #     return property_map
-
-    # def orientation_similarity_map(self):
-    #     try:
-    #         osm = kp.indexing.orientation_similarity_map(self.crystal_map)
-    #     except:
-    #         osm = None
-
-    #     return osm
-
+        return property_map
 
 class EBSDDataset:
 
     """
     Loads an EBSD dataset
+
     """
 
-    def __init__(self, dataset, ebsd_pattern_path: str):
+    def __init__(self, dataset):
         self.ebsd = dataset
         self.datatype = "ebsd_dataset"
         self.nav_shape = self.ebsd.axes_manager.navigation_shape
         self.navigator = {
-            "Mean intensity map": mean_intensity_map(self.ebsd),
-            "Image quality map": self.ebsd.get_image_quality().compute(),
-            "VBSE map": virtual_bse_map(self.ebsd),
+            "Mean intensity map": 0,
+            "Image quality map": 1,
+            "VBSE map": 2,
         }
+
+    def compute_navigator(self, nav_num: int = 0):
+        """
+        Computes navigator
+
+        0 = mean intensity map
+        1 = image quality
+        2 = virtual bse image
+        """
+
+        if nav_num == 0:
+            navigator = self.mean_intensity
+            return navigator
+        if nav_num == 1:
+            navigator = self.image_quality
+            return navigator
+        if nav_num == 2:
+            navigator = self.virtual_bse
+            return navigator
+
+    @functools.cached_property
+    def mean_intensity(self):
+        mean_intensity_map = self.ebsd.mean(axis=(2, 3))
+        return mean_intensity_map
+
+    @functools.cached_property
+    def image_quality(self):
+        return self.ebsd.get_image_quality().compute()
+
+    @functools.cached_property
+    def virtual_bse(self):
+        vbse_gen = kp.generators.VirtualBSEGenerator(self.ebsd)
+        vbse_map = vbse_gen.get_rgb_image(r=(3, 1), b=(3, 2), g=(3, 3))
+        vbse_map.change_dtype("uint8")
+        vbse_map = vbse_map.data
+        return vbse_map

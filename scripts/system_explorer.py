@@ -109,14 +109,14 @@ class SystemExplorerWidget(QWidget):
         # Misc available actions
         elif file and ext in [".txt"]:
             txtAction = menu.addAction("Open")
-            txtAction.triggered.connect(lambda: self.openTxtFile(menu_path))
+            txtAction.triggered.connect(lambda: openTxtFile(menu_path))
 
         # Globally available actions
         menu.addSeparator()
         revealAction = menu.addAction("Reveal in File Explorer")
         deleteAction = menu.addAction("Delete")
         revealAction.triggered.connect(
-            lambda: self.revealInExplorer(self.selected_path)
+            lambda: revealInExplorer(self.selected_path)
         )
         deleteAction.triggered.connect(
             lambda: self.displayDeleteWarning(self.selected_path)
@@ -125,28 +125,16 @@ class SystemExplorerWidget(QWidget):
         cursor = QCursor()
         menu.exec(cursor.pos())
 
-    def openTxtFile(self, txt_path: str):
-        if platform.system().lower() == "darwin":
-            subprocess.call(["open", "-a", "TextEdit", txt_path])
-        if platform.system().lower() == "windows":
-            startfile(txt_path)
-
-    def revealInExplorer(self, revealed_path):
-        if path.isdir(revealed_path):
-            webbrowser.open(revealed_path)
-        elif path.isfile(revealed_path):
-            webbrowser.open(path.dirname(revealed_path))
-
     def displayDeleteWarning(self, deletion_path):
-        msg = QMessageBox(self)
-        msg.setWindowTitle("Delete Information")
-        msg.setIcon(QMessageBox.Information)
-        msg.setText(
-            f"Are you sure you want to permentantly delete '{path.basename(deletion_path)}'?"
+        reply = QMessageBox.question(
+            self,
+            f"Delete {path.basename(deletion_path)}",
+            f"Are you sure you want to permentantly delete '{path.basename(deletion_path)}'?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes,  # Default button
         )
-        msg.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
-        msg.accepted.connect(lambda: self.deleteSelected(deletion_path))
-        msg.exec()
+        if reply == QMessageBox.Yes:
+            self.deleteSelected(deletion_path)
 
     def deleteSelected(self, deletion_path):
         if path.isdir(deletion_path):
@@ -178,3 +166,15 @@ class SystemExplorerWidget(QWidget):
         # TODO: more functionality, open dataset for signal navigation
         if path.splitext(self.selected_path)[1] in self.KP_EXTENSIONS:
             self.requestSignalNavigation.emit(self.selected_path)
+
+def revealInExplorer(revealed_path):
+    if path.isdir(revealed_path):
+        webbrowser.open(revealed_path)
+    elif path.isfile(revealed_path):
+        webbrowser.open(path.dirname(revealed_path))
+
+def openTxtFile(txt_path: str):
+        if platform.system().lower() == "darwin":
+            subprocess.call(["open", "-a", "TextEdit", txt_path])
+        if platform.system().lower() == "windows":
+            startfile(txt_path)

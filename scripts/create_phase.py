@@ -77,25 +77,32 @@ class NewPhaseDialog(QDialog):
             ATOM_X_INDX = 1
             ATOM_Y_INDX = 2
             ATOM_Z_INDX = 3
+            ATOM_OCCUP = 4
             atoms = []
             lattice_kwargs = {}
             for row in range(atomsTable.rowCount()):
                 element_item = atomsTable.item(row, ATOM_ELEMENT_INDX)
                 if not element_item or not len(element_item.text()):
                     message += f"\nAtom {row + 1} has no element"
+                elif not element_item.text().isnumeric() and True in (char.isnumeric() for char in element_item.text()):
+                    message += f"\nAtom {row + 1} element cannot be a combination of numbers and letters"
+                elif not element_item.text().isnumeric() and not element_item.text()[0].isupper():
+                    message += f"\nAtom {row + 1} element's first letter must be a captial letter"
                 else:
                     try:
-                        atoms.append(
-                            Atom(
+                        atom = Atom(
                                 atype=atomsTable.item(row, ATOM_ELEMENT_INDX).text(),
                                 xyz=[
                                     float(atomsTable.item(row, ATOM_X_INDX).text()),
                                     float(atomsTable.item(row, ATOM_Y_INDX).text()),
                                     float(atomsTable.item(row, ATOM_Z_INDX).text()),
                                 ],
+                                occupancy=float(atomsTable.item(row, ATOM_OCCUP).text())
                             )
-                        )
-                    except Exception as e:
+                        if atom.element.isnumeric():
+                            atom.element = int(atom.element)
+                        atoms.append(atom)
+                    except:
                         message += f"\nAtom {row + 1} contains illegal values"
             for col, kwarg in enumerate(["a", "b", "c", "alpha", "beta", "gamma"]):
                 cell = latticeTable.item(0, col)
