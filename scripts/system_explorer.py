@@ -52,6 +52,8 @@ class SystemExplorerWidget(QWidget):
             lambda new, old: self.onSystemModelChanged(new, old)
         )
         self.ui.systemViewer.doubleClicked.connect(lambda: self.doubleClickEvent())
+        self.ui.systemViewer.setSortingEnabled(True)
+        self.ui.systemViewer.setCursor(Qt.PointingHandCursor)
         self.ui.systemViewer.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.systemViewer.customContextMenuRequested.connect(self.contextMenu)
 
@@ -64,7 +66,7 @@ class SystemExplorerWidget(QWidget):
         self.systemModel.setNameFilterDisables(0)
         self.ui.systemViewer.setModel(self.systemModel)
         self.ui.systemViewer.setRootIndex(self.systemModel.index(working_dir))
-        self.ui.systemViewer.setColumnWidth(0, 250)
+        self.ui.systemViewer.setColumnWidth(0, 200)
         self.ui.systemViewer.hideColumn(2)
         self.ui.folderLabel.setText(path.basename(working_dir))
         self.app.setWindowTitle(f"EBSP Indexer - {working_dir}")
@@ -72,6 +74,7 @@ class SystemExplorerWidget(QWidget):
     def contextMenu(self):
         menu = QMenu()
         menu_path = self.selected_path
+        menu.setCursor(Qt.PointingHandCursor)
         file = path.isfile(menu_path)
         ext = path.splitext(menu_path)[-1]
         # Kikuchipy available actions
@@ -172,6 +175,8 @@ def revealInExplorer(revealed_path):
         webbrowser.open(revealed_path)
     elif path.isfile(revealed_path):
         webbrowser.open(path.dirname(revealed_path))
+    else:
+        webbrowser.open()
 
 def openTxtFile(txt_path: str):
         if platform.system().lower() == "darwin":
