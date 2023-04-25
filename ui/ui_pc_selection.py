@@ -27,9 +27,9 @@ class Ui_PCSelection(object):
     def setupUi(self, PCSelection):
         if not PCSelection.objectName():
             PCSelection.setObjectName(u"PCSelection")
-        PCSelection.resize(1354, 746)
-        self.horizontalLayout_5 = QHBoxLayout(PCSelection)
-        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        PCSelection.resize(1211, 753)
+        self.horizontalLayout_6 = QHBoxLayout(PCSelection)
+        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.verticalLayout_3 = QVBoxLayout()
@@ -246,6 +246,10 @@ class Ui_PCSelection(object):
 
         self.horizontalLayout.addWidget(self.labelPC)
 
+        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout.addItem(self.horizontalSpacer_5)
+
         self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer_6)
@@ -332,10 +336,33 @@ class Ui_PCSelection(object):
 
         self.verticalLayout.addWidget(self.line_3)
 
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.workingDistanceLabel = QLabel(PCSelection)
         self.workingDistanceLabel.setObjectName(u"workingDistanceLabel")
 
-        self.verticalLayout.addWidget(self.workingDistanceLabel)
+        self.horizontalLayout_5.addWidget(self.workingDistanceLabel)
+
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_5.addItem(self.horizontalSpacer_3)
+
+        self.label = QLabel(PCSelection)
+        self.label.setObjectName(u"label")
+        self.label.setToolTipDuration(-1)
+
+        self.horizontalLayout_5.addWidget(self.label)
+
+        self.spinBoxInlier = QDoubleSpinBox(PCSelection)
+        self.spinBoxInlier.setObjectName(u"spinBoxInlier")
+        self.spinBoxInlier.setMaximum(1.000000000000000)
+        self.spinBoxInlier.setSingleStep(0.010000000000000)
+        self.spinBoxInlier.setValue(0.400000000000000)
+
+        self.horizontalLayout_5.addWidget(self.spinBoxInlier)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_5)
 
         self.line_2 = QFrame(PCSelection)
         self.line_2.setObjectName(u"line_2")
@@ -375,7 +402,6 @@ class Ui_PCSelection(object):
         self.verticalLayout.setStretch(12, 1)
         self.verticalLayout.setStretch(13, 1)
         self.verticalLayout.setStretch(14, 1)
-        self.verticalLayout.setStretch(15, 1)
         self.verticalLayout.setStretch(16, 1)
         self.verticalLayout.setStretch(17, 1)
 
@@ -384,7 +410,7 @@ class Ui_PCSelection(object):
         self.horizontalLayout_4.setStretch(0, 3)
         self.horizontalLayout_4.setStretch(1, 1)
 
-        self.horizontalLayout_5.addLayout(self.horizontalLayout_4)
+        self.horizontalLayout_6.addLayout(self.horizontalLayout_4)
 
 
         self.retranslateUi(PCSelection)
@@ -416,5 +442,9 @@ class Ui_PCSelection(object):
         self.conventionBox.setItemText(1, QCoreApplication.translate("PCSelection", u"TSL", None))
 
         self.workingDistanceLabel.setText(QCoreApplication.translate("PCSelection", u"Working Distance (mm): 0.0", None))
+#if QT_CONFIG(tooltip)
+        self.label.setToolTip("")
+#endif // QT_CONFIG(tooltip)
+        self.label.setText(QCoreApplication.translate("PCSelection", u"Inlier criteria", None))
     # retranslateUi
 
