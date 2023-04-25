@@ -298,9 +298,13 @@ class AppWindow(QMainWindow):
     def selectSignalNavigation(self, signal_path: str):
         try:
             self.signalNavigationWidget.load_dataset(signal_path)
-            self.ui.dockWidgetSignalNavigation.setWindowTitle(
+            dw = self.ui.dockWidgetSignalNavigation
+            dw.setWindowTitle(
                 f"Signal Navigation - {os.path.basename(signal_path)}"
             )
+            if dw.isHidden():
+                dw.setVisible(True)
+            dw.raise_()
         except Exception as e:
             if self.getSelectedPath() == "":
                 dlg = QMessageBox(self)
