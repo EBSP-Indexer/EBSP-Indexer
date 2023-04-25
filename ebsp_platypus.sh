@@ -1,2 +1,2 @@
 #!/bin/bash
-./EBSD-GUI.app/Contents/MacOS/EBSD-GUI
+"./EBSP Indexer.app/Contents/MacOS/EBSP Indexer"
