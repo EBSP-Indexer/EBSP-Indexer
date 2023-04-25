@@ -72,27 +72,18 @@ class PatternProcessingDialog(QDialog):
 
     def setupInitialSettings(self):
         processing_steps = self.filenamebase.split("_")[1:]
-        for step in processing_steps:
-            if step == "sb":
-                self.ui.staticBackgroundBox.setEnabled(False)
-            if step == "db":
-                self.ui.dynamicBackgroundBox.setEnabled(False)
-            if step == "adp":
-                self.ui.averageBox.setEnabled(False)
-        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
-        """        
-        self.sf = SettingFile(path.join(self.working_dir, "project_settings.txt"))
-
         try:
-            self.rsb = self.sf.read("Remove static bacground")
-            self.rdb = self.sf.read("Remove dynamic bacground")
-            self.anp = self.sf.read("Average neighbour patterns")
+            for step in processing_steps:
+                if step == "sb":
+                    self.ui.staticBackgroundBox.setEnabled(False)
+                if step == "db":
+                    self.ui.dynamicBackgroundBox.setEnabled(False)
+                if step == "anp":
+                    self.ui.averageBox.setEnabled(False)
         except:
-            self.rsb = False
-            self.rdb = False
-            self.anp = False
+            pass
 
-        """
+        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
 
     def remove_static(self, dataset, show_progressbar=True):
         dataset.remove_static_background(show_progressbar=show_progressbar)
@@ -126,7 +117,7 @@ class PatternProcessingDialog(QDialog):
             box_checked = True
         if self.ui.averageBox.isChecked():
             self.average_neighbour(dataset=s_prev, show_progressbar=False)
-            extensions += "_adp"
+            extensions += "_anp"
             box_checked = True
 
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(box_checked)
