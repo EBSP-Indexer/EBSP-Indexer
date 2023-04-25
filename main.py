@@ -187,7 +187,7 @@ class AppWindow(QMainWindow):
             reply = QMessageBox.question(
                 self,
                 "Close EBSP Indexer",
-                "Some jobs were not completed.\nAre ydou sure you want to close EBSP Indexer?",
+                "Some jobs are still running.\nAre you sure you want to close EBSP Indexer?",
                 QMessageBox.Yes | QMessageBox.No,
                 QMessageBox.No,  # Default button
             )
