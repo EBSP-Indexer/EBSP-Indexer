@@ -33,8 +33,9 @@ else:
 args_list = [
     '--noconfirm',
     '--onedir',
+    '--windowed',
     '--icon', os.path.join(workdir, "resources/ebsd_gui.ico"),
-    '--name', "EBSD-GUI",
+    '--name', "EBSP Indexer",
     '--add-data', os.path.join(workdir, f"resources{sep}resources/"),
     '--add-data', os.path.join(workdir, f"*G.txt{sep}."),   # Add COPYING.txt
     '--additional-hooks-dir', os.path.join(workdir,"hooks"),
@@ -46,12 +47,6 @@ args_list = [
 if target_arch in ['x86_64', 'arm64', 'universal2']:
     args_list.append("--target-arch") 
     args_list.append(target_arch) 
-
-# Skips creating application on macOS as it currently do not work
-if platform.system().lower() == "darwin":
-    args_list.append("--console")
-else:
-    args_list.append("--windowed")
 
 args_list.append('main.py')
 PyInstaller.__main__.run(args_list) # Runs the command with arguments

@@ -41,7 +41,7 @@ from kikuchipy import (
     load,
 )  # Import something from kikutchipy to avoid load times during dialog initalizations
 
-import resources_rc # Imports resources in a pythonic way from resources.qrc
+import resources_rc  # Imports resources in a pythonic way from resources.qrc
 from scripts.advanced_settings import AdvancedSettingsDialog
 from scripts.console import Console
 from scripts.dictionary_indexing import DiSetupDialog
@@ -60,7 +60,7 @@ from scripts.region_of_interest import RegionOfInteresDialog
 from scripts.signal_navigation_widget import SignalNavigationWidget
 from scripts.system_explorer import SystemExplorerWidget
 from ui.ui_main_window import Ui_MainWindow
-from utils import FileBrowser, Redirect, SettingFile, sendToWorker
+from utils import FileBrowser, Redirect, SettingFile, sendToWorker, resource_path
 
 NUM_OF_THREADS = 1
 
@@ -96,7 +96,7 @@ class AppWindow(QMainWindow):
             self.stayOnTopHint = False
 
         self.setupConnections()
-        self.showImage(self.getSelectedPath())
+        self.showImage()
         self.importSettings()
         self.updateActiveJobs()
 
@@ -107,13 +107,16 @@ class AppWindow(QMainWindow):
             self.ui.dockWidgetImageViewer, self.ui.dockWidgetSignalNavigation
         )
         self.ui.dockWidgetImageViewer.setFocus()
-
-        # self.ui.dockWidgetSystemExplorer.adjustSize()
+        self.ui.dockWidgetJobManager.setHidden(True)
+        self.ui.statusbar.addPermanentWidget(self.ui.threadsLabel)
         self.systemExplorer.pathChanged.connect(
             lambda new_path: self.updateMenuButtons(new_path)
         )
-        self.systemExplorer.pathChanged.connect(
-            lambda new_path: self.showImage(new_path)
+        # self.systemExplorer.pathChanged.connect(
+        #     lambda new_path: self.showImage(new_path)
+        # )
+        self.systemExplorer.requestImageViewer.connect(
+            lambda image_path: self.showImage(image_path)
         )
         self.systemExplorer.requestSignalNavigation.connect(
             lambda signal_path: self.selectSignalNavigation(signal_path)
@@ -160,24 +163,50 @@ class AppWindow(QMainWindow):
         # )
 
         # else:
+        
         self.ui.actionAverage_dot_product.triggered.connect(
-            lambda: sendToWorker(
-                self, save_adp_map, pattern_path=self.getSelectedPath()
-            )
+            lambda: self.generatePreIndexingMap(map=0)
         )
         self.ui.actionImage_quality.triggered.connect(
-            lambda: sendToWorker(self, save_iq_map, pattern_path=self.getSelectedPath())
+            lambda: self.generatePreIndexingMap(map=1)
         )
         self.ui.actionMean_intensity.triggered.connect(
-            lambda: sendToWorker(
-                self, save_mean_intensity_map, pattern_path=self.getSelectedPath()
-            )
+            lambda: self.generatePreIndexingMap(map=2)
         )
         self.ui.actionVirtual_backscatter_electron.triggered.connect(
-            lambda: sendToWorker(
-                self, save_rgb_vbse, pattern_path=self.getSelectedPath()
-            )
+            lambda: self.generatePreIndexingMap(map=3)
         )
+
+    def generatePreIndexingMap(self, map: int):
+        """
+        0 = average dot product map
+        1 = image quality map
+        2 = mean intensity map
+        3 = virual BSE image
+        """
+
+        def image_saved():
+            sb.showMessage("Image saved", 3000)
+
+        pattern_path = self.getSelectedPath()
+        sb = self.ui.statusbar
+
+        if map == 0:
+            sb.showMessage("Generating average dot product map ...")
+            worker = sendToWorker(self, save_adp_map, pattern_path=pattern_path)
+        if map == 1:
+            sb.showMessage("Generating image quality map ...")
+            worker = sendToWorker(self, save_iq_map, pattern_path=pattern_path)
+        if map == 2:
+            sb.showMessage("Generating mean intensity map ...")
+            worker = sendToWorker(
+                self, save_mean_intensity_map, pattern_path=pattern_path
+            )
+        if map == 3:
+            sb.showMessage("Generating VBSE image ...")
+            worker = sendToWorker(self, save_rgb_vbse, pattern_path=pattern_path)
+
+        worker.isFinished.connect(image_saved)
 
     # Override closeEvent from QMainWindow
     def closeEvent(self, event):
@@ -185,9 +214,9 @@ class AppWindow(QMainWindow):
             reply = QMessageBox.question(
                 self,
                 "Close EBSP Indexer",
-                "Some jobs were not completed.\nAre ydou sure you want to close EBSP Indexer?",
+                "Some jobs are still running.\nAre you sure you want to close EBSP Indexer?",
                 QMessageBox.Yes | QMessageBox.No,
-                QMessageBox.No, # Default button
+                QMessageBox.No,  # Default button
             )
             if reply == QMessageBox.Yes:
                 event.accept()
@@ -255,15 +284,19 @@ class AppWindow(QMainWindow):
 
         # TODO: This whole thing should be changed to inside AdvancedSettingsDialog, and should only be executed when ok is pressed
         # updates file browser to changes:
-        setting_file = SettingFile("advanced_settings.txt")
-        file_types = json.loads(setting_file.read("File Types"))
-        system_view_filters = ["*" + x for x in file_types]
-        if setting_file.read("Default Directory") not in ["False", ""]:
-            if self.working_dir == QDir():
-                self.working_dir = setting_file.read("Default Directory")
-            self.systemExplorer.setSystemViewer(
-                self.working_dir, filters=system_view_filters
-            )
+        try:
+            setting_file = SettingFile("advanced_settings.txt")
+            file_types = json.loads(setting_file.read("File Types"))
+            system_view_filters = ["*" + x for x in file_types]
+            if setting_file.read("Default Directory") not in ["False", ""]:
+                new_dir = setting_file.read("Default Directory")
+                if self.working_dir != new_dir:
+                    self.working_dir = new_dir
+                self.systemExplorer.setSystemViewer(
+                    self.working_dir, filters=system_view_filters
+                )
+        except Exception as e:
+            raise e
 
     def selectRefineOrientations(self, file_path: str):
         try:
@@ -303,9 +336,7 @@ class AppWindow(QMainWindow):
         try:
             self.signalNavigationWidget.load_dataset(signal_path)
             dw = self.ui.dockWidgetSignalNavigation
-            dw.setWindowTitle(
-                f"Signal Navigation - {os.path.basename(signal_path)}"
-            )
+            dw.setWindowTitle(f"Signal Navigation - {os.path.basename(signal_path)}")
             if dw.isHidden():
                 dw.setVisible(True)
             dw.raise_()
@@ -346,32 +377,29 @@ class AppWindow(QMainWindow):
             self.patternCenter.show()
         except Exception as e:
             raise e
-            
+
     def openPCSelection(self, pattern_path: str):
         try:
             self.PCSelection = PCSelectionDialog(self, pattern_path)
-            self.PCSelection.setWindowFlag(
-                Qt.WindowStaysOnTopHint, self.stayOnTopHint
-            )
+            self.PCSelection.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.PCSelection.show()
         except Exception as e:
             raise e
-    
-    def showImage(self, image_path):
+
+    def showImage(self, image_path: str = ""):
+        imageViewer = self.ui.dockWidgetImageViewer
+        if imageViewer.isHidden():
+            imageViewer.setVisible(True)
+        imageViewer.raise_()
         try:
-            if image_path == None or not os.path.splitext(image_path)[1] in [
-                ".jpg",
-                ".png",
-                ".gif",
-                ".bmp",
-            ]:
-                image = mpimg.imread("resources/ebsd_gui.png")
-                self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer")
-            else:
-                image = mpimg.imread(image_path)
-                self.ui.dockWidgetImageViewer.setWindowTitle(
+            if len(image_path):
+                image = mpimg.imread(resource_path(image_path))
+                imageViewer.setWindowTitle(
                     f"Image Viewer - {os.path.basename(image_path)}"
                 )
+            else:
+                image = mpimg.imread(resource_path("resources/ebsd_gui.png"))
+                imageViewer.setWindowTitle(f"Image Viewer")
             self.ui.MplWidget.canvas.ax.clear()
             self.ui.MplWidget.canvas.ax.axis(False)
             self.ui.MplWidget.canvas.ax.imshow(image)
@@ -403,11 +431,11 @@ class AppWindow(QMainWindow):
             kp_enabled = False
         setAvailableMenuActions(kp_enabled)
 
-        # Special case for plotting calibration patterns from Settings.txt
-        if os.path.basename(file_path) == "Setting.txt":
-            self.ui.menuPatternInspection.setEnabled(True)
-            self.ui.actionSignalNavigation.setEnabled(True)
-            self.ui.menuPre_indexing_maps.setEnabled(False)
+        # Special case for plotting calibration patterns from Settings.txt, currently not avaiable
+        # if os.path.basename(file_path) == "Setting.txt":
+        #     self.ui.menuPatternInspection.setEnabled(True)
+        #     self.ui.actionSignalNavigation.setEnabled(True)
+        #     self.ui.menuPre_indexing_maps.setEnabled(False)
 
     # TODO Move removeWorker and updateActiveJobs to a jobmanagerlist class
     @Slot(int)
@@ -421,9 +449,8 @@ class AppWindow(QMainWindow):
 
     @Slot()
     def updateActiveJobs(self):
-        self.ui.threadsLabel.setText(
-            f"{QThreadPool.globalInstance().activeThreadCount()} out of {QThreadPool.globalInstance().maxThreadCount()} active jobs"
-        )
+        msg = f"{QThreadPool.globalInstance().activeThreadCount()} out of {QThreadPool.globalInstance().maxThreadCount()} active jobs"
+        self.ui.threadsLabel.setText(msg)
 
 
 if __name__ == "__main__":

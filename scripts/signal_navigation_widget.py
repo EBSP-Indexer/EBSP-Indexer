@@ -298,47 +298,47 @@ class SignalNavigationWidget(QWidget):
         )
         if saveImageBrowser.getFile():
             image_export_path = saveImageBrowser.getPaths()[0]
-        x, y = self.current_x, self.current_y
-        fig, ax = plt.subplots(1, 2, figsize=(12, 6))
-        ax[0].set_title(self.ui.comboBoxNavigator.currentText())
-        ax[0].imshow(
-            self.dataset.compute_navigator(navigator_index),
-            cmap="gray",
-            extent=(0, self.dataset.nav_shape[0], self.dataset.nav_shape[1], 0),
-        )
-        
-        ax[0].add_patch(
-            Rectangle(
-                (x, y),
-                1,
-                1,
-                linewidth=0.5,
-                edgecolor="black",
-                facecolor="red",
-                alpha=1,
+            x, y = self.current_x, self.current_y
+            fig, ax = plt.subplots(1, 2, figsize=(12, 6))
+            ax[0].set_title(self.ui.comboBoxNavigator.currentText())
+            ax[0].imshow(
+                self.dataset.compute_navigator(navigator_index),
+                cmap="gray",
+                extent=(0, self.dataset.nav_shape[0], self.dataset.nav_shape[1], 0),
             )
-        )
-        ax[0].axis("off")
-
-        ax[1].set_title(f"EBSD signal ({x}, {y})")
-        ax[1].imshow(signal, cmap="gray")
-        ax[1].axis("off")
-        if self.ui.checkBox.isChecked():
-            phase_id = self.dataset.phase_id_array[y, x]
-            thdout = ThreadedOutput()
-            with redirect_stdout(thdout):
-                simulator = kp.simulations.KikuchiPatternSimulator(
-                    self.dataset.hkl[phase_id]
+            
+            ax[0].add_patch(
+                Rectangle(
+                    (x, y),
+                    1,
+                    1,
+                    linewidth=0.5,
+                    edgecolor="black",
+                    facecolor="red",
+                    alpha=1,
                 )
-
-                hkl_lines = simulator.on_detector(
-                    self.dataset.ebsd_detector,
-                    self.dataset.crystal_map[y, x].rotations,
-                ).as_collections(zone_axes_labels=False)
-
-            ax[1].add_collection(
-                hkl_lines[0], autolim=False
             )
-        fig.savefig(
-            image_export_path
-        )  # image is saved as .png by default, as of now no other file format is supported
+            ax[0].axis("off")
+
+            ax[1].set_title(f"EBSD signal ({x}, {y})")
+            ax[1].imshow(signal, cmap="gray")
+            ax[1].axis("off")
+            if self.ui.checkBox.isChecked():
+                phase_id = self.dataset.phase_id_array[y, x]
+                thdout = ThreadedOutput()
+                with redirect_stdout(thdout):
+                    simulator = kp.simulations.KikuchiPatternSimulator(
+                        self.dataset.hkl[phase_id]
+                    )
+
+                    hkl_lines = simulator.on_detector(
+                        self.dataset.ebsd_detector,
+                        self.dataset.crystal_map[y, x].rotations,
+                    ).as_collections(zone_axes_labels=False)
+
+                ax[1].add_collection(
+                    hkl_lines[0], autolim=False
+                )
+            fig.savefig(
+                image_export_path
+            )  # image is saved as .png by default, as of now no other file format is supported

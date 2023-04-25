@@ -31,9 +31,11 @@ class SystemExplorerWidget(QWidget):
         "*.txt",
     )
     KP_EXTENSIONS = (".h5", ".dat")
+    IMAGE_EXTENSIONS = (".jpg", ".png", ".gif", ".bmp",)
 
     pathChanged = Signal(str)
     requestSignalNavigation = Signal(str)
+    requestImageViewer = Signal(str)
 
     def __init__(self, parent: Optional[QWidget] = ...) -> None:
         super().__init__(parent)
@@ -52,6 +54,9 @@ class SystemExplorerWidget(QWidget):
             lambda new, old: self.onSystemModelChanged(new, old)
         )
         self.ui.systemViewer.doubleClicked.connect(lambda: self.doubleClickEvent())
+        self.ui.systemViewer.setSortingEnabled(True)
+        # self.ui.systemViewer. sortItems(column, order)
+        self.ui.systemViewer.setCursor(Qt.PointingHandCursor)
         self.ui.systemViewer.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.systemViewer.customContextMenuRequested.connect(self.contextMenu)
 
@@ -64,7 +69,7 @@ class SystemExplorerWidget(QWidget):
         self.systemModel.setNameFilterDisables(0)
         self.ui.systemViewer.setModel(self.systemModel)
         self.ui.systemViewer.setRootIndex(self.systemModel.index(working_dir))
-        self.ui.systemViewer.setColumnWidth(0, 250)
+        self.ui.systemViewer.setColumnWidth(0, 200)
         self.ui.systemViewer.hideColumn(2)
         self.ui.folderLabel.setText(path.basename(working_dir))
         self.app.setWindowTitle(f"EBSP Indexer - {working_dir}")
@@ -72,10 +77,19 @@ class SystemExplorerWidget(QWidget):
     def contextMenu(self):
         menu = QMenu()
         menu_path = self.selected_path
+        menu.setCursor(Qt.PointingHandCursor)
         file = path.isfile(menu_path)
+        directory = path.isdir(menu_path)
+        if not (file or directory):
+            revealAction = menu.addAction("Reveal in File Explorer")
+            revealAction.triggered.connect(
+                lambda: revealInExplorer(self.systemModel.rootPath())
+            )
+            cursor = QCursor()
+            menu.exec(cursor.pos())
         ext = path.splitext(menu_path)[-1]
         # Kikuchipy available actions
-        if file and ext in self.KP_EXTENSIONS:
+        if ext in self.KP_EXTENSIONS:
             snAction = menu.addAction("Open in Signal Navigation")
             snAction.triggered.connect(
                 lambda: self.requestSignalNavigation.emit(menu_path)
@@ -107,9 +121,12 @@ class SystemExplorerWidget(QWidget):
                 except Exception as e:
                     pass
         # Misc available actions
-        elif file and ext in [".txt"]:
-            txtAction = menu.addAction("Open")
+        elif ext in [".txt"]:
+            txtAction = menu.addAction("Open Text")
             txtAction.triggered.connect(lambda: openTxtFile(menu_path))
+        elif ext in self.IMAGE_EXTENSIONS:
+            imageAction = menu.addAction("Open Image")
+            imageAction.triggered.connect(lambda: self.requestImageViewer.emit(menu_path))
 
         # Globally available actions
         menu.addSeparator()
@@ -121,7 +138,6 @@ class SystemExplorerWidget(QWidget):
         deleteAction.triggered.connect(
             lambda: self.displayDeleteWarning(self.selected_path)
         )
-
         cursor = QCursor()
         menu.exec(cursor.pos())
 
@@ -147,6 +163,8 @@ class SystemExplorerWidget(QWidget):
         self.ui.systemViewer.selectionModel().clearCurrentIndex()
 
     def onSystemModelChanged(self, new_selected, old_selected):
+        if new_selected == old_selected:
+            return
         if new_selected.empty():
             self.selected_path = ""
         else:
@@ -158,20 +176,25 @@ class SystemExplorerWidget(QWidget):
     def doubleClickEvent(self):
         index = self.ui.systemViewer.currentIndex()
         self.selected_path = self.systemModel.filePath(index)
-        if path.splitext(self.selected_path)[1] in [".txt"]:
+        ext = path.splitext(self.selected_path)[1]
+        if ext in [".txt"]:
             if platform.system().lower() == "darwin":
                 subprocess.call(["open", "-a", "TextEdit", self.selected_path])
             if platform.system().lower() == "windows":
                 startfile(self.selected_path)
         # TODO: more functionality, open dataset for signal navigation
-        if path.splitext(self.selected_path)[1] in self.KP_EXTENSIONS:
+        elif ext in self.KP_EXTENSIONS:
             self.requestSignalNavigation.emit(self.selected_path)
+        elif ext in self.IMAGE_EXTENSIONS:
+            self.requestImageViewer.emit(self.selected_path)
 
 def revealInExplorer(revealed_path):
     if path.isdir(revealed_path):
         webbrowser.open(revealed_path)
     elif path.isfile(revealed_path):
         webbrowser.open(path.dirname(revealed_path))
+    else:
+        webbrowser.open()
 
 def openTxtFile(txt_path: str):
         if platform.system().lower() == "darwin":
