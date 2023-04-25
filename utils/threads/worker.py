@@ -117,3 +117,5 @@ def sendToWorker(parent: QMainWindow | QObject, func: Callable, *args, **kwargs)
     """
     worker = Worker(parent, func, *args, **kwargs)
     QThreadPool.globalInstance().start(worker)
+    
+    return worker

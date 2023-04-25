@@ -159,24 +159,50 @@ class AppWindow(QMainWindow):
         # )
 
         # else:
+        
         self.ui.actionAverage_dot_product.triggered.connect(
-            lambda: sendToWorker(
-                self, save_adp_map, pattern_path=self.getSelectedPath()
-            )
+            lambda: self.generatePreIndexingMap(map=0)
         )
         self.ui.actionImage_quality.triggered.connect(
-            lambda: sendToWorker(self, save_iq_map, pattern_path=self.getSelectedPath())
+            lambda: self.generatePreIndexingMap(map=1)
         )
         self.ui.actionMean_intensity.triggered.connect(
-            lambda: sendToWorker(
-                self, save_mean_intensity_map, pattern_path=self.getSelectedPath()
-            )
+            lambda: self.generatePreIndexingMap(map=2)
         )
         self.ui.actionVirtual_backscatter_electron.triggered.connect(
-            lambda: sendToWorker(
-                self, save_rgb_vbse, pattern_path=self.getSelectedPath()
-            )
+            lambda: self.generatePreIndexingMap(map=3)
         )
+
+    def generatePreIndexingMap(self, map: int):
+        """
+        0 = average dot product map
+        1 = image quality map
+        2 = mean intensity map
+        3 = virual BSE image
+        """
+
+        def image_saved():
+            sb.showMessage("Image saved", 3000)
+
+        pattern_path = self.getSelectedPath()
+        sb = self.ui.statusbar
+
+        if map == 0:
+            sb.showMessage("Generating average dot product map ...")
+            worker = sendToWorker(self, save_adp_map, pattern_path=pattern_path)
+        if map == 1:
+            sb.showMessage("Generating image quality map ...")
+            worker = sendToWorker(self, save_iq_map, pattern_path=pattern_path)
+        if map == 2:
+            sb.showMessage("Generating mean intensity map ...")
+            worker = sendToWorker(
+                self, save_mean_intensity_map, pattern_path=pattern_path
+            )
+        if map == 3:
+            sb.showMessage("Generating VBSE image ...")
+            worker = sendToWorker(self, save_rgb_vbse, pattern_path=pattern_path)
+
+        worker.isFinished.connect(image_saved)
 
     # Override closeEvent from QMainWindow
     def closeEvent(self, event):
