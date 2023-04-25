@@ -185,7 +185,7 @@ class AppWindow(QMainWindow):
             reply = QMessageBox.question(
                 self,
                 "Close EBSP Indexer",
-                "Some jobs were not completed.\nAre you sure you want to close EBSP Indexer?",
+                "Some jobs were not completed.\nAre ydou sure you want to close EBSP Indexer?",
                 QMessageBox.Yes | QMessageBox.No,
                 QMessageBox.No, # Default button
             )
@@ -259,7 +259,7 @@ class AppWindow(QMainWindow):
         file_types = json.loads(setting_file.read("File Types"))
         system_view_filters = ["*" + x for x in file_types]
         if setting_file.read("Default Directory") not in ["False", ""]:
-            if self.working_dir == QDir.currentPath():
+            if self.working_dir == QDir():
                 self.working_dir = setting_file.read("Default Directory")
             self.systemExplorer.setSystemViewer(
                 self.working_dir, filters=system_view_filters
