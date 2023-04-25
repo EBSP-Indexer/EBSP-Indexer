@@ -39,7 +39,7 @@ class crystalMap:
                 if len(self.crystal_map.phases.ids) > 1:
 
                     self.navigator = {
-                        "Inverse polefigure": 0,
+                        "Inverse pole figure": 0,
                         "Phase map": 1,
                     }
                 else:
@@ -120,9 +120,12 @@ class crystalMap:
 
     @functools.cached_property
     def inverse_pole_figure(self):
-        phase_id = self.crystal_map.phases.ids[0]
+        if self.crystal_map.phases.ids[0] == -1:
+            phase_id = self.crystal_map.phases.ids[1]
+        else:
+            phase_id = self.crystal_map.phases.ids[0]
+        
         ckey = orix.plot.IPFColorKeyTSL(self.crystal_map.phases[phase_id].point_group)
-
         rgb_all = np.zeros((self.crystal_map.size, 3))
         for i, phase in self.crystal_map.phases:
             if i != -1:
@@ -168,7 +171,7 @@ class EBSDDataset:
 
     """
 
-    def __init__(self, dataset, ebsd_pattern_path: str):
+    def __init__(self, dataset):
         self.ebsd = dataset
         self.datatype = "ebsd_dataset"
         self.nav_shape = self.ebsd.axes_manager.navigation_shape
