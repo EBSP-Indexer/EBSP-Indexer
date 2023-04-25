@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'main_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.0
+## Created by: Qt User Interface Compiler version 6.3.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -130,7 +130,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1467, 24))
+        self.menubar.setGeometry(QRect(0, 0, 1467, 26))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuProcessing = QMenu(self.menubar)
@@ -198,7 +198,7 @@ class Ui_MainWindow(object):
         self.dockWidgetSystemExplorerContents.setObjectName(u"dockWidgetSystemExplorerContents")
         self.gridLayout = QGridLayout(self.dockWidgetSystemExplorerContents)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.horizontalSpacer = QSpacerItem(320, 320, QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
+        self.horizontalSpacer = QSpacerItem(420, 300, QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
 
         self.gridLayout.addItem(self.horizontalSpacer, 0, 0, 1, 1)
 

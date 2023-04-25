@@ -96,7 +96,7 @@ class AppWindow(QMainWindow):
             self.stayOnTopHint = False
 
         self.setupConnections()
-        self.showImage(self.getSelectedPath())
+        self.showImage()
         self.importSettings()
         self.updateActiveJobs()
 
@@ -107,12 +107,16 @@ class AppWindow(QMainWindow):
             self.ui.dockWidgetImageViewer, self.ui.dockWidgetSignalNavigation
         )
         self.ui.dockWidgetImageViewer.setFocus()
+        self.ui.dockWidgetJobManager.setHidden(True)
         self.ui.statusbar.addPermanentWidget(self.ui.threadsLabel)
         self.systemExplorer.pathChanged.connect(
             lambda new_path: self.updateMenuButtons(new_path)
         )
-        self.systemExplorer.pathChanged.connect(
-            lambda new_path: self.showImage(new_path)
+        # self.systemExplorer.pathChanged.connect(
+        #     lambda new_path: self.showImage(new_path)
+        # )
+        self.systemExplorer.requestImageViewer.connect(
+            lambda image_path: self.showImage(image_path)
         )
         self.systemExplorer.requestSignalNavigation.connect(
             lambda signal_path: self.selectSignalNavigation(signal_path)
@@ -210,7 +214,7 @@ class AppWindow(QMainWindow):
             reply = QMessageBox.question(
                 self,
                 "Close EBSP Indexer",
-                "Some jobs were not completed.\nAre ydou sure you want to close EBSP Indexer?",
+                "Some jobs are still running.\nAre you sure you want to close EBSP Indexer?",
                 QMessageBox.Yes | QMessageBox.No,
                 QMessageBox.No,  # Default button
             )
@@ -382,21 +386,20 @@ class AppWindow(QMainWindow):
         except Exception as e:
             raise e
 
-    def showImage(self, image_path):
+    def showImage(self, image_path: str = ""):
+        imageViewer = self.ui.dockWidgetImageViewer
+        if imageViewer.isHidden():
+            imageViewer.setVisible(True)
+        imageViewer.raise_()
         try:
-            if image_path == None or not os.path.splitext(image_path)[1] in [
-                ".jpg",
-                ".png",
-                ".gif",
-                ".bmp",
-            ]:
-                image = mpimg.imread(resource_path("resources/ebsd_gui.png"))
-                self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer")
-            else:
+            if len(image_path):
                 image = mpimg.imread(resource_path(image_path))
-                self.ui.dockWidgetImageViewer.setWindowTitle(
+                imageViewer.setWindowTitle(
                     f"Image Viewer - {os.path.basename(image_path)}"
                 )
+            else:
+                image = mpimg.imread(resource_path("resources/ebsd_gui.png"))
+                imageViewer.setWindowTitle(f"Image Viewer")
             self.ui.MplWidget.canvas.ax.clear()
             self.ui.MplWidget.canvas.ax.axis(False)
             self.ui.MplWidget.canvas.ax.imshow(image)
@@ -428,11 +431,11 @@ class AppWindow(QMainWindow):
             kp_enabled = False
         setAvailableMenuActions(kp_enabled)
 
-        # Special case for plotting calibration patterns from Settings.txt
-        if os.path.basename(file_path) == "Setting.txt":
-            self.ui.menuPatternInspection.setEnabled(True)
-            self.ui.actionSignalNavigation.setEnabled(True)
-            self.ui.menuPre_indexing_maps.setEnabled(False)
+        # Special case for plotting calibration patterns from Settings.txt, currently not avaiable
+        # if os.path.basename(file_path) == "Setting.txt":
+        #     self.ui.menuPatternInspection.setEnabled(True)
+        #     self.ui.actionSignalNavigation.setEnabled(True)
+        #     self.ui.menuPre_indexing_maps.setEnabled(False)
 
     # TODO Move removeWorker and updateActiveJobs to a jobmanagerlist class
     @Slot(int)
@@ -446,9 +449,8 @@ class AppWindow(QMainWindow):
 
     @Slot()
     def updateActiveJobs(self):
-        self.ui.threadsLabel.setText(
-            f"{QThreadPool.globalInstance().activeThreadCount()} out of {QThreadPool.globalInstance().maxThreadCount()} active jobs"
-        )
+        msg = f"{QThreadPool.globalInstance().activeThreadCount()} out of {QThreadPool.globalInstance().maxThreadCount()} active jobs"
+        self.ui.threadsLabel.setText(msg)
 
 
 if __name__ == "__main__":

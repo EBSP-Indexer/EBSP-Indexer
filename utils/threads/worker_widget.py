@@ -92,6 +92,12 @@ class WorkerWidget(QWidget):
         self.ui.setupUi(self)
         self.setupConnections()
         self.outdisplay = self.ui.textBrowserStatus
+        # Show Job Manager if hidden
+        dw = self.parentWidget().ui.dockWidgetJobManager
+        if dw.isHidden():
+            dw.setVisible(True)
+        dw.raise_()
+        
 
     def setupConnections(self):
         # UI
