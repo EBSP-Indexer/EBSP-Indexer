@@ -106,8 +106,7 @@ class AppWindow(QMainWindow):
             self.ui.dockWidgetImageViewer, self.ui.dockWidgetSignalNavigation
         )
         self.ui.dockWidgetImageViewer.setFocus()
-
-        # self.ui.dockWidgetSystemExplorer.adjustSize()
+        self.ui.statusbar.addPermanentWidget(self.ui.threadsLabel)
         self.systemExplorer.pathChanged.connect(
             lambda new_path: self.updateMenuButtons(new_path)
         )
