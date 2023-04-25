@@ -77,14 +77,8 @@ class PCSelectionDialog(QDialog):
             self.convention = self.program_settings.read("Convention")
         
         try:
-            try:
-                self.pc = eval(self.setting_file.read("Pattern center (x*, y*, z*)"))
-            except:
-                self.pc = [
-                        float(self.setting_file.read("X star")),
-                        float(self.setting_file.read("Y star")),
-                        float(self.setting_file.read("Z star")),
-                ]
+            self.pc = eval(self.setting_file.read("PC"))
+
         except:
             if self.s.metadata.Acquisition_instrument.SEM.microscope == "ZEISS SUPRA55 VP":
                 self.pc = [
@@ -190,9 +184,12 @@ class PCSelectionDialog(QDialog):
             self.ui.buttonRemovePattern.setEnabled(False)
     
     def coordinateListClicked(self):
-        coords = self.ui.listCoordinates.currentItem().text().split(", ")
-        x, y = int(coords[0].strip("()")), int(coords[1].strip("()"))
-        self.plot_signal(x, y)
+        try:
+            coords = self.ui.listCoordinates.currentItem().text().split(", ")
+            x, y = int(coords[0].strip("()")), int(coords[1].strip("()"))
+            self.plot_signal(x, y)
+        except:
+            pass
 
         try:
             self.click_rect.remove()
@@ -263,7 +260,7 @@ class PCSelectionDialog(QDialog):
 ### INTERACTION WITH NAVIGATOR ###
 
     def plot_navigator(self, x=0, y=0):
-        self.dataset = EBSDDataset(self.s, self.pattern_path)
+        self.dataset = EBSDDataset(self.s)
 
         try:
             self.ui.MplWidget.canvas.mpl_disconnect(self.cid)
@@ -521,6 +518,9 @@ class PCSelectionDialog(QDialog):
         is_inlier = xmap_cal_ref.scores > 0.4
         det_cal_ref.pc = det_cal_ref.pc[is_inlier]
 
+        # update pattern center
+        self.pc = np.array(det_cal_ref.pc_average.round(4))
+
         # Write to file
         det_cal_ref.save(path.join(save_dir, "pc_optimization.txt"))
 
@@ -529,3 +529,15 @@ class PCSelectionDialog(QDialog):
         f.write("\n# Standard deviation: "+str(abs(det_cal_ref.pc_flattened.std(0))))
         f.close()
 
+    def save_project_settings(self):
+        self.setting_file.delete_all_entries()  # clean up initial dictionary
+
+        ### Sample parameters
+        for i, mppath in enumerate(self.mp_paths.values(), 1):
+            self.setting_file.write(f"Master pattern {i}", mppath)
+
+        self.setting_file.write("Convention", self.convention)
+
+        self.setting_file.write("PC", f"{self.pc}")
+
+        self.setting_file.save()
