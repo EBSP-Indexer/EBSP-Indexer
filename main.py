@@ -257,15 +257,19 @@ class AppWindow(QMainWindow):
 
         # TODO: This whole thing should be changed to inside AdvancedSettingsDialog, and should only be executed when ok is pressed
         # updates file browser to changes:
-        setting_file = SettingFile("advanced_settings.txt")
-        file_types = json.loads(setting_file.read("File Types"))
-        system_view_filters = ["*" + x for x in file_types]
-        if setting_file.read("Default Directory") not in ["False", ""]:
-            if self.working_dir == QDir():
-                self.working_dir = setting_file.read("Default Directory")
-            self.systemExplorer.setSystemViewer(
-                self.working_dir, filters=system_view_filters
-            )
+        try:
+            setting_file = SettingFile("advanced_settings.txt")
+            file_types = json.loads(setting_file.read("File Types"))
+            system_view_filters = ["*" + x for x in file_types]
+            if setting_file.read("Default Directory") not in ["False", ""]:
+                new_dir = setting_file.read("Default Directory")
+                if self.working_dir != new_dir:
+                    self.working_dir = new_dir
+                self.systemExplorer.setSystemViewer(
+                    self.working_dir, filters=system_view_filters
+                )
+        except Exception as e:
+            raise e
 
     def selectRefineOrientations(self, file_path: str):
         try:
