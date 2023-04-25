@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'pc_selection.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.3.2
+## Created by: Qt User Interface Compiler version 6.5.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -27,7 +27,7 @@ class Ui_PCSelection(object):
     def setupUi(self, PCSelection):
         if not PCSelection.objectName():
             PCSelection.setObjectName(u"PCSelection")
-        PCSelection.resize(927, 821)
+        PCSelection.resize(1354, 746)
         self.horizontalLayout_5 = QHBoxLayout(PCSelection)
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.horizontalLayout_4 = QHBoxLayout()
@@ -113,6 +113,7 @@ class Ui_PCSelection(object):
 
         self.buttonRemovePhase = QPushButton(PCSelection)
         self.buttonRemovePhase.setObjectName(u"buttonRemovePhase")
+        self.buttonRemovePhase.setEnabled(False)
 
         self.horizontalLayout_3.addWidget(self.buttonRemovePhase)
 
@@ -200,6 +201,8 @@ class Ui_PCSelection(object):
 
         self.horizontalLayout_2.addWidget(self.MplWidgetPattern)
 
+        self.verticalLayout_2 = QVBoxLayout()
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.listCoordinates = QListWidget(PCSelection)
         self.listCoordinates.setObjectName(u"listCoordinates")
         sizePolicy1 = QSizePolicy(QSizePolicy.Ignored, QSizePolicy.Minimum)
@@ -208,36 +211,22 @@ class Ui_PCSelection(object):
         sizePolicy1.setHeightForWidth(self.listCoordinates.sizePolicy().hasHeightForWidth())
         self.listCoordinates.setSizePolicy(sizePolicy1)
         self.listCoordinates.setMinimumSize(QSize(0, 0))
+        self.listCoordinates.setFocusPolicy(Qt.StrongFocus)
 
-        self.horizontalLayout_2.addWidget(self.listCoordinates)
-
-        self.horizontalLayout_2.setStretch(0, 3)
-        self.horizontalLayout_2.setStretch(1, 1)
-
-        self.verticalLayout.addLayout(self.horizontalLayout_2)
-
-        self.horizontalLayout_6 = QHBoxLayout()
-        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
-        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_6.addItem(self.horizontalSpacer_3)
-
-        self.buttonAddPattern = QPushButton(PCSelection)
-        self.buttonAddPattern.setObjectName(u"buttonAddPattern")
-
-        self.horizontalLayout_6.addWidget(self.buttonAddPattern)
+        self.verticalLayout_2.addWidget(self.listCoordinates)
 
         self.buttonRemovePattern = QPushButton(PCSelection)
         self.buttonRemovePattern.setObjectName(u"buttonRemovePattern")
+        self.buttonRemovePattern.setEnabled(False)
 
-        self.horizontalLayout_6.addWidget(self.buttonRemovePattern)
+        self.verticalLayout_2.addWidget(self.buttonRemovePattern)
 
-        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.verticalLayout_2.setStretch(0, 1)
 
-        self.horizontalLayout_6.addItem(self.horizontalSpacer_5)
+        self.horizontalLayout_2.addLayout(self.verticalLayout_2)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout_6)
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -389,7 +378,6 @@ class Ui_PCSelection(object):
         self.verticalLayout.setStretch(15, 1)
         self.verticalLayout.setStretch(16, 1)
         self.verticalLayout.setStretch(17, 1)
-        self.verticalLayout.setStretch(18, 1)
 
         self.horizontalLayout_4.addLayout(self.verticalLayout)
 
@@ -400,6 +388,8 @@ class Ui_PCSelection(object):
 
 
         self.retranslateUi(PCSelection)
+        self.buttonBox.accepted.connect(PCSelection.accept)
+        self.buttonBox.rejected.connect(PCSelection.reject)
 
         QMetaObject.connectSlotsByName(PCSelection)
     # setupUi
@@ -416,7 +406,6 @@ class Ui_PCSelection(object):
         self.buttonGrid.setText(QCoreApplication.translate("PCSelection", u"Grid     ", None))
         self.labelMultiplicator.setText(QCoreApplication.translate("PCSelection", u"x", None))
         self.buttonUpdateGrid.setText(QCoreApplication.translate("PCSelection", u"Update grid", None))
-        self.buttonAddPattern.setText(QCoreApplication.translate("PCSelection", u"Add Pattern", None))
         self.buttonRemovePattern.setText(QCoreApplication.translate("PCSelection", u"Remove Pattern", None))
         self.labelPC.setText(QCoreApplication.translate("PCSelection", u"Pattern center:", None))
         self.labelXStar.setText(QCoreApplication.translate("PCSelection", u"X:", None))

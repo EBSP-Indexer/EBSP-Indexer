@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'main_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.3.2
+## Created by: Qt User Interface Compiler version 6.5.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -135,7 +135,7 @@ class Ui_MainWindow(object):
         self.menuFile.setObjectName(u"menuFile")
         self.menuProcessing = QMenu(self.menubar)
         self.menuProcessing.setObjectName(u"menuProcessing")
-        self.menuProcessing.setEnabled(True)
+        self.menuProcessing.setEnabled(False)
         self.menuPattern_center_optimization = QMenu(self.menuProcessing)
         self.menuPattern_center_optimization.setObjectName(u"menuPattern_center_optimization")
         self.menuPatternInspection = QMenu(self.menubar)
