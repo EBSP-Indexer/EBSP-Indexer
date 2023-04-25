@@ -47,6 +47,7 @@ from scripts.console import Console
 from scripts.dictionary_indexing import DiSetupDialog
 from scripts.hough_indexing import HiSetupDialog
 from scripts.pattern_center import PatterCenterDialog
+from scripts.pc_selection import PCSelectionDialog
 from scripts.pattern_processing import PatternProcessingDialog
 from scripts.pre_indexing_maps import (
     save_adp_map,
@@ -137,8 +138,11 @@ class AppWindow(QMainWindow):
         self.ui.actionRefineOrientations.triggered.connect(
             lambda: self.selectRefineOrientations(file_path=self.getSelectedPath())
         )
-        self.ui.actionPattern_Center.triggered.connect(
+        self.ui.actionCalibration_patterns.triggered.connect(
             lambda: self.selectPatternCenter()
+        )
+        self.ui.actionPattern_selection.triggered.connect(
+            lambda: self.openPCSelection(pattern_path=self.getSelectedPath())
         )
         # if platform.system().lower() != "darwin":
         # self.ui.actionAverage_dot_product.triggered.connect(
@@ -297,9 +301,13 @@ class AppWindow(QMainWindow):
     def selectSignalNavigation(self, signal_path: str):
         try:
             self.signalNavigationWidget.load_dataset(signal_path)
-            self.ui.dockWidgetSignalNavigation.setWindowTitle(
+            dw = self.ui.dockWidgetSignalNavigation
+            dw.setWindowTitle(
                 f"Signal Navigation - {os.path.basename(signal_path)}"
             )
+            if dw.isHidden():
+                dw.setVisible(True)
+            dw.raise_()
         except Exception as e:
             if self.getSelectedPath() == "":
                 dlg = QMessageBox(self)
@@ -337,7 +345,17 @@ class AppWindow(QMainWindow):
             self.patternCenter.show()
         except Exception as e:
             raise e
-
+            
+    def openPCSelection(self, pattern_path: str):
+        try:
+            self.PCSelection = PCSelectionDialog(self, pattern_path)
+            self.PCSelection.setWindowFlag(
+                Qt.WindowStaysOnTopHint, self.stayOnTopHint
+            )
+            self.PCSelection.show()
+        except Exception as e:
+            raise e
+    
     def showImage(self, image_path):
         try:
             if image_path == None or not os.path.splitext(image_path)[1] in [
