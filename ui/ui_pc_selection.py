@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'pc_selection.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.0
+## Created by: Qt User Interface Compiler version 6.3.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -375,6 +375,12 @@ class Ui_PCSelection(object):
 
         self.verticalLayout.addItem(self.verticalSpacer_2)
 
+        self.horizontalLayout_10 = QHBoxLayout()
+        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
+        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_10.addItem(self.horizontalSpacer_7)
+
         self.buttonBox = QDialogButtonBox(PCSelection)
         self.buttonBox.setObjectName(u"buttonBox")
         sizePolicy4 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -382,10 +388,12 @@ class Ui_PCSelection(object):
         sizePolicy4.setVerticalStretch(0)
         sizePolicy4.setHeightForWidth(self.buttonBox.sizePolicy().hasHeightForWidth())
         self.buttonBox.setSizePolicy(sizePolicy4)
-        self.buttonBox.setLayoutDirection(Qt.RightToLeft)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
 
-        self.verticalLayout.addWidget(self.buttonBox)
+        self.horizontalLayout_10.addWidget(self.buttonBox)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_10)
 
         self.verticalLayout.setStretch(0, 1)
         self.verticalLayout.setStretch(1, 1)

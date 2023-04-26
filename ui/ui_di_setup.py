@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'di_setup.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.0
+## Created by: Qt User Interface Compiler version 6.3.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -545,7 +545,7 @@ class Ui_DiSetupDialog(object):
         self.label_8.setText(QCoreApplication.translate("DiSetupDialog", u"Angular step size (\u00b0)", None))
         self.label_10.setText(QCoreApplication.translate("DiSetupDialog", u"# simulated patterns", None))
         self.numSimPatterns.setText(QCoreApplication.translate("DiSetupDialog", u"N/A", None))
-        self.nIterLabel.setText(QCoreApplication.translate("DiSetupDialog", u"Number of iterations", None))
+        self.nIterLabel.setText(QCoreApplication.translate("DiSetupDialog", u"Number of chunks", None))
         self.checkBoxRefine.setText(QCoreApplication.translate("DiSetupDialog", u"Refine orientations", None))
         self.label_15.setText(QCoreApplication.translate("DiSetupDialog", u"Figures to be saved:", None))
         self.label_14.setText(QCoreApplication.translate("DiSetupDialog", u"Quality metric maps:", None))

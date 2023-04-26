@@ -144,7 +144,7 @@ class WorkerWidget(QWidget):
     def adjustSize(self, show):
         super().adjustSize()
         if show:
-            self.jobItem.setSizeHint(self.sizeHint() - QSize(100, 100))
+            self.jobItem.setSizeHint(self.sizeHint() - QSize(100, 50))
         else:
             self.jobItem.setSizeHint(self.sizeHint() - QSize(100, 0))
 

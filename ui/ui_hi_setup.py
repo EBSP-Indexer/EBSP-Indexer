@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'hi_setup.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.0
+## Created by: Qt User Interface Compiler version 6.3.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -26,7 +26,7 @@ class Ui_HISetupDialog(object):
     def setupUi(self, HISetupDialog):
         if not HISetupDialog.objectName():
             HISetupDialog.setObjectName(u"HISetupDialog")
-        HISetupDialog.resize(673, 624)
+        HISetupDialog.resize(814, 624)
         self.gridLayout = QGridLayout(HISetupDialog)
         self.gridLayout.setObjectName(u"gridLayout")
         self.frame = QFrame(HISetupDialog)

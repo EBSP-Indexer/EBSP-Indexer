@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'pattern_processing.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.0
+## Created by: Qt User Interface Compiler version 6.3.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -26,7 +26,7 @@ class Ui_PatternProcessingDialog(object):
     def setupUi(self, PatternProcessingDialog):
         if not PatternProcessingDialog.objectName():
             PatternProcessingDialog.setObjectName(u"PatternProcessingDialog")
-        PatternProcessingDialog.resize(963, 472)
+        PatternProcessingDialog.resize(865, 472)
         PatternProcessingDialog.setLocale(QLocale(QLocale.English, QLocale.UnitedKingdom))
         self.gridLayout = QGridLayout(PatternProcessingDialog)
         self.gridLayout.setObjectName(u"gridLayout")
@@ -42,6 +42,10 @@ class Ui_PatternProcessingDialog(object):
 
         self.label = QLabel(self.frame)
         self.label.setObjectName(u"label")
+        font = QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        self.label.setFont(font)
 
         self.verticalLayout.addWidget(self.label)
 
@@ -87,6 +91,7 @@ class Ui_PatternProcessingDialog(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
         self.label_2.setSizePolicy(sizePolicy)
+        self.label_2.setFont(font)
 
         self.verticalLayout_4.addWidget(self.label_2)
 

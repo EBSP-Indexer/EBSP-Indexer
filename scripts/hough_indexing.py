@@ -397,9 +397,14 @@ class HiSetupDialog(QDialog):
             )
         else:
             index_data_path = None
-        io.save(path.join(self.dir_out, "xmap_hi.h5"), xmap)
-        io.save(path.join(self.dir_out, "xmap_hi.ang"), xmap)
-        print("Result was saved as xmap_hi.ang and xmap_hi.h5")
+        name = ""
+        for phase_id, phase in xmap.phases_in_data:
+            if phase_id != -1:
+                name += f"{phase.name}_"
+        name = f"{name}xmap"
+        io.save(path.join(self.dir_out, f"{name}.h5"), xmap)
+        io.save(path.join(self.dir_out, f"{name}.ang"), xmap)
+        print(f"Result was saved as {name}.ang and {name}.h5")
         for key in ["quality", "phase", "orientation"]:
             optionEnabled, optionExecute = options.get(key)
             if optionEnabled:
