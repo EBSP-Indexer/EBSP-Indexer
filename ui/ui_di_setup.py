@@ -80,6 +80,7 @@ class Ui_DiSetupDialog(object):
         self.tableWidgetPhase.setMinimumSize(QSize(510, 0))
         self.tableWidgetPhase.setMaximumSize(QSize(16777215, 16777215))
         self.tableWidgetPhase.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidgetPhase.horizontalHeader().setStretchLastSection(True)
 
         self.verticalLayout_4.addWidget(self.tableWidgetPhase)
 
