@@ -1,27 +1,21 @@
-import warnings
 import json
 from datetime import date
-from os import mkdir, path, getcwd
+from os import mkdir, path
 
 import kikuchipy as kp
-from kikuchipy.signals.ebsd import EBSD, LazyEBSD
-
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import numpy as np
+from kikuchipy.signals.ebsd import EBSD, LazyEBSD
 from matplotlib_scalebar.scalebar import ScaleBar
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-
-import numpy as np
-from orix import io, plot, sampling, crystal_map
-from orix.quaternion import Rotation
-from orix.crystal_map import PhaseList, CrystalMap
+from orix import io, plot, sampling
+from orix.crystal_map import CrystalMap, PhaseList
 from PySide6.QtWidgets import QDialog, QDialogButtonBox, QTableWidgetItem
-from PySide6.QtCore import QThreadPool
+from PySide6.QtGui import QColor
 
 from ui.ui_di_setup import Ui_DiSetupDialog
-from utils import SettingFile, FileBrowser, sendToJobManager
-
-import gc
+from utils import FileBrowser, SettingFile, sendToJobManager
 
 """
 Lookup table for rotations for cubic and tetragonal point groups
@@ -150,7 +144,6 @@ class DiSetupDialog(QDialog):
             try:
                 mp_path = self.setting_file.read(f"Master pattern {i}")
                 mp = kp.load(mp_path, lazy=True)
-                print(mp.phase.name)
                 if mp.phase.name == "":
                     mp.phase.name = path.dirname(mp_path).split("/").pop()
                 phase = mp.phase.name
@@ -319,10 +312,14 @@ class DiSetupDialog(QDialog):
                 sg.number,
                 sg.short_name,
                 sg.crystal_system,
-                ph.color,
+                ph.color_rgb,
             ]
             for col, entry in enumerate(entries):
                 item = QTableWidgetItem(str(entry))
+                if entry == ph.color_rgb:
+                    color = QColor.fromRgbF(*entry)
+                    item = QTableWidgetItem(ph.color)
+                    item.setBackground(color)
                 phaseTable.setItem(row, col, item)
             row += 1
 
@@ -451,9 +448,9 @@ class DiSetupDialog(QDialog):
             ncc_map = crystal_map.scores[:, 0].reshape(*crystal_map.shape)
         else:
             ncc_map = crystal_map.get_map_data("scores")
-        
+
         ### Inspect dictionary indexing results for phase
-        
+
         fig, ax = plt.subplots()
         ax.axis("off")
         ncc = ax.imshow(ncc_map, cmap="gray")
@@ -464,7 +461,7 @@ class DiSetupDialog(QDialog):
             self.scale, "um", location="lower left", box_alpha=0.5, border_pad=0.4
         )
         ax.add_artist(scalebar)
-        
+
         fig.savefig(
             path.join(self.results_dir, f"ncc_{filename}.png"),
             **savefig_kwargs,
@@ -497,7 +494,11 @@ class DiSetupDialog(QDialog):
         )
         ax.add_artist(scalebar)
         fig.savefig(
-            path.join(self.results_dir, f"osm_{crystal_map.phases[crystal_map.phases.ids[0]].name}.png"), **savefig_kwargs
+            path.join(
+                self.results_dir,
+                f"osm_{crystal_map.phases[crystal_map.phases.ids[0]].name}.png",
+            ),
+            **savefig_kwargs,
         )
 
         plt.close(fig)
@@ -651,7 +652,7 @@ class DiSetupDialog(QDialog):
                 ),
                 merged,
             )
-        
+
         return merged
 
     def dictionary_indexing(self, ebsd):
@@ -689,7 +690,6 @@ class DiSetupDialog(QDialog):
             convention=self.convention,  # Default is Bruker
         )
         detector.save(path.join(self.results_dir, "detector.txt"))
-        print("done")
         # Apply signal mask
         self.signal_mask(sig_shape)
 
@@ -713,7 +713,7 @@ class DiSetupDialog(QDialog):
 
         for i, ph in self.phaseList:
             ### Sample orientations
-            
+
             rot = sampling.get_sample_fundamental(
                 method="cubochoric",
                 resolution=self.angular_step_size,
@@ -756,11 +756,10 @@ class DiSetupDialog(QDialog):
 
         if self.refine:
             xmaps_ref = self.refine_orientations(xmaps, detector, ebsd)
-            
-            
+
         if len(self.phaseList.ids) == 1:
             print("Saving figures ...")
-            if self.refine:             
+            if self.refine:
                 # Save IPF of refined crystal_map
                 if self.options["ipf"]:
                     print("Inverse pole figure map ...")
@@ -773,10 +772,9 @@ class DiSetupDialog(QDialog):
                     print("Normalized cross-correlation map ...")
                     for i, ph in self.phaseList:
                         self.save_ncc_figure(xmaps_ref[ph.name], f"{ph.name}_refined")
-                
+
                 # Save DI parameters
                 self.save_di_settings(xmaps_ref, ebsd, original_nav_shape)
-            
 
             else:
                 # Save DI settings to file
@@ -813,13 +811,13 @@ class DiSetupDialog(QDialog):
                     path.join(self.results_dir, f"phase_map.png"),
                     **savefig_kwargs,
                 )
-            
+
             ### NCC map
             if self.options["ncc"]:
                 self.save_ncc_figure(merged, "merged")
 
             self.save_di_settings(merged, ebsd, original_nav_shape)
-        
+
         print(
             f"Dictionary indexing complete, results stored in {path.basename(self.results_dir)}"
         )

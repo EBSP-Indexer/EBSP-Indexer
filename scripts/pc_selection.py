@@ -1,28 +1,21 @@
-import sys
-from os import path, devnull, mkdir
-import kikuchipy as kp
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog, QDialogButtonBox
-import numpy as np
-from math import floor, ceil, isnan
+from math import ceil, floor
+from os import devnull, mkdir, path
 
-from diffsims.crystallography import ReciprocalLatticeVector
-from pyebsdindex import ebsd_index, pcopt
-from orix.quaternion import Rotation
-from orix.crystal_map import PhaseList, Phase
-import hyperspy.api as hs
 import dask as da
-
-from pyebsdindex.ebsd_index import EBSDIndexer
-
+import kikuchipy as kp
 import matplotlib.pyplot as plt
+import numpy as np
+from diffsims.crystallography import ReciprocalLatticeVector
 from matplotlib.patches import Rectangle
 from matplotlib.widgets import Cursor
+from orix.crystal_map import PhaseList
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QDialog, QDialogButtonBox
 
-from utils import SettingFile, FileBrowser, sendToJobManager
-from ui.ui_pc_selection import Ui_PCSelection
-from scripts.signal_loader import crystalMap, EBSDDataset
 from scripts.pc_from_wd import pc_from_wd
+from scripts.signal_loader import EBSDDataset
+from ui.ui_pc_selection import Ui_PCSelection
+from utils import FileBrowser, SettingFile, sendToJobManager
 
 progressbar_bool = False
 
@@ -377,8 +370,8 @@ class PCSelectionDialog(QDialog):
 ### PATTERN CENTER OPTIMIZATION ###
 
     def runPatternCenterOpimization(self):
-        basename, extension = path.basename(self.pattern_path).split(".")
-        save_dir = path.join(self.working_dir, f"{basename}_{extension}")
+        basename, _ = path.basename(self.pattern_path).split(".")
+        save_dir = path.join(self.working_dir, f"{basename}_PC")
         self.inlier_limit = float(self.ui.spinBoxInlier.value())
 
         sendToJobManager(
@@ -393,7 +386,7 @@ class PCSelectionDialog(QDialog):
     def patternCenterOpimization(self):
         print("Initializing pattern center optimization...\n\n")
         basename, extension = path.basename(self.pattern_path).split(".")
-        save_dir = path.join(self.working_dir, f"{basename}_{extension}")       
+        save_dir = path.join(self.working_dir, f"{basename}_PC")       
 
         try:
             mkdir(save_dir)

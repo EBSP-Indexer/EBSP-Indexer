@@ -354,7 +354,9 @@ class RefineSetupDialog(QDialog):
                 item = QTableWidgetItem(str(entry))
                 item.setFlags(item.flags() ^ Qt.ItemIsEditable)
                 if entry == mp.phase.color_rgb:
-                    item.setBackground(QColor.fromRgbF(*entry))
+                    color = QColor.fromRgbF(*entry)
+                    item = QTableWidgetItem(mp.phase.color)
+                    item.setBackground(color)
                 tableMP.setItem(row, col, item)
             row += 1
         self.setAvailableButtons()
@@ -514,11 +516,6 @@ class RefineSetupDialog(QDialog):
             merge_kwargs = dict(simulation_indices_prop="simulation_indices")
         else:
             merge_kwargs = dict()
-        # Add back not_indexed phases as a workaround
-        for ref_xmap in ref_xmaps:
-            ref_xmap._phases.add_not_indexed()
-            ref_xmap._phases
-            print(ref_xmap)
         if len(ref_xmaps) == 1:
             refined_xmap = ref_xmaps[0]
         else:
@@ -529,7 +526,7 @@ class RefineSetupDialog(QDialog):
                 **merge_kwargs,
             )
         name = ""
-        for phase_id, phase in xmap.phases_in_data:
+        for phase_id, phase in refined_xmap.phases_in_data:
             if phase_id != -1:
                 name += f"{phase.name}_"
         name = f"{name}refined_xmap"
@@ -567,9 +564,11 @@ class RefineSetupDialog(QDialog):
         except Exception as e:
             raise e
         if options["data"] and path.exists(self.data_path):
-            phases = PhaseList(
-                [phase for _, phase in list(self.xmaps.values())[0].phases]
-            )
+            phases = PhaseList()
+            for phase_id, phase in list(self.xmaps.values())[0].phases_in_data:
+                if phase_id != -1:
+                    phases.add(phase)
+            phases.add_not_indexed()
             data = np.load(self.data_path)
             try:
                 self.xmaps: dict[str, CrystalMap] = {}
@@ -664,7 +663,7 @@ class RefineSetupDialog(QDialog):
         print("Saving phase map ...")
         fig = xmap.plot(return_figure=True, remove_padding=True)
         fig.savefig(
-            path.join(self.xmap_dir, "refined_phase_map.png"), **self.savefig_kwds
+            path.join(self.xmap_dir, "phase_map_refined.png"), **self.savefig_kwds
         )
 
     def save_ipf_map(
@@ -704,7 +703,7 @@ class RefineSetupDialog(QDialog):
                 path.join(self.xmap_dir, "orientation_colour_key.png"),
                 **self.savefig_kwds,
             )
-        fig.savefig(path.join(self.xmap_dir, "refined_IPF.png"), **self.savefig_kwds)
+        fig.savefig(path.join(self.xmap_dir, "IPF_refined.png"), **self.savefig_kwds)
 
     def save_ncc_map(self, xmap: CrystalMap):
         if len(xmap.phases.ids) == 1:
@@ -726,7 +725,7 @@ class RefineSetupDialog(QDialog):
                 remove_padding=True,
             )
         fig.savefig(
-            path.join(self.xmap_dir, "refined_NCC.png"),
+            path.join(self.xmap_dir, "NCC_refined.png"),
             **self.savefig_kwds,
         )
 
