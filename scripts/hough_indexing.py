@@ -291,7 +291,9 @@ class HiSetupDialog(QDialog):
                 item = QTableWidgetItem(str(entry))
                 item.setFlags(item.flags() ^ Qt.ItemIsEditable)
                 if entry == phase.color_rgb:
-                    item.setBackground(QColor.fromRgbF(*entry))
+                    color = QColor.fromRgbF(*entry)
+                    item = QTableWidgetItem(phase.color)
+                    item.setBackground(color)
                 phasesTable.setItem(row, col, item)
             row += 1
         self.setAvailableButtons()
