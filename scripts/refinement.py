@@ -43,6 +43,7 @@ class RefineSetupDialog(QDialog):
         parameter_file, self.xmap_dir = get_setting_file_bottom_top(
             file_path, "indexing_parameters.txt", return_dir_path=True
         )
+        print("XMAP_DIR",self.xmap_dir)
         self.setting_file, self.working_dir = get_setting_file_bottom_top(
             file_path, "project_settings.txt", return_dir_path=True
         )
@@ -260,8 +261,8 @@ class RefineSetupDialog(QDialog):
             try:
                 xmap_name = path.basename(xmap_path)
                 self.xmaps[f"{xmap_name}"] = io.load(xmap_path)
-                self.xmap_dir = path.dirname(xmap_path)
                 self.xmap_path = xmap_path
+                self.xmap_dir = path.dirname(self.xmap_path)
                 self.data_path = RefineSetupDialog.available_index_data(xmap_path)
             except Exception as e:
                 raise e
@@ -278,8 +279,8 @@ class RefineSetupDialog(QDialog):
                 try:
                     xmap_name = path.basename(temp_path)
                     self.xmaps[f"{xmap_name}"] = io.load(temp_path)
-                    self.xmap_dir = path.dirname(self.xmap_path)
                     self.xmap_path = temp_path
+                    self.xmap_dir = path.dirname(self.xmap_path)
                     self.data_path = RefineSetupDialog.available_index_data(
                         self.xmap_path
                     )
@@ -504,9 +505,10 @@ class RefineSetupDialog(QDialog):
             for xmap in xmaps.values():
                 for phase_id, phase in xmap.phases:
                     if phase.name == mp_phase_name:
+                        # TODO Switch from -2 to -1 when kikuchipy supports merging not_indexed (0.8.5)
                         nav_mask_phase = ~np.logical_or(
                             xmap.phase_id == phase_id,
-                            xmap.phase_id == -1,
+                            xmap.phase_id == -2,
                         )
                         nav_mask_phase = nav_mask_phase.reshape(xmap.shape)
                         refined_xmap = s.refine_orientation(
@@ -632,7 +634,7 @@ class RefineSetupDialog(QDialog):
             self,
             "Warning Phase conflict",
             f"{message}\nOverride phase from crystal map with phase from master pattern'?",
-            QMessageBox.Yes | QMessageBox.Cancel,
+            QMessageBox.Yes | QMessageBox.Abort,
             QMessageBox.Yes,
         )
         if reply == QMessageBox.Yes:
