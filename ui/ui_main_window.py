@@ -211,6 +211,7 @@ class Ui_MainWindow(object):
         sizePolicy3.setVerticalStretch(10)
         sizePolicy3.setHeightForWidth(self.dockWidgetImageViewer.sizePolicy().hasHeightForWidth())
         self.dockWidgetImageViewer.setSizePolicy(sizePolicy3)
+        self.dockWidgetImageViewer.setMinimumSize(QSize(160, 160))
         self.dockWidgetContentsImageViewer = QWidget()
         self.dockWidgetContentsImageViewer.setObjectName(u"dockWidgetContentsImageViewer")
         sizePolicy.setHeightForWidth(self.dockWidgetContentsImageViewer.sizePolicy().hasHeightForWidth())
@@ -224,7 +225,7 @@ class Ui_MainWindow(object):
         sizePolicy4.setVerticalStretch(0)
         sizePolicy4.setHeightForWidth(self.MplWidget.sizePolicy().hasHeightForWidth())
         self.MplWidget.setSizePolicy(sizePolicy4)
-        self.MplWidget.setMinimumSize(QSize(200, 200))
+        self.MplWidget.setMinimumSize(QSize(150, 150))
         self.MplWidget.setAutoFillBackground(False)
         self.MplWidget.setStyleSheet(u"background-color: transparent")
 
