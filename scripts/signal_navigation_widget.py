@@ -39,6 +39,7 @@ class SignalNavigationWidget(QWidget):
         self.ui.signalMplWidget.setVisible(False)
         self.ui.navigatorMplWidget.setVisible(False)
         self.ui.checkBox.setVisible(False)
+        self.ui.buttonBox.setVisible(False)
 
         self.file_selected = ""
         self.setupConnection()
@@ -79,6 +80,7 @@ class SignalNavigationWidget(QWidget):
         
         self.ui.signalMplWidget.setVisible(True)
         self.ui.navigatorMplWidget.setVisible(True)
+        self.ui.buttonBox.setVisible(True)
 
         self.plot_navigator(self.dataset, nav_type=list(self.dataset.navigator)[0])
         self.ui.comboBoxNavigator.clear()

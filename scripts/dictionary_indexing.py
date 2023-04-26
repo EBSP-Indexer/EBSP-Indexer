@@ -150,6 +150,7 @@ class DiSetupDialog(QDialog):
             try:
                 mp_path = self.setting_file.read(f"Master pattern {i}")
                 mp = kp.load(mp_path, lazy=True)
+                print(mp.phase.name)
                 if mp.phase.name == "":
                     mp.phase.name = path.dirname(mp_path).split("/").pop()
                 phase = mp.phase.name
@@ -400,14 +401,16 @@ class DiSetupDialog(QDialog):
         mp_dict = {}
         for i, ph in self.phaseList:
             file_mp = path.join(self.mpPaths[ph.name])
-
-            mp_dict[f"{ph.name}"] = kp.load(
+            mp = kp.load(
                 file_mp,
                 energy=self.energy,  # single energies like 10, 11, 12 etc. or a range like (10, 20)
                 projection="lambert",  # stereographic, lambert
                 hemisphere="upper",  # upper, lower
                 lazy=True,
             )
+            if mp.phase.name == "":
+                mp.phase.name = ph.name
+            mp_dict[f"{ph.name}"] = mp
 
         return mp_dict
 
@@ -676,7 +679,7 @@ class DiSetupDialog(QDialog):
             convention=self.convention,  # Default is Bruker
         )
         detector.save(path.join(self.results_dir, "detector.txt"))
-
+        print("done")
         # Apply signal mask
         self.signal_mask(sig_shape)
 
@@ -700,6 +703,7 @@ class DiSetupDialog(QDialog):
 
         for i, ph in self.phaseList:
             ### Sample orientations
+            
             rot = sampling.get_sample_fundamental(
                 method="cubochoric",
                 resolution=self.angular_step_size,
