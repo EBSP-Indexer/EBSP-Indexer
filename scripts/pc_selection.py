@@ -13,6 +13,8 @@ from orix.crystal_map import PhaseList, Phase
 import hyperspy.api as hs
 import dask as da
 
+from pyebsdindex.ebsd_index import EBSDIndexer
+
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from matplotlib.widgets import Cursor
@@ -76,13 +78,18 @@ class PCSelectionDialog(QDialog):
             self.convention = self.setting_file.read("Convention")
         except:
             self.convention = self.program_settings.read("Convention")
+
+        self.ui.conventionBox.setCurrentText(self.convention)
         
         try:
             self.pc = eval(self.setting_file.read("PC"))
 
         except:
-            microscope = self.s.metadata.Acquisition_instrument.SEM.microscope
-            self.pc = pc_from_wd(microscope, working_distance, self.convention)
+            try:
+                microscope = self.s.metadata.Acquisition_instrument.SEM.microscope
+                self.pc = pc_from_wd(microscope, working_distance, self.convention)
+            except:
+                self.pc = (0.5000, 0.5000, 0.5000)
         
         self.updatePCSpinBox()
         
@@ -158,6 +165,8 @@ class PCSelectionDialog(QDialog):
         if [x, y] not in self.coordinates:
             self.coordinates.append([x, y])
             self.ui.listCoordinates.addItem(f"({x}, {y})")
+        
+        self.changeStateOfButtons()
     
     def removePattern(self):
         index = self.ui.listCoordinates.currentRow()
@@ -175,6 +184,8 @@ class PCSelectionDialog(QDialog):
 
         if len(self.coordinates) == 0:
             self.ui.buttonRemovePattern.setEnabled(False)
+        
+        self.changeStateOfButtons()
     
     def coordinateListClicked(self):
         try:
@@ -230,8 +241,11 @@ class PCSelectionDialog(QDialog):
         self.ui.labelMultiplicator.setEnabled(enable)
 
     def changeStateOfButtons(self):
-        enable = bool(len(list(self.mp_paths.keys())))
-        self.ui.buttonRemovePhase.setEnabled(enable)
+        if bool(len(list(self.mp_paths.keys()))) and self.ui.listCoordinates.count() != 0:
+            enable = True
+        else:
+            enable = False
+        self.ui.buttonRemovePhase.setEnabled(bool(len(list(self.mp_paths.keys()))))
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(enable)
 
     def updatePCSpinBox(self):
@@ -240,9 +254,7 @@ class PCSelectionDialog(QDialog):
         self.ui.spinBoxZ.setValue(self.pc[2])
 
     def updatePCArrayFromSpinBox(self):
-        self.pc[0] = self.ui.spinBoxX.value()
-        self.pc[1] = self.ui.spinBoxY.value()
-        self.pc[2] = self.ui.spinBoxZ.value()
+        self.pc = (self.ui.spinBoxX.value(), self.ui.spinBoxY.value(), self.ui.spinBoxZ.value())
 
     def updatePCConvention(self):
         self.convention = self.ui.conventionBox.currentText()    
@@ -485,8 +497,11 @@ class PCSelectionDialog(QDialog):
         phase_list = PhaseList()
         for mp in self.mp_dict.values():
             phase_list.add(mp.phase)
+
         print(phase_list)
-            
+        
+        self.updatePCArrayFromSpinBox()
+        
         det_cal0 = kp.detectors.EBSDDetector(
             shape=self.s_cal.axes_manager.signal_shape[::-1],
             sample_tilt=self.s_cal.detector.sample_tilt,  # Degrees
@@ -494,6 +509,10 @@ class PCSelectionDialog(QDialog):
             convention=self.convention,
         )
         indexer_cal0 = det_cal0.get_indexer(phase_list, nBands=9)
+        
+        if self.convention == "TSL": #Inital guess for hough_indexing_optimize_pc must be in BRUKER convention
+            self.pc = (self.pc[0], 1-self.pc[1], self.pc[2])
+        
         det_cal = self.s_cal.hough_indexing_optimize_pc(
             self.pc,
             indexer=indexer_cal0,
@@ -583,7 +602,8 @@ class PCSelectionDialog(QDialog):
             self.setting_file.write(f"Master pattern {i}", mppath)
 
         self.setting_file.write("Convention", self.convention)
-
+        if self.convention == "TSL":
+            self.pc = (self.pc[0], round(1-self.pc[1], 4), self.pc[2])
         self.setting_file.write("PC", f"{tuple(self.pc)}")
 
         self.setting_file.save()

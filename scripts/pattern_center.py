@@ -474,7 +474,7 @@ class PatterCenterDialog(QDialog):
         if self.convention == "BRUKER":
             self.setting_file.write("PC", (x_average, y_average, z_average))
         elif self.convention == "TSL":
-            self.setting_file.write("PC", (x_average, 1 - y_average, z_average))
+            self.setting_file.write("PC", (x_average, round(1 - y_average, 4), z_average))
 
         self.setting_file.save()
         self.close()
