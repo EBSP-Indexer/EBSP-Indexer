@@ -466,7 +466,7 @@ if __name__ == "__main__":
     ):
         APP.show()
         print(
-            """EBSP Indexer  Copyright (C) 2023  EBSP Indexer developers 
+            """EBSP Indexer  Copyright (C) 2023  EBSP Indexer Developers 
 This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.txt.
 This is free software, and you are welcome to redistribute it under certain conditions; see COPYING.txt for details.""",
         )

@@ -2,7 +2,7 @@ import gc
 import os
 
 import kikuchipy as kp
-from PySide6.QtWidgets import QDialog, QDialogButtonBox
+from PySide6.QtWidgets import QDialog, QDialogButtonBox, QMessageBox
 
 from ui.ui_pattern_processing import Ui_PatternProcessingDialog
 from utils import FileBrowser, sendToJobManager
@@ -129,6 +129,16 @@ class PatternProcessingDialog(QDialog):
         del s_prev
 
     def run_processing(self):
+        if not self.ui.staticBackgroundBox.isChecked():
+            reply = QMessageBox(self).warning(
+                self,
+                "Processing Warning",
+                "Removal of static background noise was not selected, which can produce unwanted results.\nAre you sure you want to continue? ",
+                QMessageBox.Yes | QMessageBox.Abort,
+                QMessageBox.Yes,
+            )
+            if reply != QMessageBox.Yes:
+                return
         try:
             s = kp.load(self.pattern_path, lazy=False)
         except Exception as e:

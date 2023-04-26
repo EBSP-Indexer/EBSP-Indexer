@@ -573,7 +573,7 @@ class DiSetupDialog(QDialog):
                 try:
                     for filetype in self.di_result_filetypes:  # [".ang", ".h5"]
                         io.save(
-                            path.join(self.raw_data_dir, f"{ph.name}.{filetype}"),
+                            path.join(self.raw_data_dir, f"{ph.name}_xmap.{filetype}"),
                             xmaps[f"{ph.name}"],
                         )
                 except Exception as e:
@@ -583,7 +583,7 @@ class DiSetupDialog(QDialog):
                     for filetype in self.di_result_filetypes:  # [".ang", ".h5"]
                         io.save(
                             path.join(
-                                self.raw_data_dir, f"{ph.name}_refined.{filetype}"
+                                self.raw_data_dir, f"{ph.name}_refined_xmap.{filetype}"
                             ),
                             xmaps_ref[f"{ph.name}"],
                         )
@@ -591,7 +591,7 @@ class DiSetupDialog(QDialog):
                     for filetype in self.di_result_filetypes:  # [".ang", ".h5"]
                         io.save(
                             path.join(
-                                self.results_dir, f"{ph.name}_refined.{filetype}"
+                                self.results_dir, f"{ph.name}_refined_xmap.{filetype}"
                             ),
                             xmaps_ref[f"{ph.name}"],
                         )
@@ -620,6 +620,9 @@ class DiSetupDialog(QDialog):
             merge_kwargs = dict(
                 mean_n_best=1, simulation_indices_prop="simulation_indices"
             )
+            refined = False
+        else:
+            refined = True
 
         # Merge xmaps from indexed phases
 
@@ -631,10 +634,17 @@ class DiSetupDialog(QDialog):
             ph.color = self.colors[i]
 
         for filetype in self.di_result_filetypes:  # [".ang", ".h5"]
+            name = ""
+            for phase_id, phase in merged.phases_in_data:
+                if phase_id != -1:
+                    name += f"{phase.name}_"
+            if refined:
+                name += "refined_"
+            name = f"{name}xmap"
             io.save(
                 path.join(
                     self.results_dir,
-                    f"xmap_di.{filetype}",
+                    f"{name}.{filetype}",
                 ),
                 merged,
             )
@@ -732,7 +742,7 @@ class DiSetupDialog(QDialog):
                 try:
                     for filetype in self.di_result_filetypes:  # [".ang", ".h5"]
                         io.save(
-                            path.join(self.raw_data_dir, f"{ph.name}.{filetype}"),
+                            path.join(self.raw_data_dir, f"{ph.name}_xmap.{filetype}"),
                             xmaps[f"{ph.name}"],
                         )
                 except Exception as e:
