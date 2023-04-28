@@ -110,6 +110,11 @@ class HiSetupDialog(QDialog):
             path.join(self.working_dir, "project_settings.txt")
         )
         self.program_settings = SettingFile("advanced_settings.txt")
+        try:
+            lazy = eval(self.program_settings.read("Lazy Loading"))
+        except:
+            lazy = False
+        self.ui.checkBoxLazy.setChecked(lazy)
 
         try:
             self.convention = self.setting_file.read("Convention")

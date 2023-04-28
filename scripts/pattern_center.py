@@ -91,7 +91,7 @@ class PatterCenterDialog(QDialog):
             try:
                 mp_path = self.setting_file.read(f"Master pattern {i}")
                 try:
-                    mp = kp.load(mp_path, lazy=True)
+                    mp = kp.load(mp_path)
                 except Exception as e:
                     print(e.with_traceback(None))
                     continue
@@ -127,7 +127,7 @@ class PatterCenterDialog(QDialog):
 
     def setupCalibrationPatterns(self):
         self.pattern_index = 0
-        self.s_cal = kp.load(self.setting_path, lazy=True)
+        self.s_cal = kp.load(self.setting_path)
         sig_shape = self.s_cal.axes_manager.signal_shape[::-1]
         self.nav_size = self.s_cal.axes_manager.navigation_size
 
@@ -231,7 +231,7 @@ class PatterCenterDialog(QDialog):
         if self.fileBrowserOF.getFile():
             mp_path = self.fileBrowserOF.getPaths()[0]
             try:
-                mp = kp.load(mp_path, lazy=True)
+                mp = kp.load(mp_path)
                 if not len(mp.phase.name):
                     mp.phase.name = path.basename(
                         path.dirname(mp_path)
