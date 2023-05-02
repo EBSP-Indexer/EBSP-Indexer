@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'worker_widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.0
+## Created by: Qt User Interface Compiler version 6.3.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -38,6 +38,14 @@ class Ui_WorkerWidget(object):
 "	outline: none;\n"
 "}\n"
 "QPushButton:checked {\n"
+"	selection-background-color: rgba(255, 255, 255, 0);\n"
+"	background-color: rgba(255, 255, 255, 0);\n"
+"	border: none;\n"
+"	outline: none;\n"
+"}\n"
+"QPushButton:pressed {\n"
+"	selection-background-color: rgba(255, 255, 255, 0);\n"
+"	background-color: rgba(255, 255, 255, 0);\n"
 "	border: none;\n"
 "	outline: none;\n"
 "}")
