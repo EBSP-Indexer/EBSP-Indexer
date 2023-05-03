@@ -85,6 +85,10 @@ class RefineSetupDialog(QDialog):
                         raise Exception(
                             "No indexing parameters associated with selected crystal map"
                         )
+                    if self.setting_file is None:
+                        raise Exception(
+                            "Could not determine project settings associated with selected crystal map"
+                        )
                     self.pattern_path = path.join(
                         self.working_dir, parameter_file.read("Pattern name")
                     )
@@ -307,12 +311,22 @@ class RefineSetupDialog(QDialog):
     def load_master_pattern(self, mp_path: Optional[str] = None):
         if mp_path is not None:
             try:
-                mp: LazyEBSDMasterPattern = kp.load(
+                mp_preview: LazyEBSDMasterPattern = kp.load(
                     mp_path,
                     energy=self.s_energy,
                     projection="lambert",
                     hemisphere="upper",
                     lazy=True,
+                )
+                load_kwargs = {"hemisphere": "both"}
+                if mp_preview.phase.point_group.contains_inversion:
+                    load_kwargs["hemisphere"] = "upper"
+                mp: LazyEBSDMasterPattern = kp.load(
+                    mp_path,
+                    energy=self.s_energy,
+                    projection="lambert",
+                    lazy=True,
+                    **load_kwargs,
                 )
                 if mp.phase.name == "":
                     mp.phase.name = path.dirname(mp_path).split("/").pop()
@@ -327,12 +341,22 @@ class RefineSetupDialog(QDialog):
             mp_paths = self.fileBrowserOF.getPaths()
             for mp_path in mp_paths:
                 try:
-                    mp: LazyEBSDMasterPattern = kp.load(
+                    mp_preview: LazyEBSDMasterPattern = kp.load(
                         mp_path,
                         energy=self.s_energy,
                         projection="lambert",
                         hemisphere="upper",
                         lazy=True,
+                    )
+                    load_kwargs = {"hemisphere": "both"}
+                    if mp_preview.phase.point_group.contains_inversion:
+                        load_kwargs["hemisphere"] = "upper"
+                    mp: LazyEBSDMasterPattern = kp.load(
+                        mp_path,
+                        energy=self.s_energy,
+                        projection="lambert",
+                        lazy=True,
+                        **load_kwargs,
                     )
                     if mp.phase.name == "":
                         mp.phase.name = path.dirname(mp_path).split("/").pop()
@@ -545,8 +569,8 @@ class RefineSetupDialog(QDialog):
             if phase_id != -1:
                 name += f"{phase.name}_"
         name = f"{name}refined_xmap"
-        io.save(path.join(self.xmap_dir, f"{name}.h5"), refined_xmap, overwrite=True)
-        io.save(path.join(self.xmap_dir, f"{name}.ang"), refined_xmap, overwrite=True)
+        io.save(path.join(self.output_dir, f"{name}.h5"), refined_xmap, overwrite=True)
+        io.save(path.join(self.output_dir, f"{name}.ang"), refined_xmap, overwrite=True)
         print(f"Result was saved as {name}.ang and {name}.h5")
 
         for key in ["phase", "orientation", "ncc"]:
@@ -564,6 +588,12 @@ class RefineSetupDialog(QDialog):
         print(f"Finished refining orientations")
 
     def run_refinement(self):
+        fileBrowserOF = FileBrowser(
+            mode=FileBrowser.OpenDirectory,
+            dirpath=path.dirname(self.xmap_dir),
+            filter_name="Hierarchical Data Format (*.h5);",
+            caption="Choose Output Directory for Refined Results"
+        )
         options = self.getOptions()
         try:
             s: EBSD = kp.load(self.pattern_path, lazy=options["lazy"])
@@ -617,9 +647,12 @@ class RefineSetupDialog(QDialog):
             for ph_id, ph in xmap.phases_in_data:
                 if ph_id != -1:
                     job_title += f"{ph.name}, "
+        if not fileBrowserOF.getFile():
+            return
+        self.output_dir = fileBrowserOF.getPaths()[0]
         sendToJobManager(
             job_title=job_title[0:-2],
-            output_path=self.xmap_dir,
+            output_path=self.output_dir,
             listview=self.parentWidget().ui.jobList,
             func=self.refine_orientations,
             allow_cleanup=False,
@@ -657,12 +690,12 @@ class RefineSetupDialog(QDialog):
             fig.colorbar(im, ax=a, label=to_plot)
             a.axis("off")
             plt.imsave(
-                path.join(self.xmap_dir, f"quality_metrics_{to_plot}.png"),
+                path.join(self.output_dir, f"quality_metrics_{to_plot}.png"),
                 arr,
             )
         fig.subplots_adjust(wspace=0, hspace=0.05)
         fig.savefig(
-            path.join(self.xmap_dir, "quality_metrics_all.png"), **self.savefig_kwds
+            path.join(self.output_dir, "quality_metrics_all.png"), **self.savefig_kwds
         )
 
     def save_phase_map(self, xmap):
@@ -672,7 +705,7 @@ class RefineSetupDialog(QDialog):
         print("Saving phase map ...")
         fig = xmap.plot(return_figure=True, remove_padding=True)
         fig.savefig(
-            path.join(self.xmap_dir, "phase_map_refined.png"), **self.savefig_kwds
+            path.join(self.output_dir, "phase_map_refined.png"), **self.savefig_kwds
         )
 
     def save_ipf_map(
@@ -709,10 +742,10 @@ class RefineSetupDialog(QDialog):
             ax_ckey.patch.set_facecolor("None")
         else:
             fig_ckey.savefig(
-                path.join(self.xmap_dir, "orientation_colour_key.png"),
+                path.join(self.output_dir, "orientation_colour_key.png"),
                 **self.savefig_kwds,
             )
-        fig.savefig(path.join(self.xmap_dir, "IPF_refined.png"), **self.savefig_kwds)
+        fig.savefig(path.join(self.output_dir, "IPF_refined.png"), **self.savefig_kwds)
 
     def save_ncc_map(self, xmap: CrystalMap):
         if len(xmap.phases.ids) == 1:
@@ -734,7 +767,7 @@ class RefineSetupDialog(QDialog):
                 remove_padding=True,
             )
         fig.savefig(
-            path.join(self.xmap_dir, "NCC_refined.png"),
+            path.join(self.output_dir, "NCC_refined.png"),
             **self.savefig_kwds,
         )
 
