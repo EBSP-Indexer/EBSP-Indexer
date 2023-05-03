@@ -412,13 +412,11 @@ class DiSetupDialog(QDialog):
             Returns dictionary with all master patterns
         """
         mp_dict = {}
-        for i, ph in self.phaseList:
+        for _, ph in self.phaseList:
             file_mp = path.join(self.mpPaths[ph.name])
             load_kwargs = {"hemisphere": "both"}
             if ph.point_group.contains_inversion:
-                print("ok")
                 load_kwargs["hemisphere"] = "upper"
-            print(load_kwargs["hemisphere"])
             mp = kp.load(
                 file_mp,
                 energy=self.energy,  # single energies like 10, 11, 12 etc. or a range like (10, 20)
