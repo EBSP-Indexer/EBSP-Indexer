@@ -114,6 +114,12 @@ class DiSetupDialog(QDialog):
 
         if self.program_settings.read("Lazy Loading") == "False":
             self.ui.checkBoxLazy.setChecked(False)
+        
+        try:
+            if self.program_settings.read("Refine orientations") == "True":
+                self.ui.checkBoxRefine.setChecked(True)
+        except:
+            pass
 
         # Update pattern center to be displayed in UI
         try:
@@ -402,7 +408,7 @@ class DiSetupDialog(QDialog):
                 file_mp,
                 energy=self.energy,  # single energies like 10, 11, 12 etc. or a range like (10, 20)
                 projection="lambert",  # stereographic, lambert
-                hemisphere="upper",  # upper, lower
+                hemisphere="both",  # upper, lower
                 lazy=True,
             )
             if mp.phase.name == "":
