@@ -198,6 +198,11 @@ class Ui_AdvancedSettings(object):
 
         self.verticalLayout_4.addWidget(self.lazyLoadingBox)
 
+        self.checkBoxRefine = QCheckBox(self.indexingTab)
+        self.checkBoxRefine.setObjectName(u"checkBoxRefine")
+
+        self.verticalLayout_4.addWidget(self.checkBoxRefine)
+
         self.label_7 = QLabel(self.indexingTab)
         self.label_7.setObjectName(u"label_7")
 
@@ -285,7 +290,7 @@ class Ui_AdvancedSettings(object):
         self.buttonBox.accepted.connect(AdvancedSettings.accept)
         self.buttonBox.rejected.connect(AdvancedSettings.reject)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(2)
 
 
         QMetaObject.connectSlotsByName(AdvancedSettings)
@@ -313,6 +318,7 @@ class Ui_AdvancedSettings(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.preProcessingTab), QCoreApplication.translate("AdvancedSettings", u"Pre Prosessing", None))
         self.label.setText(QCoreApplication.translate("AdvancedSettings", u"Default settings:", None))
         self.lazyLoadingBox.setText(QCoreApplication.translate("AdvancedSettings", u"Lazy Loading (recommended)", None))
+        self.checkBoxRefine.setText(QCoreApplication.translate("AdvancedSettings", u"Refine orientations", None))
         self.label_7.setText(QCoreApplication.translate("AdvancedSettings", u"Colors:", None))
         ___qtreewidgetitem = self.colorTreeWidget.headerItem()
         ___qtreewidgetitem.setText(1, QCoreApplication.translate("AdvancedSettings", u"2", None));

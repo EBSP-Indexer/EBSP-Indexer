@@ -32,6 +32,7 @@ class AdvancedSettingsDialog(QDialog):
         self.ui.brukerButton.clicked.connect(lambda: self.setBruker())
         self.ui.tslButton.clicked.connect(lambda: self.setTSL())
         self.ui.lazyLoadingBox.clicked.connect(lambda: self.setLazy())
+        self.ui.checkBoxRefine.clicked.connect(lambda: self.setRefine())
         self.ui.savePcsBox.clicked.connect(lambda: self.setIndividualPCData())
         self.ui.buttonBox.accepted.connect(lambda: self.saveSettings())
         self.ui.directoryBox.clicked.connect(lambda: self.toggleDefaultDirectory())
@@ -93,6 +94,9 @@ class AdvancedSettingsDialog(QDialog):
         else:
             self.lazy = False
 
+    def setRefine(self):
+        self.refine = self.ui.checkBoxRefine.isChecked()
+
     def colorPicker(self):
         if self.ui.colorTreeWidget.currentItem().parent() is None:
             return
@@ -144,6 +148,16 @@ class AdvancedSettingsDialog(QDialog):
         else:
             self.lazy = False
 
+        try:
+            if self.setting_file.read("Refine orientations") == "True":
+                self.ui.checkBoxRefine.setChecked(True)
+                self.refine = True
+            else:
+                self.refine = False
+                
+        except:
+            self.refine = False
+
         if exists(self.setting_file.read("Default Directory")):
             self.ui.directoryBox.setChecked(True)
             self.directory = self.setting_file.read("Default Directory")
@@ -170,6 +184,7 @@ class AdvancedSettingsDialog(QDialog):
         self.setting_file.write("Individual PC data", str(self.individual_PC_data))
         self.setting_file.write("Convention", str(self.convention))
         self.setting_file.write("Lazy Loading", str(self.lazy))
+        self.setting_file.write("Refine orientations", str(self.refine))
         self.setting_file.write("Default Directory", str(self.directory))
         self.setting_file.write("Colors", json.dumps(self.colors))
         self.setting_file.save()

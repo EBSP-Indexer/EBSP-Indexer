@@ -27,7 +27,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="fileExplorerTab">
       <attribute name="title">
@@ -260,6 +260,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkBoxRefine">
+         <property name="text">
+          <string>Refine orientations</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="label_7">
          <property name="text">
           <string>Colors:</string>
@@ -297,6 +304,7 @@
          </property>
          <property name="font">
           <font>
+           <weight>50</weight>
            <bold>false</bold>
           </font>
          </property>
