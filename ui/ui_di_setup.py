@@ -381,7 +381,7 @@ class Ui_DiSetupDialog(object):
         self.checkBoxRefine.setObjectName(u"checkBoxRefine")
         self.checkBoxRefine.setMinimumSize(QSize(200, 0))
         self.checkBoxRefine.setLayoutDirection(Qt.LeftToRight)
-        self.checkBoxRefine.setChecked(True)
+        self.checkBoxRefine.setChecked(False)
         self.checkBoxRefine.setTristate(False)
 
         self.verticalLayout.addWidget(self.checkBoxRefine)
