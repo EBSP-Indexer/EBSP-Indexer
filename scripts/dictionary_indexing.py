@@ -11,9 +11,10 @@ from matplotlib_scalebar.scalebar import ScaleBar
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from orix import io, plot, sampling
 from orix.crystal_map import CrystalMap, PhaseList
-from PySide6.QtWidgets import QDialog, QDialogButtonBox, QTableWidgetItem
 from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QDialog, QDialogButtonBox, QTableWidgetItem
 
+from scripts.pc_from_wd import pc_from_wd
 from ui.ui_di_setup import Ui_DiSetupDialog
 from utils import FileBrowser, SettingFile, sendToJobManager
 
@@ -114,7 +115,7 @@ class DiSetupDialog(QDialog):
 
         if self.program_settings.read("Lazy Loading") == "False":
             self.ui.checkBoxLazy.setChecked(False)
-        
+
         try:
             if self.program_settings.read("Refine orientations") == "True":
                 self.ui.checkBoxRefine.setChecked(True)
@@ -125,7 +126,16 @@ class DiSetupDialog(QDialog):
         try:
             self.pc = np.array(eval(self.setting_file.read("PC")))
         except:
-            self.pc = np.array((0.500, 0.800, 0.500))
+            try:
+                microscope = ebsd_signal.metadata.Acquisition_instrument.SEM.microscope
+                working_distance = (
+                    ebsd_signal.metadata.Acquisition_instrument.SEM.working_distance
+                )
+                self.pc: list[float] = pc_from_wd(
+                    microscope, working_distance, self.convention
+                )
+            except:
+                self.pc = np.array((0.500, 0.800, 0.500))
 
         self.ui.patternCenterX.setValue(self.pc[0])
         self.ui.patternCenterY.setValue(self.pc[1])
@@ -402,13 +412,11 @@ class DiSetupDialog(QDialog):
             Returns dictionary with all master patterns
         """
         mp_dict = {}
-        for i, ph in self.phaseList:
+        for _, ph in self.phaseList:
             file_mp = path.join(self.mpPaths[ph.name])
             load_kwargs = {"hemisphere": "both"}
             if ph.point_group.contains_inversion:
-                print("ok")
                 load_kwargs["hemisphere"] = "upper"
-            print(load_kwargs["hemisphere"])
             mp = kp.load(
                 file_mp,
                 energy=self.energy,  # single energies like 10, 11, 12 etc. or a range like (10, 20)

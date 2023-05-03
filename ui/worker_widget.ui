@@ -30,6 +30,14 @@
 	outline: none;
 }
 QPushButton:checked {
+	selection-background-color: rgba(255, 255, 255, 0);
+	background-color: rgba(255, 255, 255, 0);
+	border: none;
+	outline: none;
+}
+QPushButton:pressed {
+	selection-background-color: rgba(255, 255, 255, 0);
+	background-color: rgba(255, 255, 255, 0);
 	border: none;
 	outline: none;
 }</string>

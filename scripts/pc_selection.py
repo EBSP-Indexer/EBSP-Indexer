@@ -82,7 +82,7 @@ class PCSelectionDialog(QDialog):
                 microscope = self.s.metadata.Acquisition_instrument.SEM.microscope
                 self.pc = pc_from_wd(microscope, working_distance, self.convention)
             except:
-                self.pc = (0.5000, 0.5000, 0.5000)
+                self.pc = (0.5000, 0.8000, 0.5000)
         
         self.updatePCSpinBox()
         
@@ -94,9 +94,8 @@ class PCSelectionDialog(QDialog):
                 mp_path = self.setting_file.read(f"Master pattern {i}")
                 try:
                     mp = kp.load(mp_path, lazy=True)
-                except Exception as e:
-                    print(e.with_traceback(None))
-                    continue
+                except IOError as ioe:
+                    raise ioe
                 if not len(mp.phase.name):
                     mp.phase.name = path.dirname(mp_path).split("/").pop()
                 self.mp_paths[mp.phase.name] = mp_path
@@ -104,7 +103,8 @@ class PCSelectionDialog(QDialog):
                 if mp.phase.name not in FCC + BCC:
                     self.ui.listPhases.item(i-1).setFlags(Qt.NoItemFlags)
                 i += 1
-                
+            except IOError as ioe:
+                raise ioe
             except:
                 break
 

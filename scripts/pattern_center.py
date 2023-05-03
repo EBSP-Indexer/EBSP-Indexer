@@ -8,6 +8,7 @@ import numpy as np
 from diffsims.crystallography import ReciprocalLatticeVector
 from pyebsdindex import ebsd_index, pcopt
 from orix.quaternion import Rotation
+from scripts.pc_from_wd import pc_from_wd
 
 from utils import FileBrowser, SettingFile, get_setting_file_bottom_top
 from ui.ui_pattern_center import Ui_PatternCenter
@@ -66,17 +67,14 @@ class PatterCenterDialog(QDialog):
         try:
             self.pc = np.array(eval(self.setting_file.read("PC")))
         except:
-            if (
-                self.s_cal.metadata.Acquisition_instrument.SEM.microscope
-                == "ZEISS SUPRA55 VP"
-            ):
-                self.pc = [
-                    0.5605 - 0.0017 * float(self.working_distance),
-                    1.2056 - 0.0225 * float(self.working_distance),
-                    0.483,
-                ]
-            else:
-                self.pc = np.array([0.5000, 0.5000, 0.5000])
+            try:
+                microscope = self.s_cal.metadata.Acquisition_instrument.SEM.microscope
+                working_distance = (
+                    self.s_cal.metadata.Acquisition_instrument.SEM.working_distance
+                )
+                self.pc = pc_from_wd(microscope, working_distance, self.convention)
+            except:
+                self.pc = np.array((0.5000, 0.8000, 0.5000))
 
         if self.convention == "TSL":
             # Store TSL convention in BRUKER convention
@@ -92,9 +90,8 @@ class PatterCenterDialog(QDialog):
                 mp_path = self.setting_file.read(f"Master pattern {i}")
                 try:
                     mp = kp.load(mp_path)
-                except Exception as e:
-                    print(e.with_traceback(None))
-                    continue
+                except IOError as ioe:
+                    raise ioe
                 if not len(mp.phase.name):
                     mp.phase.name = path.dirname(mp_path).split("/").pop()
                 self.mp_paths[mp.phase.name] = mp_path
@@ -102,6 +99,8 @@ class PatterCenterDialog(QDialog):
                 if mp.phase.name not in FCC + BCC:
                     self.ui.listPhases.item(i - 1).setFlags(Qt.NoItemFlags)
                 i += 1
+            except IOError as ioe:
+                raise ioe
             except:
                 break
 

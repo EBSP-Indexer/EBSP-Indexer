@@ -15,6 +15,7 @@ from orix import io, plot
 from orix.crystal_map import CrystalMap, PhaseList
 from orix.vector import Vector3d
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
@@ -22,8 +23,8 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QTableWidgetItem,
 )
-from PySide6.QtGui import QColor
 
+from scripts.pc_from_wd import pc_from_wd
 from ui.ui_refine_setup import Ui_RefineSetupDialog
 from utils import (
     FileBrowser,
@@ -48,6 +49,7 @@ class RefineSetupDialog(QDialog):
         )
         self.program_settings = SettingFile("advanced_settings.txt")
         self.pattern_path = ""
+        self.xmap_path = ""
         self.s_energy = 20  # kV
         self.data_path = ""
         self.xmaps: dict[str, CrystalMap] = {}
@@ -57,17 +59,17 @@ class RefineSetupDialog(QDialog):
         self.setWindowTitle(f"{self.windowTitle()} - {file_path}")
         self.fileBrowserOF = FileBrowser(
             mode=FileBrowser.OpenFile,
-            dirpath=self.working_dir,
+            dirpath=path.dirname(file_path),
             filter_name="Hierarchical Data Format (*.h5);",
         )
         # Try loading file as EBSD or LazyEBSD
         try:
             try:
-                s_prew = kp.load(file_path, lazy=True)
-                if isinstance(s_prew, (EBSD, LazyEBSD)):
+                s_preview = kp.load(file_path, lazy=True)
+                if isinstance(s_preview, (EBSD, LazyEBSD)):
                     self.pattern_path = file_path
                     self.s_energy = (
-                        s_prew.metadata.Acquisition_instrument.SEM.beam_energy
+                        s_preview.metadata.Acquisition_instrument.SEM.beam_energy
                     )
                 else:
                     raise ValueError("File selected does not contain a siganl")
@@ -83,14 +85,18 @@ class RefineSetupDialog(QDialog):
                         raise Exception(
                             "No indexing parameters associated with selected crystal map"
                         )
+                    if self.setting_file is None:
+                        raise Exception(
+                            "Could not determine project settings associated with selected crystal map"
+                        )
                     self.pattern_path = path.join(
                         self.working_dir, parameter_file.read("Pattern name")
                     )
                     # Try loading signal from path found in parameter file
                     try:
-                        s_prew = kp.load(self.pattern_path)
+                        s_preview = kp.load(self.pattern_path)
                         self.s_energy = (
-                            s_prew.metadata.Acquisition_instrument.SEM.beam_energy
+                            s_preview.metadata.Acquisition_instrument.SEM.beam_energy
                         )
                     except Exception as e:
                         print("Could not load patterns associated with crystal map")
@@ -100,9 +106,9 @@ class RefineSetupDialog(QDialog):
             except Exception as e:
                 raise e
         self.ui.labelNavigationShape.setText(
-            f"Navigation shape: {str(s_prew.axes_manager.navigation_shape[::-1])}"
+            f"Navigation shape: {str(s_preview.axes_manager.navigation_shape[::-1])}"
         )
-        self.binnings = self.getBinningShapes(s_prew)
+        self.binnings = self.getBinningShapes(s_preview)
         self.colors = [
             "blue",
             "orange",
@@ -111,7 +117,7 @@ class RefineSetupDialog(QDialog):
         ]
 
         self.setupConnections()
-        self.load_parameters()
+        self.load_parameters(s_preview)
 
         # Matplotlib configuration
         mpl.use("agg")
@@ -122,10 +128,10 @@ class RefineSetupDialog(QDialog):
         self.ui.buttonBox.accepted.connect(lambda: self.run_refinement())
         self.ui.pushButtonLoadMP.clicked.connect(lambda: self.load_master_pattern())
         self.ui.pushButtonRemoveMP.clicked.connect(lambda: self.remove_master_pattern())
-        self.ui.pushButtonLoadXmap.clicked.connect(lambda: self.load_crystal_maps(force_clear=True))
-        self.ui.pushButtonAddXmap.clicked.connect(
-            lambda: self.load_crystal_maps()
+        self.ui.pushButtonLoadXmap.clicked.connect(
+            lambda: self.load_crystal_maps(force_clear=True)
         )
+        self.ui.pushButtonAddXmap.clicked.connect(lambda: self.load_crystal_maps())
         self.ui.pushButtonRemoveXmap.clicked.connect(lambda: self.remove_crystal_maps())
         self.ui.comboBoxBinning.currentTextChanged.connect(
             lambda: self.ui.labelNewSignalShape.setText(
@@ -172,7 +178,7 @@ class RefineSetupDialog(QDialog):
             "ref_kwargs": self.ui.lineEditRefKwargs.text(),
         }
 
-    def load_parameters(self):
+    def load_parameters(self, signal: LazyEBSD):
         """
         Read current settings from project_settings.txt, advanced_settings.txt
         """
@@ -191,8 +197,17 @@ class RefineSetupDialog(QDialog):
             for i, param in enumerate(pc_params):
                 param.setValue(float(pc[i]))
         except:
-            for param in pc_params:
-                param.setValue(0.5)
+            try:
+                microscope = signal.metadata.Acquisition_instrument.SEM.microscope
+                working_distance = (
+                    signal.metadata.Acquisition_instrument.SEM.working_distance
+                )
+                pc: list[float] = pc_from_wd(microscope, working_distance, convention)
+                for i, param in enumerate(pc_params):
+                    param.setValue(pc[i])
+            except:
+                for value, param in zip((0.5, 0.8, 0.5), pc_params):
+                    param.setValue(value)
         try:
             self.colors = json.loads(self.program_settings.read("Colors"))
         except:
@@ -237,7 +252,9 @@ class RefineSetupDialog(QDialog):
         return ""
 
     def clear_crystal_maps(self, force_clear: Optional[bool] = False):
-        if force_clear or (len(self.xmaps) > 1 and self.ui.radioButtonSingleXmap.isChecked()):
+        if force_clear or (
+            len(self.xmaps) > 1 and self.ui.radioButtonSingleXmap.isChecked()
+        ):
             self.xmaps: dict[str, CrystalMap] = {}
             self.xmap_path = "No crystal map loaded"
             self.data_path = ""
@@ -294,12 +311,22 @@ class RefineSetupDialog(QDialog):
     def load_master_pattern(self, mp_path: Optional[str] = None):
         if mp_path is not None:
             try:
-                mp: LazyEBSDMasterPattern = kp.load(
+                mp_preview: LazyEBSDMasterPattern = kp.load(
                     mp_path,
                     energy=self.s_energy,
                     projection="lambert",
                     hemisphere="upper",
                     lazy=True,
+                )
+                load_kwargs = {"hemisphere": "both"}
+                if mp_preview.phase.point_group.contains_inversion:
+                    load_kwargs["hemisphere"] = "upper"
+                mp: LazyEBSDMasterPattern = kp.load(
+                    mp_path,
+                    energy=self.s_energy,
+                    projection="lambert",
+                    lazy=True,
+                    **load_kwargs,
                 )
                 if mp.phase.name == "":
                     mp.phase.name = path.dirname(mp_path).split("/").pop()
@@ -314,12 +341,22 @@ class RefineSetupDialog(QDialog):
             mp_paths = self.fileBrowserOF.getPaths()
             for mp_path in mp_paths:
                 try:
-                    mp: LazyEBSDMasterPattern = kp.load(
+                    mp_preview: LazyEBSDMasterPattern = kp.load(
                         mp_path,
                         energy=self.s_energy,
                         projection="lambert",
                         hemisphere="upper",
                         lazy=True,
+                    )
+                    load_kwargs = {"hemisphere": "both"}
+                    if mp_preview.phase.point_group.contains_inversion:
+                        load_kwargs["hemisphere"] = "upper"
+                    mp: LazyEBSDMasterPattern = kp.load(
+                        mp_path,
+                        energy=self.s_energy,
+                        projection="lambert",
+                        lazy=True,
+                        **load_kwargs,
                     )
                     if mp.phase.name == "":
                         mp.phase.name = path.dirname(mp_path).split("/").pop()
@@ -365,7 +402,9 @@ class RefineSetupDialog(QDialog):
         if self.ui.radioButtonMultipleXmap.isChecked():
             self.ui.labelXmapPath.setText("Multiple crystal maps")
         else:
-            self.ui.labelXmapPath.setText(self.xmap_path)
+            self.ui.labelXmapPath.setText(
+                self.xmap_path if len(self.xmap_path) else "No crystal map loaded"
+            )
         xmapTable = self.ui.tableWidgetXmap
         row_count = 0
         for xmap in self.xmaps.values():
@@ -399,7 +438,7 @@ class RefineSetupDialog(QDialog):
         """
         tableMP = self.ui.tableWidgetMP
         indexes = tableMP.selectionModel().selectedRows()
-        indexes.sort(key = lambda qIndex: qIndex.row(), reverse=True)
+        indexes.sort(key=lambda qIndex: qIndex.row(), reverse=True)
         for model_index in indexes:
             mp_phase_name = tableMP.item(model_index.row(), 0).text()
             tableMP.removeRow(model_index.row())
@@ -530,14 +569,8 @@ class RefineSetupDialog(QDialog):
             if phase_id != -1:
                 name += f"{phase.name}_"
         name = f"{name}refined_xmap"
-        io.save(
-            path.join(self.xmap_dir, f"{name}.h5"),
-            refined_xmap,
-        )
-        io.save(
-            path.join(self.xmap_dir, f"{name}.ang"),
-            refined_xmap,
-        )
+        io.save(path.join(self.output_dir, f"{name}.h5"), refined_xmap, overwrite=True)
+        io.save(path.join(self.output_dir, f"{name}.ang"), refined_xmap, overwrite=True)
         print(f"Result was saved as {name}.ang and {name}.h5")
 
         for key in ["phase", "orientation", "ncc"]:
@@ -555,6 +588,12 @@ class RefineSetupDialog(QDialog):
         print(f"Finished refining orientations")
 
     def run_refinement(self):
+        fileBrowserOF = FileBrowser(
+            mode=FileBrowser.OpenDirectory,
+            dirpath=path.dirname(self.xmap_dir),
+            filter_name="Hierarchical Data Format (*.h5);",
+            caption="Choose Output Directory for Refined Results"
+        )
         options = self.getOptions()
         try:
             s: EBSD = kp.load(self.pattern_path, lazy=options["lazy"])
@@ -608,9 +647,12 @@ class RefineSetupDialog(QDialog):
             for ph_id, ph in xmap.phases_in_data:
                 if ph_id != -1:
                     job_title += f"{ph.name}, "
+        if not fileBrowserOF.getFile():
+            return
+        self.output_dir = fileBrowserOF.getPaths()[0]
         sendToJobManager(
             job_title=job_title[0:-2],
-            output_path=self.xmap_dir,
+            output_path=self.output_dir,
             listview=self.parentWidget().ui.jobList,
             func=self.refine_orientations,
             allow_cleanup=False,
@@ -648,12 +690,12 @@ class RefineSetupDialog(QDialog):
             fig.colorbar(im, ax=a, label=to_plot)
             a.axis("off")
             plt.imsave(
-                path.join(self.xmap_dir, f"quality_metrics_{to_plot}.png"),
+                path.join(self.output_dir, f"quality_metrics_{to_plot}.png"),
                 arr,
             )
         fig.subplots_adjust(wspace=0, hspace=0.05)
         fig.savefig(
-            path.join(self.xmap_dir, "quality_metrics_all.png"), **self.savefig_kwds
+            path.join(self.output_dir, "quality_metrics_all.png"), **self.savefig_kwds
         )
 
     def save_phase_map(self, xmap):
@@ -663,7 +705,7 @@ class RefineSetupDialog(QDialog):
         print("Saving phase map ...")
         fig = xmap.plot(return_figure=True, remove_padding=True)
         fig.savefig(
-            path.join(self.xmap_dir, "phase_map_refined.png"), **self.savefig_kwds
+            path.join(self.output_dir, "phase_map_refined.png"), **self.savefig_kwds
         )
 
     def save_ipf_map(
@@ -700,10 +742,10 @@ class RefineSetupDialog(QDialog):
             ax_ckey.patch.set_facecolor("None")
         else:
             fig_ckey.savefig(
-                path.join(self.xmap_dir, "orientation_colour_key.png"),
+                path.join(self.output_dir, "orientation_colour_key.png"),
                 **self.savefig_kwds,
             )
-        fig.savefig(path.join(self.xmap_dir, "IPF_refined.png"), **self.savefig_kwds)
+        fig.savefig(path.join(self.output_dir, "IPF_refined.png"), **self.savefig_kwds)
 
     def save_ncc_map(self, xmap: CrystalMap):
         if len(xmap.phases.ids) == 1:
@@ -725,8 +767,9 @@ class RefineSetupDialog(QDialog):
                 remove_padding=True,
             )
         fig.savefig(
-            path.join(self.xmap_dir, "NCC_refined.png"),
+            path.join(self.output_dir, "NCC_refined.png"),
             **self.savefig_kwds,
         )
+
 
 # TODO Log method

@@ -12,7 +12,11 @@ class FileBrowser(QWidget):
     SaveFile = 3
 
     def __init__(
-        self, mode=OpenFile, dirpath=QDir.currentPath(), filter_name="All files (*.*)"
+        self,
+        mode=OpenFile,
+        dirpath=QDir.currentPath(),
+        filter_name="All files (*.*)",
+        caption=None,
     ):
         QWidget.__init__(self)
         self.browser_mode = mode
@@ -21,6 +25,7 @@ class FileBrowser(QWidget):
         else:
             self.dirpath = QDir.currentPath()
         self.filter_name = filter_name
+        self.caption = caption
 
     def setMode(self, browser_mode):
         self.browser_mode = browser_mode
@@ -32,16 +37,20 @@ class FileBrowser(QWidget):
         if os.path.exists(path):
             self.dirpath = path
 
+    def setCaption(self, caption):
+        self.caption = caption
+
     def getFile(self) -> int:
         """
         Method returns 1 if one or more paths are set. Abort/ cancel returns 0
         """
+        cap = self.caption
         self.filepaths: list[str] = []
         if self.browser_mode == FileBrowser.OpenFile:
             self.filepaths.append(
                 QFileDialog.getOpenFileName(
                     self,
-                    caption="Choose File",
+                    caption=cap if cap else "Choose File",
                     dir=self.dirpath,
                     filter=self.filter_name,
                 )[0]
@@ -50,7 +59,7 @@ class FileBrowser(QWidget):
             self.filepaths.extend(
                 QFileDialog.getOpenFileNames(
                     self,
-                    caption="Choose Files",
+                    caption=cap if cap else "Choose Files",
                     dir=self.dirpath,
                     filter=self.filter_name,
                 )[0]
@@ -58,7 +67,7 @@ class FileBrowser(QWidget):
         elif self.browser_mode == FileBrowser.OpenDirectory:
             self.filepaths.append(
                 QFileDialog.getExistingDirectory(
-                    self, caption="Choose Directory", dir=self.dirpath
+                    self, caption=cap if cap else "Choose Directory", dir=self.dirpath
                 )
             )
         elif self.browser_mode == FileBrowser.SaveFile:
@@ -68,7 +77,7 @@ class FileBrowser(QWidget):
             self.filepaths.append(
                 QFileDialog.getSaveFileName(
                     self,
-                    caption="Save/Save As",
+                    caption=cap if cap else "Save/Save As",
                     dir=self.dirpath,
                     filter=self.filter_name,
                     options=options,

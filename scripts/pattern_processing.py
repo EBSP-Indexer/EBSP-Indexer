@@ -20,6 +20,9 @@ class PatternProcessingDialog(QDialog):
         # Standard filename of processed pattern
         self.save_path = os.path.join(self.working_dir, f"{self.filenamebase}.h5")
 
+        # Overview of whether the file already is processed
+        self.already_indexed = {"sb": False, "db": False, "anp": False}
+
         self.ui = Ui_PatternProcessingDialog()
         self.ui.setupUi(self)
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
@@ -75,10 +78,16 @@ class PatternProcessingDialog(QDialog):
         try:
             for step in processing_steps:
                 if step == "sb":
+                    self.already_indexed["sb"] = True
+                    self.ui.staticBackgroundBox.setChecked(True)
                     self.ui.staticBackgroundBox.setEnabled(False)
                 if step == "db":
+                    self.already_indexed["db"] = True
+                    self.ui.dynamicBackgroundBox.setChecked(True)
                     self.ui.dynamicBackgroundBox.setEnabled(False)
                 if step == "anp":
+                    self.already_indexed["anp"] = True
+                    self.ui.averageBox.setChecked(True)
                     self.ui.averageBox.setEnabled(False)
         except:
             pass
@@ -107,15 +116,15 @@ class PatternProcessingDialog(QDialog):
         s_prev = self.s_preview.deepcopy().inav[0:3, 0:3]
         extensions = ""
         box_checked = False
-        if self.ui.staticBackgroundBox.isChecked():
+        if self.ui.staticBackgroundBox.isChecked() and not self.already_indexed["sb"]:
             self.remove_static(dataset=s_prev, show_progressbar=False)
             extensions += "_sb"
             box_checked = True
-        if self.ui.dynamicBackgroundBox.isChecked():
+        if self.ui.dynamicBackgroundBox.isChecked() and not self.already_indexed["db"]:
             self.remove_dynamic(dataset=s_prev, show_progressbar=False)
             extensions += "_db"
             box_checked = True
-        if self.ui.averageBox.isChecked():
+        if self.ui.averageBox.isChecked() and not self.already_indexed["anp"]:
             self.average_neighbour(dataset=s_prev, show_progressbar=False)
             extensions += "_anp"
             box_checked = True
@@ -152,16 +161,16 @@ class PatternProcessingDialog(QDialog):
         )
 
     def apply_processing(self, dataset):
-        print("Applying processing ...")
-        if self.ui.staticBackgroundBox.isChecked():
+        if self.ui.staticBackgroundBox.isChecked() and not self.already_indexed["sb"]:
+            print("Removing static background")
             self.remove_static(dataset=dataset)
-            print("Static background removed")
-        if self.ui.dynamicBackgroundBox.isChecked():
+        if self.ui.dynamicBackgroundBox.isChecked() and not self.already_indexed["db"]:
+            print("Removing dynamic background")
             self.remove_dynamic(dataset=dataset)
-            print("Dynamic background removed")
-        if self.ui.averageBox.isChecked():
+        if self.ui.averageBox.isChecked() and not self.already_indexed["anp"]:
+            print("Applying averaging")
             self.average_neighbour(dataset=dataset)
-            print("Averaged neighbouring patterns")
+            
 
         self.save_path = os.path.join(
             self.working_dir, self.ui.filenameEdit.text()
