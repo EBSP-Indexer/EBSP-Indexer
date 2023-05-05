@@ -458,7 +458,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     QThreadPool.globalInstance().setMaxThreadCount(NUM_OF_THREADS)
     if platform.system().lower() != "darwin":
-        qdarktheme.setup_theme("light")
+        qdarktheme.setup_theme("auto")
     app.setWindowIcon(QIcon(":/icons/app_icon.ico"))
     APP = AppWindow()
     # Redirect stdout to console.write and stderr to console.errorwrite
