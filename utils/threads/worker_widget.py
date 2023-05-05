@@ -107,9 +107,9 @@ class WorkerWidget(QWidget):
         self.adjustSize(show=True)
         self.inpfmt = self.ui.textBrowserStatus.currentCharFormat()
         self.outfmt = QTextCharFormat(self.inpfmt)
-        self.outfmt.setForeground(QBrush(QColor(0, 0, 255)))
+        self.outfmt.setForeground(QBrush(QColor(50, 130, 234)))
         self.errfmt = QTextCharFormat(self.inpfmt)
-        self.errfmt.setForeground(QBrush(QColor(255, 0, 0)))
+        self.errfmt.setForeground(QBrush(QColor(240, 80, 57)))
 
         # Signals
         self.ui.pushButtonRemove.clicked.connect(self.sendRemoveItem)
@@ -151,7 +151,7 @@ class WorkerWidget(QWidget):
     @Slot(int)
     def time_worker(self, id):
         if self.id == id:
-            self.ui.labelTime.setStyleSheet("QLabel { color : red; }")
+            self.ui.labelTime.setStyleSheet("QLabel { color: rgb(240, 80, 57); }")
             self.time.start()
             self.updateTimerDisplay()
             self.timer.start(500)
@@ -176,13 +176,13 @@ class WorkerWidget(QWidget):
             self.timer.stop()
             self.ui.pushButtonRemove.setEnabled(True)
             if failed:
-                self.ui.labelTime.setStyleSheet("QLabel { color : red; }")
+                self.ui.labelTime.setStyleSheet("QLabel { color : rgb(240, 80, 57); }")
                 self.ui.labelTime.setText(f"Failed in {self.ui.labelTime.text()}")
             elif cancelled:
-                self.ui.labelTime.setStyleSheet("QLabel { color : green; }")
+                self.ui.labelTime.setStyleSheet("QLabel { color : rgb(50, 130, 234); }")
                 self.ui.labelTime.setText(f"Cancelled")
             else:
-                self.ui.labelTime.setStyleSheet("QLabel { color : green; }")
+                self.ui.labelTime.setStyleSheet("QLabel { color : rgb(50, 130, 234); }")
                 self.ui.labelTime.setText(f"Completed in {self.ui.labelTime.text()}")
             if cleanup:
                 try:
