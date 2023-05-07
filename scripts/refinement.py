@@ -389,11 +389,11 @@ class RefineSetupDialog(QDialog):
             ]
             for col, entry in enumerate(entries):
                 item = QTableWidgetItem(str(entry))
-                item.setFlags(item.flags() ^ Qt.ItemIsEditable)
                 if entry == mp.phase.color_rgb:
                     color = QColor.fromRgbF(*entry)
                     item = QTableWidgetItem(mp.phase.color)
                     item.setBackground(color)
+                item.setFlags(item.flags() ^ Qt.ItemIsEditable)
                 tableMP.setItem(row, col, item)
             row += 1
         self.setAvailableButtons()
@@ -742,7 +742,7 @@ class RefineSetupDialog(QDialog):
             ax_ckey.patch.set_facecolor("None")
         else:
             fig_ckey.savefig(
-                path.join(self.output_dir, "orientation_colour_key.png"),
+                path.join(self.output_dir, "orientation_color_key.png"),
                 **self.savefig_kwds,
             )
         fig.savefig(path.join(self.output_dir, "IPF_refined.png"), **self.savefig_kwds)

@@ -292,11 +292,11 @@ class HiSetupDialog(QDialog):
             ]
             for col, entry in enumerate(entries):
                 item = QTableWidgetItem(str(entry))
-                item.setFlags(item.flags() ^ Qt.ItemIsEditable)
                 if entry == phase.color_rgb:
                     color = QColor.fromRgbF(*entry)
                     item = QTableWidgetItem(phase.color)
                     item.setBackground(color)
+                item.setFlags(item.flags() ^ Qt.ItemIsEditable)
                 phasesTable.setItem(row, col, item)
             row += 1
         self.setAvailableButtons()
@@ -418,6 +418,7 @@ class HiSetupDialog(QDialog):
                         optionExecute(xmap)
                 except Exception as e:
                     print(f"Could not save {key}_map:\n{e}")
+                    raise e
         print("Logging parameters used ...")
         log_hi_parameters(
             self.pattern_path,
@@ -506,7 +507,8 @@ class HiSetupDialog(QDialog):
         """
         print("Saving inverse pole figure map ...")
         v_ipf = Vector3d(ckey_direction)
-        sym = xmap.phases[0].point_group
+        print(xmap.phases_in_data[xmap.phase_id[0]])
+        sym = xmap.phases_in_data[xmap.phase_id[0]].point_group
         ckey = plot.IPFColorKeyTSL(sym, v_ipf)
         print(ckey)
         fig_ckey = ckey.plot(return_figure=True)
@@ -520,7 +522,7 @@ class HiSetupDialog(QDialog):
             ax_ckey.patch.set_facecolor("None")
         else:
             fig_ckey.savefig(
-                path.join(self.dir_out, "orientation_colour_key.png"),
+                path.join(self.dir_out, "orientation_color_key.png"),
                 **self.savefig_kwds,
             )
         fig.savefig(path.join(self.dir_out, "IPF.png"), **self.savefig_kwds)
