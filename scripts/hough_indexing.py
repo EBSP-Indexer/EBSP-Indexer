@@ -25,6 +25,7 @@ from utils import FileBrowser, SettingFile, sendToJobManager
 # Ignore warnings to avoid crash with integrated console
 warnings.filterwarnings("ignore")
 
+ALLOWED_SPACE_GROUPS = ["Fm-3m", "Im-3m"] # FCC and BCC
 
 class HiSetupDialog(QDialog):
     def __init__(self, parent: QMainWindow, pattern_path: str):
@@ -333,6 +334,11 @@ class HiSetupDialog(QDialog):
                 add_phase_flag = False
                 display_message = True
                 message = "Current version of PyEBSDIndex supports maximum two phases (FCC, BCC)"
+        for _, ph in self.phases:
+            if ph.space_group.short_name not in ALLOWED_SPACE_GROUPS:
+                ok_flag = False
+                display_message = True
+                message = f"Structure {ph.space_group.short_name} in {ph.name} is currently not supported, only CUBIC Crystal Systems"
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(ok_flag)
         self.ui.checkBoxPhase.setEnabled(phase_map_flag)
         self.ui.checkBoxPhase.setChecked(phase_map_flag)
