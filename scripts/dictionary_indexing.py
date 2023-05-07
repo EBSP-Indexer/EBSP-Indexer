@@ -11,6 +11,7 @@ from matplotlib_scalebar.scalebar import ScaleBar
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from orix import io, plot, sampling
 from orix.crystal_map import CrystalMap, PhaseList
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QDialog, QDialogButtonBox, QTableWidgetItem
 
@@ -336,6 +337,7 @@ class DiSetupDialog(QDialog):
                     color = QColor.fromRgbF(*entry)
                     item = QTableWidgetItem(ph.color)
                     item.setBackground(color)
+                item.setFlags(item.flags() ^ Qt.ItemIsEditable)
                 phaseTable.setItem(row, col, item)
             row += 1
 
@@ -524,7 +526,7 @@ class DiSetupDialog(QDialog):
 
     def save_inverse_pole_figure(self, crystal_map: CrystalMap):
         """
-        Takes in a crystal map and generates an Inverse Pole Figure map which is saves as a .png image.
+        Takes in a crystal map and generates an Inverse Pole Figure map which is saved as a .png image.
 
         Parameters
         ----------
@@ -532,19 +534,20 @@ class DiSetupDialog(QDialog):
             class orix.crystal_maps.CrystalMap
         """
 
-        phase_id = crystal_map.phases.ids[0]
-        ckey = plot.IPFColorKeyTSL(crystal_map.phases[phase_id].point_group)
+        phase_id = crystal_map.phases_in_data.ids[0]
+        ckey = plot.IPFColorKeyTSL(crystal_map.phases_in_data[phase_id].point_group)
 
         fig = ckey.plot(return_figure=True)
         fig.savefig(
             path.join(
                 self.results_dir,
-                f"{crystal_map.phases[phase_id].point_group.name}_color_key_.png",
+                f"orientation_color_key_.png"
+                #f"{crystal_map.phases_in_data[phase_id].point_group.name}_color_key_.png",
             ),
             **savefig_kwargs,
         )
         rgb_all = np.zeros((crystal_map.size, 3))
-        for i, phase in crystal_map.phases:
+        for i, phase in crystal_map.phases_in_data:
             if i != -1:
                 rgb_i = ckey.orientation2color(crystal_map[phase.name].orientations)
                 rgb_all[crystal_map.phase_id == i] = rgb_i
