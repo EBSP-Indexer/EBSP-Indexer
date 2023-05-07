@@ -8,6 +8,7 @@ from utils.redirect import Redirect
 from utils.setting_file import SettingFile, get_setting_file_bottom_top
 from utils.filebrowser import FileBrowser
 
+#https://stackoverflow.com/a/31966932
 def resource_path(relative_path):
      if hasattr(sys, '_MEIPASS'):
          return os.path.join(sys._MEIPASS, relative_path)
