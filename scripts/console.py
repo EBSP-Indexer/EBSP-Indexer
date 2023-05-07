@@ -108,9 +108,9 @@ class Console(QtWidgets.QWidget):
         # Use color to differentiate input, output and stderr
         self.inpfmt = self.outdisplay.currentCharFormat()
         self.outfmt = QtGui.QTextCharFormat(self.inpfmt)
-        self.outfmt.setForeground(QtGui.QBrush(QtGui.QColor(0, 0, 255)))
+        self.outfmt.setForeground(QtGui.QBrush(QtGui.QColor(50, 130, 234)))
         self.errfmt = QtGui.QTextCharFormat(self.inpfmt)
-        self.errfmt.setForeground(QtGui.QBrush(QtGui.QColor(255, 0, 0)))
+        self.errfmt.setForeground(QtGui.QBrush(QtGui.QColor(240, 80, 57)))
         self.setprompt(">>>")
 
         # Enter commands here

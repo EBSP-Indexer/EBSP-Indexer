@@ -3,6 +3,7 @@
     <file alias="app_icon.ico">resources/ebsd_gui.ico</file>
   </qresource>
   <qresource prefix="linea_basic">
+    <file alias="lightbulb.svg">resources/linea_basic_icons/basic_lightbulb.svg</file>
     <file>resources/linea_basic_icons/basic_ban.svg</file>
     <file>resources/linea_basic_icons/basic_picture.svg</file>
     <file>resources/linea_basic_icons/basic_gear.svg</file>
