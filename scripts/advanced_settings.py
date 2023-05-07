@@ -1,3 +1,4 @@
+import platform
 import json
 from os.path import exists
 
@@ -38,6 +39,10 @@ class AdvancedSettingsDialog(QDialog):
         self.ui.directoryBox.clicked.connect(lambda: self.toggleDefaultDirectory())
         self.ui.browseDirectoryButton.clicked.connect(lambda: self.browseDirectory())
         self.ui.colorTreeWidget.doubleClicked.connect(lambda: self.colorPicker())
+        
+        if platform.system().lower() == "darwin":
+            self.ui.lightRadioButton.setDisabled(True)
+            self.ui.darkRadioButton.setDisabled(True)
 
     def addFileType(self):
         if self.ui.fileTypeLineEdit.text():
