@@ -27,7 +27,7 @@ class Ui_AdvancedSettings(object):
     def setupUi(self, AdvancedSettings):
         if not AdvancedSettings.objectName():
             AdvancedSettings.setObjectName(u"AdvancedSettings")
-        AdvancedSettings.resize(393, 361)
+        AdvancedSettings.resize(427, 361)
         self.gridLayout = QGridLayout(AdvancedSettings)
         self.gridLayout.setObjectName(u"gridLayout")
         self.buttonBox = QDialogButtonBox(AdvancedSettings)
@@ -282,6 +282,49 @@ class Ui_AdvancedSettings(object):
         self.verticalLayout_4.addItem(self.verticalSpacer_3)
 
         self.tabWidget.addTab(self.indexingTab, "")
+        self.apperanceTab = QWidget()
+        self.apperanceTab.setObjectName(u"apperanceTab")
+        self.verticalLayout_6 = QVBoxLayout(self.apperanceTab)
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.label_8 = QLabel(self.apperanceTab)
+        self.label_8.setObjectName(u"label_8")
+
+        self.verticalLayout_6.addWidget(self.label_8)
+
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.lightRadioButton = QRadioButton(self.apperanceTab)
+        self.lightRadioButton.setObjectName(u"lightRadioButton")
+        self.lightRadioButton.setChecked(True)
+
+        self.horizontalLayout_3.addWidget(self.lightRadioButton)
+
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer_3)
+
+
+        self.verticalLayout_6.addLayout(self.horizontalLayout_3)
+
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.darkRadioButton = QRadioButton(self.apperanceTab)
+        self.darkRadioButton.setObjectName(u"darkRadioButton")
+
+        self.horizontalLayout_4.addWidget(self.darkRadioButton)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_2)
+
+
+        self.verticalLayout_6.addLayout(self.horizontalLayout_4)
+
+        self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_6.addItem(self.verticalSpacer_4)
+
+        self.tabWidget.addTab(self.apperanceTab, "")
 
         self.gridLayout.addWidget(self.tabWidget, 0, 0, 1, 1)
 
@@ -290,7 +333,7 @@ class Ui_AdvancedSettings(object):
         self.buttonBox.accepted.connect(AdvancedSettings.accept)
         self.buttonBox.rejected.connect(AdvancedSettings.reject)
 
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(3)
 
 
         QMetaObject.connectSlotsByName(AdvancedSettings)
@@ -343,5 +386,12 @@ class Ui_AdvancedSettings(object):
         self.colorTreeWidget.setSortingEnabled(__sortingEnabled)
 
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.indexingTab), QCoreApplication.translate("AdvancedSettings", u"Indexing", None))
+#if QT_CONFIG(accessibility)
+        self.apperanceTab.setAccessibleName(QCoreApplication.translate("AdvancedSettings", u"Apperance", None))
+#endif // QT_CONFIG(accessibility)
+        self.label_8.setText(QCoreApplication.translate("AdvancedSettings", u"Theme", None))
+        self.lightRadioButton.setText(QCoreApplication.translate("AdvancedSettings", u"Light", None))
+        self.darkRadioButton.setText(QCoreApplication.translate("AdvancedSettings", u"Dark", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.apperanceTab), QCoreApplication.translate("AdvancedSettings", u"Apperance", None))
     # retranslateUi
 

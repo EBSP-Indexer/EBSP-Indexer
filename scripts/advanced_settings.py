@@ -125,6 +125,12 @@ class AdvancedSettingsDialog(QDialog):
             self.convention = self.setting_file.read("Convention")
         except:
             self.convention = "TSL"
+        try:
+            theme = self.setting_file.read("theme")
+            if theme == "dark":
+                self.ui.darkRadioButton.setChecked(True)
+        except:
+            self.theme = "light"
 
         file_types_str = self.setting_file.read("File Types")
         self.file_types = json.loads(file_types_str)
@@ -187,6 +193,10 @@ class AdvancedSettingsDialog(QDialog):
         self.setting_file.write("Refine orientations", str(self.refine))
         self.setting_file.write("Default Directory", str(self.directory))
         self.setting_file.write("Colors", json.dumps(self.colors))
+        if self.ui.darkRadioButton.isChecked():
+            self.setting_file.write("theme", "dark")
+        else:
+            self.setting_file.write("theme", "light")
         self.setting_file.save()
 
     def createSettingsFile(self):

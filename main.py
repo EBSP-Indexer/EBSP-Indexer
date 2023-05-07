@@ -24,7 +24,7 @@ from contextlib import redirect_stderr, redirect_stdout
 
 from PySide6.QtCore import QDir, Qt, QThreadPool, Slot
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QDialog
 
 if platform.system().lower() != "darwin":
     import qdarktheme
@@ -96,8 +96,8 @@ class AppWindow(QMainWindow):
             self.stayOnTopHint = False
 
         self.setupConnections()
-        self.showImage()
         self.importSettings()
+        self.showImage()
         self.updateActiveJobs()
 
     def setupConnections(self):
@@ -249,6 +249,12 @@ class AppWindow(QMainWindow):
     def importSettings(self):
         if os.path.exists("advanced_settings.txt"):
             setting_file = SettingFile("advanced_settings.txt")
+            if platform.system().lower() != "darwin":
+                try:
+                    self.theme = setting_file.read("theme")
+                except:
+                    self.theme = "light"
+                qdarktheme.setup_theme(self.theme)
             try:
                 file_types = json.loads(setting_file.read("File Types"))
                 system_view_filter = ["*" + x for x in file_types]
@@ -279,23 +285,21 @@ class AppWindow(QMainWindow):
             self.settingsDialog.setWindowFlag(
                 Qt.WindowStaysOnTopHint, self.stayOnTopHint
             )
-            self.settingsDialog.exec()
-        except Exception as e:
-            raise e
-
-        # TODO: This whole thing should be changed to inside AdvancedSettingsDialog, and should only be executed when ok is pressed
-        # updates file browser to changes:
-        try:
-            setting_file = SettingFile("advanced_settings.txt")
-            file_types = json.loads(setting_file.read("File Types"))
-            system_view_filters = ["*" + x for x in file_types]
-            if setting_file.read("Default Directory") not in ["False", ""]:
-                new_dir = setting_file.read("Default Directory")
-                if self.working_dir != new_dir:
-                    self.working_dir = new_dir
-                self.systemExplorer.setSystemViewer(
-                    self.working_dir, filters=system_view_filters
-                )
+            if self.settingsDialog.exec() == QDialog.Accepted:
+                setting_file = SettingFile("advanced_settings.txt")
+                file_types = json.loads(setting_file.read("File Types"))
+                self.theme = setting_file.read("theme")
+                system_view_filters = ["*" + x for x in file_types]
+                if setting_file.read("Default Directory") not in ["False", ""]:
+                    new_dir = setting_file.read("Default Directory")
+                    if self.working_dir != new_dir:
+                        self.working_dir = new_dir
+                    self.systemExplorer.setSystemViewer(
+                        self.working_dir, filters=system_view_filters
+                    )
+                if platform.system().lower() != "darwin":
+                    qdarktheme.setup_theme(self.theme)
+                self.showImage()
         except Exception as e:
             raise e
 
@@ -399,7 +403,11 @@ class AppWindow(QMainWindow):
                     f"Image Viewer - {os.path.basename(image_path)}"
                 )
             else:
-                image = mpimg.imread(resource_path("resources/ebsd_gui.png"))
+                if self.theme == "dark":
+                    im_path = resource_path("resources/ebsp_indexer_logo_dark_hd.png")
+                else:
+                    im_path = resource_path("resources/ebsd_gui.png")                    
+                image = mpimg.imread(im_path) 
                 imageViewer.setWindowTitle(f"Image Viewer")
             self.ui.MplWidget.canvas.ax.clear()
             self.ui.MplWidget.canvas.ax.axis(False)
@@ -458,7 +466,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     QThreadPool.globalInstance().setMaxThreadCount(NUM_OF_THREADS)
     if platform.system().lower() != "darwin":
-        qdarktheme.setup_theme("auto")
+        qdarktheme.setup_theme("light")
     app.setWindowIcon(QIcon(":/icons/app_icon.ico"))
     APP = AppWindow()
     # Redirect stdout to console.write and stderr to console.errorwrite
