@@ -1,4 +1,4 @@
-![Alt text](https://github.com/EBSP-Indexer/EBSP-Indexer/blob/dev/resources/ebsd_gui.png?raw=true "Electron backscatter diffraction - Graphicacl User Interface")
+![Alt text](https://github.com/EBSP-Indexer/EBSP-Indexer/blob/dev/resources/ebsd_gui.png?raw=true "Electron backscatter pattern Indexer")
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
@@ -21,7 +21,16 @@ The GUI supports:
 
 The project was originally developed by students at [The Department of Material Science](https://www.ntnu.edu/ima/research/emlab) at [Norwegian University of Science and Techonolgy (NTNU)](https://www.ntnu.edu/), and is open source and free to use.
 
-WARNING: The software is still in early development and can produce unrelaible results, and should therefor be used at own risk. 
+## Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 ## Requirements:
 - Windows 10/11 **or** macOS 13 (Ventura)
