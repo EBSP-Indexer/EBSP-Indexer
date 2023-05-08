@@ -17,6 +17,28 @@
         "doc",
         "ideas"
       ]
+    },
+      "login": "olavlet",
+      "name": "olavlet",
+      "avatar_url": "https://avatars.githubusercontent.com/u/113110330?v=4",
+      "profile": "https://github.com/olavlet",
+      "contributions": [
+        "code",
+        "bug",
+        "doc",
+        "ideas"
+      ]
+    },
+      "login": "htrellin",
+      "name": "htrellin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/80631936?v=4",
+      "profile": "https://github.com/htrellin",
+      "contributions": [
+        "code",
+        "bug",
+        "doc",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
