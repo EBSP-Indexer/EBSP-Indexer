@@ -333,7 +333,7 @@ class Ui_AdvancedSettings(object):
         self.buttonBox.accepted.connect(AdvancedSettings.accept)
         self.buttonBox.rejected.connect(AdvancedSettings.reject)
 
-        self.tabWidget.setCurrentIndex(3)
+        self.tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(AdvancedSettings)
