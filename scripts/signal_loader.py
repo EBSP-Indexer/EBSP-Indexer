@@ -37,7 +37,6 @@ class crystalMap:
             thdout = ThreadedOutput()
             with redirect_stdout(thdout):
                 if len(self.crystal_map.phases.ids) > 1:
-
                     self.navigator = {
                         "Inverse pole figure": 0,
                         "Phase map": 1,
@@ -46,7 +45,11 @@ class crystalMap:
                     self.navigator = {
                         "Inverse pole figure": 0,
                     }
-
+                if "scores" in self.crystal_map.prop:
+                    self.navigator["Normalized cross-correlation"] = 2
+                if self.crystal_map.rotations_per_point > 1:
+                    self.navigator["Orientation similarity metric"] = 3
+                
                 self.hkl = self.hkl_simulation()
 
             self.ebsd_detector = self.detector(crystal_map_path)
@@ -108,6 +111,8 @@ class crystalMap:
         """
         0 = inverse pole figure
         1 = phase map
+        2 = ncc_map
+        3 = osm_map
         """
 
         if nav_num == 0:
@@ -116,6 +121,14 @@ class crystalMap:
 
         if nav_num == 1:
             navigator = self.phase_map
+            return navigator
+        
+        if nav_num == 2:
+            navigator =  self.normalized_corss_correlation_map
+            return navigator
+        
+        if nav_num == 3:
+            navigator = self.orientation_simliarity_metric
             return navigator
 
     @functools.cached_property
@@ -156,13 +169,20 @@ class crystalMap:
         return phase_map
     
     @functools.cached_property
-    def property_map(self):
+    def normalized_corss_correlation_map(self):
         if self.crystal_map.rotations_per_point > 1:
-            property_map = self.crystal_map.scores[:, 0].reshape(*self.crystal_map.shape)
+            ncc_map = self.crystal_map.scores[:, 0].reshape(*self.crystal_map.shape)
         else:
-            property_map = self.crystal_map.get_map_data("scores")
+            ncc_map = self.crystal_map.get_map_data("scores")
 
-        return property_map
+        return ncc_map
+
+    @functools.cached_property
+    def orientation_simliarity_metric(self):
+        osm_map = kp.indexing.orientation_similarity_map(self.crystal_map)
+
+        return osm_map
+
 
 class EBSDDataset:
 
