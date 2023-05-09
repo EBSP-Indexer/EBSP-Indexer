@@ -21,17 +21,6 @@ The GUI supports:
 
 The project was originally developed by students at [The Department of Material Science](https://www.ntnu.edu/ima/research/emlab) at [Norwegian University of Science and Techonolgy (NTNU)](https://www.ntnu.edu/), and is open source and free to use.
 
-## Contributors
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
 ## Requirements:
 - Windows 10/11 **or** macOS 13 (Ventura)
 - x64-based processor **or** arm64 chipset
