@@ -1,5 +1,5 @@
 ![Alt text](https://github.com/EBSP-Indexer/EBSP-Indexer/blob/dev/resources/ebsd_gui.png?raw=true "Electron backscatter pattern Indexer")
-
+[![GitHub release](https://img.shields.io/github/release/EBSP-Indexer/EBSP-Indexer.svg)](https://GitHub.com/EBSP-Indexer/EBSP-Indexer/releases/) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![macOS](https://svgshare.com/i/ZjP.svg)](https://svgshare.com/i/ZjP.svg)  [![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
