@@ -5,9 +5,12 @@ from os.path import exists
 import matplotlib.colors as mplcolors
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QDialog
+from PySide6.QtWidgets import QDialog, QMessageBox
+
+from tabulate import tabulate
 
 from scripts.color_picker import ColorPicker
+from scripts.pc_from_wd import wdCalibration
 from ui.ui_advanced_settings import Ui_AdvancedSettings
 from utils import FileBrowser, SettingFile
 
@@ -39,7 +42,16 @@ class AdvancedSettingsDialog(QDialog):
         self.ui.directoryBox.clicked.connect(lambda: self.toggleDefaultDirectory())
         self.ui.browseDirectoryButton.clicked.connect(lambda: self.browseDirectory())
         self.ui.colorTreeWidget.doubleClicked.connect(lambda: self.colorPicker())
-        
+
+        self.ui.pushButtonAddNewMicroscope.clicked.connect(
+            lambda: self.addNewMicroscope()
+        )
+        self.ui.pushButtonRemoveMicroscope.clicked.connect(lambda: self.removeMicroscope())
+
+        self.ui.listWidgetMicroscopes.itemDoubleClicked.connect(
+            lambda: self.display_calibration_params()
+        )
+
         if platform.system().lower() == "darwin":
             self.ui.lightRadioButton.setDisabled(True)
             self.ui.darkRadioButton.setDisabled(True)
@@ -101,6 +113,40 @@ class AdvancedSettingsDialog(QDialog):
 
     def setRefine(self):
         self.refine = self.ui.checkBoxRefine.isChecked()
+
+    def addNewMicroscope(self):
+        wdDialog = wdCalibration(parent=self)
+        wdDialog.exec()
+        try:
+            self.setting_file.write(wdDialog.microscope_name, wdDialog.pc_curve)
+            if wdDialog.microscope_name not in self.microscopes:
+                self.ui.listWidgetMicroscopes.addItem(wdDialog.microscope_name)
+                self.microscopes.append(wdDialog.microscope_name)
+        except:
+            pass
+    
+    def removeMicroscope(self):
+        microscope = self.ui.listWidgetMicroscopes.currentItem().text()
+        self.microscopes.pop(self.microscopes.index(microscope))
+        self.ui.listWidgetMicroscopes.takeItem(self.ui.listWidgetMicroscopes.currentRow())
+        self.setting_file.remove(microscope)
+        
+    def display_calibration_params(self):
+        microscope = self.ui.listWidgetMicroscopes.currentItem().text()
+        pc_curve = eval(self.setting_file.read(microscope))
+        pc_list = [
+            ["", "Slope", "Intersept"],
+            ["X: ", pc_curve[0][0], pc_curve[0][1]],
+            ["Y: ", pc_curve[1][0], pc_curve[1][1]],
+            ["Z: ", pc_curve[2][0], pc_curve[2][1]],
+        ]
+
+        QMessageBox.about(self,
+                          microscope,
+                          tabulate(pc_list, headers="firstrow"),
+                          )
+        
+        
 
     def colorPicker(self):
         if self.ui.colorTreeWidget.currentItem().parent() is None:
@@ -165,7 +211,7 @@ class AdvancedSettingsDialog(QDialog):
                 self.refine = True
             else:
                 self.refine = False
-                
+
         except:
             self.refine = False
 
@@ -185,6 +231,12 @@ class AdvancedSettingsDialog(QDialog):
                 1, QColor(mplcolors.to_hex(c))
             )
 
+        try:
+            self.microscopes = self.setting_file.read("MICROSCOPES").split(", ")
+            self.ui.listWidgetMicroscopes.addItems(self.microscopes)
+        except:
+            self.microscopes = []
+
     def saveSettings(self):
         if exists(self.ui.directoryEdit.text()) and self.directory:
             self.directory = self.ui.directoryEdit.text()
@@ -202,6 +254,8 @@ class AdvancedSettingsDialog(QDialog):
             self.setting_file.write("theme", "dark")
         else:
             self.setting_file.write("theme", "light")
+
+        self.setting_file.write("MICROSCOPES", ", ".join(self.microscopes))
         self.setting_file.save()
 
     def createSettingsFile(self):
