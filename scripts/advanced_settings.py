@@ -136,7 +136,6 @@ class AdvancedSettingsDialog(QDialog):
             pass
         except Exception as e:
             raise e
-        print(len(self.microscopes))
         if len(self.microscopes) == 0:
             self.ui.pushButtonRemoveMicroscope.setEnabled(False)
         else:
