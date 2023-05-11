@@ -126,10 +126,15 @@ class AdvancedSettingsDialog(QDialog):
             pass
     
     def removeMicroscope(self):
-        microscope = self.ui.listWidgetMicroscopes.currentItem().text()
-        self.microscopes.pop(self.microscopes.index(microscope))
-        self.ui.listWidgetMicroscopes.takeItem(self.ui.listWidgetMicroscopes.currentRow())
-        self.setting_file.remove(microscope)
+        try:
+            microscope = self.ui.listWidgetMicroscopes.currentItem().text()
+            self.microscopes.pop(self.microscopes.index(microscope))
+            self.ui.listWidgetMicroscopes.takeItem(self.ui.listWidgetMicroscopes.currentRow())
+            self.setting_file.remove(microscope)
+        except AttributeError:
+            pass
+        except Exception as e:
+            raise e
         
     def display_calibration_params(self):
         microscope = self.ui.listWidgetMicroscopes.currentItem().text()
