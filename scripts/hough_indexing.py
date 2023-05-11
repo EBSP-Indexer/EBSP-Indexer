@@ -1,29 +1,31 @@
-from os import path, mkdir
-from datetime import date
-from typing import Optional, Sequence
 import json
 import warnings
+from datetime import date
+from os import mkdir, path
+from typing import Optional, Sequence
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog, QDialogButtonBox, QMainWindow, QTableWidgetItem
 import kikuchipy as kp
-from kikuchipy.signals.ebsd import EBSD, LazyEBSD
-import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
-from kikuchipy.signals.ebsd import EBSD
+from diffpy.structure.structure import Structure
+from kikuchipy.signals.ebsd import EBSD, LazyEBSD
 from orix import io, plot
-from orix.crystal_map import CrystalMap, PhaseList, Phase
+from orix.crystal_map import CrystalMap, Phase, PhaseList
 from orix.vector import Vector3d
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QDialog, QDialogButtonBox, QMainWindow, QTableWidgetItem
 
-from utils import SettingFile, FileBrowser, sendToJobManager
+from scripts.create_phase import NewPhaseDialog
+from scripts.pc_from_wd import pc_from_wd
 from ui.ui_hi_setup import Ui_HISetupDialog
-from ui.ui_new_phase import Ui_NewPhaseDialog
+from utils import FileBrowser, SettingFile, sendToJobManager
 
 # Ignore warnings to avoid crash with integrated console
 warnings.filterwarnings("ignore")
 
-EBSD.refine_orientation
+ALLOWED_SPACE_GROUPS = ["Fm-3m", "Im-3m"] # FCC and BCC
 
 class HiSetupDialog(QDialog):
     def __init__(self, parent: QMainWindow, pattern_path: str):
@@ -35,16 +37,14 @@ class HiSetupDialog(QDialog):
         self.ui = Ui_HISetupDialog()
         self.ui.setupUi(self)
         self.setWindowTitle(f"{self.windowTitle()} - {self.pattern_path}")
-        self.fileBrowserOF = FileBrowser(
-            mode=FileBrowser.OpenFile, filter_name="*.h5"
-        )
+        self.fileBrowserOF = FileBrowser(mode=FileBrowser.OpenFile, filter_name="*.h5")
 
         # Load pattern-file to get acquisition resolution
         try:
-            s_prew: LazyEBSD = kp.load(self.pattern_path, lazy=True)
+            s_preview: LazyEBSD = kp.load(self.pattern_path, lazy=True)
         except Exception as e:
             raise e
-        self.binnings = self.getBinningShapes(s_prew)
+        self.binnings = self.getBinningShapes(s_preview)
         self.colors = [
             "blue",
             "orange",
@@ -55,7 +55,7 @@ class HiSetupDialog(QDialog):
         self.phases = PhaseList()
 
         self.setupConnections()
-        self.load_parameters()
+        self.load_parameters(s_preview)
         self.setAvailableButtons()
 
         # Matplotlib configuration
@@ -66,18 +66,18 @@ class HiSetupDialog(QDialog):
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.run_hough_indexing())
         self.ui.buttonBox.rejected.connect(lambda: self.reject())
-        self.ui.pushButtonAddPhase.clicked.connect(lambda: self.create_phase())
+        self.ui.pushButtonCreatePhase.clicked.connect(lambda: self.create_phase())
         self.ui.pushButtonLoadPhase.clicked.connect(
             lambda: self.load_master_pattern_phase()
         )
         self.ui.pushButtonRemovePhase.clicked.connect(lambda: self.remove_phase())
-        self.ui.comboBoxBinning.currentTextChanged.connect(
-            lambda: self.ui.labelSignalShape.setText(
-                f"Signal Shape: {self.binnings[self.ui.comboBoxBinning.currentText()]}"
-            )
-        )
         self.ui.horizontalSliderRho.valueChanged.connect(
             lambda: self.ui.labelRho.setText(f"{self.ui.horizontalSliderRho.value()}%")
+        )
+        self.ui.comboBoxBinning.currentTextChanged.connect(
+            lambda: self.ui.labelNewSignalShape.setText(
+                f"{self.binnings[self.ui.comboBoxBinning.currentText()]} px"
+            )
         )
         self.ui.comboBoxBinning.addItems(self.binnings.keys())
 
@@ -86,6 +86,7 @@ class HiSetupDialog(QDialog):
             "binning": self.ui.comboBoxBinning.currentText(),
             "bands": self.ui.spinBoxBands.value(),
             "rho": self.ui.horizontalSliderRho.value(),
+            "data": self.ui.checkBoxIndexData.isChecked(),
             "lazy": self.ui.checkBoxLazy.isChecked(),
             "quality": [
                 self.ui.checkBoxQuality.isChecked(),
@@ -96,7 +97,7 @@ class HiSetupDialog(QDialog):
                 self.ui.checkBoxOrientation.isChecked(),
                 self.save_ipf_map,
             ],
-            "ckey_direction" : self.ui.lineEditColorKey.text(),
+            "ckey_direction": self.ui.lineEditColorKey.text(),
             "convention": self.ui.comboBoxConvention.currentText().lower(),
             "pc": (
                 self.ui.patternCenterX.value(),
@@ -105,24 +106,44 @@ class HiSetupDialog(QDialog):
             ),
         }
 
-    def load_parameters(self):
-        # read current setting from project_settings.txt, advanced_settings.txt
+    def load_parameters(self, signal: LazyEBSD):
+        # Read current setting from project_settings.txt, advanced_settings.txt
         self.setting_file = SettingFile(
             path.join(self.working_dir, "project_settings.txt")
         )
         self.program_settings = SettingFile("advanced_settings.txt")
+        try:
+            lazy = eval(self.program_settings.read("Lazy Loading"))
+        except:
+            lazy = False
+        self.ui.checkBoxLazy.setChecked(lazy)
 
         try:
-            self.convention = self.setting_file.read("Convention")
+            convention = self.setting_file.read("Convention")
         except:
-            self.convention = self.program_settings.read("Convention")
+            convention = self.program_settings.read("Convention")
+        self.ui.comboBoxConvention.setCurrentText(convention)
+        pc_params = (
+            self.ui.patternCenterX,
+            self.ui.patternCenterY,
+            self.ui.patternCenterZ,
+        )
         try:
-            self.ui.patternCenterX.setValue(float(self.setting_file.read("X star")))
-            self.ui.patternCenterY.setValue(float(self.setting_file.read("Y star")))
-            self.ui.patternCenterZ.setValue(float(self.setting_file.read("Z star")))
+            pc = eval(self.setting_file.read("PC"))
+            for i, param in enumerate(pc_params):
+                param.setValue(float(pc[i]))
         except:
-            self.pc = np.array([0.500, 0.200, 0.500])
-        self.ui.comboBoxConvention.setCurrentText(self.convention)
+            try:
+                microscope = signal.metadata.Acquisition_instrument.SEM.microscope
+                working_distance = (
+                    signal.metadata.Acquisition_instrument.SEM.working_distance
+                )
+                pc: list[float] = pc_from_wd(microscope, working_distance, convention)
+                for i, param in enumerate(pc_params):
+                    param.setValue(pc[i])
+            except:
+                for value, param in zip((0.5, 0.8, 0.5), pc_params):
+                    param.setValue(value)
         try:
             self.colors = json.loads(self.program_settings.read("Colors"))
         except:
@@ -151,8 +172,16 @@ class HiSetupDialog(QDialog):
         i = 1
         while True:
             try:
-                phase_settings = self.setting_file.read(f"Phase {i}")
-                self.add_phase(eval(phase_settings))
+                params = eval(self.setting_file.read(f"Phase {i}"))
+                structure = Structure()
+                if params["structure"]:
+                    structure.readStr(s=params["structure"], format="cif")
+                self.add_phase(
+                    name=params["name"],
+                    space_group=params["space_group"],
+                    structure=structure,
+                    color=params["color"],
+                )
                 i += 1
             except:
                 break
@@ -174,14 +203,14 @@ class HiSetupDialog(QDialog):
                     "name": phase.name,
                     "space_group": sg.number,
                     "color": phase.color,
+                    "structure": phase.structure.writeStr(format="cif")
+                    if phase.structure
+                    else None,
                 }
                 self.setting_file.write(f"Phase {phase_idx}", phase_settings)
                 phase_idx += 1
         self.setting_file.write("Convention", options["convention"].upper())
-        pc = options["pc"]
-        self.setting_file.write("X star", pc[0])
-        self.setting_file.write("Y star", pc[1])
-        self.setting_file.write("Z star", pc[2])
+        self.setting_file.write("PC", options["pc"])
         self.setting_file.write("Binning", options["binning"])
         self.setting_file.save()
 
@@ -208,47 +237,39 @@ class HiSetupDialog(QDialog):
                     mp.phase.color = self.colors[len(self.phases.ids) - 1]
                     self.mp_paths[mp.phase.name] = mp_path
                 except Exception as e:
-                    print("Phase could not be loaded from master pattern", e)
+                    print(f"Phase could not be loaded from master pattern: \n{e}")
             self.updatePhaseTable()
 
-    # TODO Move checks to the new phase dialog class
-    def add_phase(self, phase_settings: dict):
-        name = phase_settings["name"]
-        space_group = phase_settings["space_group"]
-        color = phase_settings["color"]
-        if not len(name):
-            print("No name was given to phase")
-            return
-        if space_group < 1 or space_group > 230:
-            print("Invalid space group number")
-            return
+    def add_phase(
+        self,
+        name: str = "",
+        space_group: int = None,
+        structure: Structure = None,
+        color: str = "",
+    ):
         if not len(color):
             color = self.colors[len(self.phases.ids) - 1]
         try:
-            self.phases.add(Phase(name, space_group, color=color))
+            if structure:
+                self.phases.add(
+                    Phase(
+                        name,
+                        space_group,
+                        structure=structure,
+                        color=color,
+                    )
+                )
+            else:
+                self.phases.add(Phase(name, space_group, color=color))
         except Exception as e:
             raise e
         self.updatePhaseTable()
 
     def create_phase(self):
-        class NewPhaseDialog(QDialog):
-            def __init__(self, parent) -> None:
-                super().__init__(parent)
-                self.ui = Ui_NewPhaseDialog()
-                self.ui.setupUi(self)
-
-            def getPhaseSettings(self) -> dict:
-                return {
-                    "name": self.ui.lineName.text(),
-                    "space_group": int(self.ui.lineSpaceGroup.text()),
-                    "color": self.ui.lineColor.text(),
-                }
-
-        newPhaseDialog = NewPhaseDialog(self)
-        newPhaseDialog.ui.buttonBox.accepted.connect(
-            lambda: self.add_phase(newPhaseDialog.getPhaseSettings())
-        )
-        newPhaseDialog.exec()
+        newPhaseDialog = NewPhaseDialog(self, self.colors[len(self.phases.ids)])
+        if newPhaseDialog.exec() == QDialog.Accepted:
+            self.phases.add(newPhaseDialog.get_phase(**newPhaseDialog.kwargs))
+            self.updatePhaseTable()
 
     def updatePhaseTable(self):
         """
@@ -268,28 +289,37 @@ class HiSetupDialog(QDialog):
                 sg.number,
                 sg.short_name,
                 sg.crystal_system,
-                phase.color,
+                phase.color_rgb,
             ]
             for col, entry in enumerate(entries):
                 item = QTableWidgetItem(str(entry))
+                if entry == phase.color_rgb:
+                    color = QColor.fromRgbF(*entry)
+                    item = QTableWidgetItem(phase.color)
+                    item.setBackground(color)
                 item.setFlags(item.flags() ^ Qt.ItemIsEditable)
                 phasesTable.setItem(row, col, item)
             row += 1
         self.setAvailableButtons()
 
     def remove_phase(self):
+        """
+        Removes selected rows of phases from tableWidgetPhase
+        """
         phaseTable = self.ui.tableWidgetPhase
         indexes = phaseTable.selectionModel().selectedRows()
-        countRow = len(indexes)
-        for i in range(countRow, 0, -1):
-            phase_key = phaseTable.item(indexes[i - 1].row(), 0).text()
+        indexes.sort(key=lambda qIndex: qIndex.row(), reverse=True)
+        for modelIndex in indexes:
+            phase_key = phaseTable.item(modelIndex.row(), 0).text()
+            phaseTable.removeRow(modelIndex.row())
             self.phases.__delitem__(phase_key)
             if phase_key in self.mp_paths.keys():
                 self.mp_paths.pop(phase_key)
-            phaseTable.removeRow(indexes[i - 1].row())
-        self.setAvailableButtons()
+        self.updatePhaseTable()
 
     def setAvailableButtons(self):
+        display_message = False
+        message = ""
         ok_flag = False
         phase_map_flag = False
         add_phase_flag = True
@@ -299,14 +329,27 @@ class HiSetupDialog(QDialog):
             if n_phases == 2:
                 phase_map_flag = True
                 add_phase_flag = False
+            if n_phases > 2:
+                ok_flag = False
+                add_phase_flag = False
+                display_message = True
+                message = "Current version of PyEBSDIndex supports maximum two phases (FCC, BCC)"
+        for _, ph in self.phases:
+            if ph.space_group.short_name not in ALLOWED_SPACE_GROUPS:
+                ok_flag = False
+                display_message = True
+                message = f"Structure {ph.space_group.short_name} in {ph.name} is currently not supported, only CUBIC Crystal Systems"
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(ok_flag)
         self.ui.checkBoxPhase.setEnabled(phase_map_flag)
         self.ui.checkBoxPhase.setChecked(phase_map_flag)
-        self.ui.pushButtonAddPhase.setEnabled(add_phase_flag)
+        self.ui.pushButtonCreatePhase.setEnabled(add_phase_flag)
         self.ui.pushButtonLoadPhase.setEnabled(add_phase_flag)
+        self.ui.labelMessage.setVisible(display_message)
+        self.ui.labelMessage.setText(message)
 
     def getBinningShapes(self, signal: LazyEBSD) -> dict:
         sig_shape = signal.axes_manager.signal_shape[::-1]
+        self.ui.labelOriginalSignalShape.setText(f"{sig_shape} px")
         binnings: dict = {"None": sig_shape}
         for num in range(2, 17):
             if sig_shape[0] % num == 0 and sig_shape[1] % num == 0:
@@ -323,6 +366,10 @@ class HiSetupDialog(QDialog):
         self.save_parameters()
         print(f"Loading {self.pattern_name} | lazy = {options['lazy']}")
         nav_shape = s.axes_manager.navigation_shape[::-1]
+        step_sizes = (s.axes_manager["x"].scale, s.axes_manager["y"].scale)
+        scan_unit = s.axes_manager[
+            "x"
+        ].units  # Assumes scan unit is the same for y and x
         if binning is None:
             binning = 1
         else:
@@ -340,22 +387,33 @@ class HiSetupDialog(QDialog):
         )
         det.save(path.join(self.dir_out, "detector.txt"), convention)
         indexer = det.get_indexer(
-            phase_list=self.phases,
-            rhoMaskFrac=self.rho_mask,
-            nBands=self.number_bands,
+            phase_list=self.phases, rhoMaskFrac=self.rho_mask, nBands=self.number_bands
         )
         print("------- Detector stats -------")
-        print(f"Vendor: {indexer.vendor}")
+        print(f"Indexer Vendor: {indexer.vendor}")
         print(f"Sample tilt: {indexer.sampleTilt}")
         print(f"Camera elevation: {indexer.camElev}")
         print(f"Atomic arrangements: {indexer.phaselist}")
         print(f"Navigation shape: {nav_shape}")
         print(f"Signal shape: {sig_shape}")
-        print(f"PC convention: {convention}")
-        xmap = s.hough_indexing(phase_list=self.phases, indexer=indexer, verbose=0)
-        io.save(path.join(self.dir_out, "xmap_hi.h5"), xmap)
-        io.save(path.join(self.dir_out, "xmap_hi.ang"), xmap)
-        print("Result was saved as xmap_hi.ang and xmap_hi.h5")
+        print(f"Steps: {step_sizes} {scan_unit}")
+        xmap, data = s.hough_indexing(
+            phase_list=self.phases, indexer=indexer, verbose=0, return_index_data=True
+        )
+        if options["data"]:
+            index_data_path = path.join(self.dir_out, "index_data.npy")
+            np.save(index_data_path, data)
+            print(f"Saved index data array to {index_data_path}")
+        else:
+            index_data_path = None
+        name = ""
+        for phase_id, phase in xmap.phases_in_data:
+            if phase_id != -1:
+                name += f"{phase.name}_"
+        name = f"{name}xmap"
+        io.save(path.join(self.dir_out, f"{name}.h5"), xmap)
+        io.save(path.join(self.dir_out, f"{name}.ang"), xmap)
+        print(f"Result was saved as {name}.ang and {name}.h5")
         for key in ["quality", "phase", "orientation"]:
             optionEnabled, optionExecute = options.get(key)
             if optionEnabled:
@@ -366,7 +424,8 @@ class HiSetupDialog(QDialog):
                         optionExecute(xmap)
                 except Exception as e:
                     print(f"Could not save {key}_map:\n{e}")
-        print("Logging results ...")
+                    raise e
+        print("Logging parameters used ...")
         log_hi_parameters(
             self.pattern_path,
             self.dir_out,
@@ -376,18 +435,19 @@ class HiSetupDialog(QDialog):
             convention=options["convention"],
             binning=binning,
             pattern_center=pc,
+            index_data_path=index_data_path,
         )
         print(f"Finished indexing {self.pattern_name}")
 
     def run_hough_indexing(self):
         for i in range(1, 100):
             try:
-                self.dir_out = path.join(self.working_dir, "hi_results" + str(i))
+                self.dir_out = path.join(self.working_dir, "hi_results_" + str(i))
                 mkdir(self.dir_out)
                 break
             except FileExistsError:
                 pass
-        # Load s outside of thread to avoid leaked sesmaphores 
+        # Load s outside of thread to avoid leaked sesmaphores
         options = self.getOptions()
         try:
             signal = kp.load(self.pattern_path, lazy=options["lazy"])
@@ -400,7 +460,7 @@ class HiSetupDialog(QDialog):
             func=self.hough_indexing,
             allow_cleanup=True,
             allow_logging=True,
-            s = signal
+            s=signal,
         )
 
     def save_quality_metrics(self, xmap):
@@ -430,10 +490,8 @@ class HiSetupDialog(QDialog):
         Plot phase map
         """
         print("Saving phase map ...")
-        # for i, ph in enumerate(self.phases):
-        #     xmap.phases[ph].color = self.colors[i]
         fig = xmap.plot(return_figure=True, remove_padding=True)
-        fig.savefig(path.join(self.dir_out, "maps_phase.png"), **self.savefig_kwds)
+        fig.savefig(path.join(self.dir_out, "phase_map.png"), **self.savefig_kwds)
 
     def save_ipf_map(
         self,
@@ -455,7 +513,7 @@ class HiSetupDialog(QDialog):
         """
         print("Saving inverse pole figure map ...")
         v_ipf = Vector3d(ckey_direction)
-        sym = xmap.phases[0].point_group
+        sym = xmap.phases_in_data[xmap.phase_id[0]].point_group
         ckey = plot.IPFColorKeyTSL(sym, v_ipf)
         print(ckey)
         fig_ckey = ckey.plot(return_figure=True)
@@ -469,7 +527,7 @@ class HiSetupDialog(QDialog):
             ax_ckey.patch.set_facecolor("None")
         else:
             fig_ckey.savefig(
-                path.join(self.dir_out, "orientation_colour_key.png"),
+                path.join(self.dir_out, "orientation_color_key.png"),
                 **self.savefig_kwds,
             )
         fig.savefig(path.join(self.dir_out, "IPF.png"), **self.savefig_kwds)
@@ -485,6 +543,7 @@ def log_hi_parameters(
     pattern_center: np.ndarray = None,
     convention: str = "BRUKER",
     binning: int = 1,
+    index_data_path=None,
 ):
     """
     Assumes convention is BRUKER for pattern center if none is given
@@ -513,17 +572,16 @@ def log_hi_parameters(
         "Navigation shape (rows, columns)",
         signal.axes_manager.navigation_shape[::-1],
     )
-    if binning == 1:
-        log.write("Binning", None)
-    else:
-        log.write("Binning", binning)
+    binning = None if binning == 1 else binning
+    log.write("Binning", binning)
     log.write("Signal shape (rows, columns)", signal.axes_manager.signal_shape[::-1])
     log.write("Step size", f"{signal.axes_manager[0].scale} um\n")
 
     ### HI parameteres
 
     log.write("kikuchipy version", kp.__version__)
-
+    if index_data_path is not None:
+        log.write("data_path", index_data_path)
     if mp_paths is not None:
         for i, mp_path in enumerate(mp_paths.values(), 1):
             log.write(f"Master pattern path {i}", mp_path)

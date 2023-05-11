@@ -1,69 +1,68 @@
-# Copyright (c) 2022 EBSD-GUI developers
+# Copyright (c) 2022 EBSP Indexer developers
 #
-# This file is part of EBSD-GUI.
+# This file is part of EBSP Indexer.
 
-# EBSD-GUI is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+# EBSP Indexer is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-# EBSD-GUI is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# EBSP Indexer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
 # of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
-import platform
+
 import multiprocessing
-import sys
+
+multiprocessing.freeze_support()  # Pyinstaller fix for MacOS
+
 import json
-import os
 import logging
+import os
+import platform
+import sys
+from contextlib import redirect_stderr, redirect_stdout
+
+from PySide6.QtCore import QDir, Qt, QThreadPool, Slot
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QDialog
+
+if platform.system().lower() != "darwin":
+    import qdarktheme
 logging.getLogger("pyopencl").setLevel(logging.WARNING)
 logging.getLogger("hyperspy").setLevel(logging.WARNING)
-from contextlib import redirect_stdout, redirect_stderr
+logging.getLogger("kikuchipy").setLevel(logging.WARNING)
 
-try:
-    import pyopencl.tools
-except:
-    print("PyOpenCL could not be imported")
-import platform
-
-from contextlib import redirect_stdout, redirect_stderr
-import resources_rc
-from PySide6.QtCore import QDir, Qt, QThreadPool, Slot
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileSystemModel, QMessageBox
-from PySide6.QtGui import QIcon
-#try: 
-#    import pyi_splash
-#except:
-#    pass
 # Modules available from start in the console
+import hyperspy as hs
 import kikuchipy as kp
-import hyperspy.api as hs
-
-# Import something from kikutchipy to avoid load times during dialog initalizations
-from kikuchipy import load
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
+from kikuchipy import (
+    load,
+)  # Import something from kikutchipy to avoid load times during dialog initalizations
 
-from ui.ui_main_window import Ui_MainWindow
-from scripts.system_explorer import SystemExplorerWidget
-from scripts.hough_indexing import HiSetupDialog
-from scripts.pattern_processing import PatternProcessingDialog
-from scripts.dictionary_indexing import DiSetupDialog
-from scripts.refinement import RefineSetupDialog
-from scripts.pre_indexing_maps import (
-    save_adp_map,
-    save_mean_intensity_map,
-    save_rgb_vbse,
-    save_iq_map,
-)
+import resources_rc  # Imports resources in a pythonic way from resources.qrc
 from scripts.advanced_settings import AdvancedSettingsDialog
 from scripts.console import Console
-from utils import Redirect, SettingFile, FileBrowser, sendToWorker
+from scripts.dictionary_indexing import DiSetupDialog
+from scripts.hough_indexing import HiSetupDialog
 from scripts.pattern_center import PatterCenterDialog
+from scripts.pc_selection import PCSelectionDialog
+from scripts.pattern_processing import PatternProcessingDialog
+from scripts.pre_indexing_maps import (
+    save_adp_map,
+    save_iq_map,
+    save_mean_intensity_map,
+    save_rgb_vbse,
+)
+from scripts.refinement import RefineSetupDialog
 from scripts.region_of_interest import RegionOfInteresDialog
 from scripts.signal_navigation_widget import SignalNavigationWidget
+from scripts.system_explorer import SystemExplorerWidget
+from ui.ui_main_window import Ui_MainWindow
+from utils import FileBrowser, Redirect, SettingFile, sendToWorker, resource_path
 
-hs.set_log_level("CRITICAL")
+NUM_OF_THREADS = 1
 
 KP_EXTENSIONS = (".h5", ".dat")
 IMAGE_EXTENSIONS = ()
@@ -97,28 +96,33 @@ class AppWindow(QMainWindow):
             self.stayOnTopHint = False
 
         self.setupConnections()
-        self.showImage(self.getSelectedPath())
         self.importSettings()
-        QThreadPool.globalInstance().setMaxThreadCount(1)
+        self.showImage()
         self.updateActiveJobs()
-        #try:
-        #    pyi_splash.close()
-        #except Exception as e:
-        #    pass
 
     def setupConnections(self):
         self.ui.dockWidgetSystemExplorer.setWidget(self.systemExplorer)
-        # self.ui.dockWidgetSystemExplorer.adjustSize()
+        self.ui.dockWidgetSignalNavigation.setWidget(self.signalNavigationWidget)
+        self.tabifyDockWidget(
+            self.ui.dockWidgetImageViewer, self.ui.dockWidgetSignalNavigation
+        )
+        self.ui.dockWidgetImageViewer.setFocus()
+        self.ui.dockWidgetJobManager.setHidden(True)
+        self.ui.dockWidgetSignalNavigation.setHidden(True)
+        self.ui.statusbar.addPermanentWidget(self.ui.threadsLabel)
         self.systemExplorer.pathChanged.connect(
             lambda new_path: self.updateMenuButtons(new_path)
         )
-        self.systemExplorer.pathChanged.connect(
-            lambda new_path: self.showImage(new_path)
+        # self.systemExplorer.pathChanged.connect(
+        #     lambda new_path: self.showImage(new_path)
+        # )
+        self.systemExplorer.requestImageViewer.connect(
+            lambda image_path: self.showImage(image_path)
         )
         self.systemExplorer.requestSignalNavigation.connect(
             lambda signal_path: self.selectSignalNavigation(signal_path)
         )
-        self.ui.dockWidgetSignalNavigation.setWidget(self.signalNavigationWidget)
+
         self.ui.actionOpen_Workfolder.triggered.connect(
             lambda: self.selectWorkingDirectory()
         )
@@ -139,27 +143,88 @@ class AppWindow(QMainWindow):
         self.ui.actionRefineOrientations.triggered.connect(
             lambda: self.selectRefineOrientations(file_path=self.getSelectedPath())
         )
-        self.ui.actionPattern_Center.triggered.connect(
+        self.ui.actionCalibration_patterns.triggered.connect(
             lambda: self.selectPatternCenter()
         )
+        self.ui.actionPattern_selection.triggered.connect(
+            lambda: self.openPCSelection(pattern_path=self.getSelectedPath())
+        )
+        # if platform.system().lower() != "darwin":
+        # self.ui.actionAverage_dot_product.triggered.connect(
+        #     lambda: save_adp_map(pattern_path=self.getSelectedPath())
+        # )
+        # self.ui.actionImage_quality.triggered.connect(
+        #     lambda: save_iq_map(pattern_path=self.getSelectedPath())
+        # )
+        # self.ui.actionMean_intensity.triggered.connect(
+        #     lambda: save_mean_intensity_map(pattern_path=self.getSelectedPath())
+        # )
+        # self.ui.actionVirtual_backscatter_electron.triggered.connect(
+        #     lambda: save_rgb_vbse(pattern_path=self.getSelectedPath())
+        # )
+
+        # else:
+        
         self.ui.actionAverage_dot_product.triggered.connect(
-            lambda: sendToWorker(
-                self, save_adp_map, pattern_path=self.getSelectedPath()
-            )
+            lambda: self.generatePreIndexingMap(map=0)
         )
         self.ui.actionImage_quality.triggered.connect(
-            lambda: sendToWorker(self, save_iq_map, pattern_path=self.getSelectedPath())
+            lambda: self.generatePreIndexingMap(map=1)
         )
         self.ui.actionMean_intensity.triggered.connect(
-            lambda: sendToWorker(
-                self, save_mean_intensity_map, pattern_path=self.getSelectedPath()
-            )
+            lambda: self.generatePreIndexingMap(map=2)
         )
         self.ui.actionVirtual_backscatter_electron.triggered.connect(
-            lambda: sendToWorker(
-                self, save_rgb_vbse, pattern_path=self.getSelectedPath()
-            )
+            lambda: self.generatePreIndexingMap(map=3)
         )
+
+    def generatePreIndexingMap(self, map: int):
+        """
+        0 = average dot product map
+        1 = image quality map
+        2 = mean intensity map
+        3 = virual BSE image
+        """
+
+        def image_saved():
+            sb.showMessage("Image saved", 3000)
+
+        pattern_path = self.getSelectedPath()
+        sb = self.ui.statusbar
+
+        if map == 0:
+            sb.showMessage("Generating average dot product map ...")
+            worker = sendToWorker(self, save_adp_map, pattern_path=pattern_path)
+        if map == 1:
+            sb.showMessage("Generating image quality map ...")
+            worker = sendToWorker(self, save_iq_map, pattern_path=pattern_path)
+        if map == 2:
+            sb.showMessage("Generating mean intensity map ...")
+            worker = sendToWorker(
+                self, save_mean_intensity_map, pattern_path=pattern_path
+            )
+        if map == 3:
+            sb.showMessage("Generating VBSE image ...")
+            worker = sendToWorker(self, save_rgb_vbse, pattern_path=pattern_path)
+
+        worker.isFinished.connect(image_saved)
+
+    # Override closeEvent from QMainWindow
+    def closeEvent(self, event):
+        if QThreadPool.globalInstance().activeThreadCount() != 0:
+            reply = QMessageBox.question(
+                self,
+                "Close EBSP Indexer",
+                "Some jobs are still running.\nAre you sure you want to close EBSP Indexer?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No,  # Default button
+            )
+            if reply == QMessageBox.Yes:
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            event.accept()
 
     def selectWorkingDirectory(self):
         if self.fileBrowserOD.getFile():
@@ -178,14 +243,18 @@ class AppWindow(QMainWindow):
             else:
                 self.systemExplorer.setSystemViewer(self.working_dir)
 
-            self.setWindowTitle(f"EBSD-GUI - {self.working_dir}")
-
     def getSelectedPath(self) -> str:
         return self.systemExplorer.selected_path
 
     def importSettings(self):
         if os.path.exists("advanced_settings.txt"):
             setting_file = SettingFile("advanced_settings.txt")
+            if platform.system().lower() != "darwin":
+                try:
+                    self.theme = setting_file.read("theme")
+                except:
+                    self.theme = "light"
+                qdarktheme.setup_theme(self.theme)
             try:
                 file_types = json.loads(setting_file.read("File Types"))
                 system_view_filter = ["*" + x for x in file_types]
@@ -216,37 +285,31 @@ class AppWindow(QMainWindow):
             self.settingsDialog.setWindowFlag(
                 Qt.WindowStaysOnTopHint, self.stayOnTopHint
             )
-            self.settingsDialog.exec()
+            if self.settingsDialog.exec() == QDialog.Accepted:
+                setting_file = SettingFile("advanced_settings.txt")
+                file_types = json.loads(setting_file.read("File Types"))
+                self.theme = setting_file.read("theme")
+                system_view_filters = ["*" + x for x in file_types]
+                if setting_file.read("Default Directory") not in ["False", ""]:
+                    new_dir = setting_file.read("Default Directory")
+                    if self.working_dir != new_dir:
+                        self.working_dir = new_dir
+                    self.systemExplorer.setSystemViewer(
+                        self.working_dir, filters=system_view_filters
+                    )
+                if platform.system().lower() != "darwin":
+                    qdarktheme.setup_theme(self.theme)
+                self.showImage()
         except Exception as e:
-            self.console.errorwrite(
-                f"Could not initialize settings dialog:\n{str(e)}\n"
-            )
-
-        # TODO: This whole thing should be changed to inside AdvancedSettingsDialog, and should only be executed when ok is pressed
-        # updates file browser to changes:
-        setting_file = SettingFile("advanced_settings.txt")
-        file_types = json.loads(setting_file.read("File Types"))
-        system_view_filters = ["*" + x for x in file_types]
-        if setting_file.read("Default Directory") not in ["False", ""]:
-            if self.working_dir == QDir.currentPath():
-                self.working_dir = setting_file.read("Default Directory")
-            self.systemExplorer.setSystemViewer(
-                self.working_dir, filters=system_view_filters
-            )
+            raise e
 
     def selectRefineOrientations(self, file_path: str):
         try:
-            self.refineDialog = RefineSetupDialog(
-                parent=self, file_path=file_path
-            )
-            self.refineDialog.setWindowFlag(
-                Qt.WindowStaysOnTopHint, self.stayOnTopHint
-            )
+            self.refineDialog = RefineSetupDialog(parent=self, file_path=file_path)
+            self.refineDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.refineDialog.exec()
         except Exception as e:
-            self.console.errorwrite(
-                f"Could not initialize refinement dialog:\n{str(e)}\n"
-            )
+            raise e
 
     def selectProcessing(self):
         try:
@@ -258,16 +321,13 @@ class AppWindow(QMainWindow):
             )
             self.processingDialog.exec()
         except Exception as e:
-            self.console.errorwrite(
-                f"Could not initialize processing dialog:\n{str(e)}\n"
-            )
+            raise e
 
     def selectROI(self):
         try:
             plt.close("all")
         except Exception as e:
-            print(e)
-            pass
+            self.console.errorwrite(e)
         try:
             self.ROIDialog = RegionOfInteresDialog(
                 parent=self, pattern_path=self.getSelectedPath()
@@ -275,36 +335,16 @@ class AppWindow(QMainWindow):
             self.ROIDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.ROIDialog.exec()
         except Exception as e:
-            self.console.errorwrite(f"Could not initialize ROI dialog:\n{str(e)}\n")
-
-    # def onSystemModelChanged(self, new_selected, old_selected):
-    #     if new_selected.empty():
-    #         self.file_selected = ""
-    #     else:
-    #         self.file_selected = self.systemModel.filePath(
-    #             self.ui.systemViewer.currentIndex()
-    #         )
-    #     self.updateMenuButtons(self.file_selected)
-    #     self.showImage(self.file_selected)
-
-    # def doubleClickEvent(self):
-    #     index = self.ui.systemViewer.currentIndex()
-    #     self.file_selected = self.systemModel.filePath(index)
-
-    #     if path.splitext(self.file_selected)[1] in [".txt"]:
-    #         if platform.system().lower() == "darwin":
-    #             subprocess.call(["open", "-a", "TextEdit", self.file_selected])
-    #         if platform.system().lower() == "windows":
-    #             startfile(self.file_selected)
-
-    #     # TODO: more functionality, open dataset for signal navigation
-    #     if splitext(self.file_selected)[1] in [".h5", ".dat"]:
-    #         self.selectSignalNavigation()
+            raise e
 
     def selectSignalNavigation(self, signal_path: str):
         try:
             self.signalNavigationWidget.load_dataset(signal_path)
-
+            dw = self.ui.dockWidgetSignalNavigation
+            dw.setWindowTitle(f"Signal Navigation - {os.path.basename(signal_path)}")
+            if dw.isHidden():
+                dw.setVisible(True)
+            dw.raise_()
         except Exception as e:
             if self.getSelectedPath() == "":
                 dlg = QMessageBox(self)
@@ -313,9 +353,7 @@ class AppWindow(QMainWindow):
                 dlg.setStandardButtons(QMessageBox.Ok)
                 dlg.setIcon(QMessageBox.Warning)
                 dlg.exec()
-            self.console.errorwrite(
-                f"Could not initialize signal navigation:\n{str(e)}\n"
-            )
+            raise e
 
     def selectDictionaryIndexingSetup(self, pattern_path: str):
         try:
@@ -323,9 +361,7 @@ class AppWindow(QMainWindow):
             self.diSetup.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.diSetup.show()
         except Exception as e:
-            self.console.errorwrite(
-                f"Could not initialize dictionary indexing:\n{str(e)}\n"
-            )
+            raise e
 
     def selectHoughIndexingSetup(self, pattern_path: str):
         try:
@@ -333,7 +369,7 @@ class AppWindow(QMainWindow):
             self.hiSetup.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
             self.hiSetup.show()
         except Exception as e:
-            self.console.errorwrite(f"Could not initialize hough indexing:\n{str(e)}\n")
+            raise e
 
     def selectPatternCenter(self):
         try:
@@ -345,23 +381,34 @@ class AppWindow(QMainWindow):
             )
             self.patternCenter.show()
         except Exception as e:
-            self.console.errorwrite(
-                f"Could not initialize pattern center refinement:\n{str(e)}\n"
-            )
+            raise e
 
-    def showImage(self, image_path):
+    def openPCSelection(self, pattern_path: str):
         try:
-            if image_path == None or not os.path.splitext(image_path)[1] in [
-                ".jpg",
-                ".png",
-                ".gif",
-                ".bmp",
-            ]:
-                image = mpimg.imread("resources/ebsd_gui.png")
-                self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer")
+            self.PCSelection = PCSelectionDialog(self, pattern_path)
+            self.PCSelection.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
+            self.PCSelection.show()
+        except Exception as e:
+            raise e
+
+    def showImage(self, image_path: str = ""):
+        imageViewer = self.ui.dockWidgetImageViewer
+        if imageViewer.isHidden():
+            imageViewer.setVisible(True)
+        imageViewer.raise_()
+        try:
+            if len(image_path):
+                image = mpimg.imread(resource_path(image_path))
+                imageViewer.setWindowTitle(
+                    f"Image Viewer - {os.path.basename(image_path)}"
+                )
             else:
-                image = mpimg.imread(image_path)
-                self.ui.dockWidgetImageViewer.setWindowTitle(f"Image Viewer - {image_path}")
+                if self.theme == "dark":
+                    im_path = resource_path("resources/ebsp_indexer_logo_dark_hd.png")
+                else:
+                    im_path = resource_path("resources/ebsd_gui.png")                    
+                image = mpimg.imread(im_path) 
+                imageViewer.setWindowTitle(f"Image Viewer")
             self.ui.MplWidget.canvas.ax.clear()
             self.ui.MplWidget.canvas.ax.axis(False)
             self.ui.MplWidget.canvas.ax.imshow(image)
@@ -393,13 +440,13 @@ class AppWindow(QMainWindow):
             kp_enabled = False
         setAvailableMenuActions(kp_enabled)
 
-        # Special case for plotting calibration patterns from Settings.txt
-        if os.path.basename(file_path) == "Setting.txt":
-            self.ui.menuPatternInspection.setEnabled(True)
-            self.ui.actionSignalNavigation.setEnabled(True)
-            self.ui.menuPre_indexing_maps.setEnabled(False)
+        # Special case for plotting calibration patterns from Settings.txt, currently not avaiable
+        # if os.path.basename(file_path) == "Setting.txt":
+        #     self.ui.menuPatternInspection.setEnabled(True)
+        #     self.ui.actionSignalNavigation.setEnabled(True)
+        #     self.ui.menuPre_indexing_maps.setEnabled(False)
 
-    #TODO Move removeWorker and updateActiveJobs to a jobmanagerlist class
+    # TODO Move removeWorker and updateActiveJobs to a jobmanagerlist class
     @Slot(int)
     def removeWorker(self, worker_id: int):
         jobList = self.ui.jobList
@@ -411,17 +458,16 @@ class AppWindow(QMainWindow):
 
     @Slot()
     def updateActiveJobs(self):
-        self.ui.threadsLabel.setText(
-            f"{QThreadPool.globalInstance().activeThreadCount()} out of {QThreadPool.globalInstance().maxThreadCount()} active jobs"
-        )
+        msg = f"{QThreadPool.globalInstance().activeThreadCount()} out of {QThreadPool.globalInstance().maxThreadCount()} active jobs"
+        self.ui.threadsLabel.setText(msg)
 
 
 if __name__ == "__main__":
-    # Pyinstaller fix
-    multiprocessing.freeze_support()
-
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon(':/icons/app_icon.ico'))
+    QThreadPool.globalInstance().setMaxThreadCount(NUM_OF_THREADS)
+    if platform.system().lower() != "darwin":
+        qdarktheme.setup_theme("light")
+    app.setWindowIcon(QIcon(":/icons/app_icon.ico"))
     APP = AppWindow()
     # Redirect stdout to console.write and stderr to console.errorwrite
     with redirect_stdout(APP.console), redirect_stderr(
@@ -429,7 +475,7 @@ if __name__ == "__main__":
     ):
         APP.show()
         print(
-            """EBSD-GUI  Copyright (C) 2023  EBSD-GUI developers 
+            """EBSP Indexer  Copyright (C) 2023  EBSP Indexer Developers 
 This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.txt.
 This is free software, and you are welcome to redistribute it under certain conditions; see COPYING.txt for details.""",
         )

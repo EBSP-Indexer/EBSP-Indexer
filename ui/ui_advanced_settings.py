@@ -27,7 +27,7 @@ class Ui_AdvancedSettings(object):
     def setupUi(self, AdvancedSettings):
         if not AdvancedSettings.objectName():
             AdvancedSettings.setObjectName(u"AdvancedSettings")
-        AdvancedSettings.resize(393, 361)
+        AdvancedSettings.resize(427, 402)
         self.gridLayout = QGridLayout(AdvancedSettings)
         self.gridLayout.setObjectName(u"gridLayout")
         self.buttonBox = QDialogButtonBox(AdvancedSettings)
@@ -178,6 +178,38 @@ class Ui_AdvancedSettings(object):
 
         self.verticalLayout_3.addWidget(self.savePcsBox)
 
+        self.line_2 = QFrame(self.preProcessingTab)
+        self.line_2.setObjectName(u"line_2")
+        self.line_2.setFrameShape(QFrame.HLine)
+        self.line_2.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout_3.addWidget(self.line_2)
+
+        self.label_9 = QLabel(self.preProcessingTab)
+        self.label_9.setObjectName(u"label_9")
+
+        self.verticalLayout_3.addWidget(self.label_9)
+
+        self.listWidgetMicroscopes = QListWidget(self.preProcessingTab)
+        self.listWidgetMicroscopes.setObjectName(u"listWidgetMicroscopes")
+
+        self.verticalLayout_3.addWidget(self.listWidgetMicroscopes)
+
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.pushButtonAddNewMicroscope = QPushButton(self.preProcessingTab)
+        self.pushButtonAddNewMicroscope.setObjectName(u"pushButtonAddNewMicroscope")
+
+        self.horizontalLayout_5.addWidget(self.pushButtonAddNewMicroscope)
+
+        self.pushButtonRemoveMicroscope = QPushButton(self.preProcessingTab)
+        self.pushButtonRemoveMicroscope.setObjectName(u"pushButtonRemoveMicroscope")
+
+        self.horizontalLayout_5.addWidget(self.pushButtonRemoveMicroscope)
+
+
+        self.verticalLayout_3.addLayout(self.horizontalLayout_5)
+
         self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_3.addItem(self.verticalSpacer_2)
@@ -197,6 +229,11 @@ class Ui_AdvancedSettings(object):
         self.lazyLoadingBox.setFocusPolicy(Qt.NoFocus)
 
         self.verticalLayout_4.addWidget(self.lazyLoadingBox)
+
+        self.checkBoxRefine = QCheckBox(self.indexingTab)
+        self.checkBoxRefine.setObjectName(u"checkBoxRefine")
+
+        self.verticalLayout_4.addWidget(self.checkBoxRefine)
 
         self.label_7 = QLabel(self.indexingTab)
         self.label_7.setObjectName(u"label_7")
@@ -277,6 +314,49 @@ class Ui_AdvancedSettings(object):
         self.verticalLayout_4.addItem(self.verticalSpacer_3)
 
         self.tabWidget.addTab(self.indexingTab, "")
+        self.apperanceTab = QWidget()
+        self.apperanceTab.setObjectName(u"apperanceTab")
+        self.verticalLayout_6 = QVBoxLayout(self.apperanceTab)
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.label_8 = QLabel(self.apperanceTab)
+        self.label_8.setObjectName(u"label_8")
+
+        self.verticalLayout_6.addWidget(self.label_8)
+
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.lightRadioButton = QRadioButton(self.apperanceTab)
+        self.lightRadioButton.setObjectName(u"lightRadioButton")
+        self.lightRadioButton.setChecked(True)
+
+        self.horizontalLayout_3.addWidget(self.lightRadioButton)
+
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer_3)
+
+
+        self.verticalLayout_6.addLayout(self.horizontalLayout_3)
+
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.darkRadioButton = QRadioButton(self.apperanceTab)
+        self.darkRadioButton.setObjectName(u"darkRadioButton")
+
+        self.horizontalLayout_4.addWidget(self.darkRadioButton)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_2)
+
+
+        self.verticalLayout_6.addLayout(self.horizontalLayout_4)
+
+        self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_6.addItem(self.verticalSpacer_4)
+
+        self.tabWidget.addTab(self.apperanceTab, "")
 
         self.gridLayout.addWidget(self.tabWidget, 0, 0, 1, 1)
 
@@ -310,9 +390,13 @@ class Ui_AdvancedSettings(object):
         self.tslButton.setText(QCoreApplication.translate("AdvancedSettings", u"TSL", None))
         self.label_3.setText(QCoreApplication.translate("AdvancedSettings", u"Pattern Center Refinement:", None))
         self.savePcsBox.setText(QCoreApplication.translate("AdvancedSettings", u"Save individual pattern data to project settings file ", None))
+        self.label_9.setText(QCoreApplication.translate("AdvancedSettings", u"Calibrated microscopes", None))
+        self.pushButtonAddNewMicroscope.setText(QCoreApplication.translate("AdvancedSettings", u"Add new microscope", None))
+        self.pushButtonRemoveMicroscope.setText(QCoreApplication.translate("AdvancedSettings", u"Remove microscope", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.preProcessingTab), QCoreApplication.translate("AdvancedSettings", u"Pre Prosessing", None))
         self.label.setText(QCoreApplication.translate("AdvancedSettings", u"Default settings:", None))
         self.lazyLoadingBox.setText(QCoreApplication.translate("AdvancedSettings", u"Lazy Loading (recommended)", None))
+        self.checkBoxRefine.setText(QCoreApplication.translate("AdvancedSettings", u"Refine orientations", None))
         self.label_7.setText(QCoreApplication.translate("AdvancedSettings", u"Colors:", None))
         ___qtreewidgetitem = self.colorTreeWidget.headerItem()
         ___qtreewidgetitem.setText(1, QCoreApplication.translate("AdvancedSettings", u"2", None));
@@ -337,5 +421,12 @@ class Ui_AdvancedSettings(object):
         self.colorTreeWidget.setSortingEnabled(__sortingEnabled)
 
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.indexingTab), QCoreApplication.translate("AdvancedSettings", u"Indexing", None))
+#if QT_CONFIG(accessibility)
+        self.apperanceTab.setAccessibleName(QCoreApplication.translate("AdvancedSettings", u"Apperance", None))
+#endif // QT_CONFIG(accessibility)
+        self.label_8.setText(QCoreApplication.translate("AdvancedSettings", u"Theme", None))
+        self.lightRadioButton.setText(QCoreApplication.translate("AdvancedSettings", u"Light", None))
+        self.darkRadioButton.setText(QCoreApplication.translate("AdvancedSettings", u"Dark", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.apperanceTab), QCoreApplication.translate("AdvancedSettings", u"Apperance", None))
     # retranslateUi
 

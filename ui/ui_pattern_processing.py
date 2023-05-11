@@ -26,7 +26,7 @@ class Ui_PatternProcessingDialog(object):
     def setupUi(self, PatternProcessingDialog):
         if not PatternProcessingDialog.objectName():
             PatternProcessingDialog.setObjectName(u"PatternProcessingDialog")
-        PatternProcessingDialog.resize(756, 472)
+        PatternProcessingDialog.resize(865, 472)
         PatternProcessingDialog.setLocale(QLocale(QLocale.English, QLocale.UnitedKingdom))
         self.gridLayout = QGridLayout(PatternProcessingDialog)
         self.gridLayout.setObjectName(u"gridLayout")
@@ -42,6 +42,10 @@ class Ui_PatternProcessingDialog(object):
 
         self.label = QLabel(self.frame)
         self.label.setObjectName(u"label")
+        font = QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        self.label.setFont(font)
 
         self.verticalLayout.addWidget(self.label)
 
@@ -87,6 +91,7 @@ class Ui_PatternProcessingDialog(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
         self.label_2.setSizePolicy(sizePolicy)
+        self.label_2.setFont(font)
 
         self.verticalLayout_4.addWidget(self.label_2)
 
@@ -167,6 +172,7 @@ class Ui_PatternProcessingDialog(object):
 
         self.gridLayout_2.addWidget(self.buttonBox, 2, 1, 1, 1)
 
+        self.gridLayout_2.setColumnStretch(1, 1)
 
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
 
