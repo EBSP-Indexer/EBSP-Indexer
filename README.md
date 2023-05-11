@@ -35,6 +35,9 @@ The project was originally developed by students at [The Department of Material 
 
 In addition, the windows version requires [Microsoft Visual C++ Redistributable packages for Visual Studio 2015, 2017, 2019, and 2022.](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170) This is included in our installer, and is automatically installed if needed.
 
+## Download
+Installer for Windows and App for macOS are available to download from [Zenodo](https://zenodo.org/record/7925262) or [SourceForge](https://sourceforge.net/projects/ebsp-indexer/).
+
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
