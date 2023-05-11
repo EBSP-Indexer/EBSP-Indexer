@@ -178,6 +178,38 @@ class Ui_AdvancedSettings(object):
 
         self.verticalLayout_3.addWidget(self.savePcsBox)
 
+        self.line_2 = QFrame(self.preProcessingTab)
+        self.line_2.setObjectName(u"line_2")
+        self.line_2.setFrameShape(QFrame.HLine)
+        self.line_2.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout_3.addWidget(self.line_2)
+
+        self.label_9 = QLabel(self.preProcessingTab)
+        self.label_9.setObjectName(u"label_9")
+
+        self.verticalLayout_3.addWidget(self.label_9)
+
+        self.listWidgetMicroscopes = QListWidget(self.preProcessingTab)
+        self.listWidgetMicroscopes.setObjectName(u"listWidgetMicroscopes")
+
+        self.verticalLayout_3.addWidget(self.listWidgetMicroscopes)
+
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.pushButtonRemoveMicroscope = QPushButton(self.preProcessingTab)
+        self.pushButtonRemoveMicroscope.setObjectName(u"pushButtonRemoveMicroscope")
+
+        self.horizontalLayout_5.addWidget(self.pushButtonRemoveMicroscope)
+
+        self.pushButtonAddNewMicroscope = QPushButton(self.preProcessingTab)
+        self.pushButtonAddNewMicroscope.setObjectName(u"pushButtonAddNewMicroscope")
+
+        self.horizontalLayout_5.addWidget(self.pushButtonAddNewMicroscope)
+
+
+        self.verticalLayout_3.addLayout(self.horizontalLayout_5)
+
         self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_3.addItem(self.verticalSpacer_2)
@@ -333,7 +365,7 @@ class Ui_AdvancedSettings(object):
         self.buttonBox.accepted.connect(AdvancedSettings.accept)
         self.buttonBox.rejected.connect(AdvancedSettings.reject)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(AdvancedSettings)
@@ -358,6 +390,9 @@ class Ui_AdvancedSettings(object):
         self.tslButton.setText(QCoreApplication.translate("AdvancedSettings", u"TSL", None))
         self.label_3.setText(QCoreApplication.translate("AdvancedSettings", u"Pattern Center Refinement:", None))
         self.savePcsBox.setText(QCoreApplication.translate("AdvancedSettings", u"Save individual pattern data to project settings file ", None))
+        self.label_9.setText(QCoreApplication.translate("AdvancedSettings", u"Calibrated microscopes", None))
+        self.pushButtonRemoveMicroscope.setText(QCoreApplication.translate("AdvancedSettings", u"Remove microscope", None))
+        self.pushButtonAddNewMicroscope.setText(QCoreApplication.translate("AdvancedSettings", u"Add new microscope", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.preProcessingTab), QCoreApplication.translate("AdvancedSettings", u"Pre Prosessing", None))
         self.label.setText(QCoreApplication.translate("AdvancedSettings", u"Default settings:", None))
         self.lazyLoadingBox.setText(QCoreApplication.translate("AdvancedSettings", u"Lazy Loading (recommended)", None))
