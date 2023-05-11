@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>427</width>
-    <height>361</height>
+    <height>402</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="fileExplorerTab">
       <attribute name="title">
@@ -242,16 +242,16 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <widget class="QPushButton" name="pushButtonRemoveMicroscope">
+          <widget class="QPushButton" name="pushButtonAddNewMicroscope">
            <property name="text">
-            <string>Remove microscope</string>
+            <string>Add new microscope</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButtonAddNewMicroscope">
+          <widget class="QPushButton" name="pushButtonRemoveMicroscope">
            <property name="text">
-            <string>Add new microscope</string>
+            <string>Remove microscope</string>
            </property>
           </widget>
          </item>
