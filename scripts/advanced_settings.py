@@ -1,12 +1,11 @@
-import platform
 import json
+import platform
 from os.path import exists
 
 import matplotlib.colors as mplcolors
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QDialog, QMessageBox
-
 from tabulate import tabulate
 
 from scripts.color_picker import ColorPicker
@@ -46,7 +45,9 @@ class AdvancedSettingsDialog(QDialog):
         self.ui.pushButtonAddNewMicroscope.clicked.connect(
             lambda: self.addNewMicroscope()
         )
-        self.ui.pushButtonRemoveMicroscope.clicked.connect(lambda: self.removeMicroscope())
+        self.ui.pushButtonRemoveMicroscope.clicked.connect(
+            lambda: self.removeMicroscope()
+        )
 
         self.ui.listWidgetMicroscopes.itemDoubleClicked.connect(
             lambda: self.display_calibration_params()
@@ -124,13 +125,19 @@ class AdvancedSettingsDialog(QDialog):
                 self.microscopes.append(wdDialog.microscope_name)
         except:
             pass
-    
+
     def removeMicroscope(self):
         microscope = self.ui.listWidgetMicroscopes.currentItem().text()
         self.microscopes.pop(self.microscopes.index(microscope))
-        self.ui.listWidgetMicroscopes.takeItem(self.ui.listWidgetMicroscopes.currentRow())
+        self.ui.listWidgetMicroscopes.takeItem(
+            self.ui.listWidgetMicroscopes.currentRow()
+        )
         self.setting_file.remove(microscope)
-        
+        if len(self.microscopes) == 0:
+            self.ui.pushButtonRemoveMicroscope.setEnabled(False)
+        else:
+            self.ui.pushButtonRemoveMicroscope.setEnabled(True)
+
     def display_calibration_params(self):
         microscope = self.ui.listWidgetMicroscopes.currentItem().text()
         pc_curve = eval(self.setting_file.read(microscope))
@@ -141,12 +148,11 @@ class AdvancedSettingsDialog(QDialog):
             ["Z: ", pc_curve[2][0], pc_curve[2][1]],
         ]
 
-        QMessageBox.about(self,
-                          microscope,
-                          tabulate(pc_list, headers="firstrow"),
-                          )
-        
-        
+        QMessageBox.about(
+            self,
+            microscope,
+            tabulate(pc_list, headers="firstrow"),
+        )
 
     def colorPicker(self):
         if self.ui.colorTreeWidget.currentItem().parent() is None:
