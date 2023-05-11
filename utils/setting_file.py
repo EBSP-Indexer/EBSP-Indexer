@@ -1,6 +1,6 @@
 import os.path as path
 import warnings
-from typing import Any, Optional
+from typing import Any, Optional, Tuple, Union
 
 
 class SettingFile:
@@ -55,14 +55,16 @@ class SettingFile:
 
 def get_setting_file_bottom_top(
     start_path: str, setting_name: str, return_dir_path: bool = False
-):
+) -> Union[SettingFile, Tuple[SettingFile, str]]:
     """
-    Searches for a file named setting_name recursivly by iterating the path hierarchy
+    Searches for a setting file recursivly by iterating the path hierarchy
     from bottom to top.
 
-    Returns a SettingFile from the found setting file. If not found returns None.
-    If return_dir_path = True, a tuple is returned where the first element is the SettingFile
-    and the second is the directory path of the setting_name.
+    Returns a SettingFile from the found setting file.
+    If not found returns None.
+    If return_dir_path = True, a tuple is returned where the first
+    element is the SettingFile and the second is the directory path
+    of the setting_name.
 
     Parameters
     ----------
@@ -72,6 +74,15 @@ def get_setting_file_bottom_top(
         The targeted name of the settings file, e.g. "Setting.txt"
     return_dir_path : bool
         Whether the directory path of the found setting file should also be retured.
+
+
+    Returns
+    -------
+    SettingFile
+        A SettingFile object which was initialized from the found path
+    String
+        The directory path of the found setting file, returned if `return_dir_path = True`
+
     """
     if path.isfile(start_path):
         dir_path = path.dirname(start_path)

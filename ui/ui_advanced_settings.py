@@ -27,7 +27,7 @@ class Ui_AdvancedSettings(object):
     def setupUi(self, AdvancedSettings):
         if not AdvancedSettings.objectName():
             AdvancedSettings.setObjectName(u"AdvancedSettings")
-        AdvancedSettings.resize(427, 361)
+        AdvancedSettings.resize(427, 402)
         self.gridLayout = QGridLayout(AdvancedSettings)
         self.gridLayout.setObjectName(u"gridLayout")
         self.buttonBox = QDialogButtonBox(AdvancedSettings)
@@ -197,15 +197,15 @@ class Ui_AdvancedSettings(object):
 
         self.horizontalLayout_5 = QHBoxLayout()
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.pushButtonRemoveMicroscope = QPushButton(self.preProcessingTab)
-        self.pushButtonRemoveMicroscope.setObjectName(u"pushButtonRemoveMicroscope")
-
-        self.horizontalLayout_5.addWidget(self.pushButtonRemoveMicroscope)
-
         self.pushButtonAddNewMicroscope = QPushButton(self.preProcessingTab)
         self.pushButtonAddNewMicroscope.setObjectName(u"pushButtonAddNewMicroscope")
 
         self.horizontalLayout_5.addWidget(self.pushButtonAddNewMicroscope)
+
+        self.pushButtonRemoveMicroscope = QPushButton(self.preProcessingTab)
+        self.pushButtonRemoveMicroscope.setObjectName(u"pushButtonRemoveMicroscope")
+
+        self.horizontalLayout_5.addWidget(self.pushButtonRemoveMicroscope)
 
 
         self.verticalLayout_3.addLayout(self.horizontalLayout_5)
@@ -365,7 +365,7 @@ class Ui_AdvancedSettings(object):
         self.buttonBox.accepted.connect(AdvancedSettings.accept)
         self.buttonBox.rejected.connect(AdvancedSettings.reject)
 
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(AdvancedSettings)
@@ -391,8 +391,8 @@ class Ui_AdvancedSettings(object):
         self.label_3.setText(QCoreApplication.translate("AdvancedSettings", u"Pattern Center Refinement:", None))
         self.savePcsBox.setText(QCoreApplication.translate("AdvancedSettings", u"Save individual pattern data to project settings file ", None))
         self.label_9.setText(QCoreApplication.translate("AdvancedSettings", u"Calibrated microscopes", None))
-        self.pushButtonRemoveMicroscope.setText(QCoreApplication.translate("AdvancedSettings", u"Remove microscope", None))
         self.pushButtonAddNewMicroscope.setText(QCoreApplication.translate("AdvancedSettings", u"Add new microscope", None))
+        self.pushButtonRemoveMicroscope.setText(QCoreApplication.translate("AdvancedSettings", u"Remove microscope", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.preProcessingTab), QCoreApplication.translate("AdvancedSettings", u"Pre Prosessing", None))
         self.label.setText(QCoreApplication.translate("AdvancedSettings", u"Default settings:", None))
         self.lazyLoadingBox.setText(QCoreApplication.translate("AdvancedSettings", u"Lazy Loading (recommended)", None))

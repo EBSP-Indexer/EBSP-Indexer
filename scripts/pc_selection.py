@@ -366,7 +366,7 @@ class PCSelectionDialog(QDialog):
         self.inlier_limit = float(self.ui.spinBoxInlier.value())
 
         sendToJobManager(
-            job_title=f"Pattern center optimization {self.pattern_name}",
+            job_title=f"PC optimization {self.pattern_name}",
             output_path=save_dir,
             listview=self.parentWidget().ui.jobList,
             func=self.patternCenterOpimization,

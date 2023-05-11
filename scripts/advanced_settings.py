@@ -127,12 +127,16 @@ class AdvancedSettingsDialog(QDialog):
             pass
 
     def removeMicroscope(self):
-        microscope = self.ui.listWidgetMicroscopes.currentItem().text()
-        self.microscopes.pop(self.microscopes.index(microscope))
-        self.ui.listWidgetMicroscopes.takeItem(
-            self.ui.listWidgetMicroscopes.currentRow()
-        )
-        self.setting_file.remove(microscope)
+        try:
+            microscope = self.ui.listWidgetMicroscopes.currentItem().text()
+            self.microscopes.pop(self.microscopes.index(microscope))
+            self.ui.listWidgetMicroscopes.takeItem(self.ui.listWidgetMicroscopes.currentRow())
+            self.setting_file.remove(microscope)
+        except AttributeError:
+            pass
+        except Exception as e:
+            raise e
+        print(len(self.microscopes))
         if len(self.microscopes) == 0:
             self.ui.pushButtonRemoveMicroscope.setEnabled(False)
         else:
@@ -239,9 +243,12 @@ class AdvancedSettingsDialog(QDialog):
 
         try:
             self.microscopes = self.setting_file.read("MICROSCOPES").split(", ")
+            self.microscopes = [ms for ms in self.microscopes if ms]
             self.ui.listWidgetMicroscopes.addItems(self.microscopes)
         except:
             self.microscopes = []
+        if not len(self.microscopes):
+            self.ui.pushButtonRemoveMicroscope.setEnabled(False)
 
     def saveSettings(self):
         if exists(self.ui.directoryEdit.text()) and self.directory:

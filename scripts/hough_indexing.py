@@ -513,7 +513,6 @@ class HiSetupDialog(QDialog):
         """
         print("Saving inverse pole figure map ...")
         v_ipf = Vector3d(ckey_direction)
-        print(xmap.phases_in_data[xmap.phase_id[0]])
         sym = xmap.phases_in_data[xmap.phase_id[0]].point_group
         ckey = plot.IPFColorKeyTSL(sym, v_ipf)
         print(ckey)

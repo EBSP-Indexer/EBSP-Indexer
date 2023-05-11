@@ -1,4 +1,4 @@
-""" Console
+"""
 Interactive console widget.  Use to add an interactive python interpreter
 in a GUI application.
 
@@ -13,13 +13,30 @@ import PySide6.QtWidgets as QtWidgets
 
 
 class LineEdit(QtWidgets.QLineEdit):
-    """QLIneEdit with a history buffer for recalling previous lines.
-    Also accepts tab as input (4 spaces).
+    """
+    QLIneEdit with a history buffer for recalling previous lines.
+
+    Signals
+    -------
+    newline : str
+        Signal when return key pressed
+
     """
 
-    newline = QtCore.Signal(str)  # Signal when return key pressed
+    newline = QtCore.Signal(str)
 
     def __init__(self, parent, history: int = 100) -> "LineEdit":
+        """
+        QLineEdit with a history buffer for recalling previous lines.
+        Also accepts tab as input (4 spaces).
+
+        Parameters
+        ----------
+        parent : QWidget
+            The widget which contains the console widget
+        history : int
+            The max number of lines in the history buffer
+        """
         super().__init__(parent=parent)
         self.setObjectName("consoleInput")
         self.historymax = history
@@ -33,7 +50,7 @@ class LineEdit(QtWidgets.QLineEdit):
 
     def event(self, ev: QtCore.QEvent) -> bool:
         """Intercept tab and arrow key presses.  Insert 4 spaces
-        when tab pressed instead of moving to next contorl.  WHen
+        when tab pressed instead of moving to next contorl.  When
         arrow up or down are pressed select a line from the history
         buffer.  Emit newline signal when return key is pressed.
         """
@@ -85,15 +102,31 @@ class LineEdit(QtWidgets.QLineEdit):
 
 
 class Console(QtWidgets.QWidget):
-    """A GUI version of code.InteractiveConsole."""
+    """
+    A GUI version of code.InteractiveConsole.
+    """
 
     def __init__(
         self,
         parent,
-        context=locals(),  # context for interpreter
-        history: int = 20,  # max lines in history buffer
-        blockcount: int = 500,  # max lines in output buffer
+        context,
+        history: int = 20,
+        blockcount: int = 500,
     ) -> "Console":
+        """
+        A GUI version of code.InteractiveConsole.
+
+        Parameters
+        ----------
+        parent : QWidget
+            The widget which contains the console widget
+        context : dict[str, Any]
+            Specifies the dictionary in which code will be executed
+        history : int
+            The max number of lines in the history buffer
+        blockcount : int
+            The max number of lines in the output buffer
+        """
         super().__init__()
         self.parent = parent
         self.setcontext(context)
