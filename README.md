@@ -1,5 +1,10 @@
 ![Alt text](https://github.com/EBSP-Indexer/EBSP-Indexer/blob/dev/resources/ebsd_gui.png?raw=true "Electron backscatter pattern Indexer")
-[![GitHub release](https://img.shields.io/github/release/EBSP-Indexer/EBSP-Indexer.svg)](https://GitHub.com/EBSP-Indexer/EBSP-Indexer/releases/) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![macOS](https://svgshare.com/i/ZjP.svg)](https://svgshare.com/i/ZjP.svg)  [![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
+[![GitHub release](https://img.shields.io/github/release/EBSP-Indexer/EBSP-Indexer.svg)](https://GitHub.com/EBSP-Indexer/EBSP-Indexer/releases/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7925262.svg)](https://doi.org/10.5281/zenodo.7925262)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) 
+
+[![macOS](https://svgshare.com/i/ZjP.svg)](https://svgshare.com/i/ZjP.svg)
+[![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
@@ -26,7 +31,7 @@ The project was originally developed by students at [The Department of Material 
 
 ## Minimum requirements:
 - Windows 10/11 **or** macOS 13 (Ventura)
-- x64-based processor **or** arm64 chipset
+- x86_64-based CPU (arm64 chipset is experimental)
 
 In addition, the windows version requires [Microsoft Visual C++ Redistributable packages for Visual Studio 2015, 2017, 2019, and 2022.](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170) This is included in our installer, and is automatically installed if needed.
 
