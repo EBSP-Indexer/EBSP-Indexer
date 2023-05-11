@@ -47,8 +47,10 @@ Platypus is a software tool which can create macOS application bundles from comm
 It can be installed via Homebrew.
 
 Make sure that the following is correct for the app bundle made with Platypus:
+![Alt text](https://github.com/EBSP-Indexer/EBSP-Indexer/blob/dev/resources/tutorial/tutorial_platypus.png?raw=true "Configuration used for bundling with Platypus")
 - Script path pointing to `ebsp_platypus.sh` in the root directory.
-- Script type is bash. 
+- Script type is `sh`. 
+- Interface type is `None`
 - The app bundled with PyInstaller must be added to the Bundlded Files list.
 - Make sure that `"Run in background"` is checked
 - The identifier used should be:
