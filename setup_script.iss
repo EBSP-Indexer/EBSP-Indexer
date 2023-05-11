@@ -6,7 +6,7 @@
 #define MyAppPublisher "EBSP Indexer Developers"
 #define MyAppExeName "EBSP Indexer.exe"
 
-#define InstallerVersion "0.0.5"
+#define InstallerVersion "0.1.0"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
