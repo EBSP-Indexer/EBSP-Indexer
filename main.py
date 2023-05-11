@@ -278,6 +278,7 @@ class AppWindow(QMainWindow):
             setting_file = SettingFile("advanced_settings.txt")
             file_types = json.loads(setting_file.read("File Types"))
             self.system_view_filter = ["*" + x for x in file_types]
+            self.theme = "light"
 
     def openSettings(self):
         try:
