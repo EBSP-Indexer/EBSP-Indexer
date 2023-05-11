@@ -1,10 +1,9 @@
-from scipy.stats import linregress as linreg
 import numpy as np
-from utils import SettingFile, FileBrowser
-from PySide6.QtWidgets import QDialog, QMessageBox, QDialogButtonBox
-from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QDialog, QDialogButtonBox, QMessageBox
+from scipy.stats import linregress as linreg
 
 from ui.ui_wd_calibration import Ui_WdCalDialog
+from utils import FileBrowser, SettingFile
 
 
 class wdCalibration(QDialog):
@@ -21,7 +20,7 @@ class wdCalibration(QDialog):
         )
         self.setupConnections()
         self.checkValidInput()
-        
+
         self.ui.pushButtonRemovePosition.setEnabled(False)
 
     def setupConnections(self):
@@ -69,8 +68,7 @@ class wdCalibration(QDialog):
             self.ui.pushButtonRemovePosition.setEnabled(True)
 
     def removeRow(self):
-        row = self.ui.tableWidget.rowCount()
-        self.ui.tableWidget.removeRow(row - 1)
+        self.ui.tableWidget.removeRow(self.ui.tableWidget.currentRow())
 
         if self.ui.tableWidget.rowCount() <= 2:
             self.ui.pushButtonRemovePosition.setEnabled(False)
@@ -78,28 +76,36 @@ class wdCalibration(QDialog):
     def checkValidInput(self):
         columns = self.ui.tableWidget.columnCount()
         rows = self.ui.tableWidget.rowCount()
-        checksum = columns*rows
+        checksum = columns * rows
         for column in range(self.ui.tableWidget.columnCount()):
+            col = []
             for row in range(self.ui.tableWidget.rowCount()):
                 try:
                     float(self.ui.tableWidget.item(row, column).text())
+                    col.append(float(self.ui.tableWidget.item(row, column).text()))
                 except:
-                    checksum -= 1      
-        
-        if checksum == columns*rows:
+                    checksum -= 1
+            if column == 0 and len(col) > len(set(col)):
+                checksum -= 1
+
+        if checksum == columns * rows:
             self.ui.labelValidInput.setStyleSheet("QLabel{color:green}")
             self.ui.labelValidInput.setText("Valid input.")
-            
+
         else:
             self.ui.labelValidInput.setStyleSheet("QLabel{color:red}")
             self.ui.labelValidInput.setText("Invalid input.")
 
-        if checksum == columns*rows and self.ui.lineEdit.text():
+        if checksum == columns * rows and self.ui.lineEdit.text():
             self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
-            self.ui.buttonBox.button(QDialogButtonBox.Ok).setToolTip("Save microscope calibration.")
+            self.ui.buttonBox.button(QDialogButtonBox.Ok).setToolTip(
+                "Save microscope calibration."
+            )
         else:
             self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
-            self.ui.buttonBox.button(QDialogButtonBox.Ok).setToolTip("Missing valid microscope name and/or calibration values.")
+            self.ui.buttonBox.button(QDialogButtonBox.Ok).setToolTip(
+                "Missing valid microscope name and/or calibration values."
+            )
 
     def run_calibration(self):
         self.setting_file = SettingFile("advanced_settings.txt")
@@ -119,10 +125,11 @@ class wdCalibration(QDialog):
         z_slope, z_intersept, *_ = linreg(calibration_values[0], calibration_values[3])
 
         self.pc_curve = (
-                (round(x_slope, 5), round(x_intersept, 5)),
-                (round(y_slope, 5), round(y_intersept, 5)),
-                (round(z_slope, 5), round(z_intersept, 5)),
-            )
+            (round(x_slope, 5), round(x_intersept, 5)),
+            (round(y_slope, 5), round(y_intersept, 5)),
+            (round(z_slope, 5), round(z_intersept, 5)),
+        )
+
 
 def pc_from_wd(microscope: str, working_distance: float, convention="TSL"):
     """
