@@ -130,6 +130,10 @@ class AdvancedSettingsDialog(QDialog):
         self.microscopes.pop(self.microscopes.index(microscope))
         self.ui.listWidgetMicroscopes.takeItem(self.ui.listWidgetMicroscopes.currentRow())
         self.setting_file.remove(microscope)
+        if len(self.microscopes) == 0:
+            self.ui.pushButtonRemoveMicroscope.setEnabled(False)
+        else:
+            self.ui.pushButtonRemoveMicroscope.setEnabled(True)
         
     def display_calibration_params(self):
         microscope = self.ui.listWidgetMicroscopes.currentItem().text()
