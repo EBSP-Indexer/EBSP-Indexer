@@ -30,6 +30,10 @@ The GUI supports:
 The project was originally developed by students at [The Department of Material Science](https://www.ntnu.edu/ima/research/emlab) at [Norwegian University of Science and Techonolgy (NTNU)](https://www.ntnu.edu/), and is open source and free to use.
 
 ## Known issues :heavy_exclamation_mark: 
+- macOS might experience leaked semaphores when creating images in threads,
+  e.g. Inverse Pole Figure Map in Hough Indexing.
+
+  As of now, it is recommended to run indexing **without** generating images on Mac.  
 - Refinement of orientations of a crystal map which includes not_indexed points,
   might produce results that cannot be opened in signal navigation.
 - Updating the application's settings will set the current working directory to 
@@ -46,6 +50,8 @@ The project was originally developed by students at [The Department of Material 
 In addition, the windows version requires [Microsoft Visual C++ Redistributable packages for Visual Studio 2015, 2017, 2019, and 2022.](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170) This is included in our installer, and is automatically installed if needed.
 
 ## Downloads ⬇️
+⚠️ Make sure to read the aboves about **Known issues** and **Minimum requirements** before downloading the software. 
+
 Installer for Windows and App for macOS are available to download from [Zenodo](https://zenodo.org/record/7925262) or [SourceForge](https://sourceforge.net/projects/ebsp-indexer/).
 
 ## Contributors ✨
