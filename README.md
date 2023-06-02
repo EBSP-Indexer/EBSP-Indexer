@@ -45,6 +45,8 @@ The project was originally developed by students at [The Department of Material 
   even though it appears to be selected.
 - When saving a merged crystal map in the case where only one phase is identified, 
   save will fail since a crystal map with the same name exists already.
+- Creating jobs while the Job Manager is unlocked from the main window will result
+  in an error, due to the parent widget of the job list changes. 
 
 ## Minimum requirements 🔧
 - Windows 10/11 **or** macOS 13 (Ventura)
