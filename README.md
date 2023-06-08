@@ -37,8 +37,6 @@ The project was originally developed by students at [The Department of Material 
   e.g. Inverse Pole Figure Map in Hough Indexing.
 
   As of now, it is recommended to run indexing **without** generating images on Mac.  
-- Refinement of orientations of a crystal map which includes not_indexed points,
-  might produce results that cannot be opened in signal navigation.
 - Updating the application's settings will set the current working directory to 
   the specified default directory (if checked).
 - Updating the application's settings will reset the current selected file, 

@@ -50,6 +50,7 @@ class RefineSetupDialog(QDialog):
         self.program_settings = SettingFile("advanced_settings.txt")
         self.pattern_path = ""
         self.xmap_path = ""
+        self.output_dir = ""
         self.s_energy = 20  # kV
         self.data_path = ""
         self.xmaps: dict[str, CrystalMap] = {}
@@ -149,6 +150,7 @@ class RefineSetupDialog(QDialog):
         self.ui.radioButtonMultipleXmap.toggled.connect(
             lambda: self.updateCrystalMapTable()
         )
+        self.ui.pushButtonChooseOutput.clicked.connect(lambda: self.set_output_directory())
 
     def getOptions(self) -> dict:
         return {
@@ -251,6 +253,21 @@ class RefineSetupDialog(QDialog):
                 pass
         return ""
 
+    def set_output_directory(self, output_path = ""):
+        fileBrowserOD = FileBrowser(
+            mode=FileBrowser.OpenDirectory,
+            dirpath=path.dirname(self.xmap_dir),
+            filter_name="Hierarchical Data Format (*.h5);",
+            caption="Choose Output Directory for Refined Results"
+        )
+        if output_path != "":
+            self.output_dir = output_path
+            self.ui.labelOutput.setText(f"Output Path: {self.output_dir}" )
+        elif fileBrowserOD.getFile():
+            self.output_dir = fileBrowserOD.getPaths()[0]
+            self.ui.labelOutput.setText(f"Output Path: {self.output_dir}" )
+        self.setAvailableButtons()
+
     def clear_crystal_maps(self, force_clear: Optional[bool] = False):
         if force_clear or (
             len(self.xmaps) > 1 and self.ui.radioButtonSingleXmap.isChecked()
@@ -268,6 +285,7 @@ class RefineSetupDialog(QDialog):
                 self.xmap_path = xmap_path
                 self.xmap_dir = path.dirname(self.xmap_path)
                 self.data_path = RefineSetupDialog.available_index_data(xmap_path)
+                self.set_output_directory(output_path = self.xmap_dir)
             except Exception as e:
                 raise e
             self.updateCrystalMapTable()
@@ -287,6 +305,7 @@ class RefineSetupDialog(QDialog):
                     self.data_path = RefineSetupDialog.available_index_data(
                         self.xmap_path
                     )
+                    self.set_output_directory(output_path = self.xmap_dir)
                 except Exception as e:
                     raise e
             self.updateCrystalMapTable()
@@ -463,6 +482,8 @@ class RefineSetupDialog(QDialog):
                 phase_map_flag = True
         if self.ui.radioButtonSingleXmap.isChecked() and len(self.data_path):
             index_data = True
+        if self.output_dir == "":
+            ok_flag = False
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(ok_flag)
         self.ui.checkBoxPhase.setEnabled(phase_map_flag)
         self.ui.checkBoxPhase.setChecked(phase_map_flag)
@@ -514,6 +535,8 @@ class RefineSetupDialog(QDialog):
             pc=pc,
             convention=convention,
         )
+        det.save(path.join(self.output_dir, "detector.txt"), convention)
+
         if mask:
             signal_mask = ~kp.filters.Window("circular", det.shape).astype(bool)
         else:
@@ -534,7 +557,7 @@ class RefineSetupDialog(QDialog):
                         # TODO Switch from -2 to -1 when kikuchipy supports merging not_indexed (0.8.5)
                         nav_mask_phase = ~np.logical_or(
                             xmap.phase_id == phase_id,
-                            xmap.phase_id == -2,
+                            xmap.phase_id == -1,
                         )
                         nav_mask_phase = nav_mask_phase.reshape(xmap.shape)
                         refined_xmap = s.refine_orientation(
@@ -588,12 +611,6 @@ class RefineSetupDialog(QDialog):
         print(f"Finished refining orientations")
 
     def run_refinement(self):
-        fileBrowserOF = FileBrowser(
-            mode=FileBrowser.OpenDirectory,
-            dirpath=path.dirname(self.xmap_dir),
-            filter_name="Hierarchical Data Format (*.h5);",
-            caption="Choose Output Directory for Refined Results"
-        )
         options = self.getOptions()
         try:
             s: EBSD = kp.load(self.pattern_path, lazy=options["lazy"])
@@ -647,9 +664,6 @@ class RefineSetupDialog(QDialog):
             for ph_id, ph in xmap.phases_in_data:
                 if ph_id != -1:
                     job_title += f"{ph.name}, "
-        if not fileBrowserOF.getFile():
-            return
-        self.output_dir = fileBrowserOF.getPaths()[0]
         sendToJobManager(
             job_title=job_title[0:-2],
             output_path=self.output_dir,

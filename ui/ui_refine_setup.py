@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'refine_setup.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.0
+## Created by: Qt User Interface Compiler version 6.3.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -26,7 +26,7 @@ class Ui_RefineSetupDialog(object):
     def setupUi(self, RefineSetupDialog):
         if not RefineSetupDialog.objectName():
             RefineSetupDialog.setObjectName(u"RefineSetupDialog")
-        RefineSetupDialog.resize(842, 641)
+        RefineSetupDialog.resize(842, 651)
         self.gridLayout = QGridLayout(RefineSetupDialog)
         self.gridLayout.setObjectName(u"gridLayout")
         self.frame = QFrame(RefineSetupDialog)
@@ -675,11 +675,67 @@ class Ui_RefineSetupDialog(object):
 
         self.verticalLayout_2.addLayout(self.horizontalLayout)
 
+        self.verticalSpacer_6 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_2.addItem(self.verticalSpacer_6)
+
+        self.line_20 = QFrame(self.frame)
+        self.line_20.setObjectName(u"line_20")
+        self.line_20.setFrameShape(QFrame.HLine)
+        self.line_20.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout_2.addWidget(self.line_20)
+
+        self.label_17 = QLabel(self.frame)
+        self.label_17.setObjectName(u"label_17")
+        self.label_17.setFont(font)
+
+        self.verticalLayout_2.addWidget(self.label_17)
+
+        self.line_21 = QFrame(self.frame)
+        self.line_21.setObjectName(u"line_21")
+        self.line_21.setFrameShape(QFrame.HLine)
+        self.line_21.setFrameShadow(QFrame.Sunken)
+
+        self.verticalLayout_2.addWidget(self.line_21)
+
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.labelOutput = QLabel(self.frame)
+        self.labelOutput.setObjectName(u"labelOutput")
+
+        self.horizontalLayout_3.addWidget(self.labelOutput)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer_2)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_3)
+
+        self.horizontalLayout_9 = QHBoxLayout()
+        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
+        self.horizontalSpacer_12 = QSpacerItem(40, 0, QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        self.horizontalLayout_9.addItem(self.horizontalSpacer_12)
+
+        self.pushButtonChooseOutput = QPushButton(self.frame)
+        self.pushButtonChooseOutput.setObjectName(u"pushButtonChooseOutput")
+
+        self.horizontalLayout_9.addWidget(self.pushButtonChooseOutput)
+
+        self.horizontalSpacer_11 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_9.addItem(self.horizontalSpacer_11)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_9)
+
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_2.addItem(self.verticalSpacer)
 
-        self.verticalLayout_2.setStretch(17, 1)
+        self.verticalLayout_2.setStretch(23, 1)
 
         self.gridLayout_3.addLayout(self.verticalLayout_2, 2, 3, 1, 1)
 
@@ -830,5 +886,8 @@ class Ui_RefineSetupDialog(object):
         self.comboBoxConvention.setItemText(0, QCoreApplication.translate("RefineSetupDialog", u"BRUKER", None))
         self.comboBoxConvention.setItemText(1, QCoreApplication.translate("RefineSetupDialog", u"TSL", None))
 
+        self.label_17.setText(QCoreApplication.translate("RefineSetupDialog", u"Output", None))
+        self.labelOutput.setText(QCoreApplication.translate("RefineSetupDialog", u"<html><head/><body><p>Output Path:<span style=\" color:#ff0000;\"> None </span></p></body></html>", None))
+        self.pushButtonChooseOutput.setText(QCoreApplication.translate("RefineSetupDialog", u"Choose Folder", None))
     # retranslateUi
 
