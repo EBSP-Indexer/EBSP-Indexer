@@ -227,8 +227,27 @@ class Ui_AdvancedSettings(object):
         self.lazyLoadingBox = QCheckBox(self.indexingTab)
         self.lazyLoadingBox.setObjectName(u"lazyLoadingBox")
         self.lazyLoadingBox.setFocusPolicy(Qt.NoFocus)
+        self.lazyLoadingBox.setChecked(True)
 
         self.verticalLayout_4.addWidget(self.lazyLoadingBox)
+
+        self.checkBoxSaveIPFMap = QCheckBox(self.indexingTab)
+        self.checkBoxSaveIPFMap.setObjectName(u"checkBoxSaveIPFMap")
+        self.checkBoxSaveIPFMap.setChecked(True)
+
+        self.verticalLayout_4.addWidget(self.checkBoxSaveIPFMap)
+
+        self.checkBoxSavePhaseMap = QCheckBox(self.indexingTab)
+        self.checkBoxSavePhaseMap.setObjectName(u"checkBoxSavePhaseMap")
+        self.checkBoxSavePhaseMap.setChecked(True)
+
+        self.verticalLayout_4.addWidget(self.checkBoxSavePhaseMap)
+
+        self.checkBoxSaveNumpy = QCheckBox(self.indexingTab)
+        self.checkBoxSaveNumpy.setObjectName(u"checkBoxSaveNumpy")
+        self.checkBoxSaveNumpy.setChecked(False)
+
+        self.verticalLayout_4.addWidget(self.checkBoxSaveNumpy)
 
         self.checkBoxRefine = QCheckBox(self.indexingTab)
         self.checkBoxRefine.setObjectName(u"checkBoxRefine")
@@ -393,10 +412,25 @@ class Ui_AdvancedSettings(object):
         self.label_9.setText(QCoreApplication.translate("AdvancedSettings", u"Calibrated microscopes", None))
         self.pushButtonAddNewMicroscope.setText(QCoreApplication.translate("AdvancedSettings", u"Add new microscope", None))
         self.pushButtonRemoveMicroscope.setText(QCoreApplication.translate("AdvancedSettings", u"Remove microscope", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.preProcessingTab), QCoreApplication.translate("AdvancedSettings", u"Pre Prosessing", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.preProcessingTab), QCoreApplication.translate("AdvancedSettings", u"Pre-processing", None))
         self.label.setText(QCoreApplication.translate("AdvancedSettings", u"Default settings:", None))
         self.lazyLoadingBox.setText(QCoreApplication.translate("AdvancedSettings", u"Lazy Loading (recommended)", None))
-        self.checkBoxRefine.setText(QCoreApplication.translate("AdvancedSettings", u"Refine orientations", None))
+#if QT_CONFIG(tooltip)
+        self.checkBoxSaveIPFMap.setToolTip(QCoreApplication.translate("AdvancedSettings", u"<html><head/><body><p>Default option for saving an inverse pole figure map as a .png file</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBoxSaveIPFMap.setText(QCoreApplication.translate("AdvancedSettings", u"Save IPF map", None))
+#if QT_CONFIG(tooltip)
+        self.checkBoxSavePhaseMap.setToolTip(QCoreApplication.translate("AdvancedSettings", u"<html><head/><body><p>Default option for saving a phase map as a .png file.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBoxSavePhaseMap.setText(QCoreApplication.translate("AdvancedSettings", u"Save phase map", None))
+#if QT_CONFIG(tooltip)
+        self.checkBoxSaveNumpy.setToolTip(QCoreApplication.translate("AdvancedSettings", u"<html><head/><body><p>Default option for saving numpy file generated from Hough Indexing. </p><p>The file allows all present phases to be considered during a later refinement of orientations for all patterns, which may produce better results during refinement. </p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBoxSaveNumpy.setText(QCoreApplication.translate("AdvancedSettings", u"Save .npy file during Hough Indexing", None))
+#if QT_CONFIG(tooltip)
+        self.checkBoxRefine.setToolTip(QCoreApplication.translate("AdvancedSettings", u"<html><head/><body><p>Default option for refining orientations when doing Dictionary Indexing.</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBoxRefine.setText(QCoreApplication.translate("AdvancedSettings", u"Refine orientations (DI)", None))
         self.label_7.setText(QCoreApplication.translate("AdvancedSettings", u"Colors:", None))
         ___qtreewidgetitem = self.colorTreeWidget.headerItem()
         ___qtreewidgetitem.setText(1, QCoreApplication.translate("AdvancedSettings", u"2", None));

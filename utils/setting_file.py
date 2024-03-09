@@ -1,7 +1,15 @@
+from enum import Enum
 import os.path as path
 import warnings
 from typing import Any, Optional, Tuple, Union
 
+# TODO: Complete and use this enum instead
+class Setting(str, Enum):
+    FILE_TYPES = "File Types"
+    LAZY_LOADING = "Lazy Loading"
+    SAVE_IPF = "Save IPF"
+    SAVE_PHASE = "Save Phase"
+    SAVE_NUMPY = "Save Numpy"
 
 class SettingFile:
     def __init__(self, file_path: str, sep: Optional[str] = ":\t"):

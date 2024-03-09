@@ -69,6 +69,7 @@ class SystemExplorerWidget(QWidget):
         self.systemModel.setNameFilterDisables(0)
         self.ui.systemViewer.setModel(self.systemModel)
         self.ui.systemViewer.setRootIndex(self.systemModel.index(working_dir))
+        self.ui.systemViewer.clearSelection()
         self.ui.systemViewer.setColumnWidth(0, 200)
         self.ui.systemViewer.hideColumn(2)
         self.ui.folderLabel.setText(path.basename(working_dir))

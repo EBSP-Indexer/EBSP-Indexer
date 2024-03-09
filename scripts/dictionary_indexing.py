@@ -17,7 +17,7 @@ from PySide6.QtWidgets import QDialog, QDialogButtonBox, QTableWidgetItem
 
 from scripts.pc_from_wd import pc_from_wd
 from ui.ui_di_setup import Ui_DiSetupDialog
-from utils import FileBrowser, SettingFile, sendToJobManager
+from utils import FileBrowser, SettingFile, Setting, sendToJobManager
 
 """
 Lookup table for rotations for cubic and tetragonal point groups
@@ -114,12 +114,24 @@ class DiSetupDialog(QDialog):
 
         self.ui.comboBoxConvention.setCurrentText(self.convention)
 
-        if self.program_settings.read("Lazy Loading") == "False":
-            self.ui.checkBoxLazy.setChecked(False)
+        try:
+            self.ui.checkBoxLazy.setChecked(eval(self.program_settings.read(Setting.LAZY_LOADING.value)))
+        except:
+            pass
 
         try:
             if self.program_settings.read("Refine orientations") == "True":
                 self.ui.checkBoxRefine.setChecked(True)
+        except:
+            pass
+
+        try:
+            self.ui.checkBoxIPF.setChecked(eval(self.program_settings.read(Setting.SAVE_IPF.value)))
+        except:
+            pass
+
+        try: 
+            self.ui.checkBoxPM.setChecked(eval(self.program_settings.read(Setting.SAVE_PHASE.value)))
         except:
             pass
 

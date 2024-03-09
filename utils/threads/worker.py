@@ -90,7 +90,7 @@ class Worker(QRunnable, QObject):
                 self.fn(*self.args, **self.kwargs)
                 self.isFinished.emit(self.id)
             except Exception as e:
-                self.thdout.errorwrite(f"{e} (See terminal for traceback)")
+                self.thdout.errorwrite(f"Error: {e} (See terminal for traceback)")
                 self.failed = True
                 raise e
             finally:

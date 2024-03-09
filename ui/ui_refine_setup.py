@@ -26,7 +26,7 @@ class Ui_RefineSetupDialog(object):
     def setupUi(self, RefineSetupDialog):
         if not RefineSetupDialog.objectName():
             RefineSetupDialog.setObjectName(u"RefineSetupDialog")
-        RefineSetupDialog.resize(842, 651)
+        RefineSetupDialog.resize(842, 656)
         self.gridLayout = QGridLayout(RefineSetupDialog)
         self.gridLayout.setObjectName(u"gridLayout")
         self.frame = QFrame(RefineSetupDialog)
@@ -321,6 +321,7 @@ class Ui_RefineSetupDialog(object):
 
         self.checkBoxPhase = QCheckBox(self.frame)
         self.checkBoxPhase.setObjectName(u"checkBoxPhase")
+        self.checkBoxPhase.setChecked(True)
 
         self.verticalLayout.addWidget(self.checkBoxPhase)
 

@@ -29,6 +29,7 @@ from ui.ui_refine_setup import Ui_RefineSetupDialog
 from utils import (
     FileBrowser,
     SettingFile,
+    Setting,
     get_setting_file_bottom_top,
     sendToJobManager,
 )
@@ -215,8 +216,17 @@ class RefineSetupDialog(QDialog):
         except:
             pass
         try:
-            if self.program_settings.read("Lazy Loading") == "False":
-                self.ui.checkBoxLazy.setChecked(False)
+            self.ui.checkBoxLazy.setChecked(eval(self.program_settings.read(Setting.LAZY_LOADING.value)))
+        except:
+            pass
+
+        try:
+            self.ui.checkBoxOrientation.setChecked(eval(self.program_settings.read(Setting.SAVE_IPF.value)))
+        except:
+            pass
+
+        try: 
+            self.ui.checkBoxPhase.setChecked(eval(self.program_settings.read(Setting.SAVE_PHASE.value)))
         except:
             pass
 
