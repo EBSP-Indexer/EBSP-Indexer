@@ -3,8 +3,8 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7925262.svg)](https://doi.org/10.5281/zenodo.7925262)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) 
 
-[![macOS](https://svgshare.com/i/ZjP.svg)](https://svgshare.com/i/ZjP.svg)
-[![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
+![Static Badge](https://img.shields.io/badge/Platforms-Windows%2C_macOS-red)
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
@@ -37,14 +37,12 @@ The project was originally developed by students at [The Department of Material 
   e.g. Inverse Pole Figure Map in Hough Indexing.
 
   As of now, it is recommended to run indexing **without** generating images on Mac.  
-- Refinement of orientations of a crystal map which includes not_indexed points,
-  might produce results that cannot be opened in signal navigation.
 - Updating the application's settings will set the current working directory to 
   the specified default directory (if checked).
-- Updating the application's settings will reset the current selected file, 
-  even though it appears to be selected.
 - When saving a merged crystal map in the case where only one phase is identified, 
   save will fail since a crystal map with the same name exists already.
+- Creating jobs while the Job Manager is unlocked from the main window will result
+  in an error, due to the parent widget of the job list changes. 
 
 ## Minimum requirements 🔧
 - Windows 10/11 **or** macOS 13 (Ventura)

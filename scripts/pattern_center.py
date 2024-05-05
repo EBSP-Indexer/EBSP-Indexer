@@ -440,7 +440,7 @@ class PatterCenterDialog(QDialog):
             self.pattern_ignored = False
 
     def saveAndExit(self):
-        self.setting_file.delete_all_entries()  # clean up initial dictionary
+        self.setting_file.clean()  # clean up initial dictionary
 
         ### Sample parameters
         for i, path in enumerate(self.mp_paths.values(), 1):

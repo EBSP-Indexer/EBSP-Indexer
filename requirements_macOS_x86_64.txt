@@ -37,7 +37,7 @@ Jinja2==3.1.2
 joblib==1.2.0
 jupyter_client==8.0.3
 jupyter_core==5.2.0
-kikuchipy==0.8.4
+kikuchipy==0.8.6
 kiwisolver==1.4.4
 lazy_loader==0.1
 llvmlite==0.39.1

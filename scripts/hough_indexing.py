@@ -8,6 +8,7 @@ import kikuchipy as kp
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+from diffsims.crystallography import ReciprocalLatticeVector
 from diffpy.structure.structure import Structure
 from kikuchipy.signals.ebsd import EBSD, LazyEBSD
 from orix import io, plot
@@ -20,12 +21,11 @@ from PySide6.QtWidgets import QDialog, QDialogButtonBox, QMainWindow, QTableWidg
 from scripts.create_phase import NewPhaseDialog
 from scripts.pc_from_wd import pc_from_wd
 from ui.ui_hi_setup import Ui_HISetupDialog
-from utils import FileBrowser, SettingFile, sendToJobManager
+from utils import FileBrowser, SettingFile, Setting, sendToJobManager
 
 # Ignore warnings to avoid crash with integrated console
 warnings.filterwarnings("ignore")
 
-ALLOWED_SPACE_GROUPS = ["Fm-3m", "Im-3m"] # FCC and BCC
 
 class HiSetupDialog(QDialog):
     def __init__(self, parent: QMainWindow, pattern_path: str):
@@ -113,10 +113,24 @@ class HiSetupDialog(QDialog):
         )
         self.program_settings = SettingFile("advanced_settings.txt")
         try:
-            lazy = eval(self.program_settings.read("Lazy Loading"))
+            self.ui.checkBoxLazy.setChecked(eval(self.program_settings.read(Setting.LAZY_LOADING.value)))
         except:
-            lazy = False
-        self.ui.checkBoxLazy.setChecked(lazy)
+            pass
+
+        try:
+            self.ui.checkBoxOrientation.setChecked(eval(self.program_settings.read(Setting.SAVE_IPF.value)))
+        except:
+            pass
+
+        try: 
+            self.ui.checkBoxPhase.setChecked(eval(self.program_settings.read(Setting.SAVE_PHASE.value)))
+        except:
+            pass
+
+        try:
+            self.ui.checkBoxIndexData.setChecked(eval(self.program_settings.read(Setting.SAVE_NUMPY.value)))
+        except:
+            pass
 
         try:
             convention = self.setting_file.read("Convention")
@@ -146,11 +160,6 @@ class HiSetupDialog(QDialog):
                     param.setValue(value)
         try:
             self.colors = json.loads(self.program_settings.read("Colors"))
-        except:
-            pass
-        try:
-            if self.program_settings.read("Lazy Loading") == "False":
-                self.ui.checkBoxLazy.setChecked(False)
         except:
             pass
 
@@ -187,7 +196,7 @@ class HiSetupDialog(QDialog):
                 break
 
     def save_parameters(self):
-        self.setting_file.delete_all_entries()  # Clean up initial dictionary
+        self.setting_file.clean()  # Clean up initial dictionary
         options = self.getOptions()
         master_idx = 1
         phase_idx = 1
@@ -218,20 +227,20 @@ class HiSetupDialog(QDialog):
         if mp_path is not None:
             try:
                 mp = kp.load(mp_path, lazy=True)
-                if mp.phase.name == "":
+                if mp.phase.name == "" or "\\" in mp.phase.name or "/" in mp.phase.name:
                     mp.phase.name = path.dirname(mp_path).split("/").pop()
                 self.phases.add(mp.phase)
                 mp.phase.color = self.colors[len(self.phases.ids) - 1]
                 self.mp_paths[mp.phase.name] = mp_path
             except Exception as e:
-                print("Phase could not be loaded from master pattern", e)
+                print(e)
             self.updatePhaseTable()
         elif self.fileBrowserOF.getFile():
             mp_paths = self.fileBrowserOF.getPaths()
             for mp_path in mp_paths:
                 try:
                     mp = kp.load(mp_path, lazy=True)
-                    if mp.phase.name == "":
+                    if mp.phase.name == "" or "\\" in mp.phase.name or "/" in mp.phase.name:
                         mp.phase.name = path.dirname(mp_path).split("/").pop()
                     self.phases.add(mp.phase)
                     mp.phase.color = self.colors[len(self.phases.ids) - 1]
@@ -318,32 +327,27 @@ class HiSetupDialog(QDialog):
         self.updatePhaseTable()
 
     def setAvailableButtons(self):
+        # TODO: Clean up function and messaging UI
         display_message = False
         message = ""
         ok_flag = False
-        phase_map_flag = False
-        add_phase_flag = True
         n_phases = self.ui.tableWidgetPhase.rowCount()
         if n_phases != 0:
             ok_flag = True
-            if n_phases == 2:
-                phase_map_flag = True
-                add_phase_flag = False
-            if n_phases > 2:
-                ok_flag = False
-                add_phase_flag = False
-                display_message = True
-                message = "Current version of PyEBSDIndex supports maximum two phases (FCC, BCC)"
-        for _, ph in self.phases:
-            if ph.space_group.short_name not in ALLOWED_SPACE_GROUPS:
-                ok_flag = False
-                display_message = True
-                message = f"Structure {ph.space_group.short_name} in {ph.name} is currently not supported, only CUBIC Crystal Systems"
+        #   if n_phases >= 2:
+        #        phase_map_flag = True
+        #        add_phase_flag = False
+        #     if n_phases > 2:
+        #         ok_flag = False
+        #         add_phase_flag = False
+        #         display_message = True
+        #         message = "Current version of PyEBSDIndex supports maximum two phases (FCC, BCC)"
+        # for _, ph in self.phases:
+        #     if ph.space_group.short_name not in ALLOWED_SPACE_GROUPS:
+        #         ok_flag = False
+        #         display_message = True
+        #         message = f"Structure {ph.space_group.short_name} in {ph.name} is currently not supported, only CUBIC Crystal Systems"
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(ok_flag)
-        self.ui.checkBoxPhase.setEnabled(phase_map_flag)
-        self.ui.checkBoxPhase.setChecked(phase_map_flag)
-        self.ui.pushButtonCreatePhase.setEnabled(add_phase_flag)
-        self.ui.pushButtonLoadPhase.setEnabled(add_phase_flag)
         self.ui.labelMessage.setVisible(display_message)
         self.ui.labelMessage.setText(message)
 
@@ -386,14 +390,34 @@ class HiSetupDialog(QDialog):
             convention=convention,
         )
         det.save(path.join(self.dir_out, "detector.txt"), convention)
+
+        reflectors = []
+        for indx, ph in self.phases:
+            if indx != -1:
+                lattice = ph.structure.lattice
+                lattice.setLatPar(lattice.a * 10, lattice.b * 10, lattice.c * 10)
+
+                ref = ReciprocalLatticeVector.from_min_dspacing(ph, 0.7)    # TODO: Allow users to adjust this?
+                ref.sanitise_phase()
+                ref.calculate_structure_factor()
+                F = abs(ref.structure_factor)
+                ref2 = ref[F > 0.47 * F.max()]  # TODO: Allow users to adjust this?
+                _, unique_indices = ref2.unit.unique(return_index=True)
+                ref3 = ref2[unique_indices]
+                reflectors.append(ref3)
+
         indexer = det.get_indexer(
-            phase_list=self.phases, rhoMaskFrac=self.rho_mask, nBands=self.number_bands
+            phase_list=self.phases, 
+            reflectors=reflectors, 
+            rhoMaskFrac=self.rho_mask, 
+            nBands=self.number_bands,
+            tSigma = 2,
+            rSigma = 2
         )
         print("------- Detector stats -------")
         print(f"Indexer Vendor: {indexer.vendor}")
         print(f"Sample tilt: {indexer.sampleTilt}")
         print(f"Camera elevation: {indexer.camElev}")
-        print(f"Atomic arrangements: {indexer.phaselist}")
         print(f"Navigation shape: {nav_shape}")
         print(f"Signal shape: {sig_shape}")
         print(f"Steps: {step_sizes} {scan_unit}")
@@ -485,12 +509,12 @@ class HiSetupDialog(QDialog):
             path.join(self.dir_out, "quality_metrics_all.png"), **self.savefig_kwds
         )
 
-    def save_phase_map(self, xmap):
+    def save_phase_map(self, xmap: CrystalMap):
         """
         Plot phase map
         """
         print("Saving phase map ...")
-        fig = xmap.plot(return_figure=True, remove_padding=True)
+        fig = xmap.plot(return_figure=True, remove_padding=True, legend_properties={'fontsize': 'xx-small'}, scalebar_properties={'font_properties': {'size': 'xx-small'}})
         fig.savefig(path.join(self.dir_out, "phase_map.png"), **self.savefig_kwds)
 
     def save_ipf_map(
@@ -518,7 +542,7 @@ class HiSetupDialog(QDialog):
         print(ckey)
         fig_ckey = ckey.plot(return_figure=True)
         rgb_direction = ckey.orientation2color(xmap.rotations)
-        fig = xmap.plot(rgb_direction, remove_padding=True, return_figure=True)
+        fig = xmap.plot(rgb_direction, remove_padding=True, return_figure=True, scalebar_properties={'font_properties': {'size': 'xx-small'}})
         if ckey_overlay:
             ax_ckey = fig.add_axes(
                 [0.77, 0.07, 0.2, 0.2], projection="ipf", symmetry=sym

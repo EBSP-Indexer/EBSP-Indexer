@@ -2,11 +2,11 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "EBSP Indexer"
-#define MyAppVersion "0.1.0"
+#define MyAppVersion "0.2.0"
 #define MyAppPublisher "EBSP Indexer Developers"
 #define MyAppExeName "EBSP Indexer.exe"
 
-#define InstallerVersion "0.0.5"
+#define InstallerVersion "0.2.1"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -19,11 +19,10 @@ VersionInfoVersion={#InstallerVersion}
 AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\EBSP-Indexer
 DisableProgramGroupPage=yes
-LicenseFile=C:\EBSP-Indexer\dist\EBSP Indexer\COPYING.txt
-; Uncomment the following line to run in non administrative install mode (install for current user only.)
+LicenseFile=C:\Users\eroest\source\EBSP-Indexer\dist\EBSP Indexer\COPYING.txt
 PrivilegesRequired=lowest
-OutputBaseFilename=EBSP_Indexer_0.1.0_Win_x86_install
-SetupIconFile=C:\EBSP-Indexer\resources\setup_icon.ico
+OutputBaseFilename=EBSP_Indexer_0.2.0_Win_x86_install
+SetupIconFile=C:\Users\eroest\source\EBSP-Indexer\resources\setup_icon.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -36,10 +35,10 @@ Name: "norwegian"; MessagesFile: "compiler:Languages\Norwegian.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\EBSP-Indexer\dist\EBSP Indexer\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\EBSP-Indexer\dist\EBSP Indexer\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\eroest\source\EBSP-Indexer\dist\EBSP Indexer\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\eroest\source\EBSP-Indexer\dist\EBSP Indexer\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; VC++ redistributable runtime. Extracted by VC2017RedistNeedsInstall(), if needed.
-Source: "C:\EBSP-Indexer\VC_redist.x64.exe"; DestDir: {tmp}; Flags: dontcopy
+Source: "C:\Users\eroest\source\EBSP-Indexer\VC_redist.x64.exe"; DestDir: {tmp}; Flags: dontcopy
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

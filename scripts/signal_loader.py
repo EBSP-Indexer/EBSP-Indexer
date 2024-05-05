@@ -73,13 +73,18 @@ class crystalMap:
         hkl_simulations = []
 
         for i, ph in self.crystal_map.phases:
-            phase_lattice = ph.structure.lattice
-            phase_lattice.setLatPar(
-                phase_lattice.a * 10, phase_lattice.b * 10, phase_lattice.c * 10
-            )  # diffsim uses ångstrøm and not nm for lattice parameters
+            
 
             if i != -1:
-                rlv = ReciprocalLatticeVector.from_min_dspacing(ph, 0.7)
+                try:
+                    rlv = ReciprocalLatticeVector.from_min_dspacing(ph, 0.7)
+                except ValueError as _:    
+                    # Backwards-compatibility with crystal maps that has phases saved using nm instead of ångstrøm
+                    phase_lattice = ph.structure.lattice
+                    phase_lattice.setLatPar(
+                        phase_lattice.a * 10, phase_lattice.b * 10, phase_lattice.c * 10
+                    )  # diffsim uses ångstrøm and not nm for lattice parameters
+                    rlv = ReciprocalLatticeVector.from_min_dspacing(ph, 0.7)
 
                 rlv.sanitise_phase()
                 rlv = rlv.unique(use_symmetry=True)
@@ -231,7 +236,7 @@ class EBSDDataset:
 
     @functools.cached_property
     def virtual_bse(self):
-        vbse_gen = kp.generators.VirtualBSEGenerator(self.ebsd)
+        vbse_gen = kp.imaging.VirtualBSEImager(self.ebsd)
         vbse_map = vbse_gen.get_rgb_image(r=(3, 1), b=(3, 2), g=(3, 3))
         vbse_map.change_dtype("uint8")
         vbse_map = vbse_map.data

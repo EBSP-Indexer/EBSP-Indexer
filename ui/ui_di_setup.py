@@ -421,6 +421,7 @@ class Ui_DiSetupDialog(object):
 
         self.checkBoxPM = QCheckBox(self.centralwidget)
         self.checkBoxPM.setObjectName(u"checkBoxPM")
+        self.checkBoxPM.setChecked(True)
 
         self.gridLayout.addWidget(self.checkBoxPM, 0, 2, 1, 1)
 
@@ -433,6 +434,7 @@ class Ui_DiSetupDialog(object):
         self.checkBoxIPF.setObjectName(u"checkBoxIPF")
         self.checkBoxIPF.setToolTipDuration(-1)
         self.checkBoxIPF.setAutoFillBackground(False)
+        self.checkBoxIPF.setChecked(True)
 
         self.gridLayout.addWidget(self.checkBoxIPF, 0, 1, 1, 1)
 
