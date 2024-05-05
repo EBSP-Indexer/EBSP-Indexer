@@ -408,7 +408,7 @@ class Ui_AdvancedSettings(object):
         self.brukerButton.setText(QCoreApplication.translate("AdvancedSettings", u"Bruker", None))
         self.tslButton.setText(QCoreApplication.translate("AdvancedSettings", u"TSL", None))
         self.label_3.setText(QCoreApplication.translate("AdvancedSettings", u"Pattern Center Refinement:", None))
-        self.savePcsBox.setText(QCoreApplication.translate("AdvancedSettings", u"Save individual pattern data to project settings file ", None))
+        self.savePcsBox.setText(QCoreApplication.translate("AdvancedSettings", u"Save individual calibration pattern data to project settings file ", None))
         self.label_9.setText(QCoreApplication.translate("AdvancedSettings", u"Calibrated microscopes", None))
         self.pushButtonAddNewMicroscope.setText(QCoreApplication.translate("AdvancedSettings", u"Add new microscope", None))
         self.pushButtonRemoveMicroscope.setText(QCoreApplication.translate("AdvancedSettings", u"Remove microscope", None))

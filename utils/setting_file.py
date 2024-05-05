@@ -45,8 +45,10 @@ class SettingFile:
         except:
             warnings.warn(f"Could not remove {key} from settings file.")
 
-    def delete_all_entries(self):
-        self.dict = {}
+    def clean(self):
+        keys_to_remove = [key for key in self.dict.keys() if "Master pattern" in key]
+        for key in keys_to_remove:
+            self.remove(key)
 
     def save(self):
         try:

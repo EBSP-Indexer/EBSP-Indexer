@@ -218,7 +218,7 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="text">
-          <string>Save individual pattern data to project settings file </string>
+          <string>Save individual calibration pattern data to project settings file </string>
          </property>
         </widget>
        </item>

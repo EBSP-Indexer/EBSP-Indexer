@@ -357,7 +357,7 @@ class RefineSetupDialog(QDialog):
                     lazy=True,
                     **load_kwargs,
                 )
-                if mp.phase.name == "":
+                if mp.phase.name == "" or "\\" in mp.phase.name or "/" in mp.phase.name:
                     mp.phase.name = path.dirname(mp_path).split("/").pop()
                 mp.phase.color = self.colors[len(self.master_patterns.keys())]
                 self.master_patterns[mp.phase.name] = mp
@@ -387,7 +387,7 @@ class RefineSetupDialog(QDialog):
                         lazy=True,
                         **load_kwargs,
                     )
-                    if mp.phase.name == "":
+                    if mp.phase.name == "" or "\\" in mp.phase.name or "/" in mp.phase.name:
                         mp.phase.name = path.dirname(mp_path).split("/").pop()
                     mp.phase.color = self.colors[len(self.master_patterns.keys())]
                     self.master_patterns[mp.phase.name] = mp
@@ -727,7 +727,7 @@ class RefineSetupDialog(QDialog):
         Plot phase map
         """
         print("Saving phase map ...")
-        fig = xmap.plot(return_figure=True, remove_padding=True)
+        fig = xmap.plot(return_figure=True, remove_padding=True, legend_properties={'fontsize': 'xx-small'}, scalebar_properties={'font_properties': {'size': 'xx-small'}})
         fig.savefig(
             path.join(self.output_dir, "phase_map_refined.png"), **self.savefig_kwds
         )
@@ -757,7 +757,7 @@ class RefineSetupDialog(QDialog):
         print(ckey)
         fig_ckey = ckey.plot(return_figure=True)
         rgb_direction = ckey.orientation2color(xmap.rotations)
-        fig = xmap.plot(rgb_direction, remove_padding=True, return_figure=True)
+        fig = xmap.plot(rgb_direction, remove_padding=True, return_figure=True, scalebar_properties={'font_properties': {'size': 'xx-small'}})
         if ckey_overlay:
             ax_ckey = fig.add_axes(
                 [0.77, 0.07, 0.2, 0.2], projection="ipf", symmetry=sym
@@ -780,6 +780,8 @@ class RefineSetupDialog(QDialog):
                 colorbar_label="NCC",
                 cmap="gray",
                 remove_padding=True,
+                legend_properties={'fontsize': 'xx-small'}, 
+                scalebar_properties={'font_properties': {'size': 'xx-small'}}
             )
         else:
             fig = xmap.plot(
@@ -789,6 +791,8 @@ class RefineSetupDialog(QDialog):
                 return_figure=True,
                 cmap="gray",
                 remove_padding=True,
+                legend_properties={'fontsize': 'xx-small'}, 
+                scalebar_properties={'font_properties': {'size': 'xx-small'}}
             )
         fig.savefig(
             path.join(self.output_dir, "NCC_refined.png"),

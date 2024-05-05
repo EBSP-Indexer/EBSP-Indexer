@@ -196,7 +196,7 @@ class HiSetupDialog(QDialog):
                 break
 
     def save_parameters(self):
-        self.setting_file.delete_all_entries()  # Clean up initial dictionary
+        self.setting_file.clean()  # Clean up initial dictionary
         options = self.getOptions()
         master_idx = 1
         phase_idx = 1
@@ -227,7 +227,7 @@ class HiSetupDialog(QDialog):
         if mp_path is not None:
             try:
                 mp = kp.load(mp_path, lazy=True)
-                if mp.phase.name == "":
+                if mp.phase.name == "" or "\\" in mp.phase.name or "/" in mp.phase.name:
                     mp.phase.name = path.dirname(mp_path).split("/").pop()
                 self.phases.add(mp.phase)
                 mp.phase.color = self.colors[len(self.phases.ids) - 1]
@@ -240,7 +240,7 @@ class HiSetupDialog(QDialog):
             for mp_path in mp_paths:
                 try:
                     mp = kp.load(mp_path, lazy=True)
-                    if mp.phase.name == "":
+                    if mp.phase.name == "" or "\\" in mp.phase.name or "/" in mp.phase.name:
                         mp.phase.name = path.dirname(mp_path).split("/").pop()
                     self.phases.add(mp.phase)
                     mp.phase.color = self.colors[len(self.phases.ids) - 1]
@@ -509,12 +509,12 @@ class HiSetupDialog(QDialog):
             path.join(self.dir_out, "quality_metrics_all.png"), **self.savefig_kwds
         )
 
-    def save_phase_map(self, xmap):
+    def save_phase_map(self, xmap: CrystalMap):
         """
         Plot phase map
         """
         print("Saving phase map ...")
-        fig = xmap.plot(return_figure=True, remove_padding=True)
+        fig = xmap.plot(return_figure=True, remove_padding=True, legend_properties={'fontsize': 'xx-small'}, scalebar_properties={'font_properties': {'size': 'xx-small'}})
         fig.savefig(path.join(self.dir_out, "phase_map.png"), **self.savefig_kwds)
 
     def save_ipf_map(
@@ -542,7 +542,7 @@ class HiSetupDialog(QDialog):
         print(ckey)
         fig_ckey = ckey.plot(return_figure=True)
         rgb_direction = ckey.orientation2color(xmap.rotations)
-        fig = xmap.plot(rgb_direction, remove_padding=True, return_figure=True)
+        fig = xmap.plot(rgb_direction, remove_padding=True, return_figure=True, scalebar_properties={'font_properties': {'size': 'xx-small'}})
         if ckey_overlay:
             ax_ckey = fig.add_axes(
                 [0.77, 0.07, 0.2, 0.2], projection="ipf", symmetry=sym
