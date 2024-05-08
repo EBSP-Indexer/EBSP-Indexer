@@ -175,7 +175,7 @@
      </widget>
      <widget class="QWidget" name="preProcessingTab">
       <attribute name="title">
-       <string>Pre Prosessing</string>
+       <string>Pre-processing</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
@@ -218,7 +218,7 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="text">
-          <string>Save individual pattern data to project settings file </string>
+          <string>Save individual calibration pattern data to project settings file </string>
          </property>
         </widget>
        </item>
@@ -292,12 +292,57 @@
          <property name="text">
           <string>Lazy Loading (recommended)</string>
          </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBoxSaveIPFMap">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Default option for saving an inverse pole figure map as a .png file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Save IPF map</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBoxSavePhaseMap">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Default option for saving a phase map as a .png file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Save phase map</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBoxSaveNumpy">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Default option for saving numpy file generated from Hough Indexing. &lt;/p&gt;&lt;p&gt;The file allows all present phases to be considered during a later refinement of orientations for all patterns, which may produce better results during refinement. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Save .npy file during Hough Indexing</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
        <item>
         <widget class="QCheckBox" name="checkBoxRefine">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Default option for refining orientations when doing Dictionary Indexing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
-          <string>Refine orientations</string>
+          <string>Refine orientations (DI)</string>
          </property>
         </widget>
        </item>
@@ -339,7 +384,6 @@
          </property>
          <property name="font">
           <font>
-           <weight>50</weight>
            <bold>false</bold>
           </font>
          </property>

@@ -23,7 +23,7 @@ import sys
 from contextlib import redirect_stderr, redirect_stdout
 
 from PySide6.QtCore import QDir, Qt, QThreadPool, Slot
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QDesktopServices
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QDialog
 
 if platform.system().lower() != "darwin":
@@ -43,6 +43,7 @@ from kikuchipy import (
 
 import resources_rc  # Imports resources in a pythonic way from resources.qrc
 from scripts.advanced_settings import AdvancedSettingsDialog
+from scripts.about import AboutDialog
 from scripts.console import Console
 from scripts.dictionary_indexing import DiSetupDialog
 from scripts.hough_indexing import HiSetupDialog
@@ -67,6 +68,8 @@ NUM_OF_THREADS = 1
 KP_EXTENSIONS = (".h5", ".dat")
 IMAGE_EXTENSIONS = ()
 
+GITHUB_URL = "https://github.com/EBSP-Indexer/EBSP-Indexer/discussions"
+ZENODO_URL = "https://zenodo.org/records/7925261"
 
 class AppWindow(QMainWindow):
     """
@@ -113,9 +116,6 @@ class AppWindow(QMainWindow):
         self.systemExplorer.pathChanged.connect(
             lambda new_path: self.updateMenuButtons(new_path)
         )
-        # self.systemExplorer.pathChanged.connect(
-        #     lambda new_path: self.showImage(new_path)
-        # )
         self.systemExplorer.requestImageViewer.connect(
             lambda image_path: self.showImage(image_path)
         )
@@ -127,6 +127,9 @@ class AppWindow(QMainWindow):
             lambda: self.selectWorkingDirectory()
         )
         self.ui.actionSettings.triggered.connect(lambda: self.openSettings())
+        self.ui.actionAbout.triggered.connect(lambda: self.openAbout())
+        self.ui.actionGitHub.triggered.connect(lambda: QDesktopServices.openUrl(GITHUB_URL))
+        self.ui.actionZenodo.triggered.connect(lambda: QDesktopServices.openUrl(ZENODO_URL))
         self.ui.actionProcessingMenu.triggered.connect(lambda: self.selectProcessing())
         self.ui.actionROI.triggered.connect(lambda: self.selectROI())
         self.ui.actionSignalNavigation.triggered.connect(
@@ -149,21 +152,6 @@ class AppWindow(QMainWindow):
         self.ui.actionPattern_selection.triggered.connect(
             lambda: self.openPCSelection(pattern_path=self.getSelectedPath())
         )
-        # if platform.system().lower() != "darwin":
-        # self.ui.actionAverage_dot_product.triggered.connect(
-        #     lambda: save_adp_map(pattern_path=self.getSelectedPath())
-        # )
-        # self.ui.actionImage_quality.triggered.connect(
-        #     lambda: save_iq_map(pattern_path=self.getSelectedPath())
-        # )
-        # self.ui.actionMean_intensity.triggered.connect(
-        #     lambda: save_mean_intensity_map(pattern_path=self.getSelectedPath())
-        # )
-        # self.ui.actionVirtual_backscatter_electron.triggered.connect(
-        #     lambda: save_rgb_vbse(pattern_path=self.getSelectedPath())
-        # )
-
-        # else:
         
         self.ui.actionAverage_dot_product.triggered.connect(
             lambda: self.generatePreIndexingMap(map=0)
@@ -295,12 +283,22 @@ class AppWindow(QMainWindow):
                     new_dir = setting_file.read("Default Directory")
                     if self.working_dir != new_dir:
                         self.working_dir = new_dir
-                    self.systemExplorer.setSystemViewer(
-                        self.working_dir, filters=system_view_filters
-                    )
+                        self.showImage()
+                        self.updateMenuButtons("")
+                self.systemExplorer.setSystemViewer(
+                    self.working_dir, filters=system_view_filters
+                )
+
                 if platform.system().lower() != "darwin":
                     qdarktheme.setup_theme(self.theme)
-                self.showImage()
+        except Exception as e:
+            raise e
+
+    def openAbout(self):
+        try:
+            self.aboutDialog = AboutDialog(parent=self)
+            self.aboutDialog.setWindowFlag(Qt.WindowStaysOnTopHint, self.stayOnTopHint)
+            self.aboutDialog.exec()
         except Exception as e:
             raise e
 

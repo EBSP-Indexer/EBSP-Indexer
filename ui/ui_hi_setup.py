@@ -331,6 +331,7 @@ class Ui_HISetupDialog(object):
         self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
         self.checkBoxPhase = QCheckBox(self.frame)
         self.checkBoxPhase.setObjectName(u"checkBoxPhase")
+        self.checkBoxPhase.setChecked(True)
 
         self.horizontalLayout_8.addWidget(self.checkBoxPhase)
 
@@ -632,9 +633,9 @@ class Ui_HISetupDialog(object):
         self.labelRho.setText(QCoreApplication.translate("HISetupDialog", u"85%", None))
         self.label_20.setText(QCoreApplication.translate("HISetupDialog", u"Crystal map", None))
 #if QT_CONFIG(tooltip)
-        self.checkBoxIndexData.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Whether to save the index data array\u00a0as *.npy in addition to the resulting crystal map, can be used to refine orientations later</p></body></html>", None))
+        self.checkBoxIndexData.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Save numpy file generated from Hough Indexing.</p><p>The file allows all present phases to be considered during a later refinement of orientations for all patterns, which may produce better results during refinement. </p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
-        self.checkBoxIndexData.setText(QCoreApplication.translate("HISetupDialog", u"Save Index Data as .npy", None))
+        self.checkBoxIndexData.setText(QCoreApplication.translate("HISetupDialog", u"Save additional index data as .npy", None))
         self.label_12.setText(QCoreApplication.translate("HISetupDialog", u"Images", None))
 #if QT_CONFIG(tooltip)
         self.checkBoxOrientation.setToolTip(QCoreApplication.translate("HISetupDialog", u"<html><head/><body><p>Orientations are given a color based on which crystal direction &lt;<span style=\" font-style:italic;\">uvw</span>&gt; points in a certain sample direction, producing the so-called inverse pole figure (IPF) map</p></body></html>", None))

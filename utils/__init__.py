@@ -3,7 +3,7 @@ import os
 
 from .threads import sendToJobManager, sendToWorker, ThreadedOutput
 from .redirect import Redirect
-from .setting_file import SettingFile, get_setting_file_bottom_top
+from .setting_file import SettingFile, Setting, get_setting_file_bottom_top
 from .filebrowser import FileBrowser
 
 def resource_path(relative_path):
@@ -33,6 +33,7 @@ __all__ = [
     "ThreadedOutput",
     "Redirect",
     "SettingFile",
+    "Setting",
     "get_setting_file_bottom_top",
     "FileBrowser",
     "resource_path"

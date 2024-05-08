@@ -11,7 +11,7 @@ from tabulate import tabulate
 from scripts.color_picker import ColorPicker
 from scripts.pc_from_wd import wdCalibration
 from ui.ui_advanced_settings import Ui_AdvancedSettings
-from utils import FileBrowser, SettingFile
+from utils import FileBrowser, SettingFile, Setting
 
 
 class AdvancedSettingsDialog(QDialog):
@@ -29,30 +29,32 @@ class AdvancedSettingsDialog(QDialog):
 
     def setupConnections(self):
         self.ui.buttonBox.accepted.connect(lambda: self.settingsChanged.emit())
+        self.ui.buttonBox.accepted.connect(lambda: self.saveSettings())
+
+        # File Explorer
         self.ui.addFileTypeButton.clicked.connect(lambda: self.addFileType())
         self.ui.removeFileTypeButton.clicked.connect(lambda: self.removeFileType())
         self.ui.resetFileTypeButton.clicked.connect(lambda: self.resetFileType())
-        self.ui.brukerButton.clicked.connect(lambda: self.setBruker())
-        self.ui.tslButton.clicked.connect(lambda: self.setTSL())
-        self.ui.lazyLoadingBox.clicked.connect(lambda: self.setLazy())
-        self.ui.checkBoxRefine.clicked.connect(lambda: self.setRefine())
-        self.ui.savePcsBox.clicked.connect(lambda: self.setIndividualPCData())
-        self.ui.buttonBox.accepted.connect(lambda: self.saveSettings())
         self.ui.directoryBox.clicked.connect(lambda: self.toggleDefaultDirectory())
         self.ui.browseDirectoryButton.clicked.connect(lambda: self.browseDirectory())
+
+        # Pre-Processing
+        self.ui.brukerButton.clicked.connect(lambda: self.setBruker())
+        self.ui.tslButton.clicked.connect(lambda: self.setTSL())
+        self.ui.savePcsBox.clicked.connect(lambda: self.setIndividualPCData())
+        self.ui.pushButtonAddNewMicroscope.clicked.connect(lambda: self.addNewMicroscope())
+        self.ui.pushButtonRemoveMicroscope.clicked.connect(lambda: self.removeMicroscope())
+        self.ui.listWidgetMicroscopes.itemDoubleClicked.connect(lambda: self.display_calibration_params())
+
+        # Indexing
+        self.ui.lazyLoadingBox.clicked.connect(lambda: self.setLazy())
+        self.ui.checkBoxSaveIPFMap.clicked.connect(lambda: self.setSaveIPF())
+        self.ui.checkBoxSavePhaseMap.clicked.connect(lambda: self.setSavePhase())
+        self.ui.checkBoxSaveNumpy.clicked.connect(lambda: self.setSaveNumpy())
+        self.ui.checkBoxRefine.clicked.connect(lambda: self.setRefine())
         self.ui.colorTreeWidget.doubleClicked.connect(lambda: self.colorPicker())
 
-        self.ui.pushButtonAddNewMicroscope.clicked.connect(
-            lambda: self.addNewMicroscope()
-        )
-        self.ui.pushButtonRemoveMicroscope.clicked.connect(
-            lambda: self.removeMicroscope()
-        )
-
-        self.ui.listWidgetMicroscopes.itemDoubleClicked.connect(
-            lambda: self.display_calibration_params()
-        )
-
+        # Apperance
         if platform.system().lower() == "darwin":
             self.ui.lightRadioButton.setDisabled(True)
             self.ui.darkRadioButton.setDisabled(True)
@@ -101,16 +103,19 @@ class AdvancedSettingsDialog(QDialog):
         self.convention = "TSL"
 
     def setIndividualPCData(self):
-        if self.ui.savePcsBox.isChecked():
-            self.individual_PC_data = True
-        else:
-            self.individual_PC_data = False
+        self.individual_PC_data = self.ui.savePcsBox.isChecked()
 
     def setLazy(self):
-        if self.ui.lazyLoadingBox.isChecked():
-            self.lazy = True
-        else:
-            self.lazy = False
+        self.lazy = self.ui.lazyLoadingBox.isChecked()
+
+    def setSaveIPF(self):
+        self.saveIPF = self.ui.checkBoxSaveIPFMap.isChecked()
+
+    def setSavePhase(self):
+        self.savePhase = self.ui.checkBoxSavePhaseMap.isChecked()
+
+    def setSaveNumpy(self):
+        self.saveNumpy = self.ui.checkBoxSaveNumpy.isChecked()
 
     def setRefine(self):
         self.refine = self.ui.checkBoxRefine.isChecked()
@@ -192,7 +197,7 @@ class AdvancedSettingsDialog(QDialog):
         except:
             self.theme = "light"
 
-        file_types_str = self.setting_file.read("File Types")
+        file_types_str = self.setting_file.read(Setting.FILE_TYPES.value)
         self.file_types = json.loads(file_types_str)
         for f in self.file_types:
             self.ui.fileTypeList.addItem(f)
@@ -208,17 +213,24 @@ class AdvancedSettingsDialog(QDialog):
         else:
             self.individual_PC_data = False
 
-        if self.setting_file.read("Lazy Loading") == "True":
-            self.ui.lazyLoadingBox.setChecked(True)
-            self.lazy = True
-        else:
-            self.lazy = False
+        self.lazy = self.loadSetting(Setting.LAZY_LOADING, True)
+        self.ui.lazyLoadingBox.setChecked(self.lazy)
+
+        # TODO: Do this instead
+        self.saveIPF = self.loadSetting(Setting.SAVE_IPF, True)
+        self.savePhase = self.loadSetting(Setting.SAVE_PHASE, True)
+        self.saveNumpy = self.loadSetting(Setting.SAVE_NUMPY, False)
+
+        self.ui.checkBoxSaveIPFMap.setChecked(self.saveIPF)
+        self.ui.checkBoxSavePhaseMap.setChecked(self.savePhase)
+        self.ui.checkBoxSaveNumpy.setChecked(self.saveNumpy)
 
         try:
             if self.setting_file.read("Refine orientations") == "True":
                 self.ui.checkBoxRefine.setChecked(True)
                 self.refine = True
             else:
+                self.ui.checkBoxRefine.setChecked(False)
                 self.refine = False
 
         except:
@@ -249,16 +261,30 @@ class AdvancedSettingsDialog(QDialog):
         if not len(self.microscopes):
             self.ui.pushButtonRemoveMicroscope.setEnabled(False)
 
+    # TODO: Use this instead (?)
+    def loadSetting(self, setting: Setting, default: object = False) -> object:
+        try:
+            return eval(self.setting_file.read(setting.value))
+        except:
+            return default
+        
+    # TODO: And also this (?) 
+    def writeToSetting(self, setting: Setting, value: object):
+        self.setting_file.write(setting.value, str(value))
+
     def saveSettings(self):
         if exists(self.ui.directoryEdit.text()) and self.directory:
             self.directory = self.ui.directoryEdit.text()
         else:
             self.directory = False
 
-        self.setting_file.write("File Types", json.dumps(self.file_types))
+        self.setting_file.write(Setting.FILE_TYPES.value, json.dumps(self.file_types))
         self.setting_file.write("Individual PC data", str(self.individual_PC_data))
         self.setting_file.write("Convention", str(self.convention))
-        self.setting_file.write("Lazy Loading", str(self.lazy))
+        self.setting_file.write(Setting.LAZY_LOADING.value, str(self.lazy))
+        self.setting_file.write(Setting.SAVE_IPF.value, str(self.saveIPF))
+        self.setting_file.write(Setting.SAVE_PHASE.value, str(self.savePhase))
+        self.setting_file.write(Setting.SAVE_NUMPY.value, str(self.saveNumpy))
         self.setting_file.write("Refine orientations", str(self.refine))
         self.setting_file.write("Default Directory", str(self.directory))
         self.setting_file.write("Colors", json.dumps(self.colors))
@@ -275,10 +301,13 @@ class AdvancedSettingsDialog(QDialog):
         f.close()
 
         setting_dict = {
-            "File Types": json.dumps([".h5", ".dat", ".ang", ".jpg", ".png", ".txt"]),
+            Setting.FILE_TYPES.value: json.dumps([".h5", ".dat", ".ang", ".jpg", ".png", ".txt"]),
             "Individual PC data": False,
             "Convention": "TSL",
             "Lazy Loading": True,
+            Setting.SAVE_IPF.value: True,
+            Setting.SAVE_PHASE.value: True,
+            Setting.SAVE_NUMPY.value: False,
             "Default Directory": False,
             "Colors": json.dumps(["lime", "red", "blue", "yellow"]),
         }

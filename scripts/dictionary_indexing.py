@@ -17,7 +17,7 @@ from PySide6.QtWidgets import QDialog, QDialogButtonBox, QTableWidgetItem
 
 from scripts.pc_from_wd import pc_from_wd
 from ui.ui_di_setup import Ui_DiSetupDialog
-from utils import FileBrowser, SettingFile, sendToJobManager
+from utils import FileBrowser, SettingFile, Setting, sendToJobManager
 
 """
 Lookup table for rotations for cubic and tetragonal point groups
@@ -114,12 +114,24 @@ class DiSetupDialog(QDialog):
 
         self.ui.comboBoxConvention.setCurrentText(self.convention)
 
-        if self.program_settings.read("Lazy Loading") == "False":
-            self.ui.checkBoxLazy.setChecked(False)
+        try:
+            self.ui.checkBoxLazy.setChecked(eval(self.program_settings.read(Setting.LAZY_LOADING.value)))
+        except:
+            pass
 
         try:
             if self.program_settings.read("Refine orientations") == "True":
                 self.ui.checkBoxRefine.setChecked(True)
+        except:
+            pass
+
+        try:
+            self.ui.checkBoxIPF.setChecked(eval(self.program_settings.read(Setting.SAVE_IPF.value)))
+        except:
+            pass
+
+        try: 
+            self.ui.checkBoxPM.setChecked(eval(self.program_settings.read(Setting.SAVE_PHASE.value)))
         except:
             pass
 
@@ -161,7 +173,7 @@ class DiSetupDialog(QDialog):
             try:
                 mp_path = self.setting_file.read(f"Master pattern {i}")
                 mp = kp.load(mp_path, lazy=True)
-                if mp.phase.name == "":
+                if mp.phase.name == "" or "\\" in mp.phase.name or "/" in mp.phase.name:
                     mp.phase.name = path.dirname(mp_path).split("/").pop()
                 phase = mp.phase.name
                 self.mpPaths[phase] = mp_path
@@ -272,7 +284,7 @@ class DiSetupDialog(QDialog):
 
             self.fileBrowserOD.setDefaultDir(path.dirname(path.dirname(mpPath)))
             mp = kp.load(mpPath, lazy=True)
-            if mp.phase.name == "":
+            if mp.phase.name == "" or "\\" in mp.phase.name or "/" in mp.phase.name:
                 mp.phase.name = path.dirname(mpPath).split("/").pop()
 
             phase = mp.phase.name
@@ -426,8 +438,8 @@ class DiSetupDialog(QDialog):
                 lazy=True,
                 **load_kwargs
             )
-            if mp.phase.name == "":
-                mp.phase.name = ph.name
+            if mp.phase.name == "" or "\\" in mp.phase.name or "/" in mp.phase.name:
+                mp.phase.name = path.dirname(file_mp).split("/").pop()
             mp_dict[f"{ph.name}"] = mp
 
         return mp_dict
@@ -552,7 +564,7 @@ class DiSetupDialog(QDialog):
                 rgb_i = ckey.orientation2color(crystal_map[phase.name].orientations)
                 rgb_all[crystal_map.phase_id == i] = rgb_i
 
-        fig = crystal_map.plot(rgb_all, remove_padding=True, return_figure=True)
+        fig = crystal_map.plot(rgb_all, remove_padding=True, return_figure=True, scalebar_properties={'font_properties': {'size': 'xx-small'}})
         fig.savefig(
             path.join(self.results_dir, f"ipf_z.png"),
             **savefig_kwargs,
@@ -836,7 +848,7 @@ class DiSetupDialog(QDialog):
 
             ### Phase map
             if self.options["pm"]:
-                fig = merged.plot(remove_padding=True, return_figure=True)
+                fig = merged.plot(remove_padding=True, return_figure=True, legend_properties={'fontsize': 'xx-small'}, scalebar_properties={'font_properties': {'size': 'xx-small'}})
                 fig.savefig(
                     path.join(self.results_dir, f"phase_map.png"),
                     **savefig_kwargs,
@@ -853,7 +865,7 @@ class DiSetupDialog(QDialog):
         )
 
     def save_project_settings(self):
-        self.setting_file.delete_all_entries()  # clean up initial dictionary
+        self.setting_file.clean()  # clean up initial dictionary
 
         ### Sample parameters
         for i, mppath in enumerate(self.mpPaths.values(), 1):

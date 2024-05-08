@@ -76,7 +76,7 @@
      <x>0</x>
      <y>0</y>
      <width>1324</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -156,12 +156,22 @@
     </property>
     <addaction name="actionRefineOrientations"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+    <addaction name="separator"/>
+    <addaction name="actionGitHub"/>
+    <addaction name="actionZenodo"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuProcessing"/>
    <addaction name="menuPatternInspection"/>
    <addaction name="menuIndexing"/>
    <addaction name="menuRefinement"/>
    <addaction name="menuView"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QDockWidget" name="dockWidgetTerminal">
    <property name="windowTitle">
@@ -501,6 +511,34 @@
   <action name="actionPattern_selection">
    <property name="text">
     <string>Pattern selection</string>
+   </property>
+  </action>
+  <action name="actionAbout3">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/linea_basic/resources/linea_basic_icons/basic_book.svg</normaloff>:/linea_basic/resources/linea_basic_icons/basic_book.svg</iconset>
+   </property>
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionGitHub">
+   <property name="text">
+    <string>GitHub Discussions</string>
+   </property>
+  </action>
+  <action name="actionZenodo">
+   <property name="text">
+    <string>Zenodo</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/linea_basic/resources/linea_basic_icons/basic_book.svg</normaloff>:/linea_basic/resources/linea_basic_icons/basic_book.svg</iconset>
+   </property>
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
   <zorder>dockWidgetTerminal</zorder>

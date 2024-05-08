@@ -65,7 +65,7 @@ def save_mean_intensity_map(pattern_path):
 
 def save_rgb_vbse(pattern_path):
     s_vbse = kp.load(pattern_path, lazy=True)
-    vbse_gen = kp.generators.VirtualBSEGenerator(s_vbse)
+    vbse_gen = kp.imaging.VirtualBSEImager(s_vbse)
     vbse_map = vbse_gen.get_rgb_image(r=(3, 1), b=(3, 2), g=(3, 3))
     vbse_map.change_dtype("uint8")
     vbse_map = vbse_map.data
