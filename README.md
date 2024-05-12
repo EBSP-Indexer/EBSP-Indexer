@@ -53,7 +53,7 @@ In addition, the windows version requires [Microsoft Visual C++ Redistributable 
 ## Downloads ⬇️
 ⚠️ Make sure to read the aboves about **Known issues** and **Minimum requirements** before downloading the software. 
 
-Installer for Windows and App for macOS are available to download from [Zenodo](https://zenodo.org/record/7925262) or [SourceForge](https://sourceforge.net/projects/ebsp-indexer/).
+Installer for Windows and App for macOS are available to download from the [EBSP Indexer repository](https://github.com/EBSP-Indexer/EBSP-Indexer/releases) and [Zenodo](https://zenodo.org/record/7925261).
 
 ## Contributors ✨
 

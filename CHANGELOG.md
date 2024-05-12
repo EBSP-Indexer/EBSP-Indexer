@@ -7,8 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.2.0] - 2024-05-05
   
-A new Windows installer for version 0.2.0 can be found here:
-TODO
+A new Windows installer for version 0.2.0 can be found in the [EBSP Indexer repository](https://github.com/EBSP-Indexer/EBSP-Indexer/releases) and [Zenodo](https://zenodo.org/record/7925261).
 
 There does not exist a macOS application of v0.2.0 as of now.
 
